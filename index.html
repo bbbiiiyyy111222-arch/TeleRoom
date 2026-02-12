@@ -355,8 +355,51 @@
                 renderContactsList(allUsers);
             }
         });
+document.getElementById('header-name').innerText = user.name;
+document.getElementById('header-avatar').innerText = user.name[0].toUpperCase();
 
-        // ========== ПОИСК ==========
+loadGroups();
+loadPrivateChats();
+loadAllUsers();
+
+document.getElementById('header-avatar').innerText = user.name[0].toUpperCase();
+
+loadGroups();
+loadPrivateChats();
+loadAllUsers();
+
+document.getElementById('header-avatar').innerText = user.name[0].toUpperCase();
+
+loadGroups();
+loadPrivateChats();
+loadAllUsers();
+
+// ========== АВТОВХОД ==========
+(function autoLogin() {
+    const savedPhone = localStorage.getItem('teleRoomPhone');
+    const savedName = localStorage.getItem('teleRoomName');
+
+    if (savedPhone && savedName) {
+        console.log('🔄 Автовход для', savedName);
+        document.getElementById('login-name').value = savedName;
+        document.getElementById('login-phone').value = savedPhone;
+        
+        setTimeout(() => {
+            socket.emit('register', { name: savedName, phone: savedPhone });
+        }, 500);
+    }
+})();
+
+// ========== ПОИСК ==========
+function searchContacts() {
+    const query = document.getElementById('contact-search').value.toLowerCase();
+    const filtered = allUsers.filter(u => 
+        u.id !== currentUser?.id && 
+        u.name.toLowerCase().includes(query)
+    );
+    renderContactsList(filtered);
+}
+    // ========== ПОИСК ==========
         function searchContacts() {
             const query = document.getElementById('contact-search').value.toLowerCase();
             const filtered = allUsers.filter(u => 
@@ -989,5 +1032,6 @@
     </script>
 </body>
 </html>
+
 
 
