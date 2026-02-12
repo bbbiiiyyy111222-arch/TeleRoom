@@ -547,16 +547,16 @@ app.get('/chat', (req, res) => {
 });
 // ========== ЗАПУСК ==========
 const PORT = process.env.PORT || 3000;
+
 server.listen(PORT, '0.0.0.0', () => {
     console.log('\n' + '='.repeat(60));
-    console.log('   🚀 TeleRoom PRO - ВСЕ БАГИ ИСПРАВЛЕНЫ!');
+    console.log('   🚀 TeleRoom PRO - ЗАПУЩЕН!');
     console.log('='.repeat(60));
     console.log(`   📱 Порт: ${PORT}`);
-    console.log(`   ✅ Личные сообщения: РАБОТАЮТ`);
-    console.log(`   ✅ Добавление в группу: РАБОТАЕТ`); 
-    console.log(`   ✅ Поиск: РАБОТАЕТ`);
     console.log('='.repeat(60) + '\n');
 });
+
+
 
 
 
