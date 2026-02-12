@@ -56,7 +56,6 @@ app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 const db = new sqlite3.Database('./database/teleroom.db');
 
 db.serialize(() => {
-    // Пользователи
     db.run(`CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL,
@@ -350,6 +349,7 @@ app.post('/api/private_chat', (req, res) => {
                 'SELECT id FROM private_chats WHERE user1_id = ? AND user2_id = ?',
                 [minId, maxId],
                 (err, chat) => {
+                    if (!chat) return res.status(404).json({ error: 'Чат не создан' });
                     res.json({ chat_id: chat.id });
                 }
             );
@@ -413,6 +413,7 @@ app.post('/api/upload/voice', upload.single('voice'), (req, res) => {
                 JOIN users u ON m.user_id = u.id
                 WHERE m.id = ?
             `, [this.lastID], (err, message) => {
+                if (!message) return res.status(404).json({ error: 'Сообщение не найдено' });
                 const room = chat_type === 'group' ? `group_${chat_id}` : `private_${chat_id}`;
                 io.to(room).emit('new_message', message);
                 res.json(message);
@@ -439,6 +440,7 @@ app.post('/api/upload/photo', upload.single('photo'), (req, res) => {
                 JOIN users u ON m.user_id = u.id
                 WHERE m.id = ?
             `, [this.lastID], (err, message) => {
+                if (!message) return res.status(404).json({ error: 'Сообщение не найдено' });
                 const room = chat_type === 'group' ? `group_${chat_id}` : `private_${chat_id}`;
                 io.to(room).emit('new_message', message);
                 res.json(message);
@@ -467,6 +469,7 @@ app.post('/api/upload/file', upload.single('file'), (req, res) => {
                 JOIN users u ON m.user_id = u.id
                 WHERE m.id = ?
             `, [this.lastID], (err, message) => {
+                if (!message) return res.status(404).json({ error: 'Сообщение не найдено' });
                 const room = chat_type === 'group' ? `group_${chat_id}` : `private_${chat_id}`;
                 io.to(room).emit('new_message', message);
                 res.json(message);
@@ -481,79 +484,93 @@ io.on('connection', (socket) => {
 
     socket.on('register', (userData) => {
         const { name, phone } = userData;
+        console.log(`📝 Попытка регистрации: ${name}, ${phone}`);
         
-        db.get('SELECT * FROM users WHERE name = ?', [name], (err, existingName) => {
-            if (existingName) {
-                db.get('SELECT * FROM users WHERE phone = ?', [phone], (err, existingUser) => {
-                    if (existingUser && existingUser.name === name) {
-                        socket.userId = existingUser.id;
-                        socket.userName = existingUser.name;
+        // Сначала проверяем по phone (ID пользователя)
+        db.get('SELECT * FROM users WHERE phone = ?', [phone], (err, existingUser) => {
+            if (existingUser) {
+                // Пользователь с таким phone существует - это автовход
+                console.log(`🔄 Автовход для: ${existingUser.name}`);
+                socket.userId = existingUser.id;
+                socket.userName = existingUser.name;
+                
+                db.run('UPDATE users SET online = 1, last_seen = CURRENT_TIMESTAMP WHERE id = ?', [existingUser.id]);
+                
+                socket.emit('registered', existingUser);
+                console.log(`✅ Отправлено registered для ${existingUser.name}`);
+                
+                // Отправляем данные
+                db.all(`SELECT g.*, COUNT(DISTINCT gm.user_id) as members_count
+                        FROM groups g
+                        JOIN group_members gm ON g.id = gm.group_id
+                        WHERE gm.user_id = ?
+                        GROUP BY g.id`, [existingUser.id], (err, groups) => {
+                    socket.emit('user_groups', groups || []);
+                });
+                
+                db.all(`SELECT pc.id, 
+                               CASE 
+                                   WHEN pc.user1_id = ? THEN pc.user2_id 
+                                   ELSE pc.user1_id 
+                               END as other_user_id,
+                               u.name as other_user_name,
+                               u.avatar as other_user_avatar,
+                               u.online
+                        FROM private_chats pc
+                        JOIN users u ON (CASE WHEN pc.user1_id = ? THEN pc.user2_id ELSE pc.user1_id END) = u.id
+                        WHERE pc.user1_id = ? OR pc.user2_id = ?`, 
+                        [existingUser.id, existingUser.id, existingUser.id, existingUser.id], 
+                        (err, privateChats) => {
+                    socket.emit('user_private_chats', privateChats || []);
+                });
+                
+                db.all('SELECT id, name, avatar, bio, online FROM users', (err, users) => {
+                    socket.emit('all_users', users || []);
+                });
+                
+                socket.broadcast.emit('user_online', existingUser.id);
+                return;
+            }
+            
+            // Новый пользователь - проверяем имя
+            db.get('SELECT * FROM users WHERE name = ?', [name], (err, existingName) => {
+                if (existingName) {
+                    console.log(`❌ Имя ${name} уже занято`);
+                    socket.emit('register_error', 'Это имя уже занято! Выберите другое.');
+                    return;
+                }
+                
+                // Создаём нового пользователя
+                db.run('INSERT INTO users (name, phone) VALUES (?, ?)', [name, phone], function(err) {
+                    if (err) {
+                        console.error('Ошибка создания пользователя:', err);
+                        socket.emit('register_error', 'Ошибка при регистрации');
+                        return;
+                    }
+                    
+                    db.get('SELECT * FROM users WHERE id = ?', [this.lastID], (err, newUser) => {
+                        if (err || !newUser) {
+                            socket.emit('register_error', 'Ошибка при создании');
+                            return;
+                        }
                         
-                        db.run('UPDATE users SET online = 1, last_seen = CURRENT_TIMESTAMP WHERE id = ?', [existingUser.id]);
+                        console.log(`✅ Новый пользователь: ${newUser.name} (ID: ${newUser.id})`);
+                        socket.userId = newUser.id;
+                        socket.userName = newUser.name;
                         
-                        socket.emit('registered', existingUser);
+                        db.run('UPDATE users SET online = 1 WHERE id = ?', [newUser.id]);
                         
-                        db.all(`
-                            SELECT g.*, COUNT(DISTINCT gm.user_id) as members_count
-                            FROM groups g
-                            JOIN group_members gm ON g.id = gm.group_id
-                            WHERE gm.user_id = ?
-                            GROUP BY g.id
-                        `, [existingUser.id], (err, groups) => {
-                            socket.emit('user_groups', groups || []);
-                        });
-                        
-                        db.all(`
-                            SELECT pc.id, 
-                                   CASE 
-                                       WHEN pc.user1_id = ? THEN pc.user2_id 
-                                       ELSE pc.user1_id 
-                                   END as other_user_id,
-                                   u.name as other_user_name,
-                                   u.avatar as other_user_avatar,
-                                   u.online
-                            FROM private_chats pc
-                            JOIN users u ON (CASE WHEN pc.user1_id = ? THEN pc.user2_id ELSE pc.user1_id END) = u.id
-                            WHERE pc.user1_id = ? OR pc.user2_id = ?
-                        `, [existingUser.id, existingUser.id, existingUser.id, existingUser.id], (err, privateChats) => {
-                            socket.emit('user_private_chats', privateChats || []);
-                        });
+                        socket.emit('registered', newUser);
+                        console.log(`✅ Отправлено registered для ${newUser.name}`);
                         
                         db.all('SELECT id, name, avatar, bio, online FROM users', (err, users) => {
                             socket.emit('all_users', users || []);
                         });
                         
-                        socket.broadcast.emit('user_online', existingUser.id);
-                    } else {
-                        socket.emit('register_error', 'Это имя уже занято! Выберите другое имя.');
-                    }
+                        socket.broadcast.emit('user_online', newUser.id);
+                    });
                 });
-            } else {
-                db.run(
-                    'INSERT INTO users (name, phone) VALUES (?, ?)',
-                    [name, phone],
-                    function(err) {
-                        if (err) {
-                            socket.emit('register_error', 'Ошибка при регистрации');
-                            return;
-                        }
-                        db.get('SELECT * FROM users WHERE id = ?', [this.lastID], (err, newUser) => {
-                            socket.userId = newUser.id;
-                            socket.userName = newUser.name;
-                            
-                            db.run('UPDATE users SET online = 1 WHERE id = ?', [newUser.id]);
-                            
-                            socket.emit('registered', newUser);
-                            
-                            db.all('SELECT id, name, avatar, bio, online FROM users', (err, users) => {
-                                socket.emit('all_users', users || []);
-                            });
-                            
-                            socket.broadcast.emit('user_online', newUser.id);
-                        });
-                    }
-                );
-            }
+            });
         });
     });
 
