@@ -7,11 +7,10 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 
-// ========== ЭЛИТНАЯ КРИПТОГРАФИЧЕСКАЯ ЗАЩИТА ==========
+// ========== КРИПТОГРАФИЧЕСКАЯ ЗАЩИТА ==========
 const SECRET_KEY = crypto.randomBytes(32).toString('hex'); // 256-битный ключ
 const ALGORITHM = 'aes-256-gcm'; // Самый надежный режим шифрования
 
-// Функции шифрования для защиты всех сообщений
 function encrypt(text) {
     if (!text) return text;
     const iv = crypto.randomBytes(16);
@@ -44,6 +43,7 @@ function decrypt(encryptedData) {
     }
 }
 
+// ========== НАСТРОЙКА EXPRESS ==========
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -66,7 +66,7 @@ folders.forEach(folder => {
     }
 });
 
-// ========== НАСТРОЙКА ЗАГРУЗКИ ==========
+// ========== НАСТРОЙКА ЗАГРУЗКИ ФАЙЛОВ ==========
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         if (file.fieldname === 'voice') cb(null, './uploads/voice/');
@@ -81,7 +81,7 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage });
+const upload = multer({ storage, limits: { fileSize: 100 * 1024 * 1024 } }); // 100MB
 
 // ========== СТАТИЧЕСКИЕ ФАЙЛЫ ==========
 app.use(express.static(__dirname));
@@ -94,6 +94,7 @@ app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 const db = new sqlite3.Database('./database/teleroom.db');
 
 db.serialize(() => {
+    // Пользователи
     db.run(`CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL,
@@ -105,6 +106,7 @@ db.serialize(() => {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
 
+    // Группы
     db.run(`CREATE TABLE IF NOT EXISTS groups (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -115,6 +117,7 @@ db.serialize(() => {
         FOREIGN KEY (created_by) REFERENCES users(id)
     )`);
 
+    // Участники групп
     db.run(`CREATE TABLE IF NOT EXISTS group_members (
         group_id INTEGER NOT NULL,
         user_id INTEGER NOT NULL,
@@ -123,6 +126,7 @@ db.serialize(() => {
         PRIMARY KEY (group_id, user_id)
     )`);
 
+    // Личные чаты
     db.run(`CREATE TABLE IF NOT EXISTS private_chats (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user1_id INTEGER NOT NULL,
@@ -131,13 +135,13 @@ db.serialize(() => {
         UNIQUE(user1_id, user2_id)
     )`);
 
-    // Шифрованные сообщения
+    // Сообщения (с шифрованием)
     db.run(`CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         chat_type TEXT NOT NULL,
         chat_id INTEGER NOT NULL,
         user_id INTEGER NOT NULL,
-        text TEXT,  -- Будет хранить зашифрованные данные
+        text TEXT,
         photo_url TEXT,
         voice_url TEXT,
         file_url TEXT,
@@ -157,6 +161,7 @@ db.serialize(() => {
 app.get('/api/check-username/:name', (req, res) => {
     const name = req.params.name;
     db.get('SELECT id FROM users WHERE name = ?', [name], (err, user) => {
+        if (err) return res.status(500).json({ error: err.message });
         res.json({ available: !user });
     });
 });
@@ -164,6 +169,7 @@ app.get('/api/check-username/:name', (req, res) => {
 // ========== API ПОЛЬЗОВАТЕЛЕЙ ==========
 app.get('/api/users', (req, res) => {
     db.all('SELECT id, name, avatar, bio, online, last_seen FROM users ORDER BY name', (err, users) => {
+        if (err) return res.status(500).json({ error: err.message });
         res.json(users || []);
     });
 });
@@ -172,6 +178,7 @@ app.get('/api/users/:id', (req, res) => {
     db.get('SELECT id, name, avatar, bio, online, last_seen, created_at FROM users WHERE id = ?', 
         [req.params.id], 
         (err, user) => {
+            if (err) return res.status(500).json({ error: err.message });
             res.json(user || null);
         }
     );
@@ -185,58 +192,48 @@ app.post('/api/users/update-bio', (req, res) => {
     });
 });
 
-// ========== API ПРОФИЛЯ - ПОЛНОСТЬЮ РАБОЧИЕ ==========
-
-// 1. ИЗМЕНЕНИЕ ИМЕНИ
+// ========== API ПРОФИЛЯ ==========
 app.post('/api/user/update-name', (req, res) => {
     const { userId, newName } = req.body;
     
     db.get('SELECT id FROM users WHERE name = ? AND id != ?', [newName, userId], (err, existing) => {
+        if (err) return res.status(500).json({ error: err.message });
         if (existing) {
-            res.status(400).json({ error: 'Это имя уже занято!' });
-            return;
+            return res.status(400).json({ error: 'Это имя уже занято!' });
         }
         
         db.run('UPDATE users SET name = ? WHERE id = ?', [newName, userId], function(err) {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
+            if (err) return res.status(500).json({ error: err.message });
             res.json({ success: true, name: newName });
             
+            // Обновить всех пользователей
             db.all('SELECT id, name, avatar, bio, online FROM users', (err, users) => {
-                io.emit('all_users', users || []);
+                if (!err) io.emit('all_users', users || []);
             });
         });
     });
 });
 
-// 2. ИЗМЕНЕНИЕ ЮЗЕРНЕЙМА (phone)
 app.post('/api/user/update-username', (req, res) => {
     const { userId, newUsername } = req.body;
     
     if (!newUsername || newUsername.length < 3) {
-        res.status(400).json({ error: 'Юзернейм должен быть минимум 3 символа' });
-        return;
+        return res.status(400).json({ error: 'Юзернейм должен быть минимум 3 символа' });
     }
     
     db.get('SELECT id FROM users WHERE phone = ? AND id != ?', [newUsername, userId], (err, existing) => {
+        if (err) return res.status(500).json({ error: err.message });
         if (existing) {
-            res.status(400).json({ error: 'Этот юзернейм уже занят!' });
-            return;
+            return res.status(400).json({ error: 'Этот юзернейм уже занят!' });
         }
         
         db.run('UPDATE users SET phone = ? WHERE id = ?', [newUsername, userId], function(err) {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
+            if (err) return res.status(500).json({ error: err.message });
             res.json({ success: true, username: newUsername });
         });
     });
 });
 
-// 3. ЗАГРУЗКА АВАТАРКИ
 app.post('/api/user/upload-avatar', upload.single('avatar'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'Нет файла' });
     
@@ -249,12 +246,11 @@ app.post('/api/user/upload-avatar', upload.single('avatar'), (req, res) => {
         res.json({ success: true, avatar });
         
         db.all('SELECT id, name, avatar, bio, online FROM users', (err, users) => {
-            io.emit('all_users', users || []);
+            if (!err) io.emit('all_users', users || []);
         });
     });
 });
 
-// 4. УДАЛЕНИЕ АВАТАРКИ
 app.post('/api/user/remove-avatar', (req, res) => {
     const { userId } = req.body;
     
@@ -264,12 +260,11 @@ app.post('/api/user/remove-avatar', (req, res) => {
         res.json({ success: true });
         
         db.all('SELECT id, name, avatar, bio, online FROM users', (err, users) => {
-            io.emit('all_users', users || []);
+            if (!err) io.emit('all_users', users || []);
         });
     });
 });
 
-// 5. ПОЛУЧЕНИЕ ПРОФИЛЯ
 app.get('/api/user/profile/:userId', (req, res) => {
     db.get('SELECT id, name, phone, avatar, bio, online, last_seen, created_at FROM users WHERE id = ?', 
         [req.params.userId], 
@@ -288,10 +283,7 @@ app.post('/api/groups', (req, res) => {
         'INSERT INTO groups (name, description, created_by) VALUES (?, ?, ?)',
         [name, description || '', userId],
         function(err) {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
+            if (err) return res.status(500).json({ error: err.message });
             const groupId = this.lastID;
             
             db.run(
@@ -316,6 +308,7 @@ app.get('/api/groups/:userId', (req, res) => {
         GROUP BY g.id
         ORDER BY g.created_at DESC
     `, [req.params.userId], (err, groups) => {
+        if (err) return res.status(500).json({ error: err.message });
         res.json(groups || []);
     });
 });
@@ -328,6 +321,7 @@ app.get('/api/groups/:groupId/members', (req, res) => {
         WHERE gm.group_id = ?
         ORDER BY gm.joined_at
     `, [req.params.groupId], (err, members) => {
+        if (err) return res.status(500).json({ error: err.message });
         res.json(members || []);
     });
 });
@@ -339,10 +333,7 @@ app.post('/api/groups/add_member', (req, res) => {
         'INSERT OR IGNORE INTO group_members (group_id, user_id) VALUES (?, ?)',
         [group_id, user_id],
         function(err) {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
+            if (err) return res.status(500).json({ error: err.message });
             res.json({ success: true });
         }
     );
@@ -352,16 +343,13 @@ app.post('/api/groups/update-name', (req, res) => {
     const { groupId, userId, newName } = req.body;
     
     db.get('SELECT role FROM group_members WHERE group_id = ? AND user_id = ?', [groupId, userId], (err, member) => {
+        if (err) return res.status(500).json({ error: err.message });
         if (!member || member.role !== 'admin') {
-            res.status(403).json({ error: 'Только админ может менять название' });
-            return;
+            return res.status(403).json({ error: 'Только админ может менять название' });
         }
         
         db.run('UPDATE groups SET name = ? WHERE id = ?', [newName, groupId], function(err) {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
+            if (err) return res.status(500).json({ error: err.message });
             res.json({ success: true, name: newName });
         });
     });
@@ -371,16 +359,13 @@ app.post('/api/groups/update-description', (req, res) => {
     const { groupId, userId, newDescription } = req.body;
     
     db.get('SELECT role FROM group_members WHERE group_id = ? AND user_id = ?', [groupId, userId], (err, member) => {
+        if (err) return res.status(500).json({ error: err.message });
         if (!member || member.role !== 'admin') {
-            res.status(403).json({ error: 'Только админ может менять описание' });
-            return;
+            return res.status(403).json({ error: 'Только админ может менять описание' });
         }
         
         db.run('UPDATE groups SET description = ? WHERE id = ?', [newDescription, groupId], function(err) {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
+            if (err) return res.status(500).json({ error: err.message });
             res.json({ success: true, description: newDescription });
         });
     });
@@ -395,14 +380,13 @@ app.get('/api/messages/group/:groupId', (req, res) => {
         ORDER BY m.created_at ASC
         LIMIT 200
     `, [req.params.groupId], (err, messages) => {
-        // Расшифровываем сообщения
-        const decryptedMessages = messages.map(msg => {
-            if (msg.text) {
-                msg.text = decrypt(msg.text);
-            }
+        if (err) return res.status(500).json({ error: err.message });
+        // Расшифровываем текст
+        const decrypted = messages.map(msg => {
+            if (msg.text) msg.text = decrypt(msg.text);
             return msg;
         });
-        res.json(decryptedMessages || []);
+        res.json(decrypted || []);
     });
 });
 
@@ -417,15 +401,13 @@ app.post('/api/private_chat', (req, res) => {
         'INSERT OR IGNORE INTO private_chats (user1_id, user2_id) VALUES (?, ?)',
         [minId, maxId],
         function(err) {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
+            if (err) return res.status(500).json({ error: err.message });
             
             db.get(
                 'SELECT id FROM private_chats WHERE user1_id = ? AND user2_id = ?',
                 [minId, maxId],
                 (err, chat) => {
+                    if (err) return res.status(500).json({ error: err.message });
                     if (!chat) return res.status(404).json({ error: 'Чат не создан' });
                     res.json({ chat_id: chat.id });
                 }
@@ -454,6 +436,7 @@ app.get('/api/private_chats/:userId', (req, res) => {
         WHERE pc.user1_id = ? OR pc.user2_id = ?
         ORDER BY last_time DESC
     `, [userId, userId, userId, userId], (err, chats) => {
+        if (err) return res.status(500).json({ error: err.message });
         res.json(chats || []);
     });
 });
@@ -467,14 +450,13 @@ app.get('/api/messages/private/:chatId', (req, res) => {
         ORDER BY m.created_at ASC
         LIMIT 200
     `, [req.params.chatId], (err, messages) => {
-        // Расшифровываем сообщения
-        const decryptedMessages = messages.map(msg => {
-            if (msg.text) {
-                msg.text = decrypt(msg.text);
-            }
+        if (err) return res.status(500).json({ error: err.message });
+        // Расшифровываем текст
+        const decrypted = messages.map(msg => {
+            if (msg.text) msg.text = decrypt(msg.text);
             return msg;
         });
-        res.json(decryptedMessages || []);
+        res.json(decrypted || []);
     });
 });
 
@@ -497,7 +479,9 @@ app.post('/api/upload/voice', upload.single('voice'), (req, res) => {
                 JOIN users u ON m.user_id = u.id
                 WHERE m.id = ?
             `, [this.lastID], (err, message) => {
+                if (err) return res.status(500).json({ error: err.message });
                 if (!message) return res.status(404).json({ error: 'Сообщение не найдено' });
+                
                 const room = chat_type === 'group' ? `group_${chat_id}` : `private_${chat_id}`;
                 io.to(room).emit('new_message', message);
                 res.json(message);
@@ -524,8 +508,10 @@ app.post('/api/upload/photo', upload.single('photo'), (req, res) => {
                 JOIN users u ON m.user_id = u.id
                 WHERE m.id = ?
             `, [this.lastID], (err, message) => {
+                if (err) return res.status(500).json({ error: err.message });
                 if (!message) return res.status(404).json({ error: 'Сообщение не найдено' });
-                if (message.text) message.text = decrypt(message.text);
+                
+                message.text = decrypt(message.text); // расшифровываем для отправки
                 const room = chat_type === 'group' ? `group_${chat_id}` : `private_${chat_id}`;
                 io.to(room).emit('new_message', message);
                 res.json(message);
@@ -554,8 +540,10 @@ app.post('/api/upload/file', upload.single('file'), (req, res) => {
                 JOIN users u ON m.user_id = u.id
                 WHERE m.id = ?
             `, [this.lastID], (err, message) => {
+                if (err) return res.status(500).json({ error: err.message });
                 if (!message) return res.status(404).json({ error: 'Сообщение не найдено' });
-                if (message.text) message.text = decrypt(message.text);
+                
+                message.text = decrypt(message.text);
                 const room = chat_type === 'group' ? `group_${chat_id}` : `private_${chat_id}`;
                 io.to(room).emit('new_message', message);
                 res.json(message);
@@ -568,12 +556,20 @@ app.post('/api/upload/file', upload.single('file'), (req, res) => {
 io.on('connection', (socket) => {
     console.log('👤 Подключился пользователь');
 
+    // Регистрация / автовход
     socket.on('register', (userData) => {
         const { name, phone } = userData;
         console.log(`📝 Попытка регистрации: ${name}, ${phone}`);
         
+        // Проверяем по phone (ID пользователя)
         db.get('SELECT * FROM users WHERE phone = ?', [phone], (err, existingUser) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            
             if (existingUser) {
+                // Автовход
                 console.log(`🔄 Автовход для: ${existingUser.name}`);
                 socket.userId = existingUser.id;
                 socket.userName = existingUser.name;
@@ -581,8 +577,8 @@ io.on('connection', (socket) => {
                 db.run('UPDATE users SET online = 1, last_seen = CURRENT_TIMESTAMP WHERE id = ?', [existingUser.id]);
                 
                 socket.emit('registered', existingUser);
-                console.log(`✅ Отправлено registered для ${existingUser.name}`);
                 
+                // Отправляем группы
                 db.all(`SELECT g.*, COUNT(DISTINCT gm.user_id) as members_count
                         FROM groups g
                         JOIN group_members gm ON g.id = gm.group_id
@@ -591,6 +587,7 @@ io.on('connection', (socket) => {
                     socket.emit('user_groups', groups || []);
                 });
                 
+                // Отправляем личные чаты
                 db.all(`SELECT pc.id, 
                                CASE 
                                    WHEN pc.user1_id = ? THEN pc.user2_id 
@@ -607,6 +604,7 @@ io.on('connection', (socket) => {
                     socket.emit('user_private_chats', privateChats || []);
                 });
                 
+                // Отправляем всех пользователей
                 db.all('SELECT id, name, avatar, bio, online FROM users', (err, users) => {
                     socket.emit('all_users', users || []);
                 });
@@ -615,13 +613,19 @@ io.on('connection', (socket) => {
                 return;
             }
             
+            // Новый пользователь - проверяем имя
             db.get('SELECT * FROM users WHERE name = ?', [name], (err, existingName) => {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
                 if (existingName) {
                     console.log(`❌ Имя ${name} уже занято`);
                     socket.emit('register_error', 'Это имя уже занято! Выберите другое.');
                     return;
                 }
                 
+                // Создаём нового пользователя
                 db.run('INSERT INTO users (name, phone) VALUES (?, ?)', [name, phone], function(err) {
                     if (err) {
                         console.error('Ошибка создания пользователя:', err);
@@ -642,7 +646,6 @@ io.on('connection', (socket) => {
                         db.run('UPDATE users SET online = 1 WHERE id = ?', [newUser.id]);
                         
                         socket.emit('registered', newUser);
-                        console.log(`✅ Отправлено registered для ${newUser.name}`);
                         
                         db.all('SELECT id, name, avatar, bio, online FROM users', (err, users) => {
                             socket.emit('all_users', users || []);
@@ -655,20 +658,22 @@ io.on('connection', (socket) => {
         });
     });
 
+    // Присоединение к группе
     socket.on('join_group', (groupId) => {
         socket.join(`group_${groupId}`);
         console.log(`👥 ${socket.userName} присоединился к группе ${groupId}`);
     });
 
+    // Присоединение к личному чату
     socket.on('join_private_chat', (chatId) => {
         socket.join(`private_${chatId}`);
         console.log(`💬 ${socket.userName} присоединился к личному чату ${chatId}`);
     });
 
+    // Отправка сообщения (шифруется)
     socket.on('send_message', (data) => {
         const { chat_type, chat_id, user_id, text } = data;
         
-        // Шифруем сообщение перед сохранением
         const encryptedText = encrypt(text);
         
         db.run(
@@ -683,9 +688,9 @@ io.on('connection', (socket) => {
                     JOIN users u ON m.user_id = u.id
                     WHERE m.id = ?
                 `, [this.lastID], (err, message) => {
+                    if (err) return console.error(err);
                     if (message) {
-                        // Расшифровываем для отправки клиенту
-                        if (message.text) message.text = decrypt(message.text);
+                        message.text = decrypt(message.text);
                         const room = chat_type === 'group' ? `group_${chat_id}` : `private_${chat_id}`;
                         io.to(room).emit('new_message', message);
                     }
@@ -694,6 +699,7 @@ io.on('connection', (socket) => {
         );
     });
 
+    // Печатает...
     socket.on('typing', (data) => {
         const room = data.chat_type === 'group' ? `group_${data.chat_id}` : `private_${data.chat_id}`;
         socket.to(room).emit('user_typing', {
@@ -702,17 +708,19 @@ io.on('connection', (socket) => {
         });
     });
 
+    // Обновление био
     socket.on('update_bio', (data) => {
         const { userId, bio } = data;
         db.run('UPDATE users SET bio = ? WHERE id = ?', [bio, userId], function(err) {
             if (!err) {
                 db.all('SELECT id, name, avatar, bio, online FROM users', (err, users) => {
-                    io.emit('all_users', users || []);
+                    if (!err) io.emit('all_users', users || []);
                 });
             }
         });
     });
 
+    // Отключение
     socket.on('disconnect', () => {
         if (socket.userId) {
             db.run('UPDATE users SET online = 0, last_seen = CURRENT_TIMESTAMP WHERE id = ?', [socket.userId]);
@@ -727,22 +735,21 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
-// ========== ЗАПУСК ==========
+// ========== ЗАПУСК СЕРВЕРА ==========
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
     console.log('\n' + '='.repeat(60));
-    console.log('   🚀 TeleRoom PRO - ЭЛИТНАЯ ЗАЩИТА!');
+    console.log('   🚀 TeleRoom PRO - ЭЛИТНОЕ ШИФРОВАНИЕ AES-256-GCM');
     console.log('='.repeat(60));
     console.log(`   📱 Порт: ${PORT}`);
-    console.log('   🔐 Шифрование: AES-256-GCM');
-    console.log('   🔑 Ключ шифрования: ' + SECRET_KEY.substring(0, 16) + '...');
+    console.log(`   🔐 Ключ шифрования: ${SECRET_KEY.substring(0, 16)}...`);
     console.log('   ✅ ВХОД - РАБОТАЕТ');
     console.log('   ✅ Имена - УНИКАЛЬНЫЕ');
     console.log('   ✅ Юзернейм - МОЖНО МЕНЯТЬ');
-    console.log('   ✅ Аватарка - МОЖНО ЗАГРУЖАТЬ/УДАЛЯТЬ');
-    console.log('   ✅ Био - МОЖНО РЕДАКТИРОВАТЬ');
-    console.log('   ✅ Группы - РАБОТАЮТ');
-    console.log('   ✅ Личные чаты - РАБОТАЮТ');
+    console.log('   ✅ Аватарка - ЗАГРУЗКА/УДАЛЕНИЕ');
+    console.log('   ✅ Био - РЕДАКТИРОВАНИЕ');
+    console.log('   ✅ Группы - ПОЛНОСТЬЮ');
+    console.log('   ✅ Личные чаты - ПОЛНОСТЬЮ');
     console.log('   ✅ Сообщения - ШИФРУЮТСЯ');
     console.log('='.repeat(60) + '\n');
 });
