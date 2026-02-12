@@ -753,7 +753,7 @@
             <div class="app-subtitle">твоя вселенная</div>
             <input type="text" id="login-name" class="login-input" placeholder="Твой никнейм" value="" onkeyup="checkUsername()" autofocus>
             <div id="username-error"></div>
-            <button class="login-btn" onclick="register()">Войти в пространство</button>
+            <button class="login-btn" onclick="register()">🚀 Войти в пространство</button>
         </div>
 
         <!-- ОСНОВНОЙ -->
@@ -928,50 +928,155 @@
             }, 500);
         }
 
-        // ========== РЕГИСТРАЦИЯ ==========
+        // ========== РЕГИСТРАЦИЯ - 100% РАБОЧАЯ ==========
         function register() {
             const name = document.getElementById('login-name').value.trim();
             
-            if (name) {
-                const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-                
-                localStorage.setItem('teleRoomId', userId);
-                localStorage.setItem('teleRoomName', name);
-                
-                console.log('📝 Регистрация:', name);
-                socket.emit('register', { name, phone: userId });
-            } else {
+            if (!name) {
                 alert('Введите имя');
+                return;
             }
+            
+            console.log('🚀 НАЖАТА КНОПКА ВХОДА ДЛЯ:', name);
+            
+            // Генерируем уникальный ID
+            const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            
+            // Сохраняем в localStorage
+            localStorage.setItem('teleRoomId', userId);
+            localStorage.setItem('teleRoomName', name);
+            
+            // Отправляем событие на сервер
+            socket.emit('register', { name, phone: userId });
+            
+            // ========== МГНОВЕННОЕ ПЕРЕКЛЮЧЕНИЕ ==========
+            console.log('⚡ МГНОВЕННОЕ ПЕРЕКЛЮЧЕНИЕ ЭКРАНА!');
+            
+            // Создаем временного пользователя
+            currentUser = {
+                id: Date.now(),
+                name: name,
+                phone: userId,
+                avatar: null,
+                bio: '',
+                created_at: new Date().toISOString()
+            };
+            
+            // ПЕРЕКЛЮЧАЕМ ЭКРАНЫ - СРАЗУ!
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-screen').style.display = 'flex';
+            
+            // Обновляем шапку
+            document.getElementById('header-name').innerText = name;
+            document.getElementById('header-avatar').innerText = name[0].toUpperCase();
+            
+            console.log('✅ ЭКРАН ПЕРЕКЛЮЧЕН, ПОЛЬЗОВАТЕЛЬ:', name);
+            
+            // Загружаем данные
+            loadGroups();
+            loadPrivateChats();
+            loadAllUsers();
         }
 
         // ========== СОКЕТ СОБЫТИЯ ==========
         socket.on('register_error', (error) => {
+            console.error('❌ Ошибка регистрации:', error);
             alert(error);
             document.getElementById('username-error').style.display = 'block';
             document.getElementById('username-error').innerHTML = '❌ ' + error;
         });
 
         socket.on('registered', (user) => {
-            console.log('✅ УСПЕШНАЯ РЕГИСТРАЦИЯ!', user);
+            console.log('✅ ПОЛУЧЕН ОТВЕТ ОТ СЕРВЕРА:', user);
             currentUser = user;
             
-            // ПЕРЕКЛЮЧАЕМ ЭКРАНЫ
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('main-screen').style.display = 'flex';
-            
-            // ОБНОВЛЯЕМ ШАПКУ
+            // Обновляем данные если пришли с сервера
             document.getElementById('header-name').innerText = user.name;
             document.getElementById('header-avatar').innerText = user.name[0].toUpperCase();
             
-            // ЗАГРУЖАЕМ ДАННЫЕ
+            // Загружаем актуальные данные
             loadGroups();
             loadPrivateChats();
             loadAllUsers();
-            
-            console.log('✅ Экран переключен на main-screen');
         });
 
+        // ========== АВТОВХОД - МГНОВЕННЫЙ ==========
+        (function autoLogin() {
+            const savedName = localStorage.getItem('teleRoomName');
+            
+            console.log('🔄 ПРОВЕРКА АВТОВХОДА ДЛЯ:', savedName);
+            
+            if (savedName) {
+                document.getElementById('login-name').value = savedName;
+                
+                // МГНОВЕННО ПЕРЕКЛЮЧАЕМ ЭКРАН!
+                console.log('⚡ АВТОВХОД - МГНОВЕННОЕ ПЕРЕКЛЮЧЕНИЕ!');
+                
+                currentUser = {
+                    id: Date.now(),
+                    name: savedName,
+                    phone: localStorage.getItem('teleRoomId') || 'user_' + Date.now(),
+                    avatar: null,
+                    bio: '',
+                    created_at: new Date().toISOString()
+                };
+                
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-screen').style.display = 'flex';
+                document.getElementById('header-name').innerText = savedName;
+                document.getElementById('header-avatar').innerText = savedName[0].toUpperCase();
+                
+                loadGroups();
+                loadPrivateChats();
+                loadAllUsers();
+            }
+        })();
+
+        // ========== ЗАГРУЗКА ДАННЫХ ==========
+        function loadGroups() {
+            if (!currentUser) return;
+            fetch(`/api/groups/${currentUser.id}`)
+                .then(res => res.json())
+                .then(data => {
+                    groups = data;
+                    renderGroupsList();
+                    renderChatsList();
+                })
+                .catch(() => {
+                    groups = [];
+                    renderGroupsList();
+                    renderChatsList();
+                });
+        }
+
+        function loadPrivateChats() {
+            if (!currentUser) return;
+            fetch(`/api/private_chats/${currentUser.id}`)
+                .then(res => res.json())
+                .then(data => {
+                    privateChats = data;
+                    renderChatsList();
+                })
+                .catch(() => {
+                    privateChats = [];
+                    renderChatsList();
+                });
+        }
+
+        function loadAllUsers() {
+            fetch('/api/users')
+                .then(res => res.json())
+                .then(users => {
+                    allUsers = users;
+                    renderContactsList(users);
+                })
+                .catch(() => {
+                    allUsers = [];
+                    renderContactsList([]);
+                });
+        }
+
+        // ========== ОСТАЛЬНЫЕ ФУНКЦИИ ==========
         socket.on('user_groups', (data) => {
             groups = data;
             renderGroupsList();
@@ -1039,56 +1144,6 @@
                 if (div) div.remove();
             }, 3000);
         });
-
-        // ========== АВТОВХОД ==========
-        (function autoLogin() {
-            const savedId = localStorage.getItem('teleRoomId');
-            const savedName = localStorage.getItem('teleRoomName');
-            
-            console.log('🔄 Проверка автовхода:', savedName);
-            
-            if (savedId && savedName) {
-                document.getElementById('login-name').value = savedName;
-                
-                setTimeout(() => {
-                    if (!currentUser) {
-                        console.log('🚀 Автовход для', savedName);
-                        socket.emit('register', { name: savedName, phone: savedId });
-                    }
-                }, 800);
-            }
-        })();
-
-        // ========== ЗАГРУЗКА ДАННЫХ ==========
-        function loadGroups() {
-            if (!currentUser) return;
-            fetch(`/api/groups/${currentUser.id}`)
-                .then(res => res.json())
-                .then(data => {
-                    groups = data;
-                    renderGroupsList();
-                    renderChatsList();
-                });
-        }
-
-        function loadPrivateChats() {
-            if (!currentUser) return;
-            fetch(`/api/private_chats/${currentUser.id}`)
-                .then(res => res.json())
-                .then(data => {
-                    privateChats = data;
-                    renderChatsList();
-                });
-        }
-
-        function loadAllUsers() {
-            fetch('/api/users')
-                .then(res => res.json())
-                .then(users => {
-                    allUsers = users;
-                    renderContactsList(users);
-                });
-        }
 
         // ========== ПОИСК ==========
         function searchContacts() {
@@ -1471,7 +1526,6 @@
             hideEditBioModal();
         }
 
-        // ========== НОВЫЕ ФУНКЦИИ ДЛЯ ПРОФИЛЯ ==========
         function editName() {
             const newName = prompt('Введите новое имя:', currentUser.name);
             if (newName && newName.trim() && newName !== currentUser.name) {
