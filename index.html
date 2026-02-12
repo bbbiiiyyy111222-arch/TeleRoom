@@ -308,14 +308,17 @@
                 });
         }
 
-        function loadAllUsers() {
-            fetch('/api/users')
-                .then(res => res.json())
-                .then(users => {
-                    allUsers = users;
-                    renderContactsList(users);
-                });
-        }
+        socket.on('registered', (user) => {
+    currentUser = user;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-screen').style.display = 'flex';
+    document.getElementById('header-name').innerText = user.name;
+    document.getElementById('header-avatar').innerText = user.name[0].toUpperCase();
+
+    loadGroups();
+    loadPrivateChats();
+    loadAllUsers(); // 👈 ЭТО ПОЧИНИТ ПОИСК
+});
 
         socket.on('user_groups', (data) => {
             groups = data;
@@ -328,10 +331,10 @@
             renderChatsList();
         });
 
-        socket.on('all_users', (users) => {
-            allUsers = users;
-            renderContactsList(users);
-        });
+       socket.on('all_users', (users) => {
+    allUsers = users; // ← ЭТО КЛЮЧЕВАЯ СТРОКА
+    renderContactsList(users);
+});
 
         socket.on('user_online', (userId) => {
             if (allUsers) {
@@ -980,3 +983,4 @@
     </script>
 </body>
 </html>
+
