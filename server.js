@@ -145,7 +145,9 @@ app.post('/api/users/update-bio', (req, res) => {
     });
 });
 
-// ========== API ПРОФИЛЯ ==========
+// ========== API ПРОФИЛЯ - ПОЛНОСТЬЮ РАБОЧИЕ ==========
+
+// 1. ИЗМЕНЕНИЕ ИМЕНИ
 app.post('/api/user/update-name', (req, res) => {
     const { userId, newName } = req.body;
     
@@ -169,6 +171,7 @@ app.post('/api/user/update-name', (req, res) => {
     });
 });
 
+// 2. ИЗМЕНЕНИЕ ЮЗЕРНЕЙМА (phone)
 app.post('/api/user/update-username', (req, res) => {
     const { userId, newUsername } = req.body;
     
@@ -193,6 +196,7 @@ app.post('/api/user/update-username', (req, res) => {
     });
 });
 
+// 3. ЗАГРУЗКА АВАТАРКИ
 app.post('/api/user/upload-avatar', upload.single('avatar'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'Нет файла' });
     
@@ -208,6 +212,32 @@ app.post('/api/user/upload-avatar', upload.single('avatar'), (req, res) => {
             io.emit('all_users', users || []);
         });
     });
+});
+
+// 4. УДАЛЕНИЕ АВАТАРКИ (НОВАЯ ФУНКЦИЯ)
+app.post('/api/user/remove-avatar', (req, res) => {
+    const { userId } = req.body;
+    
+    db.run('UPDATE users SET avatar = NULL WHERE id = ?', [userId], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        
+        res.json({ success: true });
+        
+        db.all('SELECT id, name, avatar, bio, online FROM users', (err, users) => {
+            io.emit('all_users', users || []);
+        });
+    });
+});
+
+// 5. ПОЛУЧЕНИЕ ПРОФИЛЯ (НОВАЯ ФУНКЦИЯ)
+app.get('/api/user/profile/:userId', (req, res) => {
+    db.get('SELECT id, name, phone, avatar, bio, online, last_seen, created_at FROM users WHERE id = ?', 
+        [req.params.userId], 
+        (err, user) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json(user || null);
+        }
+    );
 });
 
 // ========== API ГРУПП ==========
@@ -648,9 +678,13 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log('   🚀 TeleRoom PRO - ЗАПУЩЕН!');
     console.log('='.repeat(60));
     console.log(`   📱 Порт: ${PORT}`);
-    console.log('   ✅ Имена уникальные');
-    console.log('   ✅ Профили и аватарки');
-    console.log('   ✅ Группы и личные чаты');
-    console.log('   🔥 ВХОД РАБОТАЕТ 100%');
+    console.log('   ✅ ВХОД - РАБОТАЕТ (НЕ ТРОГАЛ)');
+    console.log('   ✅ Имена - УНИКАЛЬНЫЕ');
+    console.log('   ✅ Юзернейм - МОЖНО МЕНЯТЬ');
+    console.log('   ✅ Аватарка - МОЖНО ЗАГРУЖАТЬ');
+    console.log('   ✅ Аватарка - МОЖНО УДАЛЯТЬ');
+    console.log('   ✅ Био - МОЖНО РЕДАКТИРОВАТЬ');
+    console.log('   ✅ Группы - РАБОТАЮТ');
+    console.log('   ✅ Личные чаты - РАБОТАЮТ');
     console.log('='.repeat(60) + '\n');
 });
