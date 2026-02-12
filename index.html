@@ -737,8 +737,14 @@
                     </div>
                 `;
             } else {
-                content = `<div class="message-text">${message.text || ''}</div>`;
-            }
+    // Превращаем ссылки в кликабельные
+    let text = message.text || '';
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    text = text.replace(urlRegex, function(url) {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: ${isMyMessage ? '#fff' : '#667eea'}; text-decoration: underline;">${url}</a>`;
+    });
+    content = `<div class="message-text">${text}</div>`;
+}
             
             messageDiv.innerHTML = `
                 <div class="message-bubble">
@@ -983,4 +989,5 @@
     </script>
 </body>
 </html>
+
 
