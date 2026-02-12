@@ -552,11 +552,11 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log('   🚀 TeleRoom PRO - ВСЕ БАГИ ИСПРАВЛЕНЫ!');
     console.log('='.repeat(60));
     console.log(`   📱 Порт: ${PORT}`);
-    console.log(`   📱 Ссылка: https://teleroom-production.up.railway.app`);
     console.log(`   ✅ Личные сообщения: РАБОТАЮТ`);
     console.log(`   ✅ Добавление в группу: РАБОТАЕТ`); 
     console.log(`   ✅ Поиск: РАБОТАЕТ`);
     console.log('='.repeat(60) + '\n');
 });
+
 
 
