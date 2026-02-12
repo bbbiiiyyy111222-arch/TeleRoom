@@ -5,6 +5,44 @@ const sqlite3 = require('sqlite3').verbose();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
+
+// ========== ЭЛИТНАЯ КРИПТОГРАФИЧЕСКАЯ ЗАЩИТА ==========
+const SECRET_KEY = crypto.randomBytes(32).toString('hex'); // 256-битный ключ
+const ALGORITHM = 'aes-256-gcm'; // Самый надежный режим шифрования
+
+// Функции шифрования для защиты всех сообщений
+function encrypt(text) {
+    if (!text) return text;
+    const iv = crypto.randomBytes(16);
+    const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(SECRET_KEY, 'hex'), iv);
+    let encrypted = cipher.update(text.toString(), 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    const authTag = cipher.getAuthTag();
+    return JSON.stringify({
+        iv: iv.toString('hex'),
+        encrypted: encrypted,
+        authTag: authTag.toString('hex')
+    });
+}
+
+function decrypt(encryptedData) {
+    if (!encryptedData || !encryptedData.startsWith('{')) return encryptedData;
+    try {
+        const { iv, encrypted, authTag } = JSON.parse(encryptedData);
+        const decipher = crypto.createDecipheriv(
+            ALGORITHM,
+            Buffer.from(SECRET_KEY, 'hex'),
+            Buffer.from(iv, 'hex')
+        );
+        decipher.setAuthTag(Buffer.from(authTag, 'hex'));
+        let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        return decrypted;
+    } catch (e) {
+        return encryptedData;
+    }
+}
 
 const app = express();
 const server = http.createServer(app);
@@ -93,12 +131,13 @@ db.serialize(() => {
         UNIQUE(user1_id, user2_id)
     )`);
 
+    // Шифрованные сообщения
     db.run(`CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         chat_type TEXT NOT NULL,
         chat_id INTEGER NOT NULL,
         user_id INTEGER NOT NULL,
-        text TEXT,
+        text TEXT,  -- Будет хранить зашифрованные данные
         photo_url TEXT,
         voice_url TEXT,
         file_url TEXT,
@@ -111,6 +150,7 @@ db.serialize(() => {
     )`);
 
     console.log('✅ База данных готова');
+    console.log('🔐 Шифрование AES-256-GCM активировано');
 });
 
 // ========== API ПРОВЕРКИ ИМЕНИ ==========
@@ -145,7 +185,9 @@ app.post('/api/users/update-bio', (req, res) => {
     });
 });
 
-// ========== API ПРОФИЛЯ ==========
+// ========== API ПРОФИЛЯ - ПОЛНОСТЬЮ РАБОЧИЕ ==========
+
+// 1. ИЗМЕНЕНИЕ ИМЕНИ
 app.post('/api/user/update-name', (req, res) => {
     const { userId, newName } = req.body;
     
@@ -169,6 +211,7 @@ app.post('/api/user/update-name', (req, res) => {
     });
 });
 
+// 2. ИЗМЕНЕНИЕ ЮЗЕРНЕЙМА (phone)
 app.post('/api/user/update-username', (req, res) => {
     const { userId, newUsername } = req.body;
     
@@ -193,6 +236,7 @@ app.post('/api/user/update-username', (req, res) => {
     });
 });
 
+// 3. ЗАГРУЗКА АВАТАРКИ
 app.post('/api/user/upload-avatar', upload.single('avatar'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'Нет файла' });
     
@@ -210,6 +254,7 @@ app.post('/api/user/upload-avatar', upload.single('avatar'), (req, res) => {
     });
 });
 
+// 4. УДАЛЕНИЕ АВАТАРКИ
 app.post('/api/user/remove-avatar', (req, res) => {
     const { userId } = req.body;
     
@@ -224,6 +269,7 @@ app.post('/api/user/remove-avatar', (req, res) => {
     });
 });
 
+// 5. ПОЛУЧЕНИЕ ПРОФИЛЯ
 app.get('/api/user/profile/:userId', (req, res) => {
     db.get('SELECT id, name, phone, avatar, bio, online, last_seen, created_at FROM users WHERE id = ?', 
         [req.params.userId], 
@@ -349,7 +395,14 @@ app.get('/api/messages/group/:groupId', (req, res) => {
         ORDER BY m.created_at ASC
         LIMIT 200
     `, [req.params.groupId], (err, messages) => {
-        res.json(messages || []);
+        // Расшифровываем сообщения
+        const decryptedMessages = messages.map(msg => {
+            if (msg.text) {
+                msg.text = decrypt(msg.text);
+            }
+            return msg;
+        });
+        res.json(decryptedMessages || []);
     });
 });
 
@@ -414,7 +467,14 @@ app.get('/api/messages/private/:chatId', (req, res) => {
         ORDER BY m.created_at ASC
         LIMIT 200
     `, [req.params.chatId], (err, messages) => {
-        res.json(messages || []);
+        // Расшифровываем сообщения
+        const decryptedMessages = messages.map(msg => {
+            if (msg.text) {
+                msg.text = decrypt(msg.text);
+            }
+            return msg;
+        });
+        res.json(decryptedMessages || []);
     });
 });
 
@@ -454,7 +514,7 @@ app.post('/api/upload/photo', upload.single('photo'), (req, res) => {
     
     db.run(
         'INSERT INTO messages (chat_type, chat_id, user_id, photo_url, text) VALUES (?, ?, ?, ?, ?)',
-        [chat_type, chat_id, user_id, photo_url, '📷 Фото'],
+        [chat_type, chat_id, user_id, photo_url, encrypt('📷 Фото')],
         function(err) {
             if (err) return res.status(500).json({ error: err.message });
             
@@ -465,6 +525,7 @@ app.post('/api/upload/photo', upload.single('photo'), (req, res) => {
                 WHERE m.id = ?
             `, [this.lastID], (err, message) => {
                 if (!message) return res.status(404).json({ error: 'Сообщение не найдено' });
+                if (message.text) message.text = decrypt(message.text);
                 const room = chat_type === 'group' ? `group_${chat_id}` : `private_${chat_id}`;
                 io.to(room).emit('new_message', message);
                 res.json(message);
@@ -483,7 +544,7 @@ app.post('/api/upload/file', upload.single('file'), (req, res) => {
     
     db.run(
         'INSERT INTO messages (chat_type, chat_id, user_id, file_url, file_name, file_size, text) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [chat_type, chat_id, user_id, file_url, file_name, file_size, '📎 Файл'],
+        [chat_type, chat_id, user_id, file_url, file_name, file_size, encrypt('📎 Файл')],
         function(err) {
             if (err) return res.status(500).json({ error: err.message });
             
@@ -494,6 +555,7 @@ app.post('/api/upload/file', upload.single('file'), (req, res) => {
                 WHERE m.id = ?
             `, [this.lastID], (err, message) => {
                 if (!message) return res.status(404).json({ error: 'Сообщение не найдено' });
+                if (message.text) message.text = decrypt(message.text);
                 const room = chat_type === 'group' ? `group_${chat_id}` : `private_${chat_id}`;
                 io.to(room).emit('new_message', message);
                 res.json(message);
@@ -510,10 +572,8 @@ io.on('connection', (socket) => {
         const { name, phone } = userData;
         console.log(`📝 Попытка регистрации: ${name}, ${phone}`);
         
-        // Проверяем по phone (ID пользователя)
         db.get('SELECT * FROM users WHERE phone = ?', [phone], (err, existingUser) => {
             if (existingUser) {
-                // Автовход
                 console.log(`🔄 Автовход для: ${existingUser.name}`);
                 socket.userId = existingUser.id;
                 socket.userName = existingUser.name;
@@ -523,7 +583,6 @@ io.on('connection', (socket) => {
                 socket.emit('registered', existingUser);
                 console.log(`✅ Отправлено registered для ${existingUser.name}`);
                 
-                // Отправляем данные
                 db.all(`SELECT g.*, COUNT(DISTINCT gm.user_id) as members_count
                         FROM groups g
                         JOIN group_members gm ON g.id = gm.group_id
@@ -556,7 +615,6 @@ io.on('connection', (socket) => {
                 return;
             }
             
-            // Новый пользователь - проверяем имя
             db.get('SELECT * FROM users WHERE name = ?', [name], (err, existingName) => {
                 if (existingName) {
                     console.log(`❌ Имя ${name} уже занято`);
@@ -564,7 +622,6 @@ io.on('connection', (socket) => {
                     return;
                 }
                 
-                // Создаём нового пользователя
                 db.run('INSERT INTO users (name, phone) VALUES (?, ?)', [name, phone], function(err) {
                     if (err) {
                         console.error('Ошибка создания пользователя:', err);
@@ -611,9 +668,12 @@ io.on('connection', (socket) => {
     socket.on('send_message', (data) => {
         const { chat_type, chat_id, user_id, text } = data;
         
+        // Шифруем сообщение перед сохранением
+        const encryptedText = encrypt(text);
+        
         db.run(
             'INSERT INTO messages (chat_type, chat_id, user_id, text) VALUES (?, ?, ?, ?)',
-            [chat_type, chat_id, user_id, text],
+            [chat_type, chat_id, user_id, encryptedText],
             function(err) {
                 if (err) return console.error(err);
                 
@@ -624,6 +684,8 @@ io.on('connection', (socket) => {
                     WHERE m.id = ?
                 `, [this.lastID], (err, message) => {
                     if (message) {
+                        // Расшифровываем для отправки клиенту
+                        if (message.text) message.text = decrypt(message.text);
                         const room = chat_type === 'group' ? `group_${chat_id}` : `private_${chat_id}`;
                         io.to(room).emit('new_message', message);
                     }
@@ -669,9 +731,11 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
     console.log('\n' + '='.repeat(60));
-    console.log('   🚀 TeleRoom PRO - ЗАПУЩЕН!');
+    console.log('   🚀 TeleRoom PRO - ЭЛИТНАЯ ЗАЩИТА!');
     console.log('='.repeat(60));
     console.log(`   📱 Порт: ${PORT}`);
+    console.log('   🔐 Шифрование: AES-256-GCM');
+    console.log('   🔑 Ключ шифрования: ' + SECRET_KEY.substring(0, 16) + '...');
     console.log('   ✅ ВХОД - РАБОТАЕТ');
     console.log('   ✅ Имена - УНИКАЛЬНЫЕ');
     console.log('   ✅ Юзернейм - МОЖНО МЕНЯТЬ');
@@ -679,7 +743,6 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log('   ✅ Био - МОЖНО РЕДАКТИРОВАТЬ');
     console.log('   ✅ Группы - РАБОТАЮТ');
     console.log('   ✅ Личные чаты - РАБОТАЮТ');
-    console.log('   ✅ Сообщения - РАБОТАЮТ');
-    console.log('   ✅ Поиск - РАБОТАЕТ');
+    console.log('   ✅ Сообщения - ШИФРУЮТСЯ');
     console.log('='.repeat(60) + '\n');
 });
