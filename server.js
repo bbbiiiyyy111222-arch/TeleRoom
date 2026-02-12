@@ -55,12 +55,13 @@ app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 const db = new sqlite3.Database('./database/teleroom.db');
 
 db.serialize(() => {
-    // Пользователи
+    // Пользователи - теперь phone это ID, а name УНИКАЛЬНОЕ!
     db.run(`CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
+        name TEXT UNIQUE NOT NULL,
         phone TEXT UNIQUE NOT NULL,
         avatar TEXT,
+        bio TEXT DEFAULT '',
         online INTEGER DEFAULT 0,
         last_seen DATETIME DEFAULT CURRENT_TIMESTAMP,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -95,7 +96,7 @@ db.serialize(() => {
         UNIQUE(user1_id, user2_id)
     )`);
 
-    // Сообщения (ПОЛНАЯ ВЕРСИЯ)
+    // Сообщения
     db.run(`CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         chat_type TEXT NOT NULL,
@@ -116,18 +117,43 @@ db.serialize(() => {
     console.log('✅ База данных готова');
 });
 
+// ========== API ПРОВЕРКИ ИМЕНИ ==========
+app.get('/api/check-username/:name', (req, res) => {
+    const name = req.params.name;
+    db.get('SELECT id FROM users WHERE name = ?', [name], (err, user) => {
+        res.json({ available: !user });
+    });
+});
+
 // ========== API ПОЛЬЗОВАТЕЛЕЙ ==========
 app.get('/api/users', (req, res) => {
-    db.all('SELECT id, name, phone, online, last_seen FROM users ORDER BY name', (err, users) => {
+    db.all('SELECT id, name, avatar, bio, online, last_seen FROM users ORDER BY name', (err, users) => {
         res.json(users || []);
+    });
+});
+
+app.get('/api/users/:id', (req, res) => {
+    db.get('SELECT id, name, avatar, bio, online, last_seen, created_at FROM users WHERE id = ?', 
+        [req.params.id], 
+        (err, user) => {
+            res.json(user || null);
+        }
+    );
+});
+
+app.post('/api/users/update-bio', (req, res) => {
+    const { userId, bio } = req.body;
+    db.run('UPDATE users SET bio = ? WHERE id = ?', [bio, userId], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true });
     });
 });
 
 // ПОИСК ПОЛЬЗОВАТЕЛЕЙ
 app.get('/api/users/search/:query', (req, res) => {
     const query = `%${req.params.query}%`;
-    db.all('SELECT id, name, phone, online, last_seen FROM users WHERE name LIKE ? OR phone LIKE ? ORDER BY name LIMIT 20', 
-        [query, query], 
+    db.all('SELECT id, name, avatar, bio, online, last_seen FROM users WHERE name LIKE ? ORDER BY name LIMIT 20', 
+        [query], 
         (err, users) => {
             res.json(users || []);
         }
@@ -176,7 +202,7 @@ app.get('/api/groups/:userId', (req, res) => {
 
 app.get('/api/groups/:groupId/members', (req, res) => {
     db.all(`
-        SELECT u.id, u.name, u.online, u.last_seen, gm.role, gm.joined_at
+        SELECT u.id, u.name, u.avatar, u.online, u.last_seen, gm.role, gm.joined_at
         FROM group_members gm
         JOIN users u ON gm.user_id = u.id
         WHERE gm.group_id = ?
@@ -186,7 +212,6 @@ app.get('/api/groups/:groupId/members', (req, res) => {
     });
 });
 
-// ДОБАВЛЕНИЕ УЧАСТНИКА В ГРУППУ
 app.post('/api/groups/add_member', (req, res) => {
     const { group_id, user_id } = req.body;
     
@@ -253,6 +278,7 @@ app.get('/api/private_chats/:userId', (req, res) => {
                    ELSE pc.user1_id 
                END as other_user_id,
                u.name as other_user_name,
+               u.avatar as other_user_avatar,
                u.online,
                u.last_seen,
                (SELECT text FROM messages WHERE chat_type = 'private' AND chat_id = pc.id ORDER BY created_at DESC LIMIT 1) as last_message,
@@ -367,50 +393,69 @@ io.on('connection', (socket) => {
     socket.on('register', (userData) => {
         const { name, phone } = userData;
         
-        db.get('SELECT * FROM users WHERE phone = ?', [phone], (err, existingUser) => {
-            if (existingUser) {
-                socket.userId = existingUser.id;
-                socket.userName = existingUser.name;
-                
-                db.run('UPDATE users SET online = 1, last_seen = CURRENT_TIMESTAMP WHERE id = ?', [existingUser.id]);
-                
-                socket.emit('registered', existingUser);
-                
-                db.all(`
-                    SELECT g.*, COUNT(DISTINCT gm.user_id) as members_count
-                    FROM groups g
-                    JOIN group_members gm ON g.id = gm.group_id
-                    WHERE gm.user_id = ?
-                    GROUP BY g.id
-                `, [existingUser.id], (err, groups) => {
-                    socket.emit('user_groups', groups || []);
+        // СНАЧАЛА ПРОВЕРЯЕМ, СВОБОДНО ЛИ ИМЯ
+        db.get('SELECT * FROM users WHERE name = ?', [name], (err, existingName) => {
+            if (existingName) {
+                // Имя занято - проверяем, наш ли это пользователь
+                db.get('SELECT * FROM users WHERE phone = ?', [phone], (err, existingUser) => {
+                    if (existingUser && existingUser.name === name) {
+                        // Это наш пользователь, просто заходим
+                        socket.userId = existingUser.id;
+                        socket.userName = existingUser.name;
+                        
+                        db.run('UPDATE users SET online = 1, last_seen = CURRENT_TIMESTAMP WHERE id = ?', [existingUser.id]);
+                        
+                        socket.emit('registered', existingUser);
+                        
+                        // Отправляем группы
+                        db.all(`
+                            SELECT g.*, COUNT(DISTINCT gm.user_id) as members_count
+                            FROM groups g
+                            JOIN group_members gm ON g.id = gm.group_id
+                            WHERE gm.user_id = ?
+                            GROUP BY g.id
+                        `, [existingUser.id], (err, groups) => {
+                            socket.emit('user_groups', groups || []);
+                        });
+                        
+                        // Отправляем личные чаты
+                        db.all(`
+                            SELECT pc.id, 
+                                   CASE 
+                                       WHEN pc.user1_id = ? THEN pc.user2_id 
+                                       ELSE pc.user1_id 
+                                   END as other_user_id,
+                                   u.name as other_user_name,
+                                   u.avatar as other_user_avatar,
+                                   u.online
+                            FROM private_chats pc
+                            JOIN users u ON (CASE WHEN pc.user1_id = ? THEN pc.user2_id ELSE pc.user1_id END) = u.id
+                            WHERE pc.user1_id = ? OR pc.user2_id = ?
+                        `, [existingUser.id, existingUser.id, existingUser.id, existingUser.id], (err, privateChats) => {
+                            socket.emit('user_private_chats', privateChats || []);
+                        });
+                        
+                        // Отправляем всех пользователей
+                        db.all('SELECT id, name, avatar, bio, online FROM users', (err, users) => {
+                            socket.emit('all_users', users || []);
+                        });
+                        
+                        socket.broadcast.emit('user_online', existingUser.id);
+                    } else {
+                        // Имя занято другим пользователем
+                        socket.emit('register_error', 'Это имя уже занято! Выберите другое имя.');
+                    }
                 });
-                
-                db.all(`
-                    SELECT pc.id, 
-                           CASE 
-                               WHEN pc.user1_id = ? THEN pc.user2_id 
-                               ELSE pc.user1_id 
-                           END as other_user_id,
-                           u.name as other_user_name,
-                           u.online
-                    FROM private_chats pc
-                    JOIN users u ON (CASE WHEN pc.user1_id = ? THEN pc.user2_id ELSE pc.user1_id END) = u.id
-                    WHERE pc.user1_id = ? OR pc.user2_id = ?
-                `, [existingUser.id, existingUser.id, existingUser.id, existingUser.id], (err, privateChats) => {
-                    socket.emit('user_private_chats', privateChats || []);
-                });
-                
-                db.all('SELECT id, name, phone, online FROM users', (err, users) => {
-                    socket.emit('all_users', users || []);
-                });
-                
-                socket.broadcast.emit('user_online', existingUser.id);
             } else {
+                // Имя свободно - создаём нового пользователя
                 db.run(
                     'INSERT INTO users (name, phone) VALUES (?, ?)',
                     [name, phone],
                     function(err) {
+                        if (err) {
+                            socket.emit('register_error', 'Ошибка при регистрации');
+                            return;
+                        }
                         db.get('SELECT * FROM users WHERE id = ?', [this.lastID], (err, newUser) => {
                             socket.userId = newUser.id;
                             socket.userName = newUser.name;
@@ -419,7 +464,7 @@ io.on('connection', (socket) => {
                             
                             socket.emit('registered', newUser);
                             
-                            db.all('SELECT id, name, phone, online FROM users', (err, users) => {
+                            db.all('SELECT id, name, avatar, bio, online FROM users', (err, users) => {
                                 socket.emit('all_users', users || []);
                             });
                             
@@ -473,6 +518,18 @@ io.on('connection', (socket) => {
         });
     });
 
+    socket.on('update_bio', (data) => {
+        const { userId, bio } = data;
+        db.run('UPDATE users SET bio = ? WHERE id = ?', [bio, userId], function(err) {
+            if (!err) {
+                // Отправляем обновлённые данные всем
+                db.all('SELECT id, name, avatar, bio, online FROM users', (err, users) => {
+                    io.emit('all_users', users || []);
+                });
+            }
+        });
+    });
+
     socket.on('disconnect', () => {
         if (socket.userId) {
             db.run('UPDATE users SET online = 0, last_seen = CURRENT_TIMESTAMP WHERE id = ?', [socket.userId]);
@@ -491,8 +548,11 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
     console.log('\n' + '='.repeat(60));
-    console.log('   🚀 TeleRoom PRO - ЗАПУЩЕН!');
+    console.log('   🚀 TeleRoom PRO - С ПРОФИЛЯМИ И ПРОВЕРКОЙ ИМЁН!');
     console.log('='.repeat(60));
     console.log(`   📱 Порт: ${PORT}`);
+    console.log('   ✅ Имена теперь УНИКАЛЬНЫЕ');
+    console.log('   ✅ Проверка занятости имени');
+    console.log('   ✅ Профили пользователей');
     console.log('='.repeat(60) + '\n');
 });
