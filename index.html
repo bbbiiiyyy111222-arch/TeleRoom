@@ -144,7 +144,7 @@
         <div id="login-screen">
             <div class="logo">📱</div>
             <div class="app-title">TeleRoom</div>
-            <div class="app-subtitle">твой личный мессенджер</div>
+            <div class="app-subtitle">лучший месенджер в россии!р</div>
             <input type="text" id="login-name" class="login-input" placeholder="Твое имя" value="">
             <input type="tel" id="login-phone" class="login-input" placeholder="Номер телефона" value="">
             <button class="login-btn" onclick="register()">Войти в TeleRoom</button>
@@ -253,52 +253,42 @@
         let audioElements = {};
 
         // ========== РЕГИСТРАЦИЯ ==========
-        function register() {
-            const name = document.getElementById('login-name').value.trim();
-            const phone = document.getElementById('login-phone').value.trim();
-            
-            if (name && phone) {
-                // СОХРАНЯЕМ В LOCALSTORAGE
-                localStorage.setItem('teleRoomPhone', phone);
-                localStorage.setItem('teleRoomName', name);
-                
-                socket.emit('register', { name, phone });
-            } else {
-                alert('Введите имя и телефон');
+function register() {
+    const name = document.getElementById('login-name').value.trim();
+    const phone = document.getElementById('login-phone').value.trim();
+    
+    if (name && phone) {
+        // 💾 СОХРАНЯЕМ В LOCALSTORAGE
+        localStorage.setItem('teleRoomPhone', phone);
+        localStorage.setItem('teleRoomName', name);
+        
+        console.log('📝 Регистрация:', name, phone);
+        socket.emit('register', { name, phone });
+    } else {
+        alert('Введите имя и телефон');
+    }
+}
+      // ========== АВТОВХОД ==========
+(function autoLogin() {
+    const savedPhone = localStorage.getItem('teleRoomPhone');
+    const savedName = localStorage.getItem('teleRoomName');
+    
+    console.log('🔄 Проверка автовхода:', savedName, savedPhone);
+    
+    if (savedPhone && savedName) {
+        // Заполняем поля
+        document.getElementById('login-name').value = savedName;
+        document.getElementById('login-phone').value = savedPhone;
+        
+        // Ждём соединения с сокетом и отправляем регистрацию
+        setTimeout(() => {
+            if (!currentUser) {
+                console.log('🚀 Автовход для', savedName);
+                socket.emit('register', { name: savedName, phone: savedPhone });
             }
-        }
-
-        socket.on('registered', (user) => {
-            currentUser = user;
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('main-screen').style.display = 'flex';
-            document.getElementById('header-name').innerText = user.name;
-            document.getElementById('header-avatar').innerText = user.name[0].toUpperCase();
-            
-            loadGroups();
-            loadPrivateChats();
-            loadAllUsers();
-        });
-
-        // ========== АВТОВХОД ==========
-        (function autoLogin() {
-            const savedPhone = localStorage.getItem('teleRoomPhone');
-            const savedName = localStorage.getItem('teleRoomName');
-            
-            if (savedPhone && savedName) {
-                console.log('🔄 Автовход для', savedName);
-                document.getElementById('login-name').value = savedName;
-                document.getElementById('login-phone').value = savedPhone;
-                
-                // Ждем соединения с сервером
-                setTimeout(() => {
-                    if (!currentUser) {
-                        socket.emit('register', { name: savedName, phone: savedPhone });
-                    }
-                }, 800);
-            }
-        })();
-
+        }, 800);
+    }
+})();
         // ========== ЗАГРУЗКА ДАННЫХ ==========
         function loadGroups() {
             if (!currentUser) return;
@@ -972,6 +962,7 @@ const time = messageDate.toLocaleTimeString('ru-RU', {
     </script>
 </body>
 </html>
+
 
 
 
