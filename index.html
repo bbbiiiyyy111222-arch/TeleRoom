@@ -671,10 +671,13 @@ function searchChats() {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isMyMessage ? 'my-message' : 'other-message'}`;
             
-            const time = new Date(message.created_at).toLocaleTimeString('ru-RU', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
+            // КОРРЕКТИРОВКА ВРЕМЕНИ +2 ЧАСА
+const messageDate = new Date(message.created_at);
+messageDate.setHours(messageDate.getHours() + 2);
+const time = messageDate.toLocaleTimeString('ru-RU', { 
+    hour: '2-digit', 
+    minute: '2-digit' 
+});
             
             let content = '';
             
@@ -969,5 +972,6 @@ function searchChats() {
     </script>
 </body>
 </html>
+
 
 
