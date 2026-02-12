@@ -34,7 +34,7 @@
         .tab { flex: 1; padding: 12px; border: none; background: none; font-size: 16px; font-weight: 600; color: #666; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .tab.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
         
-        #chats-list, #groups-list, #contacts-list, #private-chats-list { flex: 1; overflow-y: auto; padding: 10px; display: none; }
+        #chats-list, #groups-list, #contacts-list { flex: 1; overflow-y: auto; padding: 10px; display: none; }
         .active-list { display: block !important; }
         
         .search-container { padding: 10px; background: white; border-bottom: 1px solid #eee; }
@@ -145,8 +145,8 @@
             <div class="logo">📱</div>
             <div class="app-title">TeleRoom</div>
             <div class="app-subtitle">твой личный мессенджер</div>
-            <input type="text" id="login-name" class="login-input" placeholder="Твое имя" value="Никита">
-            <input type="tel" id="login-phone" class="login-input" placeholder="Номер телефона" value="+7">
+            <input type="text" id="login-name" class="login-input" placeholder="Твое имя" value="">
+            <input type="tel" id="login-phone" class="login-input" placeholder="Номер телефона" value="">
             <button class="login-btn" onclick="register()">Войти в TeleRoom</button>
         </div>
 
@@ -227,18 +227,6 @@
             </div>
         </div>
 
-        <!-- ДОБАВЛЕНИЕ В ГРУППУ -->
-        <div id="add-to-group-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-title">Добавить в группу</div>
-                <input type="text" id="add-user-search" class="modal-input" placeholder="Поиск по имени..." onkeyup="searchUsersToAdd()">
-                <div id="users-to-add-list" style="max-height: 300px; overflow-y: auto;"></div>
-                <div class="modal-buttons">
-                    <button class="modal-btn modal-btn-secondary" onclick="hideAddToGroupModal()">Закрыть</button>
-                </div>
-            </div>
-        </div>
-
         <!-- ПРОСМОТР ФОТО -->
         <div id="imageViewer" class="image-viewer" onclick="closeImageViewer()">
             <span class="close-viewer">×</span>
@@ -270,6 +258,10 @@
             const phone = document.getElementById('login-phone').value.trim();
             
             if (name && phone) {
+                // СОХРАНЯЕМ В LOCALSTORAGE
+                localStorage.setItem('teleRoomPhone', phone);
+                localStorage.setItem('teleRoomName', name);
+                
                 socket.emit('register', { name, phone });
             } else {
                 alert('Введите имя и телефон');
@@ -288,8 +280,28 @@
             loadAllUsers();
         });
 
+        // ========== АВТОВХОД ==========
+        (function autoLogin() {
+            const savedPhone = localStorage.getItem('teleRoomPhone');
+            const savedName = localStorage.getItem('teleRoomName');
+            
+            if (savedPhone && savedName) {
+                console.log('🔄 Автовход для', savedName);
+                document.getElementById('login-name').value = savedName;
+                document.getElementById('login-phone').value = savedPhone;
+                
+                // Ждем соединения с сервером
+                setTimeout(() => {
+                    if (!currentUser) {
+                        socket.emit('register', { name: savedName, phone: savedPhone });
+                    }
+                }, 800);
+            }
+        })();
+
         // ========== ЗАГРУЗКА ДАННЫХ ==========
         function loadGroups() {
+            if (!currentUser) return;
             fetch(`/api/groups/${currentUser.id}`)
                 .then(res => res.json())
                 .then(data => {
@@ -300,6 +312,7 @@
         }
 
         function loadPrivateChats() {
+            if (!currentUser) return;
             fetch(`/api/private_chats/${currentUser.id}`)
                 .then(res => res.json())
                 .then(data => {
@@ -308,18 +321,16 @@
                 });
         }
 
-        socket.on('registered', (user) => {
-    currentUser = user;
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('main-screen').style.display = 'flex';
-    document.getElementById('header-name').innerText = user.name;
-    document.getElementById('header-avatar').innerText = user.name[0].toUpperCase();
+        function loadAllUsers() {
+            fetch('/api/users')
+                .then(res => res.json())
+                .then(users => {
+                    allUsers = users;
+                    renderContactsList(users);
+                });
+        }
 
-    loadGroups();
-    loadPrivateChats();
-    loadAllUsers(); // 👈 ЭТО ПОЧИНИТ ПОИСК
-});
-
+        // ========== СОКЕТ СОБЫТИЯ ==========
         socket.on('user_groups', (data) => {
             groups = data;
             renderGroupsList();
@@ -331,10 +342,10 @@
             renderChatsList();
         });
 
-       socket.on('all_users', (users) => {
-    allUsers = users; // ← ЭТО КЛЮЧЕВАЯ СТРОКА
-    renderContactsList(users);
-});
+        socket.on('all_users', (users) => {
+            allUsers = users;
+            renderContactsList(users);
+        });
 
         socket.on('user_online', (userId) => {
             if (allUsers) {
@@ -355,67 +366,23 @@
                 renderContactsList(allUsers);
             }
         });
-document.getElementById('header-name').innerText = user.name;
-document.getElementById('header-avatar').innerText = user.name[0].toUpperCase();
 
-loadGroups();
-loadPrivateChats();
-loadAllUsers();
+        // ========== ПОИСК ==========
+        function searchContacts() {
+            const query = document.getElementById('contact-search').value.toLowerCase();
+            if (!allUsers || allUsers.length === 0) return;
+            
+            const filtered = allUsers.filter(u => 
+                u.id !== currentUser?.id && 
+                u.name && u.name.toLowerCase().includes(query)
+            );
+            renderContactsList(filtered);
+        }
 
-document.getElementById('header-avatar').innerText = user.name[0].toUpperCase();
-
-loadGroups();
-loadPrivateChats();
-loadAllUsers();
-
-document.getElementById('header-avatar').innerText = user.name[0].toUpperCase();
-
-loadGroups();
-loadPrivateChats();
-loadAllUsers();
-
-// ========== АВТОВХОД ==========
-(function autoLogin() {
-    const savedPhone = localStorage.getItem('teleRoomPhone');
-    const savedName = localStorage.getItem('teleRoomName');
-
-    if (savedPhone && savedName) {
-        console.log('🔄 Автовход для', savedName);
-        document.getElementById('login-name').value = savedName;
-        document.getElementById('login-phone').value = savedPhone;
-        
-        setTimeout(() => {
-            socket.emit('register', { name: savedName, phone: savedPhone });
-        }, 500);
-    }
-})();
-
-// ========== ПОИСК ==========
-function searchContacts() {
-    const query = document.getElementById('contact-search').value.toLowerCase();
-    const filtered = allUsers.filter(u => 
-        u.id !== currentUser?.id && 
-        u.name.toLowerCase().includes(query)
-    );
-    renderContactsList(filtered);
-}
-   // ========== ПОИСК ПО КОНТАКТАМ ==========
-function searchContacts() {
-    const query = document.getElementById('contact-search').value.toLowerCase();
-    if (!allUsers || allUsers.length === 0) return;
-    
-    const filtered = allUsers.filter(u => 
-        u.id !== currentUser?.id && 
-        u.name && u.name.toLowerCase().includes(query)
-    );
-    renderContactsList(filtered);
-}
-
-// ========== ПОИСК ПО ЧАТАМ ==========
-function searchChats() {
-    const query = document.getElementById('chat-search').value.toLowerCase();
-    renderChatsList(query);
-}
+        function searchChats() {
+            const query = document.getElementById('chat-search').value.toLowerCase();
+            renderChatsList(query);
+        }
 
         // ========== ОТРИСОВКА ==========
         function renderGroupsList() {
@@ -467,7 +434,7 @@ function searchChats() {
             ].sort((a, b) => new Date(b.last_time || 0) - new Date(a.last_time || 0));
             
             const filtered = query ? 
-                allChats.filter(c => c.name.toLowerCase().includes(query.toLowerCase())) : 
+                allChats.filter(c => c.name && c.name.toLowerCase().includes(query.toLowerCase())) : 
                 allChats;
             
             if (filtered.length === 0) {
@@ -557,64 +524,6 @@ function searchChats() {
             .then(group => {
                 hideCreateGroupModal();
                 loadGroups();
-            });
-        }
-
-        function showAddToGroupModal(groupId) {
-            currentGroupToAdd = groupId;
-            document.getElementById('add-to-group-modal').classList.add('active');
-            document.getElementById('add-user-search').value = '';
-            searchUsersToAdd();
-        }
-
-        function hideAddToGroupModal() {
-            document.getElementById('add-to-group-modal').classList.remove('active');
-            document.getElementById('users-to-add-list').innerHTML = '';
-        }
-
-        function searchUsersToAdd() {
-            const query = document.getElementById('add-user-search').value.toLowerCase();
-            const container = document.getElementById('users-to-add-list');
-            
-            fetch(`/api/groups/${currentGroupToAdd}/members`)
-                .then(res => res.json())
-                .then(members => {
-                    const memberIds = members.map(m => m.id);
-                    const availableUsers = allUsers.filter(u => 
-                        u.id !== currentUser.id && 
-                        !memberIds.includes(u.id) &&
-                        u.name.toLowerCase().includes(query)
-                    );
-                    
-                    container.innerHTML = '';
-                    if (availableUsers.length === 0) {
-                        container.innerHTML = '<div class="no-results">Пользователей не найдено</div>';
-                        return;
-                    }
-                    
-                    availableUsers.forEach(user => {
-                        container.innerHTML += `
-                            <div class="chat-item" onclick="addUserToGroup(${currentGroupToAdd}, ${user.id})">
-                                <div class="chat-avatar">👤</div>
-                                <div class="chat-info">
-                                    <div class="chat-name">${user.name}</div>
-                                </div>
-                                <button style="background: #667eea; color: white; border: none; padding: 5px 10px; border-radius: 5px;">Добавить</button>
-                            </div>
-                        `;
-                    });
-                });
-        }
-
-        function addUserToGroup(groupId, userId) {
-            fetch('/api/groups/add_member', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ group_id: groupId, user_id: userId })
-            })
-            .then(() => {
-                hideAddToGroupModal();
-                alert('Пользователь добавлен в группу');
             });
         }
 
@@ -783,14 +692,14 @@ function searchChats() {
                     </div>
                 `;
             } else {
-    // Превращаем ссылки в кликабельные
-    let text = message.text || '';
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    text = text.replace(urlRegex, function(url) {
-        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: ${isMyMessage ? '#fff' : '#667eea'}; text-decoration: underline;">${url}</a>`;
-    });
-    content = `<div class="message-text">${text}</div>`;
-}
+                // Превращаем ссылки в кликабельные
+                let text = message.text || '';
+                const urlRegex = /(https?:\/\/[^\s]+)/g;
+                text = text.replace(urlRegex, function(url) {
+                    return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: ${isMyMessage ? '#fff' : '#667eea'}; text-decoration: underline;">${url}</a>`;
+                });
+                content = `<div class="message-text">${text}</div>`;
+            }
             
             messageDiv.innerHTML = `
                 <div class="message-bubble">
@@ -1020,7 +929,17 @@ function searchChats() {
             document.getElementById(`${tabName}-list`).classList.add('active-list');
         }
 
+        // ========== ВЫХОД ==========
         function logout() {
+            // Очищаем сохранённые данные
+            localStorage.removeItem('teleRoomPhone');
+            localStorage.removeItem('teleRoomName');
+            
+            // Очищаем поля ввода
+            document.getElementById('login-name').value = '';
+            document.getElementById('login-phone').value = '';
+            
+            // Перезагружаем страницу
             location.reload();
         }
 
@@ -1035,7 +954,3 @@ function searchChats() {
     </script>
 </body>
 </html>
-
-
-
-
