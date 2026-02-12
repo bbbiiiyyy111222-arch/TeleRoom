@@ -529,6 +529,7 @@
         #profile-screen {
             background: #0f1016;
             padding: 0;
+            display: none;
         }
 
         .profile-header {
@@ -638,6 +639,7 @@
         #edit-profile-screen {
             background: #0f1016;
             padding: 20px;
+            display: none;
         }
 
         .edit-profile-header {
@@ -935,7 +937,7 @@
                 <div id="contacts-container"></div>
             </div>
 
-            <!-- ПРОФИЛЬ (ПРОСМОТР) -->
+            <!-- ПРОФИЛЬ (ПРОСМОТР) - ЗДЕСЬ ЕСТЬ КНОПКА РЕДАКТИРОВАНИЯ! -->
             <div id="profile-screen">
                 <div class="profile-header">
                     <div class="profile-avatar" id="profile-avatar">👤</div>
@@ -958,6 +960,7 @@
                     </div>
                 </div>
                 <div class="profile-actions">
+                    <!-- КНОПКА РЕДАКТИРОВАНИЯ ПРОФИЛЯ - ЗЕЛЕНАЯ! -->
                     <button class="profile-btn profile-btn-edit" onclick="showEditProfile()">✏️ Редактировать профиль</button>
                     <button class="profile-btn profile-btn-secondary" onclick="backToMain()">← Назад</button>
                 </div>
@@ -1390,7 +1393,7 @@
                 });
         }
 
-        // ========== ОСТАЛЬНЫЕ ФУНКЦИИ (СОКРАЩЕНО ДЛЯ КРАТКОСТИ) ==========
+        // ========== ОСТАЛЬНЫЕ ФУНКЦИИ ==========
         socket.on('user_groups', (data) => { groups = data; renderGroupsList(); renderChatsList(); });
         socket.on('user_private_chats', (data) => { privateChats = data; renderChatsList(); });
         socket.on('all_users', (users) => { allUsers = users; renderContactsList(users); });
