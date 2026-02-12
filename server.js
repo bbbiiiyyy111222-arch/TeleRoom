@@ -77,7 +77,7 @@ db.serialize(() => {
         FOREIGN KEY (created_by) REFERENCES users(id)
     )`);
 
-    // Участники групп - ИСПРАВЛЕНО!
+    // Участники групп
     db.run(`CREATE TABLE IF NOT EXISTS group_members (
         group_id INTEGER NOT NULL,
         user_id INTEGER NOT NULL,
@@ -86,7 +86,7 @@ db.serialize(() => {
         PRIMARY KEY (group_id, user_id)
     )`);
 
-    // Личные чаты - ИСПРАВЛЕНО!
+    // Личные чаты
     db.run(`CREATE TABLE IF NOT EXISTS private_chats (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user1_id INTEGER NOT NULL,
@@ -95,7 +95,7 @@ db.serialize(() => {
         UNIQUE(user1_id, user2_id)
     )`);
 
-    // Сообщения
+    // Сообщения (ПОЛНАЯ ВЕРСИЯ)
     db.run(`CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         chat_type TEXT NOT NULL,
@@ -123,7 +123,7 @@ app.get('/api/users', (req, res) => {
     });
 });
 
-// ПОИСК ПОЛЬЗОВАТЕЛЕЙ - ИСПРАВЛЕНО!
+// ПОИСК ПОЛЬЗОВАТЕЛЕЙ
 app.get('/api/users/search/:query', (req, res) => {
     const query = `%${req.params.query}%`;
     db.all('SELECT id, name, phone, online, last_seen FROM users WHERE name LIKE ? OR phone LIKE ? ORDER BY name LIMIT 20', 
@@ -186,7 +186,7 @@ app.get('/api/groups/:groupId/members', (req, res) => {
     });
 });
 
-// ДОБАВЛЕНИЕ УЧАСТНИКА В ГРУППУ - ИСПРАВЛЕНО!
+// ДОБАВЛЕНИЕ УЧАСТНИКА В ГРУППУ
 app.post('/api/groups/add_member', (req, res) => {
     const { group_id, user_id } = req.body;
     
@@ -216,7 +216,7 @@ app.get('/api/messages/group/:groupId', (req, res) => {
     });
 });
 
-// ========== API ЛИЧНЫХ ЧАТОВ - ПОЛНОСТЬЮ ИСПРАВЛЕНО! ==========
+// ========== API ЛИЧНЫХ ЧАТОВ ==========
 app.post('/api/private_chat', (req, res) => {
     const { user1_id, user2_id } = req.body;
     
@@ -332,6 +332,34 @@ app.post('/api/upload/photo', upload.single('photo'), (req, res) => {
     );
 });
 
+app.post('/api/upload/file', upload.single('file'), (req, res) => {
+    if (!req.file) return res.status(400).json({ error: 'Нет файла' });
+    
+    const { chat_type, chat_id, user_id } = req.body;
+    const file_url = req.file.filename;
+    const file_name = req.file.originalname;
+    const file_size = req.file.size;
+    
+    db.run(
+        'INSERT INTO messages (chat_type, chat_id, user_id, file_url, file_name, file_size, text) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [chat_type, chat_id, user_id, file_url, file_name, file_size, '📎 Файл'],
+        function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            
+            db.get(`
+                SELECT m.*, u.name as user_name, u.avatar as user_avatar
+                FROM messages m
+                JOIN users u ON m.user_id = u.id
+                WHERE m.id = ?
+            `, [this.lastID], (err, message) => {
+                const room = chat_type === 'group' ? `group_${chat_id}` : `private_${chat_id}`;
+                io.to(room).emit('new_message', message);
+                res.json(message);
+            });
+        }
+    );
+});
+
 // ========== WEB SOCKET ==========
 io.on('connection', (socket) => {
     console.log('👤 Подключился пользователь');
@@ -348,7 +376,6 @@ io.on('connection', (socket) => {
                 
                 socket.emit('registered', existingUser);
                 
-                // Отправляем группы
                 db.all(`
                     SELECT g.*, COUNT(DISTINCT gm.user_id) as members_count
                     FROM groups g
@@ -359,7 +386,6 @@ io.on('connection', (socket) => {
                     socket.emit('user_groups', groups || []);
                 });
                 
-                // Отправляем личные чаты
                 db.all(`
                     SELECT pc.id, 
                            CASE 
@@ -375,7 +401,6 @@ io.on('connection', (socket) => {
                     socket.emit('user_private_chats', privateChats || []);
                 });
                 
-                // Отправляем всех пользователей
                 db.all('SELECT id, name, phone, online FROM users', (err, users) => {
                     socket.emit('all_users', users || []);
                 });
@@ -459,95 +484,11 @@ io.on('connection', (socket) => {
 
 // ========== ГЛАВНАЯ ==========
 app.get('/', (req, res) => {
-    res.send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>TeleRoom</title>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body { 
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    min-height: 100vh;
-                    padding: 20px;
-                }
-                .container {
-                    background: white;
-                    max-width: 500px;
-                    width: 100%;
-                    border-radius: 30px;
-                    padding: 40px;
-                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-                    text-align: center;
-                }
-                h1 { 
-                    font-size: 48px; 
-                    margin-bottom: 20px;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                }
-                .status {
-                    background: #4caf50;
-                    color: white;
-                    padding: 10px 20px;
-                    border-radius: 30px;
-                    display: inline-block;
-                    margin-bottom: 30px;
-                }
-                .info {
-                    background: #f5f5f5;
-                    padding: 20px;
-                    border-radius: 15px;
-                    text-align: left;
-                    margin: 20px 0;
-                }
-                .btn {
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    border: none;
-                    padding: 15px 30px;
-                    border-radius: 30px;
-                    font-size: 18px;
-                    cursor: pointer;
-                    margin-top: 20px;
-                    width: 100%;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>📱 TeleRoom</h1>
-                <div class="status">✅ СЕРВЕР РАБОТАЕТ</div>
-                <div class="info">
-                    <p>🚀 Статус: <strong style="color: #4caf50;">ONLINE</strong></p>
-                    <p>📡 Порт: ${process.env.PORT || 3000}</p>
-                    <p>⏰ Время: ${new Date().toLocaleString('ru-RU')}</p>
-                    <p>👥 Все баги исправлены!</p>
-                    <p>✅ Личные сообщения - РАБОТАЮТ</p>
-                    <p>✅ Добавление в группу - РАБОТАЕТ</p>
-                    <p>✅ Поиск - РАБОТАЕТ</p>
-                </div>
-                <button class="btn" onclick="window.location.href='/chat'">Перейти в чат</button>
-            </div>
-        </body>
-        </html>
-    `);
+    res.sendFile(__dirname + '/index.html');
 });
 
-// ========== ЧАТ ==========
-app.get('/chat', (req, res) => {
-    res.redirect('/');
-});
 // ========== ЗАПУСК ==========
 const PORT = process.env.PORT || 3000;
-
 server.listen(PORT, '0.0.0.0', () => {
     console.log('\n' + '='.repeat(60));
     console.log('   🚀 TeleRoom PRO - ЗАПУЩЕН!');
@@ -555,8 +496,3 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log(`   📱 Порт: ${PORT}`);
     console.log('='.repeat(60) + '\n');
 });
-
-
-
-
-
