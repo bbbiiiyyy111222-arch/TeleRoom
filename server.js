@@ -380,7 +380,38 @@ io.on('connection', (socket) => {
 
 // ========== ГЛАВНАЯ ==========
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>TeleRoom</title>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <style>
+                body { 
+                    font-family: Arial, sans-serif;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    text-align: center;
+                    padding: 50px;
+                }
+                h1 { font-size: 48px; margin-bottom: 20px; }
+                .online { color: #4caf50; font-size: 24px; }
+                .info { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin-top: 30px; }
+            </style>
+        </head>
+        <body>
+            <h1>📱 TeleRoom</h1>
+            <h2 class="online">✅ СЕРВЕР РАБОТАЕТ!</h2>
+            <div class="info">
+                <p>🚀 Railway: ✅ ONLINE</p>
+                <p>📡 Порт: ${process.env.PORT || 3000}</p>
+                <p>⏰ Время: ${new Date().toLocaleString('ru-RU')}</p>
+                <p>🔥 Скоро тут будет полная версия чата!</p>
+            </div>
+        </body>
+        </html>
+    `);
 });
 
 // ========== ЗАПУСК ==========
@@ -395,4 +426,5 @@ server.listen(PORT, () => {
     console.log('   📎 Файлы: ✅ РАБОТАЮТ');
     console.log('   👥 Группы: ✅ РАБОТАЮТ');
     console.log('='.repeat(50) + '\n');
+
 });
