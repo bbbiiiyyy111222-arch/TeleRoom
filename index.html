@@ -399,20 +399,23 @@ function searchContacts() {
     );
     renderContactsList(filtered);
 }
-    // ========== ПОИСК ==========
-        function searchContacts() {
-            const query = document.getElementById('contact-search').value.toLowerCase();
-            const filtered = allUsers.filter(u => 
-                u.id !== currentUser?.id && 
-                u.name.toLowerCase().includes(query)
-            );
-            renderContactsList(filtered);
-        }
+   // ========== ПОИСК ПО КОНТАКТАМ ==========
+function searchContacts() {
+    const query = document.getElementById('contact-search').value.toLowerCase();
+    if (!allUsers || allUsers.length === 0) return;
+    
+    const filtered = allUsers.filter(u => 
+        u.id !== currentUser?.id && 
+        u.name && u.name.toLowerCase().includes(query)
+    );
+    renderContactsList(filtered);
+}
 
-        function searchChats() {
-            const query = document.getElementById('chat-search').value.toLowerCase();
-            renderChatsList(query);
-        }
+// ========== ПОИСК ПО ЧАТАМ ==========
+function searchChats() {
+    const query = document.getElementById('chat-search').value.toLowerCase();
+    renderChatsList(query);
+}
 
         // ========== ОТРИСОВКА ==========
         function renderGroupsList() {
@@ -1032,6 +1035,7 @@ function searchContacts() {
     </script>
 </body>
 </html>
+
 
 
 
