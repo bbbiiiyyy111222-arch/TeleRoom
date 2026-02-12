@@ -541,11 +541,10 @@ app.get('/', (req, res) => {
     `);
 });
 
-// Временная заглушка для /chat
+// ========== ЧАТ ==========
 app.get('/chat', (req, res) => {
-    res.send('Чат временно на ремонте. Скоро всё заработает!');
+    res.redirect('/');
 });
-
 // ========== ЗАПУСК ==========
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
@@ -559,3 +558,4 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log(`   ✅ Поиск: РАБОТАЕТ`);
     console.log('='.repeat(60) + '\n');
 });
+
