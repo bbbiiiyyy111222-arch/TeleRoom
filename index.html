@@ -479,31 +479,36 @@ function searchChats() {
             });
         }
 
-        function renderContactsList(users) {
-            const container = document.getElementById('contacts-container');
-            if (!container) return;
-            container.innerHTML = '';
-            
-            const filtered = users.filter(u => u.id !== currentUser?.id);
-            
-            if (filtered.length === 0) {
-                container.innerHTML = '<div class="no-results">Пользователей не найдено</div>';
-                return;
-            }
-            
-            filtered.forEach(user => {
-                container.innerHTML += `
-                    <div class="chat-item" onclick="startPrivateChat(${user.id}, '${user.name.replace(/'/g, "\\'")}')">
-                        <div class="chat-avatar">👤</div>
-                        <div class="chat-info">
-                            <div class="chat-name">${user.name}</div>
-                            <div class="chat-last-message">${user.phone || 'Номер не указан'}</div>
-                        </div>
-                        <div class="${user.online ? 'online-status' : 'offline-status'}">${user.online ? '🟢 онлайн' : '⚪ офлайн'}</div>
-                    </div>
-                `;
-            });
-        }
+     function renderContactsList(users) {
+    const container = document.getElementById('contacts-container');
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (!users || users.length === 0) {
+        container.innerHTML = '<div class="no-results">👥 Пользователей не найдено</div>';
+        return;
+    }
+
+    users.forEach(user => {
+        // Защита от undefined
+        const userName = user.name || 'Без имени';
+        const userPhone = user.phone || 'Номер не указан';
+        const isOnline = user.online === 1;
+        
+        container.innerHTML += `
+            <div class="chat-item" onclick="startPrivateChat(${user.id}, '${userName.replace(/'/g, "\\'")}')">
+                <div class="chat-avatar">👤</div>
+                <div class="chat-info">
+                    <div class="chat-name">${userName}</div>
+                    <div class="chat-last-message">${userPhone}</div>
+                </div>
+                <div class="${isOnline ? 'online-status' : 'offline-status'}">
+                    ${isOnline ? '🟢 онлайн' : '⚪ офлайн'}
+                </div>
+            </div>
+        `;
+    });
+}
 
         // ========== ГРУППЫ ==========
         function showCreateGroupModal() {
@@ -964,4 +969,5 @@ function searchChats() {
     </script>
 </body>
 </html>
+
 
