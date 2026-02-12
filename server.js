@@ -145,9 +145,7 @@ app.post('/api/users/update-bio', (req, res) => {
     });
 });
 
-// ========== API ПРОФИЛЯ - ПОЛНОСТЬЮ РАБОЧИЕ ==========
-
-// 1. ИЗМЕНЕНИЕ ИМЕНИ
+// ========== API ПРОФИЛЯ ==========
 app.post('/api/user/update-name', (req, res) => {
     const { userId, newName } = req.body;
     
@@ -171,7 +169,6 @@ app.post('/api/user/update-name', (req, res) => {
     });
 });
 
-// 2. ИЗМЕНЕНИЕ ЮЗЕРНЕЙМА (phone)
 app.post('/api/user/update-username', (req, res) => {
     const { userId, newUsername } = req.body;
     
@@ -196,7 +193,6 @@ app.post('/api/user/update-username', (req, res) => {
     });
 });
 
-// 3. ЗАГРУЗКА АВАТАРКИ
 app.post('/api/user/upload-avatar', upload.single('avatar'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'Нет файла' });
     
@@ -214,7 +210,6 @@ app.post('/api/user/upload-avatar', upload.single('avatar'), (req, res) => {
     });
 });
 
-// 4. УДАЛЕНИЕ АВАТАРКИ (НОВАЯ ФУНКЦИЯ)
 app.post('/api/user/remove-avatar', (req, res) => {
     const { userId } = req.body;
     
@@ -229,7 +224,6 @@ app.post('/api/user/remove-avatar', (req, res) => {
     });
 });
 
-// 5. ПОЛУЧЕНИЕ ПРОФИЛЯ (НОВАЯ ФУНКЦИЯ)
 app.get('/api/user/profile/:userId', (req, res) => {
     db.get('SELECT id, name, phone, avatar, bio, online, last_seen, created_at FROM users WHERE id = ?', 
         [req.params.userId], 
@@ -678,13 +672,14 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log('   🚀 TeleRoom PRO - ЗАПУЩЕН!');
     console.log('='.repeat(60));
     console.log(`   📱 Порт: ${PORT}`);
-    console.log('   ✅ ВХОД - РАБОТАЕТ (НЕ ТРОГАЛ)');
+    console.log('   ✅ ВХОД - РАБОТАЕТ');
     console.log('   ✅ Имена - УНИКАЛЬНЫЕ');
     console.log('   ✅ Юзернейм - МОЖНО МЕНЯТЬ');
-    console.log('   ✅ Аватарка - МОЖНО ЗАГРУЖАТЬ');
-    console.log('   ✅ Аватарка - МОЖНО УДАЛЯТЬ');
+    console.log('   ✅ Аватарка - МОЖНО ЗАГРУЖАТЬ/УДАЛЯТЬ');
     console.log('   ✅ Био - МОЖНО РЕДАКТИРОВАТЬ');
     console.log('   ✅ Группы - РАБОТАЮТ');
     console.log('   ✅ Личные чаты - РАБОТАЮТ');
+    console.log('   ✅ Сообщения - РАБОТАЮТ');
+    console.log('   ✅ Поиск - РАБОТАЕТ');
     console.log('='.repeat(60) + '\n');
 });
