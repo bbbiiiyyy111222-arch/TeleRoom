@@ -7,7 +7,7 @@
     <!-- Inter font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* ========== ПОЛНОСТЬЮ НОВЫЙ ДИЗАЙН — КИБЕРПАНК 2.0 ========== */
+        /* ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ========== */
         :root {
             --bg-deep: #05080f;
             --bg-surface: rgba(15, 25, 35, 0.9);
@@ -69,7 +69,7 @@
             transition: var(--transition);
         }
 
-        /* ========== АДАПТИВНАЯ СЕТКА ========== */
+        /* ========== АДАПТИВНАЯ СЕТКА С ПРИНУДИТЕЛЬНЫМ РЕЖИМОМ ========== */
         .app-layout {
             display: flex;
             flex: 1;
@@ -77,13 +77,48 @@
             position: relative;
         }
 
+        /* Режимы отображения */
+        .layout-desktop .left-panel {
+            width: 320px;
+            display: flex !important;
+        }
+        .layout-desktop .right-panel {
+            flex: 1;
+        }
+
+        .layout-mobile .left-panel {
+            width: 100%;
+            height: 100%;
+            display: flex !important;
+            border-right: none;
+        }
+        .layout-mobile .right-panel {
+            display: none;
+        }
+        .layout-mobile .right-panel.active-mobile {
+            display: flex;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 100;
+        }
+
+        /* По умолчанию — адаптивность */
         @media (max-width: 768px) {
-            .app-layout {
+            .app-layout:not(.layout-desktop):not(.layout-mobile) {
                 flex-direction: column;
+            }
+            .app-layout:not(.layout-desktop):not(.layout-mobile) .left-panel {
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border-glow);
             }
         }
 
-        /* ========== ЛЕВАЯ ПАНЕЛЬ — НОВАЯ ЭРГОНОМИКА ========== */
+        /* ========== ЛЕВАЯ ПАНЕЛЬ ========== */
         .left-panel {
             width: 320px;
             background: linear-gradient(145deg, rgba(20, 25, 35, 0.95), rgba(10, 15, 25, 0.98));
@@ -93,15 +128,6 @@
             flex-direction: column;
             overflow: hidden;
             transition: var(--transition);
-        }
-
-        @media (max-width: 768px) {
-            .left-panel {
-                width: 100%;
-                height: auto;
-                border-right: none;
-                border-bottom: 1px solid var(--border-glow);
-            }
         }
 
         .panel-header {
@@ -157,6 +183,11 @@
             color: white;
             text-shadow: 0 0 8px var(--accent-secondary);
             font-size: 16px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
         }
 
         .icon-btn {
@@ -331,7 +362,7 @@
             text-shadow: 0 0 8px var(--neon-green);
         }
 
-        /* ========== ПРАВАЯ ПАНЕЛЬ — ГЛАВНЫЙ КОНТЕНТ ========== */
+        /* ========== ПРАВАЯ ПАНЕЛЬ ========== */
         .right-panel {
             flex: 1;
             background: radial-gradient(circle at 80% 30%, #0a0e15, #020408);
@@ -380,6 +411,34 @@
             letter-spacing: -0.5px;
         }
 
+        .device-selector {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .device-btn {
+            padding: 8px 16px;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-glow);
+            background: rgba(0, 0, 0, 0.4);
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .device-btn.active {
+            background: var(--gradient-cosmic);
+            color: white;
+            border-color: var(--accent-secondary);
+            box-shadow: 0 0 15px var(--accent-primary);
+        }
+
         .right-content {
             flex: 1;
             overflow-y: auto;
@@ -388,7 +447,7 @@
             flex-direction: column;
         }
 
-        /* ========== ЧАТ — НОВЫЙ ВИЗУАЛ ========== */
+        /* ========== ЧАТ ========== */
         .messages-neo {
             flex: 1;
             overflow-y: auto;
@@ -534,7 +593,7 @@
             box-shadow: 0 0 35px var(--accent-secondary);
         }
 
-        /* ========== ПРОФИЛЬ — КОСМИЧЕСКИЙ СТИЛЬ ========== */
+        /* ========== ПРОФИЛЬ ========== */
         .profile-cosmic {
             display: flex;
             flex-direction: column;
@@ -646,7 +705,7 @@
             box-shadow: none;
         }
 
-        /* ========== НАСТРОЙКИ — МИНИМАЛИЗМ ========== */
+        /* ========== НАСТРОЙКИ — УЛУЧШЕННЫЙ ДИЗАЙН ========== */
         .settings-cosmic {
             background: rgba(0, 0, 0, 0.3);
             border-radius: var(--radius-lg);
@@ -684,27 +743,33 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             padding: 14px 22px;
             border-radius: var(--radius-md);
-            border: 1px solid var(--border-glow);
+            border: 1px solid var(--accent-primary);
             color: white;
+            transition: var(--transition);
+        }
+
+        .settings-field:hover {
+            border-color: var(--accent-secondary);
+            box-shadow: 0 0 15px var(--accent-primary);
         }
 
         .settings-edit {
-            background: transparent;
-            border: 1px solid var(--accent-secondary);
-            color: var(--accent-secondary);
+            background: var(--gradient-cosmic);
+            border: none;
+            color: white;
             padding: 8px 20px;
             border-radius: var(--radius-xl);
             cursor: pointer;
             transition: var(--transition);
             font-weight: 600;
+            box-shadow: 0 0 10px var(--accent-primary);
         }
 
         .settings-edit:hover {
-            background: var(--accent-secondary);
-            color: black;
+            transform: scale(1.05);
             box-shadow: 0 0 20px var(--accent-secondary);
         }
 
@@ -731,7 +796,7 @@
             box-shadow: 0 0 15px var(--accent-primary);
         }
 
-        /* ========== МОДАЛКИ — НОВАЯ ЭСТЕТИКА ========== */
+        /* ========== МОДАЛКИ ========== */
         .modal-neo {
             display: none;
             position: fixed;
@@ -856,32 +921,16 @@
             border-radius: 10px;
         }
 
-        /* ========== АДАПТАЦИЯ ДЛЯ ТЕЛЕФОНОВ ========== */
-        @media (max-width: 768px) {
-            .left-panel {
-                width: 100%;
-                max-height: 40vh;
-            }
-            .right-panel {
-                flex: 1;
-            }
-            .message-neo {
-                max-width: 90%;
-            }
-            .avatar-giant {
-                width: 100px;
-                height: 100px;
-                font-size: 48px;
-            }
-            .name-giant {
-                font-size: 28px;
-            }
+        /* ========== АНИМАЦИИ ========== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
     <div id="app">
-        <!-- ========== ЭКРАН ЛОГИНА — МИНИМАЛИЗМ ========== -->
+        <!-- ========== ЭКРАН ЛОГИНА ========== -->
         <div id="login-screen" class="modal-neo active" style="display: flex; position: relative; backdrop-filter: blur(40px);">
             <div class="modal-card" style="max-width: 400px;">
                 <div style="text-align: center; margin-bottom: 20px;">
@@ -890,18 +939,18 @@
                 <div class="cyber-title" style="font-size: 42px; background: linear-gradient(45deg, #c77dff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; margin-bottom: 8px;">
                     TeleRoom NEO
                 </div>
-                <div style="color: var(--text-muted); text-align: center; margin-bottom: 32px; font-size: 14px; letter-spacing: 2px;">
+                <div style="color: var(--text-muted); text-align: center; margin-bottom: 32px; font-size: 14px; letter-spacing: 2px;" id="login-subtitle">
                     AES-256-GCM • QUANTUM-RESISTANT
                 </div>
                 <input type="text" id="login-name" class="search-neo" placeholder="Введите уникальное имя" onkeyup="checkUsername()" autofocus style="margin-bottom: 16px;">
                 <div id="username-error" class="error-cyber" style="color: #ff6b6b; margin-bottom: 16px; display: none;"></div>
-                <button class="btn-cosmic" onclick="register()" style="width: 100%;">🚀 ВОЙТИ В СЕТЬ</button>
+                <button class="btn-cosmic" onclick="register()" style="width: 100%;" id="login-btn">🚀 ВОЙТИ В СЕТЬ</button>
             </div>
         </div>
 
-        <!-- ========== ГЛАВНЫЙ ЭКРАН — НОВАЯ ЭРА ========== -->
+        <!-- ========== ГЛАВНЫЙ ЭКРАН ========== -->
         <div id="main-screen" class="screen" style="display: none; height: 100%; flex-direction: column;">
-            <div class="app-layout" style="flex: 1;">
+            <div class="app-layout" id="appLayout" style="flex: 1;">
                 <!-- ЛЕВАЯ ПАНЕЛЬ -->
                 <div class="left-panel">
                     <div class="panel-header">
@@ -909,12 +958,15 @@
                             <div class="avatar-neo" id="header-avatar">👤</div>
                             <span class="user-neo-name" id="header-name">Загрузка...</span>
                         </div>
-                        <button class="icon-btn" onclick="openSettings()" title="Настройки">⚙️</button>
+                        <div class="header-actions">
+                            <button class="icon-btn" onclick="openCreateGroupModal()" title="Создать группу" id="create-group-btn-header">➕</button>
+                            <button class="icon-btn" onclick="openSettings()" title="Настройки" id="settings-btn-header">⚙️</button>
+                        </div>
                     </div>
                     <div class="nav-panel">
-                        <button class="nav-item active" onclick="switchPanelTab('chats', this)">💬 Чаты</button>
-                        <button class="nav-item" onclick="switchPanelTab('groups', this)">👥 Группы</button>
-                        <button class="nav-item" onclick="switchPanelTab('contacts', this)">📡 Контакты</button>
+                        <button class="nav-item active" onclick="switchPanelTab('chats', this)" id="nav-chats">💬 Чаты</button>
+                        <button class="nav-item" onclick="switchPanelTab('groups', this)" id="nav-groups">👥 Группы</button>
+                        <button class="nav-item" onclick="switchPanelTab('contacts', this)" id="nav-contacts">📡 Контакты</button>
                     </div>
                     <div class="panel-content">
                         <input type="text" id="panel-search" class="search-neo" placeholder="🔍 Поиск..." onkeyup="searchPanel()">
@@ -929,14 +981,32 @@
                     <div class="right-header">
                         <button class="back-btn" onclick="closeRightPanel()" style="display: none;">←</button>
                         <div class="right-title" id="right-title">Добро пожаловать</div>
+                        <div class="device-selector">
+                            <button class="device-btn active" id="device-auto" onclick="setDeviceMode('auto')">🔄 Авто</button>
+                            <button class="device-btn" id="device-desktop" onclick="setDeviceMode('desktop')">💻 ПК</button>
+                            <button class="device-btn" id="device-mobile" onclick="setDeviceMode('mobile')">📱 Телефон</button>
+                        </div>
                     </div>
                     <div class="right-content" id="right-content">
                         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted);">
                             <div style="font-size: 72px; margin-bottom: 24px; filter: drop-shadow(0 0 20px #7b2cbf);">🌌</div>
-                            <div style="font-size: 22px; font-weight: 600; margin-bottom: 12px; color: white;">Выберите чат или контакт</div>
-                            <div style="font-size: 15px; max-width: 70%; text-align: center; line-height: 1.6;">Все сообщения защищены квантово-стойким шифрованием AES-256-GCM</div>
+                            <div style="font-size: 22px; font-weight: 600; margin-bottom: 12px; color: white;" id="welcome-title">Выберите чат или контакт</div>
+                            <div style="font-size: 15px; max-width: 70%; text-align: center; line-height: 1.6;" id="encrypted-note">Все сообщения защищены квантово-стойким шифрованием AES-256-GCM</div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== МОДАЛКА СОЗДАНИЯ ГРУППЫ ========== -->
+        <div id="create-group-modal" class="modal-neo">
+            <div class="modal-card">
+                <div class="modal-title-neo" id="create-group-title">👥 Создать группу</div>
+                <input type="text" id="group-name" class="search-neo" placeholder="Название группы" style="margin-bottom: 16px;">
+                <input type="text" id="group-description" class="search-neo" placeholder="Описание (необязательно)" style="margin-bottom: 24px;">
+                <div style="display: flex; gap: 16px;">
+                    <button class="btn-modal btn-modal-secondary" style="flex:1;" onclick="closeCreateGroupModal()" id="create-group-cancel">Отмена</button>
+                    <button class="btn-modal btn-modal-primary" style="flex:1;" onclick="createGroup()" id="create-group-submit">Создать</button>
                 </div>
             </div>
         </div>
@@ -944,44 +1014,44 @@
         <!-- ========== МОДАЛКА НАСТРОЕК (ПРОФИЛЬ РЕДАКТИРУЕТСЯ ЗДЕСЬ) ========== -->
         <div id="settings-modal" class="modal-neo">
             <div class="modal-card">
-                <div class="modal-title-neo">⚙️ Настройки</div>
+                <div class="modal-title-neo" id="settings-title">⚙️ Настройки</div>
                 <div class="modal-avatar-area">
                     <div class="modal-avatar-neo" id="modal-avatar" onclick="document.getElementById('avatarInput').click()">👤</div>
                     <div class="modal-avatar-actions">
-                        <button class="btn-modal btn-modal-secondary" onclick="document.getElementById('avatarInput').click()">📸 Загрузить</button>
-                        <button class="btn-modal btn-modal-danger" onclick="removeAvatar()">🗑️ Удалить</button>
+                        <button class="btn-modal btn-modal-secondary" onclick="document.getElementById('avatarInput').click()" id="settings-upload-btn">📸 Загрузить</button>
+                        <button class="btn-modal btn-modal-danger" onclick="removeAvatar()" id="settings-delete-btn">🗑️ Удалить</button>
                     </div>
                 </div>
                 <div class="settings-row">
-                    <span class="settings-label">👤 Имя пользователя</span>
+                    <span class="settings-label" id="settings-name-label">👤 Имя пользователя</span>
                     <div class="settings-field">
                         <span id="settings-name">Имя</span>
-                        <button class="settings-edit" onclick="editName()">✏️ Изменить</button>
+                        <button class="settings-edit" onclick="editName()" id="settings-name-edit">✏️ Изменить</button>
                     </div>
                 </div>
                 <div class="settings-row">
-                    <span class="settings-label">@ Юзернейм</span>
+                    <span class="settings-label" id="settings-username-label">@ Юзернейм</span>
                     <div class="settings-field">
                         <span id="settings-username">@username</span>
-                        <button class="settings-edit" onclick="editUsername()">✏️ Изменить</button>
+                        <button class="settings-edit" onclick="editUsername()" id="settings-username-edit">✏️ Изменить</button>
                     </div>
                 </div>
                 <div class="settings-row">
-                    <span class="settings-label">📝 О себе</span>
+                    <span class="settings-label" id="settings-bio-label">📝 О себе</span>
                     <div class="settings-field">
                         <span id="settings-bio">Нет информации</span>
-                        <button class="settings-edit" onclick="editBio()">✏️ Изменить</button>
+                        <button class="settings-edit" onclick="editBio()" id="settings-bio-edit">✏️ Изменить</button>
                     </div>
                 </div>
                 <div class="settings-row">
-                    <span class="settings-label">🌐 Язык интерфейса</span>
+                    <span class="settings-label" id="settings-language-label">🌐 Язык интерфейса</span>
                     <div class="language-selector">
                         <button id="lang-ru" class="lang-btn active" onclick="setLanguage('ru')">Русский</button>
                         <button id="lang-en" class="lang-btn" onclick="setLanguage('en')">English</button>
                     </div>
                 </div>
                 <div style="display: flex; gap: 16px; margin-top: 32px;">
-                    <button class="btn-cosmic" style="flex:1;" onclick="closeSettings()">Закрыть</button>
+                    <button class="btn-cosmic" style="flex:1;" onclick="closeSettings()" id="settings-close-btn">Закрыть</button>
                 </div>
             </div>
         </div>
@@ -989,11 +1059,11 @@
         <!-- ========== МОДАЛКА РЕДАКТИРОВАНИЯ БИО ========== -->
         <div id="edit-bio-modal" class="modal-neo">
             <div class="modal-card">
-                <div class="modal-title-neo">📝 Редактировать био</div>
+                <div class="modal-title-neo" id="edit-bio-title">📝 Редактировать био</div>
                 <textarea id="bio-text" class="search-neo" style="height: 140px; resize: none; margin-bottom: 24px; padding: 16px;" placeholder="Расскажи о себе..."></textarea>
                 <div style="display: flex; gap: 16px;">
-                    <button class="btn-modal btn-modal-secondary" style="flex:1;" onclick="closeEditBio()">Отмена</button>
-                    <button class="btn-modal btn-modal-primary" style="flex:1;" onclick="saveBio()">Сохранить</button>
+                    <button class="btn-modal btn-modal-secondary" style="flex:1;" onclick="closeEditBio()" id="edit-bio-cancel">Отмена</button>
+                    <button class="btn-modal btn-modal-primary" style="flex:1;" onclick="saveBio()" id="edit-bio-save">Сохранить</button>
                 </div>
             </div>
         </div>
@@ -1009,19 +1079,19 @@
                     <div class="stats-cosmic">
                         <div class="stat-cosmic-item">
                             <div class="stat-cosmic-value" id="modal-profile-groups">0</div>
-                            <div class="stat-cosmic-label">Групп</div>
+                            <div class="stat-cosmic-label" id="modal-profile-groups-label">Групп</div>
                         </div>
                         <div class="stat-cosmic-item">
                             <div class="stat-cosmic-value" id="modal-profile-chats">0</div>
-                            <div class="stat-cosmic-label">Чатов</div>
+                            <div class="stat-cosmic-label" id="modal-profile-chats-label">Чатов</div>
                         </div>
                         <div class="stat-cosmic-item">
                             <div class="stat-cosmic-value" id="modal-profile-days">0</div>
-                            <div class="stat-cosmic-label">Дней</div>
+                            <div class="stat-cosmic-label" id="modal-profile-days-label">Дней</div>
                         </div>
                     </div>
-                    <button class="btn-cosmic" onclick="startChatWithProfileUser()">💬 Написать</button>
-                    <button class="btn-cosmic btn-cosmic-outline" onclick="closeUserProfile()">Закрыть</button>
+                    <button class="btn-cosmic" onclick="startChatWithProfileUser()" id="modal-profile-write">💬 Написать</button>
+                    <button class="btn-cosmic btn-cosmic-outline" onclick="closeUserProfile()" id="modal-profile-close">Закрыть</button>
                 </div>
             </div>
         </div>
@@ -1042,13 +1112,15 @@
         let groups = [], privateChats = [], allUsers = [], audioElements = {};
         let mediaRecorder = null, audioChunks = [], isRecording = false;
         let viewingUserId = null;
+        let currentDeviceMode = localStorage.getItem('teleRoomDeviceMode') || 'auto';
 
-        // ========== МУЛЬТИЯЗЫЧНОСТЬ — РУССКИЙ / АНГЛИЙСКИЙ ==========
+        // ========== МУЛЬТИЯЗЫЧНОСТЬ — ПОЛНАЯ ==========
         const i18n = {
             ru: {
+                // Общие
                 welcome: 'Добро пожаловать',
                 selectChat: 'Выберите чат или контакт',
-                encrypted: 'Все сообщения защищены AES-256-GCM',
+                encrypted: 'Все сообщения защищены квантово-стойким шифрованием AES-256-GCM',
                 noChats: 'Нет чатов',
                 noGroups: 'Нет групп',
                 noUsers: 'Нет пользователей',
@@ -1067,12 +1139,65 @@
                 groups: 'Групп',
                 chats: 'Чатов',
                 write: 'Написать',
-                close: 'Закрыть'
+                close: 'Закрыть',
+                // Навигация
+                navChats: 'Чаты',
+                navGroups: 'Группы',
+                navContacts: 'Контакты',
+                // Поиск
+                searchPlaceholder: '🔍 Поиск...',
+                // Кнопки
+                createGroup: 'Создать группу',
+                groupName: 'Название группы',
+                groupDescription: 'Описание (необязательно)',
+                // Настройки
+                settingsNameLabel: '👤 Имя пользователя',
+                settingsUsernameLabel: '@ Юзернейм',
+                settingsBioLabel: '📝 О себе',
+                settingsLanguageLabel: '🌐 Язык интерфейса',
+                settingsUpload: '📸 Загрузить',
+                settingsDelete: '🗑️ Удалить',
+                settingsEdit: '✏️ Изменить',
+                settingsClose: 'Закрыть',
+                // Модалки
+                createGroupTitle: '👥 Создать группу',
+                editBioTitle: '📝 Редактировать био',
+                // Профиль
+                profileGroups: 'Групп',
+                profileChats: 'Чатов',
+                profileDays: 'Дней',
+                profileWrite: '💬 Написать',
+                profileClose: 'Закрыть',
+                // Устройства
+                deviceAuto: '🔄 Авто',
+                deviceDesktop: '💻 ПК',
+                deviceMobile: '📱 Телефон',
+                // Логин
+                loginSubtitle: 'AES-256-GCM • QUANTUM-RESISTANT',
+                loginNamePlaceholder: 'Введите уникальное имя',
+                loginBtn: '🚀 ВОЙТИ В СЕТЬ',
+                // Чат
+                messagePlaceholder: 'Сообщение...',
+                voiceMessage: 'Голосовое сообщение',
+                file: 'Файл',
+                noInfo: 'Нет информации',
+                noBio: 'Нет информации',
+                // Ошибки
+                nameTaken: 'Это имя уже занято!',
+                enterName: 'Введите имя',
+                selectChatFirst: 'Сначала выберите чат',
+                microphoneDenied: 'Доступ к микрофону не разрешён',
+                nameChanged: '✅ Имя изменено',
+                usernameChanged: '✅ Юзернейм изменён',
+                bioUpdated: '✅ Био обновлено',
+                avatarRemoved: '✅ Аватарка удалена',
+                avatarUpdated: '✅ Аватарка обновлена'
             },
             en: {
+                // Common
                 welcome: 'Welcome',
                 selectChat: 'Select chat or contact',
-                encrypted: 'All messages are encrypted with AES-256-GCM',
+                encrypted: 'All messages are encrypted with quantum-resistant AES-256-GCM',
                 noChats: 'No chats',
                 noGroups: 'No groups',
                 noUsers: 'No users',
@@ -1091,11 +1216,64 @@
                 groups: 'Groups',
                 chats: 'Chats',
                 write: 'Message',
-                close: 'Close'
+                close: 'Close',
+                // Navigation
+                navChats: 'Chats',
+                navGroups: 'Groups',
+                navContacts: 'Contacts',
+                // Search
+                searchPlaceholder: '🔍 Search...',
+                // Buttons
+                createGroup: 'Create group',
+                groupName: 'Group name',
+                groupDescription: 'Description (optional)',
+                // Settings
+                settingsNameLabel: '👤 Name',
+                settingsUsernameLabel: '@ Username',
+                settingsBioLabel: '📝 Bio',
+                settingsLanguageLabel: '🌐 Language',
+                settingsUpload: '📸 Upload',
+                settingsDelete: '🗑️ Delete',
+                settingsEdit: '✏️ Edit',
+                settingsClose: 'Close',
+                // Modals
+                createGroupTitle: '👥 Create group',
+                editBioTitle: '📝 Edit bio',
+                // Profile
+                profileGroups: 'Groups',
+                profileChats: 'Chats',
+                profileDays: 'Days',
+                profileWrite: '💬 Message',
+                profileClose: 'Close',
+                // Devices
+                deviceAuto: '🔄 Auto',
+                deviceDesktop: '💻 Desktop',
+                deviceMobile: '📱 Mobile',
+                // Login
+                loginSubtitle: 'AES-256-GCM • QUANTUM-RESISTANT',
+                loginNamePlaceholder: 'Enter unique name',
+                loginBtn: '🚀 ENTER NETWORK',
+                // Chat
+                messagePlaceholder: 'Message...',
+                voiceMessage: 'Voice message',
+                file: 'File',
+                noInfo: 'No info',
+                noBio: 'No bio',
+                // Errors
+                nameTaken: 'This name is already taken!',
+                enterName: 'Enter name',
+                selectChatFirst: 'Select a chat first',
+                microphoneDenied: 'Microphone access denied',
+                nameChanged: '✅ Name changed',
+                usernameChanged: '✅ Username changed',
+                bioUpdated: '✅ Bio updated',
+                avatarRemoved: '✅ Avatar removed',
+                avatarUpdated: '✅ Avatar updated'
             }
         };
         let currentLang = localStorage.getItem('teleRoomLang') || 'ru';
 
+        // ========== ФУНКЦИИ ЯЗЫКА ==========
         function setLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('teleRoomLang', lang);
@@ -1106,8 +1284,110 @@
 
         function applyTranslations() {
             const t = i18n[currentLang];
-            document.getElementById('right-title').innerText = t.welcome;
-            // Здесь можно обновлять другие элементы динамически, но для простоты оставляем базовые
+            
+            // Логин
+            const loginSubtitle = document.getElementById('login-subtitle');
+            if (loginSubtitle) loginSubtitle.innerText = t.loginSubtitle;
+            const loginNameInput = document.getElementById('login-name');
+            if (loginNameInput) loginNameInput.placeholder = t.loginNamePlaceholder;
+            const loginBtn = document.getElementById('login-btn');
+            if (loginBtn) loginBtn.innerText = t.loginBtn;
+            
+            // Главный экран
+            const welcomeTitle = document.getElementById('welcome-title');
+            if (welcomeTitle) welcomeTitle.innerText = t.selectChat;
+            const encryptedNote = document.getElementById('encrypted-note');
+            if (encryptedNote) encryptedNote.innerText = t.encrypted;
+            const rightTitle = document.getElementById('right-title');
+            if (rightTitle && !currentChat) rightTitle.innerText = t.welcome;
+            
+            // Навигация
+            document.getElementById('nav-chats').innerHTML = `💬 ${t.navChats}`;
+            document.getElementById('nav-groups').innerHTML = `👥 ${t.navGroups}`;
+            document.getElementById('nav-contacts').innerHTML = `📡 ${t.navContacts}`;
+            
+            // Поиск
+            const panelSearch = document.getElementById('panel-search');
+            if (panelSearch) panelSearch.placeholder = t.searchPlaceholder;
+            
+            // Кнопки в заголовке
+            const createGroupBtn = document.getElementById('create-group-btn-header');
+            if (createGroupBtn) createGroupBtn.title = t.createGroup;
+            const settingsBtn = document.getElementById('settings-btn-header');
+            if (settingsBtn) settingsBtn.title = t.settings;
+            
+            // Селектор устройств
+            document.getElementById('device-auto').innerHTML = t.deviceAuto;
+            document.getElementById('device-desktop').innerHTML = t.deviceDesktop;
+            document.getElementById('device-mobile').innerHTML = t.deviceMobile;
+            
+            // Модалка создания группы
+            document.getElementById('create-group-title').innerText = t.createGroupTitle;
+            const groupNameInput = document.getElementById('group-name');
+            if (groupNameInput) groupNameInput.placeholder = t.groupName;
+            const groupDescInput = document.getElementById('group-description');
+            if (groupDescInput) groupDescInput.placeholder = t.groupDescription;
+            document.getElementById('create-group-cancel').innerText = t.cancel;
+            document.getElementById('create-group-submit').innerText = t.createGroup;
+            
+            // Модалка настроек
+            document.getElementById('settings-title').innerText = t.settings;
+            document.getElementById('settings-name-label').innerText = t.settingsNameLabel;
+            document.getElementById('settings-username-label').innerText = t.settingsUsernameLabel;
+            document.getElementById('settings-bio-label').innerText = t.settingsBioLabel;
+            document.getElementById('settings-language-label').innerText = t.settingsLanguageLabel;
+            document.getElementById('settings-upload-btn').innerHTML = t.settingsUpload;
+            document.getElementById('settings-delete-btn').innerHTML = t.settingsDelete;
+            document.getElementById('settings-name-edit').innerHTML = t.settingsEdit;
+            document.getElementById('settings-username-edit').innerHTML = t.settingsEdit;
+            document.getElementById('settings-bio-edit').innerHTML = t.settingsEdit;
+            document.getElementById('settings-close-btn').innerText = t.settingsClose;
+            
+            // Модалка био
+            document.getElementById('edit-bio-title').innerText = t.editBioTitle;
+            const bioTextarea = document.getElementById('bio-text');
+            if (bioTextarea) bioTextarea.placeholder = t.bio;
+            document.getElementById('edit-bio-cancel').innerText = t.cancel;
+            document.getElementById('edit-bio-save').innerText = t.save;
+            
+            // Модалка профиля другого пользователя
+            document.getElementById('modal-profile-groups-label').innerText = t.profileGroups;
+            document.getElementById('modal-profile-chats-label').innerText = t.profileChats;
+            document.getElementById('modal-profile-days-label').innerText = t.profileDays;
+            document.getElementById('modal-profile-write').innerHTML = t.profileWrite;
+            document.getElementById('modal-profile-close').innerText = t.profileClose;
+            
+            // Обновление плейсхолдера чата, если он активен
+            const chatInput = document.getElementById('chat-message-input');
+            if (chatInput) chatInput.placeholder = t.messagePlaceholder;
+            
+            // Перерисовка списков для обновления текстов "Нет чатов" и т.д.
+            renderChatsList();
+            renderGroupsList();
+            renderContactsList();
+        }
+
+        // ========== УПРАВЛЕНИЕ РЕЖИМОМ УСТРОЙСТВА ==========
+        function setDeviceMode(mode) {
+            currentDeviceMode = mode;
+            localStorage.setItem('teleRoomDeviceMode', mode);
+            const layout = document.getElementById('appLayout');
+            layout.classList.remove('layout-desktop', 'layout-mobile');
+            
+            document.getElementById('device-auto').classList.remove('active');
+            document.getElementById('device-desktop').classList.remove('active');
+            document.getElementById('device-mobile').classList.remove('active');
+            
+            if (mode === 'desktop') {
+                layout.classList.add('layout-desktop');
+                document.getElementById('device-desktop').classList.add('active');
+            } else if (mode === 'mobile') {
+                layout.classList.add('layout-mobile');
+                document.getElementById('device-mobile').classList.add('active');
+            } else {
+                // auto — ничего не добавляем, работают медиазапросы
+                document.getElementById('device-auto').classList.add('active');
+            }
         }
 
         // ========== ПРОВЕРКА ИМЕНИ ==========
@@ -1125,7 +1405,7 @@
                             const saved = localStorage.getItem('teleRoomName');
                             if (saved !== name) {
                                 errorDiv.style.display = 'block';
-                                errorDiv.innerHTML = '❌ ' + (currentLang === 'ru' ? 'Это имя уже занято!' : 'This name is already taken!');
+                                errorDiv.innerHTML = '❌ ' + i18n[currentLang].nameTaken;
                             } else errorDiv.style.display = 'none';
                         } else errorDiv.style.display = 'none';
                     });
@@ -1135,7 +1415,7 @@
         // ========== РЕГИСТРАЦИЯ ==========
         function register() {
             const name = document.getElementById('login-name').value.trim();
-            if (!name) return alert(currentLang === 'ru' ? 'Введите имя' : 'Enter name');
+            if (!name) return alert(i18n[currentLang].enterName);
             const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
             localStorage.setItem('teleRoomId', userId);
             localStorage.setItem('teleRoomName', name);
@@ -1149,6 +1429,7 @@
             loadGroups(); loadPrivateChats(); loadAllUsers();
             updateSettingsUI();
             applyTranslations();
+            setDeviceMode(currentDeviceMode); // Применяем сохранённый режим
         }
 
         socket.on('register_error', (error) => { alert(error); });
@@ -1179,6 +1460,8 @@
                 loadGroups(); loadPrivateChats(); loadAllUsers();
                 setTimeout(() => socket.emit('register', { name: savedName, phone: savedId }), 500);
                 updateSettingsUI();
+                applyTranslations();
+                setDeviceMode(currentDeviceMode);
             }
         })();
 
@@ -1207,13 +1490,14 @@
         // ========== ОТРИСОВКА СПИСКОВ ==========
         function renderChatsList() {
             const container = document.getElementById('chats-container');
+            if (!container) return;
             container.innerHTML = '';
             const all = [
                 ...privateChats.map(p => ({ 
                     id: p.id, 
                     type: 'private', 
                     name: p.other_user_name, 
-                    last: p.last_message || (currentLang === 'ru' ? 'Нет сообщений' : 'No messages'), 
+                    last: p.last_message || i18n[currentLang].noChats, 
                     time: p.last_time, 
                     online: p.online,
                     avatar: p.other_user_avatar,
@@ -1223,13 +1507,13 @@
                     id: g.id, 
                     type: 'group', 
                     name: g.name, 
-                    last: g.last_message || (currentLang === 'ru' ? 'Нет сообщений' : 'No messages'), 
+                    last: g.last_message || i18n[currentLang].noChats, 
                     time: g.last_time, 
                     members: g.members_count 
                 }))
             ].sort((a,b) => new Date(b.time||0) - new Date(a.time||0));
             if (all.length === 0) {
-                container.innerHTML = '<div class="no-results">' + (currentLang === 'ru' ? 'Нет чатов' : 'No chats') + '</div>';
+                container.innerHTML = '<div class="no-results">' + i18n[currentLang].noChats + '</div>';
                 return;
             }
             all.forEach(item => {
@@ -1250,26 +1534,28 @@
 
         function renderGroupsList() {
             const container = document.getElementById('groups-container');
+            if (!container) return;
             container.innerHTML = '';
             if (groups.length === 0) {
-                container.innerHTML = '<div class="no-results">' + (currentLang === 'ru' ? 'Нет групп' : 'No groups') + '</div>';
+                container.innerHTML = '<div class="no-results">' + i18n[currentLang].noGroups + '</div>';
                 return;
             }
             groups.forEach(g => {
                 const div = document.createElement('div');
                 div.className = 'item-neo';
                 div.onclick = () => openGroupChat(g.id, g.name);
-                div.innerHTML = `<div class="avatar-item">👥</div><div class="item-info"><div class="item-title">${g.name}</div><div class="item-sub">${g.last_message||(currentLang==='ru'?'Нет сообщений':'No messages')}</div></div><span class="badge-neo">👥 ${g.members_count||0}</span>`;
+                div.innerHTML = `<div class="avatar-item">👥</div><div class="item-info"><div class="item-title">${g.name}</div><div class="item-sub">${g.last_message || i18n[currentLang].noChats}</div></div><span class="badge-neo">👥 ${g.members_count||0}</span>`;
                 container.appendChild(div);
             });
         }
 
         function renderContactsList() {
             const container = document.getElementById('contacts-container');
+            if (!container) return;
             container.innerHTML = '';
             const filtered = allUsers.filter(u => u.id !== currentUser?.id);
             if (filtered.length === 0) {
-                container.innerHTML = '<div class="no-results">' + (currentLang === 'ru' ? 'Нет пользователей' : 'No users') + '</div>';
+                container.innerHTML = '<div class="no-results">' + i18n[currentLang].noUsers + '</div>';
                 return;
             }
             filtered.forEach(u => {
@@ -1277,7 +1563,7 @@
                 div.className = 'item-neo';
                 div.onclick = () => showUserProfileModal(u.id);
                 const avatarHtml = u.avatar ? `<img src="/avatars/${u.avatar}" style="width:100%;height:100%;object-fit:cover;">` : '👤';
-                div.innerHTML = `<div class="avatar-item">${avatarHtml}</div><div class="item-info"><div class="item-title">${u.name}</div><div class="item-sub">${u.bio||(currentLang==='ru'?'Нет информации':'No info')}</div></div><span class="${u.online ? 'online-indicator' : ''}">${u.online ? '🟢' : '⚪'}</span>`;
+                div.innerHTML = `<div class="avatar-item">${avatarHtml}</div><div class="item-info"><div class="item-title">${u.name}</div><div class="item-sub">${u.bio || i18n[currentLang].noInfo}</div></div><span class="${u.online ? 'online-indicator' : ''}">${u.online ? '🟢' : '⚪'}</span>`;
                 container.appendChild(div);
             });
         }
@@ -1296,6 +1582,40 @@
 
         function searchPanel() { /* реализация поиска */ }
 
+        // ========== ГРУППЫ ==========
+        function openCreateGroupModal() {
+            document.getElementById('create-group-modal').classList.add('active');
+        }
+
+        function closeCreateGroupModal() {
+            document.getElementById('create-group-modal').classList.remove('active');
+            document.getElementById('group-name').value = '';
+            document.getElementById('group-description').value = '';
+        }
+
+        function createGroup() {
+            const name = document.getElementById('group-name').value.trim();
+            if (!name) {
+                alert(i18n[currentLang].groupName + '?');
+                return;
+            }
+            fetch('/api/groups', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    name, 
+                    description: document.getElementById('group-description').value.trim(), 
+                    userId: currentUser.id 
+                })
+            })
+            .then(res => res.json())
+            .then(group => {
+                closeCreateGroupModal();
+                loadGroups();
+            })
+            .catch(err => console.error(err));
+        }
+
         // ========== ЧАТ ==========
         let messagesContainer = null;
         let chatInput = null;
@@ -1307,7 +1627,11 @@
             loadChatContent();
             socket.emit('join_private_chat', chatId);
             loadPrivateMessages(chatId);
-            if (window.innerWidth < 768) document.querySelector('.left-panel').style.display = 'none';
+            if (window.innerWidth < 768 && currentDeviceMode === 'auto') document.querySelector('.left-panel').style.display = 'none';
+            if (currentDeviceMode === 'mobile') {
+                document.querySelector('.left-panel').style.display = 'none';
+                document.querySelector('.right-panel').classList.add('active-mobile');
+            }
         }
 
         function openGroupChat(groupId, groupName) {
@@ -1317,7 +1641,11 @@
             loadChatContent();
             socket.emit('join_group', groupId);
             loadGroupMessages(groupId);
-            if (window.innerWidth < 768) document.querySelector('.left-panel').style.display = 'none';
+            if (window.innerWidth < 768 && currentDeviceMode === 'auto') document.querySelector('.left-panel').style.display = 'none';
+            if (currentDeviceMode === 'mobile') {
+                document.querySelector('.left-panel').style.display = 'none';
+                document.querySelector('.right-panel').classList.add('active-mobile');
+            }
         }
 
         function loadChatContent() {
@@ -1326,7 +1654,7 @@
                 <div id="messages-container" class="messages-neo"></div>
                 <div class="chat-input-area">
                     <button class="voice-neo" id="voiceBtn" onclick="toggleVoiceRecording()">🎤</button>
-                    <input type="text" id="chat-message-input" class="chat-field" placeholder="${currentLang === 'ru' ? 'Сообщение...' : 'Message...'}" onkeypress="onChatKeyPress(event)">
+                    <input type="text" id="chat-message-input" class="chat-field" placeholder="${i18n[currentLang].messagePlaceholder}" onkeypress="onChatKeyPress(event)">
                     <button class="send-neo" onclick="sendChatMessage()">➤</button>
                 </div>
             `;
@@ -1381,9 +1709,9 @@
             const date = new Date(m.created_at); date.setHours(date.getHours() + 2);
             const time = date.toLocaleTimeString(currentLang === 'ru' ? 'ru-RU' : 'en-US', { hour: '2-digit', minute: '2-digit' });
             let content = '';
-            if (m.voice_url) content = `<div>🎤 ${currentLang === 'ru' ? 'Голосовое сообщение' : 'Voice message'}</div>`;
+            if (m.voice_url) content = `<div>🎤 ${i18n[currentLang].voiceMessage}</div>`;
             else if (m.photo_url) content = `<div class="photo-message" onclick="openImageViewer('/uploads/photos/${m.photo_url}')"><img src="/uploads/photos/${m.photo_url}" style="max-width:200px; border-radius:12px;"></div>`;
-            else if (m.file_url) content = `<div>📎 ${m.file_name || (currentLang==='ru'?'Файл':'File')}</div>`;
+            else if (m.file_url) content = `<div>📎 ${m.file_name || i18n[currentLang].file}</div>`;
             else {
                 let txt = m.text || '';
                 txt = txt.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:var(--accent-secondary); text-decoration:underline;">$1</a>');
@@ -1405,7 +1733,7 @@
                     <div class="avatar-giant" id="my-profile-avatar">${currentUser.avatar ? `<img src="/avatars/${currentUser.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : currentUser.name[0].toUpperCase()}</div>
                     <div class="name-giant">${currentUser.name}</div>
                     <div class="username-giant">@${currentUser.phone || 'username'}</div>
-                    <div class="bio-giant">${currentUser.bio || (currentLang==='ru'?'Нет информации':'No bio')}</div>
+                    <div class="bio-giant">${currentUser.bio || i18n[currentLang].noBio}</div>
                     <div class="stats-cosmic">
                         <div class="stat-cosmic-item"><div class="stat-cosmic-value">${groups.length}</div><div class="stat-cosmic-label">${i18n[currentLang].groups}</div></div>
                         <div class="stat-cosmic-item"><div class="stat-cosmic-value">${privateChats.length}</div><div class="stat-cosmic-label">${i18n[currentLang].chats}</div></div>
@@ -1415,7 +1743,11 @@
                 </div>
             `;
             document.getElementById('right-title').innerText = i18n[currentLang].profile;
-            if (window.innerWidth < 768) document.querySelector('.left-panel').style.display = 'none';
+            if (window.innerWidth < 768 && currentDeviceMode === 'auto') document.querySelector('.left-panel').style.display = 'none';
+            if (currentDeviceMode === 'mobile') {
+                document.querySelector('.left-panel').style.display = 'none';
+                document.querySelector('.right-panel').classList.add('active-mobile');
+            }
         }
 
         // ========== НАСТРОЙКИ ==========
@@ -1432,7 +1764,7 @@
             if (!currentUser) return;
             document.getElementById('settings-name').innerText = currentUser.name;
             document.getElementById('settings-username').innerText = '@' + (currentUser.phone || 'username');
-            document.getElementById('settings-bio').innerText = currentUser.bio || (currentLang==='ru'?'Нет информации':'No info');
+            document.getElementById('settings-bio').innerText = currentUser.bio || i18n[currentLang].noInfo;
             if (currentUser.avatar) {
                 document.getElementById('modal-avatar').innerHTML = `<img src="/avatars/${currentUser.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
             } else {
@@ -1442,7 +1774,7 @@
 
         // ========== РЕДАКТИРОВАНИЕ ПРОФИЛЯ ==========
         function editName() {
-            const newName = prompt(currentLang === 'ru' ? 'Введите новое имя:' : 'Enter new name:', currentUser.name);
+            const newName = prompt(i18n[currentLang].settingsEdit + ' ' + i18n[currentLang].name, currentUser.name);
             if (newName && newName.trim() && newName !== currentUser.name) {
                 fetch('/api/user/update-name', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ userId: currentUser.id, newName: newName.trim() }) })
                 .then(r => r.json())
@@ -1453,14 +1785,14 @@
                         localStorage.setItem('teleRoomName', d.name);
                         document.getElementById('header-name').innerText = d.name;
                         document.getElementById('settings-name').innerText = d.name;
-                        alert(currentLang === 'ru' ? '✅ Имя изменено' : '✅ Name changed');
+                        alert(i18n[currentLang].nameChanged);
                     }
                 });
             }
         }
 
         function editUsername() {
-            const newUsername = prompt(currentLang === 'ru' ? 'Введите новый юзернейм (минимум 3 символа):' : 'Enter new username (min 3 chars):', currentUser.phone);
+            const newUsername = prompt(i18n[currentLang].settingsEdit + ' ' + i18n[currentLang].username, currentUser.phone);
             if (newUsername && newUsername.trim() && newUsername.length >= 3 && newUsername !== currentUser.phone) {
                 fetch('/api/user/update-username', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ userId: currentUser.id, newUsername: newUsername.trim() }) })
                 .then(r => r.json())
@@ -1470,7 +1802,7 @@
                         currentUser.phone = d.username;
                         localStorage.setItem('teleRoomId', d.username);
                         document.getElementById('settings-username').innerText = '@' + d.username;
-                        alert(currentLang === 'ru' ? '✅ Юзернейм изменён' : '✅ Username changed');
+                        alert(i18n[currentLang].usernameChanged);
                     }
                 });
             }
@@ -1492,16 +1824,16 @@
             .then(d => {
                 if (d.success) {
                     currentUser.bio = bio;
-                    document.getElementById('settings-bio').innerText = bio || (currentLang==='ru'?'Нет информации':'No info');
+                    document.getElementById('settings-bio').innerText = bio || i18n[currentLang].noInfo;
                     closeEditBio();
-                    alert(currentLang === 'ru' ? '✅ Био обновлено' : '✅ Bio updated');
+                    alert(i18n[currentLang].bioUpdated);
                 }
             });
         }
 
         // ========== АВАТАРКА ==========
         function removeAvatar() {
-            if (!confirm(currentLang === 'ru' ? 'Удалить аватарку?' : 'Delete avatar?')) return;
+            if (!confirm(i18n[currentLang].settingsDelete + '?')) return;
             fetch('/api/user/remove-avatar', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ userId: currentUser.id }) })
             .then(r => r.json())
             .then(d => {
@@ -1511,7 +1843,7 @@
                     document.getElementById('modal-avatar').innerHTML = initial;
                     document.getElementById('header-avatar').innerHTML = initial;
                     if (document.getElementById('my-profile-avatar')) document.getElementById('my-profile-avatar').innerHTML = initial;
-                    alert(currentLang === 'ru' ? '✅ Аватарка удалена' : '✅ Avatar removed');
+                    alert(i18n[currentLang].avatarRemoved);
                 }
             });
         }
@@ -1531,7 +1863,7 @@
                         document.getElementById('modal-avatar').innerHTML = html;
                         document.getElementById('header-avatar').innerHTML = html;
                         if (document.getElementById('my-profile-avatar')) document.getElementById('my-profile-avatar').innerHTML = html;
-                        alert(currentLang === 'ru' ? '✅ Аватарка обновлена' : '✅ Avatar updated');
+                        alert(i18n[currentLang].avatarUpdated);
                     }
                 });
             }
@@ -1546,7 +1878,7 @@
                     viewingUserId = user.id;
                     document.getElementById('modal-profile-name').innerText = user.name;
                     document.getElementById('modal-profile-username').innerText = '@' + (user.phone || 'username');
-                    document.getElementById('modal-profile-bio').innerText = user.bio || (currentLang==='ru'?'Нет информации':'No info');
+                    document.getElementById('modal-profile-bio').innerText = user.bio || i18n[currentLang].noInfo;
                     if (user.avatar) {
                         document.getElementById('modal-profile-avatar').innerHTML = `<img src="/avatars/${user.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
                     } else {
@@ -1590,7 +1922,7 @@
         // ========== ГОЛОСОВЫЕ ==========
         async function toggleVoiceRecording() {
             const btn = document.getElementById('voiceBtn');
-            if (!currentChat || !currentUser) return alert(currentLang === 'ru' ? 'Сначала выберите чат' : 'Select a chat first');
+            if (!currentChat || !currentUser) return alert(i18n[currentLang].selectChatFirst);
             if (!isRecording) {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
@@ -1613,7 +1945,7 @@
                     btn.classList.add('recording');
                     btn.innerHTML = '⏹';
                 } catch (err) {
-                    alert(currentLang === 'ru' ? 'Доступ к микрофону не разрешён' : 'Microphone access denied');
+                    alert(i18n[currentLang].microphoneDenied);
                 }
             } else {
                 if (mediaRecorder?.state !== 'inactive') mediaRecorder.stop();
@@ -1656,10 +1988,12 @@
 
         // ========== ЗАКРЫТИЕ ПРАВОЙ ПАНЕЛИ ==========
         function closeRightPanel() {
-            if (window.innerWidth < 768) {
+            if (currentDeviceMode === 'mobile' || window.innerWidth < 768) {
                 document.querySelector('.left-panel').style.display = 'flex';
+                document.querySelector('.right-panel').classList.remove('active-mobile');
                 document.getElementById('right-content').innerHTML = `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted);"><div style="font-size: 72px; margin-bottom: 24px; filter: drop-shadow(0 0 20px #7b2cbf);">🌌</div><div style="font-size: 22px; font-weight: 600; margin-bottom: 12px; color: white;">${i18n[currentLang].selectChat}</div><div style="font-size: 15px; max-width: 70%; text-align: center; line-height: 1.6;">${i18n[currentLang].encrypted}</div></div>`;
                 document.getElementById('right-title').innerText = i18n[currentLang].welcome;
+                currentChat = null;
             }
         }
 
@@ -1677,8 +2011,11 @@
         socket.on('user_online', (id) => { if (allUsers) { allUsers = allUsers.map(u => { if (u.id === id) u.online = 1; return u; }); renderContactsList(); } });
         socket.on('user_offline', (id) => { if (allUsers) { allUsers = allUsers.map(u => { if (u.id === id) u.online = 0; return u; }); renderContactsList(); } });
 
-        // Инициализация языка
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        // Применяем язык при загрузке
         setLanguage(currentLang);
+        // Устанавливаем режим устройства
+        setDeviceMode(currentDeviceMode);
     </script>
 </body>
 </html>
