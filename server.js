@@ -1,4 +1,4 @@
-const express = require('express');
+мconst express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const sqlite3 = require('sqlite3').verbose();
@@ -692,7 +692,7 @@ io.on('connection', (socket) => {
 
     socket.on('register', async (userData) => {
         try {
-            const { name } = userData;
+            const { name } = userData; // <-- ТЕПЕРЬ ТОЛЬКО name, без phone
             console.log(`📝 Попытка регистрации: ${name}`);
 
             // Проверяем, существует ли пользователь с таким именем
@@ -884,7 +884,7 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log('='.repeat(60));
     console.log(`   📱 Порт: ${PORT}`);
     console.log('   🔐 AES-256-GCM');
-    console.log('   ✅ Вход / Автовход');
+    console.log('   ✅ Вход / Автовход (только name)');
     console.log('   ✅ Авто-юзернеймы: user1..userN');
     console.log('   ✅ Профили, аватарки, био');
     console.log('   ✅ Группы, личные чаты');
