@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes, viewport-fit=cover">
     <title>TeleRoom NEO — защищённая вселенная</title>
-    <!-- Inter font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ========== */
@@ -69,7 +68,7 @@
             transition: var(--transition);
         }
 
-        /* ========== АДАПТИВНАЯ СЕТКА С ПРИНУДИТЕЛЬНЫМ РЕЖИМОМ ========== */
+        /* ========== АДАПТИВНАЯ СЕТКА ========== */
         .app-layout {
             display: flex;
             flex: 1;
@@ -77,7 +76,7 @@
             position: relative;
         }
 
-        /* Режимы отображения */
+        /* Десктопный режим (принудительно) */
         .layout-desktop .left-panel {
             width: 320px;
             display: flex !important;
@@ -86,6 +85,7 @@
             flex: 1;
         }
 
+        /* Мобильный режим (принудительно) */
         .layout-mobile .left-panel {
             width: 100%;
             height: 100%;
@@ -105,7 +105,7 @@
             z-index: 100;
         }
 
-        /* По умолчанию — адаптивность */
+        /* Авто-адаптивность (медиазапрос) */
         @media (max-width: 768px) {
             .app-layout:not(.layout-desktop):not(.layout-mobile) {
                 flex-direction: column;
@@ -439,6 +439,28 @@
             box-shadow: 0 0 15px var(--accent-primary);
         }
 
+        .right-settings-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glow);
+            color: white;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-left: 8px;
+        }
+
+        .right-settings-btn:hover {
+            background: rgba(123, 44, 191, 0.3);
+            border-color: var(--accent-secondary);
+            box-shadow: 0 0 15px var(--accent-primary);
+        }
+
         .right-content {
             flex: 1;
             overflow-y: auto;
@@ -705,7 +727,7 @@
             box-shadow: none;
         }
 
-        /* ========== НАСТРОЙКИ — УЛУЧШЕННЫЙ ДИЗАЙН ========== */
+        /* ========== НАСТРОЙКИ ========== */
         .settings-cosmic {
             background: rgba(0, 0, 0, 0.3);
             border-radius: var(--radius-lg);
@@ -800,7 +822,10 @@
         .modal-neo {
             display: none;
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: rgba(0, 0, 0, 0.9);
             backdrop-filter: blur(30px);
             align-items: center;
@@ -921,7 +946,6 @@
             border-radius: 10px;
         }
 
-        /* ========== АНИМАЦИИ ========== */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -986,6 +1010,7 @@
                             <button class="device-btn" id="device-desktop" onclick="setDeviceMode('desktop')">💻 ПК</button>
                             <button class="device-btn" id="device-mobile" onclick="setDeviceMode('mobile')">📱 Телефон</button>
                         </div>
+                        <button class="right-settings-btn" onclick="openSettings()" title="Настройки">⚙️</button>
                     </div>
                     <div class="right-content" id="right-content">
                         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted);">
@@ -1114,7 +1139,7 @@
         let viewingUserId = null;
         let currentDeviceMode = localStorage.getItem('teleRoomDeviceMode') || 'auto';
 
-        // ========== МУЛЬТИЯЗЫЧНОСТЬ — ПОЛНАЯ ==========
+        // ========== МУЛЬТИЯЗЫЧНОСТЬ — ПОЛНЫЙ ПЕРЕВОД ==========
         const i18n = {
             ru: {
                 // Общие
@@ -1150,24 +1175,27 @@
                 createGroup: 'Создать группу',
                 groupName: 'Название группы',
                 groupDescription: 'Описание (необязательно)',
+                createGroupTitle: '👥 Создать группу',
                 // Настройки
+                settingsTitle: '⚙️ Настройки',
                 settingsNameLabel: '👤 Имя пользователя',
                 settingsUsernameLabel: '@ Юзернейм',
                 settingsBioLabel: '📝 О себе',
                 settingsLanguageLabel: '🌐 Язык интерфейса',
-                settingsUpload: '📸 Загрузить',
-                settingsDelete: '🗑️ Удалить',
-                settingsEdit: '✏️ Изменить',
-                settingsClose: 'Закрыть',
-                // Модалки
-                createGroupTitle: '👥 Создать группу',
+                settingsUploadBtn: '📸 Загрузить',
+                settingsDeleteBtn: '🗑️ Удалить',
+                settingsEditBtn: '✏️ Изменить',
+                settingsCloseBtn: 'Закрыть',
+                // Био
                 editBioTitle: '📝 Редактировать био',
-                // Профиль
-                profileGroups: 'Групп',
-                profileChats: 'Чатов',
-                profileDays: 'Дней',
-                profileWrite: '💬 Написать',
-                profileClose: 'Закрыть',
+                bioPlaceholder: 'Расскажи о себе...',
+                // Профиль (свой)
+                noInfo: 'Нет информации',
+                noBio: 'Нет информации',
+                // Чат
+                messagePlaceholder: 'Сообщение...',
+                voiceMessage: 'Голосовое сообщение',
+                file: 'Файл',
                 // Устройства
                 deviceAuto: '🔄 Авто',
                 deviceDesktop: '💻 ПК',
@@ -1176,13 +1204,7 @@
                 loginSubtitle: 'AES-256-GCM • QUANTUM-RESISTANT',
                 loginNamePlaceholder: 'Введите уникальное имя',
                 loginBtn: '🚀 ВОЙТИ В СЕТЬ',
-                // Чат
-                messagePlaceholder: 'Сообщение...',
-                voiceMessage: 'Голосовое сообщение',
-                file: 'Файл',
-                noInfo: 'Нет информации',
-                noBio: 'Нет информации',
-                // Ошибки
+                // Ошибки и уведомления
                 nameTaken: 'Это имя уже занято!',
                 enterName: 'Введите имя',
                 selectChatFirst: 'Сначала выберите чат',
@@ -1191,7 +1213,13 @@
                 usernameChanged: '✅ Юзернейм изменён',
                 bioUpdated: '✅ Био обновлено',
                 avatarRemoved: '✅ Аватарка удалена',
-                avatarUpdated: '✅ Аватарка обновлена'
+                avatarUpdated: '✅ Аватарка обновлена',
+                // Профиль другого
+                profileGroups: 'Групп',
+                profileChats: 'Чатов',
+                profileDays: 'Дней',
+                profileWrite: '💬 Написать',
+                profileClose: 'Закрыть'
             },
             en: {
                 // Common
@@ -1227,24 +1255,27 @@
                 createGroup: 'Create group',
                 groupName: 'Group name',
                 groupDescription: 'Description (optional)',
+                createGroupTitle: '👥 Create group',
                 // Settings
+                settingsTitle: '⚙️ Settings',
                 settingsNameLabel: '👤 Name',
                 settingsUsernameLabel: '@ Username',
                 settingsBioLabel: '📝 Bio',
                 settingsLanguageLabel: '🌐 Language',
-                settingsUpload: '📸 Upload',
-                settingsDelete: '🗑️ Delete',
-                settingsEdit: '✏️ Edit',
-                settingsClose: 'Close',
-                // Modals
-                createGroupTitle: '👥 Create group',
+                settingsUploadBtn: '📸 Upload',
+                settingsDeleteBtn: '🗑️ Delete',
+                settingsEditBtn: '✏️ Edit',
+                settingsCloseBtn: 'Close',
+                // Bio
                 editBioTitle: '📝 Edit bio',
+                bioPlaceholder: 'Tell about yourself...',
                 // Profile
-                profileGroups: 'Groups',
-                profileChats: 'Chats',
-                profileDays: 'Days',
-                profileWrite: '💬 Message',
-                profileClose: 'Close',
+                noInfo: 'No info',
+                noBio: 'No bio',
+                // Chat
+                messagePlaceholder: 'Message...',
+                voiceMessage: 'Voice message',
+                file: 'File',
                 // Devices
                 deviceAuto: '🔄 Auto',
                 deviceDesktop: '💻 Desktop',
@@ -1253,13 +1284,7 @@
                 loginSubtitle: 'AES-256-GCM • QUANTUM-RESISTANT',
                 loginNamePlaceholder: 'Enter unique name',
                 loginBtn: '🚀 ENTER NETWORK',
-                // Chat
-                messagePlaceholder: 'Message...',
-                voiceMessage: 'Voice message',
-                file: 'File',
-                noInfo: 'No info',
-                noBio: 'No bio',
-                // Errors
+                // Errors & notifications
                 nameTaken: 'This name is already taken!',
                 enterName: 'Enter name',
                 selectChatFirst: 'Select a chat first',
@@ -1268,12 +1293,96 @@
                 usernameChanged: '✅ Username changed',
                 bioUpdated: '✅ Bio updated',
                 avatarRemoved: '✅ Avatar removed',
-                avatarUpdated: '✅ Avatar updated'
+                avatarUpdated: '✅ Avatar updated',
+                // Other user profile
+                profileGroups: 'Groups',
+                profileChats: 'Chats',
+                profileDays: 'Days',
+                profileWrite: '💬 Message',
+                profileClose: 'Close'
             }
         };
         let currentLang = localStorage.getItem('teleRoomLang') || 'ru';
 
-        // ========== ФУНКЦИИ ЯЗЫКА ==========
+        // ========== ПРИМЕНЕНИЕ ПЕРЕВОДОВ ==========
+        function applyTranslations() {
+            const t = i18n[currentLang];
+
+            // Логин
+            document.getElementById('login-subtitle').innerText = t.loginSubtitle;
+            document.getElementById('login-name').placeholder = t.loginNamePlaceholder;
+            document.getElementById('login-btn').innerText = t.loginBtn;
+
+            // Главная (если не в чате)
+            if (!currentChat) {
+                document.getElementById('right-title').innerText = t.welcome;
+            }
+            document.getElementById('welcome-title').innerText = t.selectChat;
+            document.getElementById('encrypted-note').innerText = t.encrypted;
+
+            // Навигация
+            document.getElementById('nav-chats').innerHTML = `💬 ${t.navChats}`;
+            document.getElementById('nav-groups').innerHTML = `👥 ${t.navGroups}`;
+            document.getElementById('nav-contacts').innerHTML = `📡 ${t.navContacts}`;
+
+            // Поиск
+            document.getElementById('panel-search').placeholder = t.searchPlaceholder;
+
+            // Кнопки заголовка
+            document.getElementById('create-group-btn-header').title = t.createGroup;
+            document.getElementById('settings-btn-header').title = t.settings;
+
+            // Селектор устройств
+            document.getElementById('device-auto').innerHTML = t.deviceAuto;
+            document.getElementById('device-desktop').innerHTML = t.deviceDesktop;
+            document.getElementById('device-mobile').innerHTML = t.deviceMobile;
+            document.querySelector('.right-settings-btn').title = t.settings;
+
+            // Модалка создания группы
+            document.getElementById('create-group-title').innerText = t.createGroupTitle;
+            document.getElementById('group-name').placeholder = t.groupName;
+            document.getElementById('group-description').placeholder = t.groupDescription;
+            document.getElementById('create-group-cancel').innerText = t.cancel;
+            document.getElementById('create-group-submit').innerText = t.createGroup;
+
+            // Модалка настроек
+            document.getElementById('settings-title').innerText = t.settingsTitle;
+            document.getElementById('settings-name-label').innerText = t.settingsNameLabel;
+            document.getElementById('settings-username-label').innerText = t.settingsUsernameLabel;
+            document.getElementById('settings-bio-label').innerText = t.settingsBioLabel;
+            document.getElementById('settings-language-label').innerText = t.settingsLanguageLabel;
+            document.getElementById('settings-upload-btn').innerText = t.settingsUploadBtn;
+            document.getElementById('settings-delete-btn').innerText = t.settingsDeleteBtn;
+            document.getElementById('settings-name-edit').innerText = t.settingsEditBtn;
+            document.getElementById('settings-username-edit').innerText = t.settingsEditBtn;
+            document.getElementById('settings-bio-edit').innerText = t.settingsEditBtn;
+            document.getElementById('settings-close-btn').innerText = t.settingsCloseBtn;
+
+            // Модалка био
+            document.getElementById('edit-bio-title').innerText = t.editBioTitle;
+            document.getElementById('bio-text').placeholder = t.bioPlaceholder;
+            document.getElementById('edit-bio-cancel').innerText = t.cancel;
+            document.getElementById('edit-bio-save').innerText = t.save;
+
+            // Модалка профиля другого пользователя
+            document.getElementById('modal-profile-groups-label').innerText = t.profileGroups;
+            document.getElementById('modal-profile-chats-label').innerText = t.profileChats;
+            document.getElementById('modal-profile-days-label').innerText = t.profileDays;
+            document.getElementById('modal-profile-write').innerHTML = t.profileWrite;
+            document.getElementById('modal-profile-close').innerText = t.profileClose;
+
+            // Обновляем placeholder чата, если он открыт
+            if (chatInput) {
+                chatInput.placeholder = t.messagePlaceholder;
+            }
+
+            // Перерисовываем списки для обновления текстов "Нет чатов" и т.д.
+            renderChatsList();
+            renderGroupsList();
+            renderContactsList();
+        }
+
+        // ========== ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА ==========
         function setLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('teleRoomLang', lang);
@@ -1282,111 +1391,32 @@
             applyTranslations();
         }
 
-        function applyTranslations() {
-            const t = i18n[currentLang];
-            
-            // Логин
-            const loginSubtitle = document.getElementById('login-subtitle');
-            if (loginSubtitle) loginSubtitle.innerText = t.loginSubtitle;
-            const loginNameInput = document.getElementById('login-name');
-            if (loginNameInput) loginNameInput.placeholder = t.loginNamePlaceholder;
-            const loginBtn = document.getElementById('login-btn');
-            if (loginBtn) loginBtn.innerText = t.loginBtn;
-            
-            // Главный экран
-            const welcomeTitle = document.getElementById('welcome-title');
-            if (welcomeTitle) welcomeTitle.innerText = t.selectChat;
-            const encryptedNote = document.getElementById('encrypted-note');
-            if (encryptedNote) encryptedNote.innerText = t.encrypted;
-            const rightTitle = document.getElementById('right-title');
-            if (rightTitle && !currentChat) rightTitle.innerText = t.welcome;
-            
-            // Навигация
-            document.getElementById('nav-chats').innerHTML = `💬 ${t.navChats}`;
-            document.getElementById('nav-groups').innerHTML = `👥 ${t.navGroups}`;
-            document.getElementById('nav-contacts').innerHTML = `📡 ${t.navContacts}`;
-            
-            // Поиск
-            const panelSearch = document.getElementById('panel-search');
-            if (panelSearch) panelSearch.placeholder = t.searchPlaceholder;
-            
-            // Кнопки в заголовке
-            const createGroupBtn = document.getElementById('create-group-btn-header');
-            if (createGroupBtn) createGroupBtn.title = t.createGroup;
-            const settingsBtn = document.getElementById('settings-btn-header');
-            if (settingsBtn) settingsBtn.title = t.settings;
-            
-            // Селектор устройств
-            document.getElementById('device-auto').innerHTML = t.deviceAuto;
-            document.getElementById('device-desktop').innerHTML = t.deviceDesktop;
-            document.getElementById('device-mobile').innerHTML = t.deviceMobile;
-            
-            // Модалка создания группы
-            document.getElementById('create-group-title').innerText = t.createGroupTitle;
-            const groupNameInput = document.getElementById('group-name');
-            if (groupNameInput) groupNameInput.placeholder = t.groupName;
-            const groupDescInput = document.getElementById('group-description');
-            if (groupDescInput) groupDescInput.placeholder = t.groupDescription;
-            document.getElementById('create-group-cancel').innerText = t.cancel;
-            document.getElementById('create-group-submit').innerText = t.createGroup;
-            
-            // Модалка настроек
-            document.getElementById('settings-title').innerText = t.settings;
-            document.getElementById('settings-name-label').innerText = t.settingsNameLabel;
-            document.getElementById('settings-username-label').innerText = t.settingsUsernameLabel;
-            document.getElementById('settings-bio-label').innerText = t.settingsBioLabel;
-            document.getElementById('settings-language-label').innerText = t.settingsLanguageLabel;
-            document.getElementById('settings-upload-btn').innerHTML = t.settingsUpload;
-            document.getElementById('settings-delete-btn').innerHTML = t.settingsDelete;
-            document.getElementById('settings-name-edit').innerHTML = t.settingsEdit;
-            document.getElementById('settings-username-edit').innerHTML = t.settingsEdit;
-            document.getElementById('settings-bio-edit').innerHTML = t.settingsEdit;
-            document.getElementById('settings-close-btn').innerText = t.settingsClose;
-            
-            // Модалка био
-            document.getElementById('edit-bio-title').innerText = t.editBioTitle;
-            const bioTextarea = document.getElementById('bio-text');
-            if (bioTextarea) bioTextarea.placeholder = t.bio;
-            document.getElementById('edit-bio-cancel').innerText = t.cancel;
-            document.getElementById('edit-bio-save').innerText = t.save;
-            
-            // Модалка профиля другого пользователя
-            document.getElementById('modal-profile-groups-label').innerText = t.profileGroups;
-            document.getElementById('modal-profile-chats-label').innerText = t.profileChats;
-            document.getElementById('modal-profile-days-label').innerText = t.profileDays;
-            document.getElementById('modal-profile-write').innerHTML = t.profileWrite;
-            document.getElementById('modal-profile-close').innerText = t.profileClose;
-            
-            // Обновление плейсхолдера чата, если он активен
-            const chatInput = document.getElementById('chat-message-input');
-            if (chatInput) chatInput.placeholder = t.messagePlaceholder;
-            
-            // Перерисовка списков для обновления текстов "Нет чатов" и т.д.
-            renderChatsList();
-            renderGroupsList();
-            renderContactsList();
-        }
-
         // ========== УПРАВЛЕНИЕ РЕЖИМОМ УСТРОЙСТВА ==========
         function setDeviceMode(mode) {
             currentDeviceMode = mode;
             localStorage.setItem('teleRoomDeviceMode', mode);
             const layout = document.getElementById('appLayout');
             layout.classList.remove('layout-desktop', 'layout-mobile');
-            
             document.getElementById('device-auto').classList.remove('active');
             document.getElementById('device-desktop').classList.remove('active');
             document.getElementById('device-mobile').classList.remove('active');
-            
             if (mode === 'desktop') {
                 layout.classList.add('layout-desktop');
                 document.getElementById('device-desktop').classList.add('active');
             } else if (mode === 'mobile') {
                 layout.classList.add('layout-mobile');
                 document.getElementById('device-mobile').classList.add('active');
+                document.querySelector('.left-panel').style.display = 'flex';
+                document.querySelector('.right-panel').classList.remove('active-mobile');
             } else {
-                // auto — ничего не добавляем, работают медиазапросы
                 document.getElementById('device-auto').classList.add('active');
+                if (window.innerWidth < 768) {
+                    // медиазапросы управляют
+                } else {
+                    document.querySelector('.left-panel').style.display = 'flex';
+                    document.querySelector('.right-panel').style.display = 'flex';
+                    document.querySelector('.right-panel').classList.remove('active-mobile');
+                }
             }
         }
 
@@ -1429,7 +1459,7 @@
             loadGroups(); loadPrivateChats(); loadAllUsers();
             updateSettingsUI();
             applyTranslations();
-            setDeviceMode(currentDeviceMode); // Применяем сохранённый режим
+            setDeviceMode(currentDeviceMode);
         }
 
         socket.on('register_error', (error) => { alert(error); });
@@ -1493,23 +1523,23 @@
             if (!container) return;
             container.innerHTML = '';
             const all = [
-                ...privateChats.map(p => ({ 
-                    id: p.id, 
-                    type: 'private', 
-                    name: p.other_user_name, 
-                    last: p.last_message || i18n[currentLang].noChats, 
-                    time: p.last_time, 
+                ...privateChats.map(p => ({
+                    id: p.id,
+                    type: 'private',
+                    name: p.other_user_name,
+                    last: p.last_message || i18n[currentLang].noChats,
+                    time: p.last_time,
                     online: p.online,
                     avatar: p.other_user_avatar,
                     uid: p.other_user_id
                 })),
-                ...groups.map(g => ({ 
-                    id: g.id, 
-                    type: 'group', 
-                    name: g.name, 
-                    last: g.last_message || i18n[currentLang].noChats, 
-                    time: g.last_time, 
-                    members: g.members_count 
+                ...groups.map(g => ({
+                    id: g.id,
+                    type: 'group',
+                    name: g.name,
+                    last: g.last_message || i18n[currentLang].noChats,
+                    time: g.last_time,
+                    members: g.members_count
                 }))
             ].sort((a,b) => new Date(b.time||0) - new Date(a.time||0));
             if (all.length === 0) {
@@ -1580,19 +1610,19 @@
             if (tab === 'contacts') document.getElementById('contacts-container').classList.remove('hidden');
         }
 
-        function searchPanel() { /* реализация поиска */ }
+        function searchPanel() {
+            // Поиск можно реализовать позже
+        }
 
         // ========== ГРУППЫ ==========
         function openCreateGroupModal() {
             document.getElementById('create-group-modal').classList.add('active');
         }
-
         function closeCreateGroupModal() {
             document.getElementById('create-group-modal').classList.remove('active');
             document.getElementById('group-name').value = '';
             document.getElementById('group-description').value = '';
         }
-
         function createGroup() {
             const name = document.getElementById('group-name').value.trim();
             if (!name) {
@@ -1602,10 +1632,10 @@
             fetch('/api/groups', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    name, 
-                    description: document.getElementById('group-description').value.trim(), 
-                    userId: currentUser.id 
+                body: JSON.stringify({
+                    name,
+                    description: document.getElementById('group-description').value.trim(),
+                    userId: currentUser.id
                 })
             })
             .then(res => res.json())
@@ -1627,8 +1657,10 @@
             loadChatContent();
             socket.emit('join_private_chat', chatId);
             loadPrivateMessages(chatId);
-            if (window.innerWidth < 768 && currentDeviceMode === 'auto') document.querySelector('.left-panel').style.display = 'none';
             if (currentDeviceMode === 'mobile') {
+                document.querySelector('.left-panel').style.display = 'none';
+                document.querySelector('.right-panel').classList.add('active-mobile');
+            } else if (window.innerWidth < 768 && currentDeviceMode === 'auto') {
                 document.querySelector('.left-panel').style.display = 'none';
                 document.querySelector('.right-panel').classList.add('active-mobile');
             }
@@ -1641,8 +1673,10 @@
             loadChatContent();
             socket.emit('join_group', groupId);
             loadGroupMessages(groupId);
-            if (window.innerWidth < 768 && currentDeviceMode === 'auto') document.querySelector('.left-panel').style.display = 'none';
             if (currentDeviceMode === 'mobile') {
+                document.querySelector('.left-panel').style.display = 'none';
+                document.querySelector('.right-panel').classList.add('active-mobile');
+            } else if (window.innerWidth < 768 && currentDeviceMode === 'auto') {
                 document.querySelector('.left-panel').style.display = 'none';
                 document.querySelector('.right-panel').classList.add('active-mobile');
             }
@@ -1706,7 +1740,8 @@
             const isMe = m.user_id === currentUser?.id;
             const div = document.createElement('div');
             div.className = `message-neo ${isMe ? 'message-mine' : 'message-other'}`;
-            const date = new Date(m.created_at); date.setHours(date.getHours() + 2);
+            const date = new Date(m.created_at);
+            date.setHours(date.getHours() + 2);
             const time = date.toLocaleTimeString(currentLang === 'ru' ? 'ru-RU' : 'en-US', { hour: '2-digit', minute: '2-digit' });
             let content = '';
             if (m.voice_url) content = `<div>🎤 ${i18n[currentLang].voiceMessage}</div>`;
@@ -1743,8 +1778,10 @@
                 </div>
             `;
             document.getElementById('right-title').innerText = i18n[currentLang].profile;
-            if (window.innerWidth < 768 && currentDeviceMode === 'auto') document.querySelector('.left-panel').style.display = 'none';
             if (currentDeviceMode === 'mobile') {
+                document.querySelector('.left-panel').style.display = 'none';
+                document.querySelector('.right-panel').classList.add('active-mobile');
+            } else if (window.innerWidth < 768 && currentDeviceMode === 'auto') {
                 document.querySelector('.left-panel').style.display = 'none';
                 document.querySelector('.right-panel').classList.add('active-mobile');
             }
@@ -1774,7 +1811,7 @@
 
         // ========== РЕДАКТИРОВАНИЕ ПРОФИЛЯ ==========
         function editName() {
-            const newName = prompt(i18n[currentLang].settingsEdit + ' ' + i18n[currentLang].name, currentUser.name);
+            const newName = prompt(i18n[currentLang].settingsEditBtn + ' ' + i18n[currentLang].name, currentUser.name);
             if (newName && newName.trim() && newName !== currentUser.name) {
                 fetch('/api/user/update-name', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ userId: currentUser.id, newName: newName.trim() }) })
                 .then(r => r.json())
@@ -1792,7 +1829,7 @@
         }
 
         function editUsername() {
-            const newUsername = prompt(i18n[currentLang].settingsEdit + ' ' + i18n[currentLang].username, currentUser.phone);
+            const newUsername = prompt(i18n[currentLang].settingsEditBtn + ' ' + i18n[currentLang].username, currentUser.phone);
             if (newUsername && newUsername.trim() && newUsername.length >= 3 && newUsername !== currentUser.phone) {
                 fetch('/api/user/update-username', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ userId: currentUser.id, newUsername: newUsername.trim() }) })
                 .then(r => r.json())
@@ -1812,11 +1849,9 @@
             document.getElementById('bio-text').value = currentUser.bio || '';
             document.getElementById('edit-bio-modal').classList.add('active');
         }
-
         function closeEditBio() {
             document.getElementById('edit-bio-modal').classList.remove('active');
         }
-
         function saveBio() {
             const bio = document.getElementById('bio-text').value.trim();
             fetch('/api/users/update-bio', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ userId: currentUser.id, bio }) })
@@ -1833,7 +1868,7 @@
 
         // ========== АВАТАРКА ==========
         function removeAvatar() {
-            if (!confirm(i18n[currentLang].settingsDelete + '?')) return;
+            if (!confirm(i18n[currentLang].settingsDeleteBtn + '?')) return;
             fetch('/api/user/remove-avatar', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ userId: currentUser.id }) })
             .then(r => r.json())
             .then(d => {
@@ -1988,7 +2023,13 @@
 
         // ========== ЗАКРЫТИЕ ПРАВОЙ ПАНЕЛИ ==========
         function closeRightPanel() {
-            if (currentDeviceMode === 'mobile' || window.innerWidth < 768) {
+            if (currentDeviceMode === 'mobile') {
+                document.querySelector('.left-panel').style.display = 'flex';
+                document.querySelector('.right-panel').classList.remove('active-mobile');
+                document.getElementById('right-content').innerHTML = `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted);"><div style="font-size: 72px; margin-bottom: 24px; filter: drop-shadow(0 0 20px #7b2cbf);">🌌</div><div style="font-size: 22px; font-weight: 600; margin-bottom: 12px; color: white;">${i18n[currentLang].selectChat}</div><div style="font-size: 15px; max-width: 70%; text-align: center; line-height: 1.6;">${i18n[currentLang].encrypted}</div></div>`;
+                document.getElementById('right-title').innerText = i18n[currentLang].welcome;
+                currentChat = null;
+            } else if (window.innerWidth < 768 && currentDeviceMode === 'auto') {
                 document.querySelector('.left-panel').style.display = 'flex';
                 document.querySelector('.right-panel').classList.remove('active-mobile');
                 document.getElementById('right-content').innerHTML = `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted);"><div style="font-size: 72px; margin-bottom: 24px; filter: drop-shadow(0 0 20px #7b2cbf);">🌌</div><div style="font-size: 22px; font-weight: 600; margin-bottom: 12px; color: white;">${i18n[currentLang].selectChat}</div><div style="font-size: 15px; max-width: 70%; text-align: center; line-height: 1.6;">${i18n[currentLang].encrypted}</div></div>`;
