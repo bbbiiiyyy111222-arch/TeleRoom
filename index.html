@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TeleRoom — космический мессенджер</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <title>TeleRoom — чистый мессенджер</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -14,31 +14,28 @@
         }
 
         :root {
-            --bg-dark: #0c0f15;
-            --bg-surface: #151b23;
-            --bg-card: #1e2630;
-            --bg-hover: #2c3542;
-            --accent: #5f7cff;
-            --accent-soft: #819aff;
-            --accent-dark: #3a56c9;
-            --danger: #ff5e7c;
-            --success: #4cd964;
-            --warning: #ffb347;
+            --bg: #111317;
+            --surface: #1c1f26;
+            --card: #262b33;
+            --card-hover: #2f353f;
+            --accent: #3b82f6;
+            --accent-light: #609af9;
+            --accent-dark: #2563eb;
+            --danger: #ef4444;
+            --success: #22c55e;
             --text: #ffffff;
-            --text-secondary: #cfd9e6;
-            --text-muted: #9aaec2;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
             --border: rgba(255,255,255,0.08);
-            --shadow: 0 10px 30px rgba(0,0,0,0.6);
-            --glow: 0 0 20px rgba(95,124,255,0.3);
+            --shadow: 0 4px 12px rgba(0,0,0,0.3);
             --radius-sm: 12px;
-            --radius-md: 20px;
-            --radius-lg: 30px;
-            --radius-xl: 40px;
-            --transition: 0.2s ease;
+            --radius-md: 18px;
+            --radius-lg: 24px;
+            --transition: 0.15s ease;
         }
 
         body {
-            background: var(--bg-dark);
+            background: var(--bg);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -47,14 +44,13 @@
 
         #app {
             width: 100%;
-            max-width: 480px;
+            max-width: 460px;
             height: 100vh;
-            background: var(--bg-dark);
+            background: var(--bg);
             color: var(--text);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            position: relative;
             box-shadow: var(--shadow);
         }
 
@@ -62,7 +58,7 @@
         #login-screen {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at 30% 40%, #1a1f2a, #0c0f15);
+            background: var(--bg);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -70,71 +66,62 @@
             z-index: 2000;
         }
         .login-card {
-            background: var(--bg-surface);
-            backdrop-filter: blur(20px);
-            padding: 40px 28px;
+            background: var(--surface);
+            padding: 32px 24px;
             border-radius: var(--radius-lg);
             width: 100%;
-            max-width: 360px;
+            max-width: 340px;
             border: 1px solid var(--border);
-            box-shadow: var(--glow);
+            box-shadow: var(--shadow);
         }
         .login-title {
-            font-size: 44px;
-            font-weight: 800;
+            font-size: 40px;
+            font-weight: 700;
             text-align: center;
             margin-bottom: 8px;
-            background: linear-gradient(145deg, var(--accent), var(--accent-soft));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--accent);
         }
         .login-sub {
             color: var(--text-muted);
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
             font-size: 14px;
-            letter-spacing: 2px;
         }
         .input-field {
             width: 100%;
-            padding: 16px 20px;
-            border-radius: var(--radius-xl);
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
             border: 1px solid var(--border);
-            background: var(--bg-card);
+            background: var(--card);
             color: var(--text);
             font-size: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             transition: var(--transition);
         }
         .input-field:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(95,124,255,0.2);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
         }
         .btn {
             width: 100%;
-            padding: 16px;
-            border-radius: var(--radius-xl);
+            padding: 14px;
+            border-radius: var(--radius-md);
             border: none;
-            background: linear-gradient(145deg, var(--accent), var(--accent-dark));
+            background: var(--accent);
             color: white;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
-            box-shadow: var(--glow);
         }
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 30px var(--accent);
+            background: var(--accent-light);
         }
         .error-message {
             color: var(--danger);
             font-size: 14px;
             margin-top: 8px;
             display: none;
-            background: rgba(255,94,124,0.1);
-            padding: 10px;
-            border-radius: var(--radius-md);
         }
 
         /* ========== ОСНОВНОЙ ЭКРАН ========== */
@@ -147,7 +134,7 @@
 
         .header {
             padding: 12px 16px;
-            background: var(--bg-surface);
+            background: var(--surface);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -156,21 +143,20 @@
         .user-badge {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             cursor: pointer;
-            padding: 4px 16px 4px 4px;
-            border-radius: 40px;
-            background: var(--bg-card);
+            padding: 4px 12px 4px 4px;
+            border-radius: 30px;
+            background: var(--card);
             transition: var(--transition);
         }
         .user-badge:hover {
-            background: var(--bg-hover);
-            box-shadow: var(--glow);
+            background: var(--card-hover);
         }
         .avatar {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(145deg, var(--accent), var(--accent-dark));
+            width: 38px;
+            height: 38px;
+            background: var(--accent);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -187,13 +173,12 @@
         .username {
             font-weight: 600;
             font-size: 15px;
-            color: var(--text);
         }
         .icon-btn {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            background: var(--bg-card);
+            background: var(--card);
             border: 1px solid var(--border);
             color: var(--text-secondary);
             display: flex;
@@ -203,9 +188,8 @@
             transition: var(--transition);
         }
         .icon-btn:hover {
-            background: var(--bg-hover);
+            background: var(--card-hover);
             color: white;
-            border-color: var(--accent);
         }
 
         .search-container {
@@ -213,10 +197,10 @@
         }
         .search {
             width: 100%;
-            padding: 14px 20px;
-            border-radius: var(--radius-xl);
+            padding: 12px 16px;
+            border-radius: 30px;
             border: 1px solid var(--border);
-            background: var(--bg-card);
+            background: var(--card);
             color: var(--text);
             font-size: 15px;
             transition: var(--transition);
@@ -224,7 +208,7 @@
         .search:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: var(--glow);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
         }
 
         .list-wrapper {
@@ -235,34 +219,32 @@
         .list-container {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
         .list-item {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
             padding: 12px;
-            background: var(--bg-card);
+            background: var(--card);
             border-radius: var(--radius-md);
             border: 1px solid transparent;
             cursor: pointer;
             transition: var(--transition);
         }
         .list-item:hover {
-            background: var(--bg-hover);
+            background: var(--card-hover);
             border-color: var(--accent);
-            transform: translateX(4px);
-            box-shadow: var(--glow);
         }
         .item-avatar {
-            width: 52px;
-            height: 52px;
-            background: linear-gradient(145deg, var(--accent), var(--accent-dark));
-            border-radius: 18px;
+            width: 48px;
+            height: 48px;
+            background: var(--accent-dark);
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 22px;
             color: white;
             overflow: hidden;
             flex-shrink: 0;
@@ -277,12 +259,11 @@
             min-width: 0;
         }
         .item-title {
-            font-weight: 700;
+            font-weight: 600;
             margin-bottom: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            color: var(--text);
         }
         .item-sub {
             font-size: 13px;
@@ -294,11 +275,10 @@
         .badge {
             background: var(--accent);
             color: white;
-            border-radius: 30px;
-            padding: 4px 12px;
+            border-radius: 20px;
+            padding: 2px 10px;
             font-size: 12px;
             font-weight: 600;
-            box-shadow: var(--glow);
         }
         .online {
             color: var(--success);
@@ -306,15 +286,15 @@
 
         .tab-bar {
             display: flex;
-            background: var(--bg-surface);
+            background: var(--surface);
             border-top: 1px solid var(--border);
             padding: 8px 16px;
             gap: 8px;
         }
         .tab {
             flex: 1;
-            padding: 12px 6px;
-            border-radius: var(--radius-md);
+            padding: 10px;
+            border-radius: 30px;
             border: none;
             background: transparent;
             color: var(--text-muted);
@@ -327,9 +307,8 @@
             transition: var(--transition);
         }
         .tab.active {
-            background: linear-gradient(145deg, var(--accent), var(--accent-dark));
+            background: var(--accent);
             color: white;
-            box-shadow: var(--glow);
         }
 
         /* ========== ПРАВАЯ ПАНЕЛЬ ========== */
@@ -337,14 +316,14 @@
             display: none;
             flex: 1;
             flex-direction: column;
-            background: var(--bg-dark);
+            background: var(--bg);
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: 100;
-            animation: slideIn 0.25s ease;
+            animation: slideIn 0.2s ease;
         }
         @keyframes slideIn {
             from { transform: translateX(100%); }
@@ -355,17 +334,17 @@
         }
         .right-header {
             padding: 12px 16px;
-            background: var(--bg-surface);
+            background: var(--surface);
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             gap: 12px;
         }
         .back-btn {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            background: var(--bg-card);
+            background: var(--card);
             border: 1px solid var(--border);
             color: white;
             cursor: pointer;
@@ -375,23 +354,21 @@
             transition: var(--transition);
         }
         .back-btn:hover {
-            background: var(--bg-hover);
-            border-color: var(--accent);
+            background: var(--card-hover);
         }
         .right-title {
             font-size: 18px;
-            font-weight: 700;
+            font-weight: 600;
             flex: 1;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            color: var(--text);
         }
         .call-btn {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            background: linear-gradient(145deg, var(--success), #2e8b57);
+            background: var(--success);
             border: none;
             color: white;
             cursor: pointer;
@@ -399,7 +376,6 @@
             align-items: center;
             justify-content: center;
             transition: var(--transition);
-            box-shadow: 0 0 15px var(--success);
         }
         .call-btn:hover {
             transform: scale(1.1);
@@ -418,17 +394,17 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 8px;
             padding: 16px;
         }
         .message {
             max-width: 80%;
             display: flex;
             flex-direction: column;
-            animation: messageIn 0.2s;
+            animation: fadeIn 0.15s;
         }
-        @keyframes messageIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .my-message {
@@ -438,54 +414,48 @@
             align-self: flex-start;
         }
         .bubble {
-            padding: 12px 18px;
-            border-radius: 24px 24px 6px 24px;
+            padding: 10px 14px;
+            border-radius: 18px 18px 4px 18px;
             word-break: break-word;
-            background: var(--bg-card);
+            background: var(--card);
             border: 1px solid var(--border);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         .my-message .bubble {
-            background: linear-gradient(145deg, var(--accent), var(--accent-dark));
+            background: var(--accent);
             color: white;
-            border-bottom-right-radius: 6px;
+            border-bottom-right-radius: 4px;
         }
         .other-message .bubble {
-            background: var(--bg-surface);
+            background: var(--surface);
             color: white;
-            border-bottom-left-radius: 6px;
+            border-bottom-left-radius: 4px;
         }
         .sender {
             font-size: 12px;
-            font-weight: 700;
-            color: var(--accent-soft);
+            font-weight: 600;
+            color: var(--accent-light);
             cursor: pointer;
-            margin-bottom: 5px;
-            display: inline-block;
-        }
-        .sender:hover {
-            text-decoration: underline;
+            margin-bottom: 4px;
         }
         .time {
             font-size: 10px;
-            margin-top: 6px;
-            opacity: 0.7;
+            margin-top: 4px;
+            opacity: 0.6;
             align-self: flex-end;
-            color: var(--text-muted);
         }
         .chat-input-area {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             padding: 12px 16px;
-            background: var(--bg-surface);
+            background: var(--surface);
             border-top: 1px solid var(--border);
         }
         .chat-input {
             flex: 1;
-            padding: 14px 18px;
-            border-radius: var(--radius-xl);
+            padding: 12px 16px;
+            border-radius: 30px;
             border: 1px solid var(--border);
-            background: var(--bg-card);
+            background: var(--card);
             color: white;
             font-size: 15px;
             transition: var(--transition);
@@ -493,51 +463,48 @@
         .chat-input:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: var(--glow);
         }
         .voice-btn {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            background: linear-gradient(145deg, var(--danger), #b22222);
-            border: none;
-            color: white;
-            font-size: 22px;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 0 15px var(--danger);
-        }
-        .voice-btn.recording {
-            animation: pulse 1.2s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 20px var(--danger); }
-            50% { transform: scale(1.2); box-shadow: 0 0 40px var(--danger); }
-            100% { transform: scale(1); box-shadow: 0 0 20px var(--danger); }
-        }
-        .send-btn {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: linear-gradient(145deg, var(--accent), var(--accent-dark));
+            background: var(--danger);
             border: none;
             color: white;
             font-size: 20px;
             cursor: pointer;
             transition: var(--transition);
-            box-shadow: var(--glow);
+        }
+        .voice-btn.recording {
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .send-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: var(--transition);
         }
         .send-btn:hover {
-            transform: scale(1.1);
+            background: var(--accent-light);
         }
 
         /* ИНДИКАТОР ПЕЧАТИ */
         .typing-indicator {
             display: flex;
             align-items: center;
-            gap: 5px;
-            padding: 10px 16px;
-            background: var(--bg-surface);
+            gap: 4px;
+            padding: 8px 16px;
+            background: var(--surface);
             border-radius: 30px;
             align-self: flex-start;
             margin-bottom: 8px;
@@ -566,40 +533,35 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            min-width: 180px;
+            min-width: 160px;
         }
         .voice-play {
-            width: 36px;
-            height: 36px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.15);
             border: none;
             color: white;
             cursor: pointer;
             flex-shrink: 0;
-            transition: var(--transition);
-        }
-        .voice-play:hover {
-            background: rgba(255,255,255,0.3);
-            transform: scale(1.1);
         }
         .voice-wave {
             flex: 1;
-            height: 36px;
+            height: 34px;
             background: rgba(255,255,255,0.1);
-            border-radius: 18px;
+            border-radius: 17px;
             position: relative;
             overflow: hidden;
             display: flex;
             align-items: center;
-            padding: 0 12px;
+            padding: 0 10px;
         }
         .voice-progress {
             position: absolute;
             left: 0;
             top: 0;
             height: 100%;
-            background: var(--accent-soft);
+            background: var(--accent-light);
             width: 0%;
             transition: width 0.1s linear;
         }
@@ -611,7 +573,7 @@
 
         /* ПРОФИЛЬ */
         .profile-card {
-            background: var(--bg-surface);
+            background: var(--surface);
             border-radius: var(--radius-lg);
             padding: 24px 16px;
             display: flex;
@@ -619,39 +581,36 @@
             align-items: center;
             width: 100%;
             border: 1px solid var(--border);
-            box-shadow: var(--glow);
         }
         .profile-avatar-large {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(145deg, var(--accent), var(--accent-dark));
+            width: 90px;
+            height: 90px;
+            background: var(--accent);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
+            font-size: 44px;
             color: white;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             overflow: hidden;
-            border: 4px solid rgba(255,255,255,0.2);
-            box-shadow: var(--glow);
+            border: 3px solid var(--accent);
         }
         .profile-name-large {
-            font-size: 24px;
-            font-weight: 800;
+            font-size: 22px;
+            font-weight: 700;
             margin-bottom: 4px;
             text-align: center;
-            color: var(--text);
         }
         .profile-username-large {
             color: var(--text-muted);
             margin-bottom: 12px;
-            font-size: 15px;
+            font-size: 14px;
         }
         .profile-bio-large {
             color: var(--text-secondary);
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             font-size: 14px;
             max-width: 100%;
             word-break: break-word;
@@ -660,32 +619,31 @@
             display: flex;
             justify-content: space-around;
             width: 100%;
-            padding: 16px 0;
+            padding: 12px 0;
             border-top: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         .stat-item {
             text-align: center;
         }
         .stat-value {
-            font-size: 22px;
-            font-weight: 800;
+            font-size: 20px;
+            font-weight: 700;
             color: var(--accent);
         }
         .stat-label {
             font-size: 11px;
             color: var(--text-muted);
             margin-top: 4px;
-            text-transform: uppercase;
         }
 
         /* ========== ЗВОНКИ ========== */
         .call-modal {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(30px);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
             display: none;
             align-items: center;
             justify-content: center;
@@ -695,112 +653,83 @@
             display: flex;
         }
         .call-card {
-            background: linear-gradient(145deg, var(--bg-surface), #0f1320);
-            padding: 40px 24px;
+            background: var(--surface);
+            padding: 32px 24px;
             border-radius: var(--radius-lg);
             width: 90%;
-            max-width: 360px;
+            max-width: 340px;
             border: 1px solid var(--accent);
-            box-shadow: 0 0 60px rgba(95,124,255,0.4);
             text-align: center;
-            animation: callPulse 2s infinite;
-        }
-        @keyframes callPulse {
-            0% { box-shadow: 0 0 40px rgba(95,124,255,0.3); }
-            50% { box-shadow: 0 0 80px rgba(95,124,255,0.6); }
-            100% { box-shadow: 0 0 40px rgba(95,124,255,0.3); }
         }
         .call-avatar {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(145deg, var(--accent), var(--accent-dark));
+            width: 80px;
+            height: 80px;
+            background: var(--accent);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
+            font-size: 40px;
             color: white;
-            margin: 0 auto 16px;
-            border: 4px solid var(--accent-soft);
-            animation: rotate 3s linear infinite;
-        }
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            margin: 0 auto 12px;
         }
         .call-name {
-            font-size: 28px;
-            font-weight: 800;
-            color: white;
+            font-size: 24px;
+            font-weight: 700;
             margin-bottom: 8px;
         }
         .call-status {
             color: var(--text-muted);
-            margin-bottom: 32px;
-            font-size: 16px;
+            margin-bottom: 24px;
         }
         .call-actions {
             display: flex;
-            gap: 20px;
+            gap: 16px;
             justify-content: center;
         }
         .call-btn-accept {
-            width: 70px;
-            height: 70px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            background: linear-gradient(145deg, var(--success), #2e8b57);
+            background: var(--success);
             border: none;
             color: white;
-            font-size: 32px;
+            font-size: 28px;
             cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 0 30px var(--success);
         }
         .call-btn-decline {
-            width: 70px;
-            height: 70px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            background: linear-gradient(145deg, var(--danger), #b22222);
+            background: var(--danger);
             border: none;
             color: white;
-            font-size: 32px;
+            font-size: 28px;
             cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 0 30px var(--danger);
-        }
-        .call-btn-accept:hover, .call-btn-decline:hover {
-            transform: scale(1.15);
         }
 
         /* НАСТРОЙКИ */
         .settings-group {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
         .settings-group-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--text-muted);
             margin-bottom: 12px;
-            letter-spacing: 1px;
         }
         .settings-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: var(--bg-card);
-            padding: 14px 18px;
+            background: var(--card);
+            padding: 12px 16px;
             border-radius: var(--radius-md);
             border: 1px solid var(--border);
             margin-bottom: 8px;
-            transition: var(--transition);
-        }
-        .settings-item:hover {
-            border-color: var(--accent);
-            box-shadow: var(--glow);
         }
         .settings-label {
             color: var(--text);
-            font-weight: 500;
         }
         .settings-edit {
             background: var(--accent);
@@ -810,12 +739,6 @@
             border-radius: 30px;
             cursor: pointer;
             font-size: 13px;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-        .settings-edit:hover {
-            background: var(--accent-soft);
-            transform: scale(1.05);
         }
         .language-selector, .device-selector {
             display: flex;
@@ -823,18 +746,16 @@
             flex-wrap: wrap;
         }
         .lang-btn, .device-btn {
-            padding: 8px 18px;
+            padding: 8px 16px;
             border-radius: 30px;
             border: 1px solid var(--border);
-            background: var(--bg-card);
+            background: var(--card);
             color: white;
             cursor: pointer;
-            transition: var(--transition);
         }
         .lang-btn.active, .device-btn.active {
             background: var(--accent);
             border-color: var(--accent);
-            box-shadow: var(--glow);
         }
 
         /* МОДАЛКИ */
@@ -843,7 +764,7 @@
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(4px);
             align-items: center;
             justify-content: center;
             z-index: 3000;
@@ -852,19 +773,17 @@
             display: flex;
         }
         .modal-content {
-            background: var(--bg-surface);
-            padding: 28px;
+            background: var(--surface);
+            padding: 24px;
             border-radius: var(--radius-lg);
             width: 90%;
-            max-width: 400px;
-            border: 1px solid var(--accent);
-            box-shadow: var(--glow);
+            max-width: 380px;
+            border: 1px solid var(--border);
         }
         .modal-title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
-            margin-bottom: 24px;
-            color: white;
+            margin-bottom: 20px;
         }
 
         .hidden { display: none !important; }
@@ -880,11 +799,11 @@
         <!-- ЛОГИН -->
         <div id="login-screen">
             <div class="login-card">
-                <div class="login-title">🚀 TeleRoom</div>
-                <div class="login-sub" id="login-subtitle">AES-256 • АВТО-ЮЗЕРЫ</div>
+                <div class="login-title">🛸 TeleRoom</div>
+                <div class="login-sub" id="login-subtitle">AES-256 • user1..userN</div>
                 <input type="text" id="login-name" class="input-field" placeholder="Твой никнейм" onkeyup="checkUsername()" autofocus>
                 <div id="username-error" class="error-message"></div>
-                <button class="btn" onclick="register()" id="login-btn">🌌 Войти в сеть</button>
+                <button class="btn" onclick="register()" id="login-btn">🌌 Войти</button>
             </div>
         </div>
 
@@ -948,7 +867,7 @@
                 <input type="text" id="group-name" class="input-field" placeholder="Название группы">
                 <input type="text" id="group-description" class="input-field" placeholder="Описание (необяз.)">
                 <div style="display: flex; gap: 12px; margin-top: 20px;">
-                    <button class="btn" style="background: var(--bg-card);" onclick="closeCreateGroupModal()" id="create-group-cancel">Отмена</button>
+                    <button class="btn" style="background: var(--card);" onclick="closeCreateGroupModal()" id="create-group-cancel">Отмена</button>
                     <button class="btn" onclick="createGroup()" id="create-group-submit">Создать</button>
                 </div>
             </div>
@@ -958,8 +877,8 @@
         <div id="settings-modal" class="modal">
             <div class="modal-content">
                 <div class="modal-title">⚙️ Настройки</div>
-                <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 24px;">
-                    <div class="avatar" style="width: 90px; height: 90px; font-size: 44px; cursor: pointer;" id="modal-avatar" onclick="document.getElementById('avatarInput').click()">👤</div>
+                <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;">
+                    <div class="avatar" style="width: 80px; height: 80px; font-size: 40px; cursor: pointer;" id="modal-avatar" onclick="document.getElementById('avatarInput').click()">👤</div>
                     <div style="display: flex; gap: 12px; margin-top: 12px;">
                         <button class="settings-edit" onclick="document.getElementById('avatarInput').click()" id="settings-upload-btn">📸 Загрузить</button>
                         <button class="settings-edit" style="background: var(--danger);" onclick="removeAvatar()" id="settings-delete-btn">🗑️ Удалить</button>
@@ -995,7 +914,7 @@
                         <button id="device-mobile" class="device-btn" onclick="setDeviceMode('mobile')">📱 Телефон</button>
                     </div>
                 </div>
-                <button class="btn" style="margin-top: 24px;" onclick="closeSettings()" id="settings-close-btn">Закрыть</button>
+                <button class="btn" style="margin-top: 20px;" onclick="closeSettings()" id="settings-close-btn">Закрыть</button>
             </div>
         </div>
 
@@ -1003,9 +922,9 @@
         <div id="edit-bio-modal" class="modal">
             <div class="modal-content">
                 <div class="modal-title" id="edit-bio-title">📝 Редактировать био</div>
-                <textarea id="bio-text" class="input-field" style="height: 120px; resize: none;" placeholder="Расскажи о себе..."></textarea>
-                <div style="display: flex; gap: 12px; margin-top: 20px;">
-                    <button class="btn" style="background: var(--bg-card);" onclick="closeEditBio()" id="edit-bio-cancel">Отмена</button>
+                <textarea id="bio-text" class="input-field" style="height: 100px; resize: none;" placeholder="Расскажи о себе..."></textarea>
+                <div style="display: flex; gap: 12px; margin-top: 16px;">
+                    <button class="btn" style="background: var(--card);" onclick="closeEditBio()" id="edit-bio-cancel">Отмена</button>
                     <button class="btn" onclick="saveBio()" id="edit-bio-save">Сохранить</button>
                 </div>
             </div>
@@ -1035,173 +954,71 @@
         // ========== ПОЛНЫЙ ПЕРЕВОД ==========
         const i18n = {
             ru: {
-                welcome: 'Добро пожаловать',
-                selectChat: 'Выберите чат',
-                encrypted: 'Защищено шифрованием',
-                noChats: 'Нет чатов',
-                noGroups: 'Нет групп',
-                noUsers: 'Нет пользователей',
-                settings: 'Настройки',
-                profile: 'Мой профиль',
-                edit: 'Изменить',
-                save: 'Сохранить',
-                cancel: 'Отмена',
-                delete: 'Удалить',
-                upload: 'Загрузить',
-                name: 'Имя',
-                username: 'Юзернейм',
-                bio: 'О себе',
-                language: 'Язык',
-                days: 'Дней',
-                groups: 'Групп',
-                chats: 'Чатов',
-                write: 'Написать',
-                close: 'Закрыть',
-                navChats: 'Чаты',
-                navGroups: 'Группы',
-                navContacts: 'Контакты',
-                searchPlaceholder: '🔍 Поиск...',
-                createGroup: 'Создать группу',
-                groupName: 'Название группы',
-                groupDescription: 'Описание (необяз.)',
-                createGroupTitle: '👥 Создать группу',
-                settingsTitle: '⚙️ Настройки',
-                settingsNameLabel: '👤 Имя',
-                settingsUsernameLabel: '@ Юзернейм',
-                settingsBioLabel: '📝 О себе',
-                settingsLanguageLabel: '🌐 Язык',
-                settingsDeviceLabel: '📱 Режим',
-                settingsUploadBtn: '📸 Загрузить',
-                settingsDeleteBtn: '🗑️ Удалить',
-                settingsEditBtn: '✏️',
-                settingsCloseBtn: 'Закрыть',
-                editBioTitle: '📝 Редактировать био',
-                bioPlaceholder: 'Расскажи о себе...',
-                noInfo: 'Нет информации',
-                noBio: 'Нет информации',
-                messagePlaceholder: 'Сообщение...',
-                voiceMessage: 'Голосовое сообщение',
-                file: 'Файл',
-                deviceAuto: '🔄 Авто',
-                deviceDesktop: '💻 ПК',
-                deviceMobile: '📱 Телефон',
-                loginSubtitle: 'AES-256 • АВТО-ЮЗЕРЫ',
-                loginNamePlaceholder: 'Твой никнейм',
-                loginBtn: '🌌 Войти в сеть',
-                nameTaken: 'Имя уже занято!',
-                enterName: 'Введите имя',
-                selectChatFirst: 'Сначала выберите чат',
-                microphoneDenied: 'Доступ к микрофону запрещён',
-                nameChanged: '✅ Имя изменено',
-                usernameChanged: '✅ Юзернейм изменён',
-                bioUpdated: '✅ Био обновлено',
-                avatarRemoved: '✅ Аватарка удалена',
-                avatarUpdated: '✅ Аватарка обновлена',
-                profileGroups: 'Групп',
-                profileChats: 'Чатов',
-                profileDays: 'Дней',
-                profileWrite: '💬 Написать',
-                profileClose: 'Закрыть',
-                calling: '📞 Вызов...',
-                incomingCall: '📲 Входящий звонок'
+                welcome: 'Добро пожаловать', selectChat: 'Выберите чат', encrypted: 'Шифрование AES-256',
+                noChats: 'Нет чатов', noGroups: 'Нет групп', noUsers: 'Нет пользователей',
+                settings: 'Настройки', profile: 'Мой профиль', edit: 'Изменить', save: 'Сохранить', cancel: 'Отмена',
+                delete: 'Удалить', upload: 'Загрузить', name: 'Имя', username: 'Юзернейм', bio: 'О себе',
+                language: 'Язык', days: 'Дней', groups: 'Групп', chats: 'Чатов', write: 'Написать', close: 'Закрыть',
+                navChats: 'Чаты', navGroups: 'Группы', navContacts: 'Контакты', searchPlaceholder: '🔍 Поиск...',
+                createGroup: 'Создать группу', groupName: 'Название группы', groupDescription: 'Описание (необяз.)',
+                createGroupTitle: '👥 Создать группу', settingsTitle: '⚙️ Настройки', settingsNameLabel: '👤 Имя',
+                settingsUsernameLabel: '@ Юзернейм', settingsBioLabel: '📝 О себе', settingsLanguageLabel: '🌐 Язык',
+                settingsDeviceLabel: '📱 Режим', settingsUploadBtn: '📸 Загрузить', settingsDeleteBtn: '🗑️ Удалить',
+                settingsEditBtn: '✏️', settingsCloseBtn: 'Закрыть', editBioTitle: '📝 Редактировать био',
+                bioPlaceholder: 'Расскажи о себе...', noInfo: 'Нет информации', noBio: 'Нет информации',
+                messagePlaceholder: 'Сообщение...', voiceMessage: 'Голосовое сообщение', file: 'Файл',
+                deviceAuto: '🔄 Авто', deviceDesktop: '💻 ПК', deviceMobile: '📱 Телефон',
+                loginSubtitle: 'AES-256 • user1..userN', loginNamePlaceholder: 'Твой никнейм', loginBtn: '🌌 Войти',
+                nameTaken: 'Имя уже занято!', enterName: 'Введите имя', selectChatFirst: 'Сначала выберите чат',
+                microphoneDenied: 'Доступ к микрофону запрещён', nameChanged: '✅ Имя изменено',
+                usernameChanged: '✅ Юзернейм изменён', bioUpdated: '✅ Био обновлено',
+                avatarRemoved: '✅ Аватарка удалена', avatarUpdated: '✅ Аватарка обновлена',
+                profileGroups: 'Групп', profileChats: 'Чатов', profileDays: 'Дней', profileWrite: '💬 Написать',
+                profileClose: 'Закрыть', calling: '📞 Вызов...', incomingCall: '📲 Входящий звонок'
             },
             en: {
-                welcome: 'Welcome',
-                selectChat: 'Select chat',
-                encrypted: 'Encrypted',
-                noChats: 'No chats',
-                noGroups: 'No groups',
-                noUsers: 'No users',
-                settings: 'Settings',
-                profile: 'My profile',
-                edit: 'Edit',
-                save: 'Save',
-                cancel: 'Cancel',
-                delete: 'Delete',
-                upload: 'Upload',
-                name: 'Name',
-                username: 'Username',
-                bio: 'Bio',
-                language: 'Language',
-                days: 'Days',
-                groups: 'Groups',
-                chats: 'Chats',
-                write: 'Message',
-                close: 'Close',
-                navChats: 'Chats',
-                navGroups: 'Groups',
-                navContacts: 'Contacts',
-                searchPlaceholder: '🔍 Search...',
-                createGroup: 'Create group',
-                groupName: 'Group name',
-                groupDescription: 'Description (opt.)',
-                createGroupTitle: '👥 Create group',
-                settingsTitle: '⚙️ Settings',
-                settingsNameLabel: '👤 Name',
-                settingsUsernameLabel: '@ Username',
-                settingsBioLabel: '📝 Bio',
-                settingsLanguageLabel: '🌐 Language',
-                settingsDeviceLabel: '📱 Mode',
-                settingsUploadBtn: '📸 Upload',
-                settingsDeleteBtn: '🗑️ Delete',
-                settingsEditBtn: '✏️',
-                settingsCloseBtn: 'Close',
-                editBioTitle: '📝 Edit bio',
-                bioPlaceholder: 'Tell about yourself...',
-                noInfo: 'No info',
-                noBio: 'No bio',
-                messagePlaceholder: 'Message...',
-                voiceMessage: 'Voice message',
-                file: 'File',
-                deviceAuto: '🔄 Auto',
-                deviceDesktop: '💻 Desktop',
-                deviceMobile: '📱 Mobile',
-                loginSubtitle: 'AES-256 • AUTO-USER',
-                loginNamePlaceholder: 'Your nickname',
-                loginBtn: '🌌 Login',
-                nameTaken: 'Name taken!',
-                enterName: 'Enter name',
-                selectChatFirst: 'Select a chat first',
-                microphoneDenied: 'Microphone access denied',
-                nameChanged: '✅ Name changed',
-                usernameChanged: '✅ Username changed',
-                bioUpdated: '✅ Bio updated',
-                avatarRemoved: '✅ Avatar removed',
-                avatarUpdated: '✅ Avatar updated',
-                profileGroups: 'Groups',
-                profileChats: 'Chats',
-                profileDays: 'Days',
-                profileWrite: '💬 Message',
-                profileClose: 'Close',
-                calling: '📞 Calling...',
-                incomingCall: '📲 Incoming call'
+                welcome: 'Welcome', selectChat: 'Select chat', encrypted: 'AES-256 encrypted',
+                noChats: 'No chats', noGroups: 'No groups', noUsers: 'No users',
+                settings: 'Settings', profile: 'My profile', edit: 'Edit', save: 'Save', cancel: 'Cancel',
+                delete: 'Delete', upload: 'Upload', name: 'Name', username: 'Username', bio: 'Bio',
+                language: 'Language', days: 'Days', groups: 'Groups', chats: 'Chats', write: 'Message', close: 'Close',
+                navChats: 'Chats', navGroups: 'Groups', navContacts: 'Contacts', searchPlaceholder: '🔍 Search...',
+                createGroup: 'Create group', groupName: 'Group name', groupDescription: 'Description (opt.)',
+                createGroupTitle: '👥 Create group', settingsTitle: '⚙️ Settings', settingsNameLabel: '👤 Name',
+                settingsUsernameLabel: '@ Username', settingsBioLabel: '📝 Bio', settingsLanguageLabel: '🌐 Language',
+                settingsDeviceLabel: '📱 Mode', settingsUploadBtn: '📸 Upload', settingsDeleteBtn: '🗑️ Delete',
+                settingsEditBtn: '✏️', settingsCloseBtn: 'Close', editBioTitle: '📝 Edit bio',
+                bioPlaceholder: 'Tell about yourself...', noInfo: 'No info', noBio: 'No bio',
+                messagePlaceholder: 'Message...', voiceMessage: 'Voice message', file: 'File',
+                deviceAuto: '🔄 Auto', deviceDesktop: '💻 Desktop', deviceMobile: '📱 Mobile',
+                loginSubtitle: 'AES-256 • user1..userN', loginNamePlaceholder: 'Your nickname', loginBtn: '🌌 Login',
+                nameTaken: 'Name taken!', enterName: 'Enter name', selectChatFirst: 'Select a chat first',
+                microphoneDenied: 'Microphone access denied', nameChanged: '✅ Name changed',
+                usernameChanged: '✅ Username changed', bioUpdated: '✅ Bio updated',
+                avatarRemoved: '✅ Avatar removed', avatarUpdated: '✅ Avatar updated',
+                profileGroups: 'Groups', profileChats: 'Chats', profileDays: 'Days', profileWrite: '💬 Message',
+                profileClose: 'Close', calling: '📞 Calling...', incomingCall: '📲 Incoming call'
             }
         };
 
         // ========== ПРИМЕНЕНИЕ ПЕРЕВОДОВ ==========
         function applyTranslations() {
             const t = i18n[currentLang];
-            // Логин
             document.getElementById('login-subtitle').innerText = t.loginSubtitle;
             document.getElementById('login-name').placeholder = t.loginNamePlaceholder;
             document.getElementById('login-btn').innerText = t.loginBtn;
-            // Главная
             if (!currentChat) document.getElementById('right-title').innerText = t.welcome;
             document.getElementById('search').placeholder = t.searchPlaceholder;
-            // Табы
             document.querySelectorAll('.tab')[0].innerHTML = `💬 ${t.navChats}`;
             document.querySelectorAll('.tab')[1].innerHTML = `👥 ${t.navGroups}`;
             document.querySelectorAll('.tab')[2].innerHTML = `📞 ${t.navContacts}`;
-            // Кнопки
             document.querySelector('.icon-btn[title="Создать группу"]').title = t.createGroup;
             document.querySelector('.icon-btn[title="Настройки"]').title = t.settings;
-            // Модалка создания группы
             document.getElementById('create-group-title').innerText = t.createGroupTitle;
             document.getElementById('group-name').placeholder = t.groupName;
             document.getElementById('group-description').placeholder = t.groupDescription;
             document.getElementById('create-group-cancel').innerText = t.cancel;
             document.getElementById('create-group-submit').innerText = t.createGroup;
-            // Настройки
             document.querySelector('#settings-modal .modal-title').innerText = t.settingsTitle;
             document.getElementById('settings-name-label').innerText = t.settingsNameLabel;
             document.getElementById('settings-username-label').innerText = t.settingsUsernameLabel;
@@ -1214,14 +1031,11 @@
             document.getElementById('settings-username-edit').innerHTML = t.settingsEditBtn;
             document.getElementById('settings-bio-edit').innerHTML = t.settingsEditBtn;
             document.getElementById('settings-close-btn').innerText = t.settingsCloseBtn;
-            // Био
             document.getElementById('edit-bio-title').innerText = t.editBioTitle;
             document.getElementById('bio-text').placeholder = t.bioPlaceholder;
             document.getElementById('edit-bio-cancel').innerText = t.cancel;
             document.getElementById('edit-bio-save').innerText = t.save;
-            // Звонки
-            document.querySelectorAll('.call-status')[0].innerText = t.calling; // заглушка, обновится при открытии
-            // Профиль (метки статистики) — обновляются при рендере
+            document.querySelectorAll('.call-status')[0].innerText = t.calling;
             if (chatInput) chatInput.placeholder = t.messagePlaceholder;
         }
 
@@ -1272,7 +1086,6 @@
             if (!name) return alert(i18n[currentLang].enterName);
             localStorage.setItem('teleRoomName', name);
             socket.emit('register', { name });
-            // временный юзер
             currentUser = { id: Date.now(), name, phone: '', avatar: null, bio: '', created_at: new Date().toISOString() };
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('main-screen').style.display = 'flex';
@@ -1340,22 +1153,14 @@
             container.innerHTML = '';
             const all = [
                 ...privateChats.map(p => ({
-                    id: p.id,
-                    type: 'private',
-                    name: p.other_user_name,
+                    id: p.id, type: 'private', name: p.other_user_name,
                     last: p.last_message || i18n[currentLang].noChats,
-                    time: p.last_time,
-                    online: p.online,
-                    avatar: p.other_user_avatar,
-                    uid: p.other_user_id
+                    time: p.last_time, online: p.online, avatar: p.other_user_avatar, uid: p.other_user_id
                 })),
                 ...groups.map(g => ({
-                    id: g.id,
-                    type: 'group',
-                    name: g.name,
+                    id: g.id, type: 'group', name: g.name,
                     last: g.last_message || i18n[currentLang].noChats,
-                    time: g.last_time,
-                    members: g.members_count
+                    time: g.last_time, members: g.members_count
                 }))
             ].sort((a,b) => new Date(b.time||0) - new Date(a.time||0));
             if (all.length === 0) { container.innerHTML = '<div class="no-results">' + i18n[currentLang].noChats + '</div>'; return; }
@@ -1409,29 +1214,22 @@
             const query = document.getElementById('search').value.toLowerCase().trim();
             const activeTab = document.querySelector('.tab.active')?.innerText.includes('Чаты') ? 'chats' 
                 : document.querySelector('.tab.active')?.innerText.includes('Группы') ? 'groups' : 'contacts';
-            let container;
-            if (activeTab === 'chats') container = document.getElementById('chats-container');
-            else if (activeTab === 'groups') container = document.getElementById('groups-container');
-            else container = document.getElementById('contacts-container');
+            let container = document.getElementById(activeTab === 'chats' ? 'chats-container' : activeTab === 'groups' ? 'groups-container' : 'contacts-container');
             if (!container) return;
-            const items = container.querySelectorAll('.list-item');
-            items.forEach(item => {
+            container.querySelectorAll('.list-item').forEach(item => {
                 const title = item.querySelector('.item-title')?.innerText.toLowerCase() || '';
                 const sub = item.querySelector('.item-sub')?.innerText.toLowerCase() || '';
                 item.style.display = (title.includes(query) || sub.includes(query)) ? 'flex' : 'none';
             });
         }
 
-        // ========== ПЕРЕКЛЮЧЕНИЕ ТАБОВ ==========
         function switchTab(tab, el) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
             document.getElementById('chats-container').classList.add('hidden');
             document.getElementById('groups-container').classList.add('hidden');
             document.getElementById('contacts-container').classList.add('hidden');
-            if (tab === 'chats') document.getElementById('chats-container').classList.remove('hidden');
-            if (tab === 'groups') document.getElementById('groups-container').classList.remove('hidden');
-            if (tab === 'contacts') document.getElementById('contacts-container').classList.remove('hidden');
+            document.getElementById(tab + '-container').classList.remove('hidden');
         }
 
         // ========== ГРУППЫ ==========
@@ -1462,7 +1260,7 @@
         let typingIndicator = null;
 
         function openPrivateChat(chatId, otherUserId, otherUserName) {
-            if (!otherUserId) { console.error('no otherUserId'); return; }
+            if (!otherUserId) return;
             currentChatType = 'private';
             currentChat = { id: chatId, name: otherUserName, otherUserId };
             document.getElementById('right-title').innerText = otherUserName;
@@ -1487,17 +1285,12 @@
         }
 
         function loadChatContent() {
-            const rightContent = document.getElementById('right-content');
-            rightContent.innerHTML = `
+            document.getElementById('right-content').innerHTML = `
                 <div id="messages-container" class="messages"></div>
                 <div id="typing-indicator-container" style="display: none; padding: 0 16px 8px;">
                     <div class="typing-indicator">
                         <span id="typing-user"></span>
-                        <div class="typing-dots">
-                            <div class="typing-dot"></div>
-                            <div class="typing-dot"></div>
-                            <div class="typing-dot"></div>
-                        </div>
+                        <div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
                     </div>
                 </div>
                 <div class="chat-input-area">
@@ -1544,22 +1337,10 @@
         }
 
         function onChatKeyDown(e) {
-            socket.emit('typing', { 
-                chat_type: currentChatType, 
-                chat_id: currentChat.id, 
-                user_id: currentUser.id, 
-                user_name: currentUser.name, 
-                is_typing: true 
-            });
+            socket.emit('typing', { chat_type: currentChatType, chat_id: currentChat.id, user_id: currentUser.id, user_name: currentUser.name, is_typing: true });
             clearTimeout(typingTimeout);
             typingTimeout = setTimeout(() => {
-                socket.emit('typing', { 
-                    chat_type: currentChatType, 
-                    chat_id: currentChat.id, 
-                    user_id: currentUser.id, 
-                    user_name: currentUser.name, 
-                    is_typing: false 
-                });
+                socket.emit('typing', { chat_type: currentChatType, chat_id: currentChat.id, user_id: currentUser.id, user_name: currentUser.name, is_typing: false });
             }, 2000);
         }
 
@@ -1607,7 +1388,7 @@
                 content = `<div>📎 ${m.file_name || i18n[currentLang].file}</div>`;
             } else {
                 let txt = m.text || '';
-                txt = txt.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: var(--accent-soft);">$1</a>');
+                txt = txt.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: var(--accent-light);">$1</a>');
                 content = `<div class="message-text">${txt}</div>`;
             }
             const senderHtml = (!isMe && currentChatType === 'group') ? `<span class="sender" onclick="showUserProfileModal(${m.user_id})">${m.user_name || 'User'}</span>` : '';
@@ -1618,8 +1399,7 @@
         // ========== ПРОФИЛЬ (МОЙ) ==========
         function openMyProfile() {
             if (!currentUser) return;
-            const rightContent = document.getElementById('right-content');
-            rightContent.innerHTML = `
+            document.getElementById('right-content').innerHTML = `
                 <div class="profile-card">
                     <div class="profile-avatar-large" id="my-profile-avatar">${currentUser.avatar ? `<img src="/avatars/${currentUser.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : currentUser.name[0].toUpperCase()}</div>
                     <div class="profile-name-large">${currentUser.name}</div>
@@ -1678,17 +1458,13 @@
         function startChatWithProfileUser() {
             if (!viewingUserId) return;
             const user = allUsers.find(u => u.id === viewingUserId);
-            if (user) {
-                startPrivateChat(user.id, user.name);
-            }
+            if (user) startPrivateChat(user.id, user.name);
         }
 
         function startPrivateChat(uid, uname) {
             fetch('/api/private_chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ user1_id: currentUser.id, user2_id: uid }) })
             .then(r => r.json())
-            .then(data => {
-                if (data.chat_id) openPrivateChat(data.chat_id, uid, uname);
-            });
+            .then(data => { if (data.chat_id) openPrivateChat(data.chat_id, uid, uname); });
         }
 
         // ========== НАСТРОЙКИ ==========
