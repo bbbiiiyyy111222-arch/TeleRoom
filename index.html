@@ -140,6 +140,7 @@
             display: flex;
             flex: 1;
             overflow: hidden;
+            position: relative;
         }
         /* Левая панель */
         .left-panel {
@@ -287,14 +288,21 @@
         }
         .chat-info {
             flex: 1;
+            min-width: 0; /* предотвращает переполнение */
         }
         .chat-name {
             font-weight: 600;
             margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .chat-last {
             font-size: 13px;
             color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .badge {
             background: var(--accent);
@@ -332,12 +340,16 @@
             border: 1px solid var(--border);
             color: white;
             cursor: pointer;
+            font-size: 20px;
         }
         .right-title {
             font-size: 20px;
             font-weight: 600;
             color: white;
             flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .right-settings-btn {
             width: 40px;
@@ -356,7 +368,7 @@
         .right-content {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
         }
@@ -368,10 +380,10 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            padding: 20px;
+            padding: 16px;
         }
         .message {
-            max-width: 75%;
+            max-width: 80%;
             display: flex;
             flex-direction: column;
             animation: fadeIn 0.2s;
@@ -426,6 +438,7 @@
             border: 1px solid var(--border);
             background: var(--bg-card);
             color: white;
+            font-size: 16px;
         }
         .voice-btn {
             width: 48px;
@@ -465,7 +478,8 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            min-width: 200px;
+            min-width: 180px;
+            max-width: 100%;
         }
         .voice-play {
             width: 36px;
@@ -479,6 +493,7 @@
             justify-content: center;
             cursor: pointer;
             transition: 0.2s;
+            flex-shrink: 0;
         }
         .voice-play:hover {
             background: rgba(255,255,255,0.3);
@@ -494,6 +509,7 @@
             display: flex;
             align-items: center;
             padding: 0 12px;
+            min-width: 0;
         }
         .voice-progress {
             position: absolute;
@@ -516,33 +532,35 @@
             margin-left: auto;
         }
 
-        /* ПРОФИЛЬ — компактный, без вылетов */
+        /* ПРОФИЛЬ — компактный, адаптивный */
         .profile-card {
             background: var(--bg-surface);
             border-radius: var(--radius-lg);
-            padding: 24px;
+            padding: 20px;
             border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             align-items: center;
+            width: 100%;
             max-width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         .profile-avatar-large {
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
             background: var(--accent);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
+            font-size: 44px;
             color: white;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             overflow: hidden;
+            flex-shrink: 0;
         }
         .profile-name-large {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
             margin-bottom: 4px;
             color: white;
@@ -553,34 +571,38 @@
         .profile-username-large {
             color: var(--text-muted);
             margin-bottom: 12px;
-            font-size: 15px;
+            font-size: 14px;
+            text-align: center;
+            word-break: break-word;
         }
         .profile-bio-large {
             color: var(--text-secondary);
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             max-width: 100%;
             word-break: break-word;
+            font-size: 14px;
         }
         .profile-stats {
             display: flex;
             justify-content: space-around;
             width: 100%;
-            padding: 16px 0;
+            padding: 12px 0;
             border-top: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         .stat-item {
             text-align: center;
+            flex: 1;
         }
         .stat-value {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             color: var(--accent);
         }
         .stat-label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             margin-top: 4px;
         }
@@ -624,6 +646,7 @@
             display: flex;
             gap: 12px;
             margin-top: 8px;
+            flex-wrap: wrap;
         }
         .lang-btn, .device-btn {
             padding: 8px 16px;
@@ -632,6 +655,7 @@
             background: var(--bg-card);
             color: white;
             cursor: pointer;
+            transition: var(--transition);
         }
         .lang-btn.active, .device-btn.active {
             background: var(--accent);
@@ -654,7 +678,7 @@
         }
         .modal-content {
             background: var(--bg-surface);
-            padding: 28px;
+            padding: 24px;
             border-radius: var(--radius-lg);
             width: 90%;
             max-width: 440px;
@@ -663,7 +687,7 @@
         .modal-title {
             font-size: 22px;
             font-weight: 700;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             color: white;
         }
 
@@ -676,15 +700,49 @@
             padding: 40px 20px;
         }
 
-        /* АДАПТАЦИЯ */
-        .layout-mobile .left-panel {
-            width: 100%;
+        /* ========== МОБИЛЬНАЯ АДАПТАЦИЯ (ПОЛНОСТЬЮ ПЕРЕРАБОТАНА) ========== */
+        @media (max-width: 768px) {
+            .app-layout {
+                flex-direction: column;
+            }
+            .left-panel {
+                width: 100% !important;
+                height: auto;
+                max-height: 45vh;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+            .right-panel {
+                width: 100%;
+                flex: 1;
+            }
+            .chat-item {
+                padding: 10px;
+            }
+            .chat-avatar {
+                width: 44px;
+                height: 44px;
+                font-size: 20px;
+            }
+            .message {
+                max-width: 85%;
+            }
+            .voice-message {
+                min-width: 150px;
+            }
+            .profile-avatar-large {
+                width: 80px;
+                height: 80px;
+                font-size: 40px;
+            }
+            .profile-name-large {
+                font-size: 20px;
+            }
         }
-        .layout-mobile .right-panel {
-            display: none;
-        }
-        .layout-mobile .right-panel.active-mobile {
-            display: flex;
+
+        /* ========== ПРАВАЯ ПАНЕЛЬ НА ВЕСЬ ЭКРАН (МОБИЛЬНЫЙ РЕЖИМ) ========== */
+        .right-panel.active-mobile {
+            display: flex !important;
             position: absolute;
             top: 0;
             left: 0;
@@ -693,14 +751,18 @@
             z-index: 100;
             background: var(--bg-main);
         }
-        @media (max-width: 768px) {
-            .app-layout:not(.layout-desktop):not(.layout-mobile) {
-                flex-direction: column;
-            }
-            .app-layout:not(.layout-desktop):not(.layout-mobile) .left-panel {
-                width: 100%;
-                height: 40vh;
-            }
+        .right-panel.active-mobile .back-btn {
+            display: flex !important;
+        }
+
+        /* Принудительный мобильный режим (класс на appLayout) */
+        .layout-mobile .left-panel {
+            width: 100% !important;
+            height: 100%;
+            border-right: none;
+        }
+        .layout-mobile .right-panel {
+            display: none;
         }
 
         ::-webkit-scrollbar {
@@ -1119,13 +1181,7 @@
                 document.querySelector('.right-panel').classList.remove('active-mobile');
             } else {
                 document.getElementById('device-auto').classList.add('active');
-                if (window.innerWidth < 768) {
-                    // авто
-                } else {
-                    document.querySelector('.left-panel').style.display = 'flex';
-                    document.querySelector('.right-panel').style.display = 'flex';
-                    document.querySelector('.right-panel').classList.remove('active-mobile');
-                }
+                // Авто-режим: убираем принудительные классы, работают медиазапросы
             }
         }
 
@@ -1358,10 +1414,10 @@
             loadChatContent();
             socket.emit('join_private_chat', chatId);
             loadPrivateMessages(chatId);
+            // Мобильное управление: скрываем левую панель, показываем правую на весь экран
             if (currentDeviceMode === 'mobile' || (window.innerWidth < 768 && currentDeviceMode === 'auto')) {
                 document.querySelector('.left-panel').style.display = 'none';
                 document.querySelector('.right-panel').classList.add('active-mobile');
-                document.querySelector('.back-btn').style.display = 'flex';
             }
         }
 
@@ -1375,7 +1431,6 @@
             if (currentDeviceMode === 'mobile' || (window.innerWidth < 768 && currentDeviceMode === 'auto')) {
                 document.querySelector('.left-panel').style.display = 'none';
                 document.querySelector('.right-panel').classList.add('active-mobile');
-                document.querySelector('.back-btn').style.display = 'flex';
             }
         }
 
@@ -1491,7 +1546,6 @@
             if (currentDeviceMode === 'mobile' || (window.innerWidth < 768 && currentDeviceMode === 'auto')) {
                 document.querySelector('.left-panel').style.display = 'none';
                 document.querySelector('.right-panel').classList.add('active-mobile');
-                document.querySelector('.back-btn').style.display = 'flex';
             }
         }
 
@@ -1752,14 +1806,13 @@
 
         // ========== ЗАКРЫТИЕ ПРАВОЙ ПАНЕЛИ ==========
         function closeRightPanel() {
-            if (currentDeviceMode === 'mobile' || window.innerWidth < 768) {
-                document.querySelector('.left-panel').style.display = 'flex';
-                document.querySelector('.right-panel').classList.remove('active-mobile');
-                document.querySelector('.back-btn').style.display = 'none';
-                document.getElementById('right-content').innerHTML = `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted);"><div style="font-size: 64px; margin-bottom: 20px;">💬</div><div style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: white;">${i18n[currentLang].selectChat}</div><div style="font-size: 14px; max-width: 70%; text-align: center;">${i18n[currentLang].encrypted}</div></div>`;
-                document.getElementById('right-title').innerText = i18n[currentLang].welcome;
-                currentChat = null;
-            }
+            // Возвращаем левую панель, убираем active-mobile
+            document.querySelector('.left-panel').style.display = 'flex';
+            document.querySelector('.right-panel').classList.remove('active-mobile');
+            // Восстанавливаем контент по умолчанию
+            document.getElementById('right-content').innerHTML = `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted);"><div style="font-size: 64px; margin-bottom: 20px;">💬</div><div style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: white;">${i18n[currentLang].selectChat}</div><div style="font-size: 14px; max-width: 70%; text-align: center;">${i18n[currentLang].encrypted}</div></div>`;
+            document.getElementById('right-title').innerText = i18n[currentLang].welcome;
+            currentChat = null;
         }
 
         // ========== ВЫХОД ==========
