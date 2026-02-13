@@ -1,4 +1,4 @@
-// ==================== server.js - ULTRA SECURE ====================
+// ==================== server.js - MEGA ULTRA SUPREME SECURITY ====================
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -12,88 +12,192 @@ const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const sanitize = require('sanitize-filename');
 const zlib = require('zlib');
+const os = require('os');
 
-// ========== КРИПТОГРАФИЧЕСКАЯ ЗАЩИТА УЛЬТРА УРОВНЯ ==========
+// ========== КРИПТОГРАФИЧЕСКАЯ ЗАЩИТА АБСОЛЮТ ==========
 const KEY_FILE = path.join(__dirname, '.master.key');
 const SALT_FILE = path.join(__dirname, '.salt');
 const IV_LENGTH = 16;
-const SALT_LENGTH = 64;
+const AUTH_TAG_LENGTH = 16;
 const KEY_LENGTH = 32;
-const TAG_LENGTH = 16;
+const PBKDF2_ITERATIONS = 250000; // Очень много итераций
 
-// Генерация или загрузка мастер-ключа с солью
-let SECRET_KEY, SALT;
+// Мастер-ключ с аппаратной привязкой
+let SECRET_KEY, SALT, HARDWARE_ID;
+
+// Получаем уникальный ID оборудования
+function getHardwareId() {
+    const networkInterfaces = os.networkInterfaces();
+    const mac = Object.values(networkInterfaces)
+        .flat()
+        .find(iface => !iface.internal && iface.mac !== '00:00:00:00:00:00')
+        ?.mac || '00:00:00:00:00:00';
+    
+    const cpus = os.cpus();
+    const cpuInfo = cpus[0]?.model || 'unknown';
+    
+    return crypto.createHash('sha256')
+        .update(mac + cpuInfo + os.hostname())
+        .digest('hex');
+}
+
+HARDWARE_ID = getHardwareId();
+
+// Загрузка или создание ключей с аппаратной привязкой
 if (fs.existsSync(KEY_FILE) && fs.existsSync(SALT_FILE)) {
-    SECRET_KEY = fs.readFileSync(KEY_FILE, 'utf8');
+    const encryptedKey = fs.readFileSync(KEY_FILE, 'utf8');
     SALT = fs.readFileSync(SALT_FILE, 'utf8');
-    console.log('🔑 Мастер-ключ загружен');
+    
+    // Расшифровываем ключ с использованием аппаратного ID
+    const decipher = crypto.createDecipheriv(
+        'aes-256-gcm',
+        crypto.pbkdf2Sync(HARDWARE_ID, SALT, 100000, 32, 'sha512'),
+        Buffer.from(SALT.slice(0, 32), 'hex')
+    );
+    
+    try {
+        SECRET_KEY = decipher.update(encryptedKey, 'hex', 'utf8');
+        SECRET_KEY += decipher.final('utf8');
+        console.log('🔑 Мастер-ключ загружен с аппаратной привязкой');
+    } catch (e) {
+        console.error('❌ Ошибка расшифровки ключа! Возможно, оборудование изменено');
+        process.exit(1);
+    }
 } else {
     SECRET_KEY = crypto.randomBytes(32).toString('hex');
     SALT = crypto.randomBytes(64).toString('hex');
-    fs.writeFileSync(KEY_FILE, SECRET_KEY);
+    
+    // Шифруем ключ аппаратным ID
+    const cipher = crypto.createCipheriv(
+        'aes-256-gcm',
+        crypto.pbkdf2Sync(HARDWARE_ID, SALT, 100000, 32, 'sha512'),
+        Buffer.from(SALT.slice(0, 32), 'hex')
+    );
+    
+    const encryptedKey = cipher.update(SECRET_KEY, 'utf8', 'hex');
+    fs.writeFileSync(KEY_FILE, encryptedKey);
     fs.writeFileSync(SALT_FILE, SALT);
-    console.log('🔑 Новый мастер-ключ создан и сохранён');
+    console.log('🔑 Новый мастер-ключ создан с аппаратной привязкой');
 }
 
 const ALGORITHM = 'aes-256-gcm';
 
-// Функция для получения ключа сессии (динамический ключ на основе соли)
+// Кэш ключей сессий для производительности
+const sessionKeyCache = new Map();
+const CACHE_MAX_SIZE = 1000;
+
+// Очистка кэша каждые 10 минут
+setInterval(() => {
+    if (sessionKeyCache.size > CACHE_MAX_SIZE) {
+        const keys = Array.from(sessionKeyCache.keys());
+        const toDelete = keys.slice(0, keys.length - CACHE_MAX_SIZE);
+        toDelete.forEach(key => sessionKeyCache.delete(key));
+    }
+}, 10 * 60 * 1000);
+
+// Функция для получения ключа сессии с кэшированием
 function getSessionKey(sessionId) {
-    return crypto.pbkdf2Sync(SECRET_KEY, SALT + sessionId, 100000, 32, 'sha512');
+    if (sessionKeyCache.has(sessionId)) {
+        return sessionKeyCache.get(sessionId);
+    }
+    
+    const key = crypto.pbkdf2Sync(
+        SECRET_KEY, 
+        SALT + sessionId + HARDWARE_ID, 
+        PBKDF2_ITERATIONS, 
+        KEY_LENGTH, 
+        'sha512'
+    );
+    
+    if (sessionKeyCache.size < CACHE_MAX_SIZE) {
+        sessionKeyCache.set(sessionId, key);
+    }
+    
+    return key;
 }
 
-// Шифрование с дополнительной защитой
+// Шифрование с множественной защитой
 function ultraEncrypt(text, sessionId = 'default') {
     if (!text) return text;
-    const iv = crypto.randomBytes(IV_LENGTH);
-    const key = getSessionKey(sessionId);
-    const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
     
-    // Сжатие перед шифрованием
-    const compressed = zlib.deflateSync(text.toString()).toString('base64');
-    
-    let encrypted = cipher.update(compressed, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    const authTag = cipher.getAuthTag();
-    
-    // Добавляем хеш для проверки целостности
-    const hash = crypto.createHash('sha256').update(encrypted + authTag.toString('hex')).digest('hex').substring(0, 16);
-    
-    return JSON.stringify({
-        iv: iv.toString('hex'),
-        encrypted,
-        tag: authTag.toString('hex'),
-        hash,
-        version: '2.0'
-    });
+    try {
+        const iv = crypto.randomBytes(IV_LENGTH);
+        const key = getSessionKey(sessionId);
+        
+        // Добавляем временную метку и случайные данные для уникальности
+        const timestamp = Date.now().toString();
+        const randomPadding = crypto.randomBytes(8).toString('hex');
+        const dataWithMetadata = `${timestamp}:${randomPadding}:${text}`;
+        
+        // Сжатие
+        const compressed = zlib.deflateSync(dataWithMetadata).toString('base64');
+        
+        // Шифрование
+        const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
+        let encrypted = cipher.update(compressed, 'utf8', 'hex');
+        encrypted += cipher.final('hex');
+        const authTag = cipher.getAuthTag();
+        
+        // Множественные хеши для проверки
+        const hash1 = crypto.createHash('sha256').update(encrypted).digest('hex').substring(0, 16);
+        const hash2 = crypto.createHash('sha512').update(encrypted + authTag.toString('hex')).digest('hex').substring(0, 16);
+        const combinedHash = crypto.createHash('sha256').update(hash1 + hash2).digest('hex').substring(0, 16);
+        
+        return JSON.stringify({
+            iv: iv.toString('hex'),
+            data: encrypted,
+            tag: authTag.toString('hex'),
+            hash: combinedHash,
+            ver: '3.0',
+            ts: Date.now()
+        });
+    } catch (err) {
+        console.error('❌ Ошибка шифрования:', err);
+        return null;
+    }
 }
 
-// Дешифрование с проверкой целостности
+// Дешифрование с многоуровневой проверкой
 function ultraDecrypt(encryptedData, sessionId = 'default') {
     if (!encryptedData || !encryptedData.startsWith('{')) return encryptedData;
+    
     try {
-        const { iv, encrypted, tag, hash, version } = JSON.parse(encryptedData);
+        const { iv, data, tag, hash, ver, ts } = JSON.parse(encryptedData);
         
-        // Проверка хеша
-        const computedHash = crypto.createHash('sha256').update(encrypted + tag).digest('hex').substring(0, 16);
+        // Проверка времени (сообщения старше 30 дней считаем недействительными)
+        if (ts && Date.now() - ts > 30 * 24 * 60 * 60 * 1000) {
+            console.warn('⚠️ Сообщение устарело');
+            return '[СООБЩЕНИЕ УСТАРЕЛО]';
+        }
+        
+        // Проверка целостности
+        const hash1 = crypto.createHash('sha256').update(data).digest('hex').substring(0, 16);
+        const hash2 = crypto.createHash('sha512').update(data + tag).digest('hex').substring(0, 16);
+        const computedHash = crypto.createHash('sha256').update(hash1 + hash2).digest('hex').substring(0, 16);
+        
         if (hash && computedHash !== hash) {
-            console.error('⚠️ Нарушение целостности данных!');
-            return '[ПОВРЕЖДЕННЫЕ ДАННЫЕ]';
+            logSecurity('integrity_violation', 'Data integrity check failed');
+            return '[ДАННЫЕ ПОВРЕЖДЕНЫ]';
         }
         
         const key = getSessionKey(sessionId);
         const decipher = crypto.createDecipheriv(ALGORITHM, key, Buffer.from(iv, 'hex'));
         decipher.setAuthTag(Buffer.from(tag, 'hex'));
         
-        let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+        let decrypted = decipher.update(data, 'hex', 'utf8');
         decrypted += decipher.final('utf8');
         
         // Распаковка
         const decompressed = zlib.inflateSync(Buffer.from(decrypted, 'base64')).toString();
-        return decompressed;
+        
+        // Извлечение метаданных
+        const [timestamp, padding, actualText] = decompressed.split(':');
+        
+        return actualText;
     } catch (e) {
         console.error('❌ Ошибка дешифрования:', e.message);
-        return '[НЕДОСТУПНО]';
+        logSecurity('decryption_error', e.message);
+        return '[ОШИБКА ДЕШИФРОВАНИЯ]';
     }
 }
 
@@ -102,11 +206,14 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: { origin: '*', methods: ['GET', 'POST'] },
-    pingTimeout: 60000,
-    pingInterval: 25000
+    pingTimeout: 30000,
+    pingInterval: 10000,
+    transports: ['websocket'], // Только WebSocket, без polling
+    allowEIO3: false,
+    maxHttpBufferSize: 1e6
 });
 
-// ========== УЛЬТРА ЗАЩИТА HELMET ==========
+// ========== МАКСИМАЛЬНАЯ ЗАЩИТА HELMET ==========
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
@@ -117,38 +224,50 @@ app.use(helmet({
             imgSrc: ["'self'", "data:", "blob:"],
             connectSrc: ["'self'", "ws:", "wss:"],
             frameSrc: ["'none'"],
-            objectSrc: ["'none'"]
+            objectSrc: ["'none'"],
+            baseUri: ["'self'"],
+            formAction: ["'self'"],
+            frameAncestors: ["'none'"],
+            upgradeInsecureRequests: []
         }
     },
     hsts: {
-        maxAge: 31536000,
+        maxAge: 63072000,
         includeSubDomains: true,
         preload: true
     },
-    referrerPolicy: { policy: 'same-origin' }
+    referrerPolicy: { policy: 'no-referrer' },
+    noSniff: true,
+    xssFilter: true,
+    hidePoweredBy: true,
+    ieNoOpen: true,
+    dnsPrefetchControl: { allow: false }
 }));
 
-// ========== RATE LIMITING АГРЕССИВНЫЙ ==========
+// ========== RATE LIMITING СУПЕР АГРЕССИВНЫЙ ==========
 const globalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: { error: '❌ Слишком много запросов. Подождите 15 минут.' },
+    max: 50,
+    message: { error: '❌ Превышен лимит запросов' },
     standardHeaders: true,
     legacyHeaders: false,
-    skipSuccessfulRequests: false
+    keyGenerator: (req) => {
+        // Используем IP + User-Agent для идентификации
+        return req.ip + (req.headers['user-agent'] || '');
+    }
 });
 
 const authLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
-    max: 5,
-    message: { error: '❌ Слишком много попыток входа. Подождите час.' },
+    max: 3,
+    message: { error: '❌ Слишком много попыток входа' },
     skipSuccessfulRequests: true
 });
 
 const uploadLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
-    max: 20,
-    message: { error: '❌ Лимит загрузок. Подождите час.' }
+    max: 10,
+    message: { error: '❌ Лимит загрузок исчерпан' }
 });
 
 app.use('/api/', globalLimiter);
@@ -162,32 +281,43 @@ const folders = [
     './avatars',
     './database',
     './logs',
-    './temp'
+    './temp',
+    './backups'
 ];
 
 folders.forEach(folder => {
     if (!fs.existsSync(folder)) {
-        fs.mkdirSync(folder, { recursive: true, mode: 0o755 });
+        fs.mkdirSync(folder, { recursive: true, mode: 0o700 }); // Только владелец
         console.log(`✅ Создана папка: ${folder}`);
     }
 });
 
-// ========== ЛОГИРОВАНИЕ ==========
-function logSecurity(event, details, ip) {
+// ========== ЛОГИРОВАНИЕ ВСЕХ СОБЫТИЙ ==========
+function logSecurity(event, details, ip = 'unknown', userId = null) {
     const logEntry = {
         timestamp: new Date().toISOString(),
         event,
         details,
-        ip: ip || 'unknown'
+        ip,
+        userId,
+        hardwareId: HARDWARE_ID.substring(0, 8)
     };
+    
     const logFile = path.join(__dirname, 'logs', `security-${new Date().toISOString().split('T')[0]}.log`);
     fs.appendFileSync(logFile, JSON.stringify(logEntry) + '\n');
+    
+    // Ротация логов (оставляем только 30 дней)
+    const files = fs.readdirSync('./logs');
+    if (files.length > 30) {
+        const oldest = files.sort()[0];
+        fs.unlinkSync(path.join('./logs', oldest));
+    }
 }
 
 // ========== НАСТРОЙКА ЗАГРУЗКИ ==========
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        let dest = './uploads/';
+        let dest = './temp/';
         if (file.fieldname === 'voice') dest = './uploads/voice/';
         else if (file.fieldname === 'photo') dest = './uploads/photos/';
         else if (file.fieldname === 'file') dest = './uploads/files/';
@@ -195,33 +325,38 @@ const storage = multer.diskStorage({
         cb(null, dest);
     },
     filename: (req, file, cb) => {
-        // Максимальная очистка имени
-        const cleanName = sanitize(file.originalname).replace(/[^a-zA-Z0-9.-]/g, '_');
-        const uniqueName = `${Date.now()}_${crypto.randomBytes(8).toString('hex')}_${cleanName}`;
+        // Максимальная очистка и рандомизация
+        const cleanName = sanitize(file.originalname)
+            .replace(/[^a-zA-Z0-9.-]/g, '_')
+            .substring(0, 50);
+        
+        const uniqueName = `${Date.now()}_${crypto.randomBytes(16).toString('hex')}_${cleanName}`;
         cb(null, uniqueName);
     }
 });
 
 const fileFilter = (req, file, cb) => {
-    // Проверка MIME типов
+    // Строгая проверка MIME типов
     const allowedTypes = {
         'image': ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
-        'audio': ['audio/webm', 'audio/mp3', 'audio/ogg', 'audio/mpeg'],
-        'file': ['application/pdf', 'application/zip', 'text/plain', 'application/msword']
+        'audio': ['audio/webm', 'audio/ogg', 'audio/mpeg'],
+        'file': ['application/pdf', 'text/plain', 'application/zip']
     };
     
     let allowed = false;
+    
     if (file.fieldname === 'avatar' || file.fieldname === 'photo') {
         allowed = allowedTypes.image.includes(file.mimetype);
     } else if (file.fieldname === 'voice') {
         allowed = allowedTypes.audio.includes(file.mimetype);
     } else {
-        allowed = true; // для файлов
+        allowed = allowedTypes.file.includes(file.mimetype);
     }
     
     if (allowed) {
         cb(null, true);
     } else {
+        logSecurity('invalid_file_type', `Attempted upload: ${file.mimetype}`, req.ip);
         cb(new Error('❌ Недопустимый тип файла'));
     }
 };
@@ -230,32 +365,50 @@ const upload = multer({
     storage,
     fileFilter,
     limits: { 
-        fileSize: 50 * 1024 * 1024, // 50 MB
+        fileSize: 25 * 1024 * 1024, // 25 MB
         files: 1
     }
 });
 
 // ========== СТАТИЧЕСКИЕ ФАЙЛЫ ==========
 app.use(express.static(__dirname, {
-    maxAge: '1d',
+    maxAge: '1h',
     etag: true,
-    lastModified: true
+    lastModified: true,
+    immutable: false
 }));
-app.use('/uploads', express.static('uploads', { maxAge: '1d' }));
-app.use('/avatars', express.static('avatars', { maxAge: '1d' }));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+app.use('/uploads', express.static('uploads', { 
+    maxAge: '1h',
+    setHeaders: (res, path) => {
+        res.set('X-Content-Type-Options', 'nosniff');
+    }
+}));
+
+app.use('/avatars', express.static('avatars', { 
+    maxAge: '1h',
+    setHeaders: (res, path) => {
+        res.set('X-Content-Type-Options', 'nosniff');
+    }
+}));
+
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 // ========== БАЗА ДАННЫХ ==========
 const db = new sqlite3.Database('./database/teleroom_ultra.db');
 
-// Включение внешних ключей и WAL режима
+// Максимальная защита БД
 db.run('PRAGMA foreign_keys = ON');
 db.run('PRAGMA journal_mode = WAL');
-db.run('PRAGMA synchronous = NORMAL');
+db.run('PRAGMA synchronous = FULL');
+db.run('PRAGMA temp_store = MEMORY');
+db.run('PRAGMA mmap_size = 30000000000');
+db.run('PRAGMA page_size = 4096');
+db.run('PRAGMA cache_size = -2000');
 
 db.serialize(() => {
-    // Пользователи с усиленной защитой
+    // Пользователи с максимальной защитой
     db.run(`CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL,
@@ -271,6 +424,9 @@ db.serialize(() => {
         locked_until DATETIME,
         session_id TEXT UNIQUE,
         public_key TEXT,
+        two_factor_secret TEXT,
+        is_verified INTEGER DEFAULT 0,
+        last_password_change DATETIME,
         CHECK (length(name) >= 2 AND length(name) <= 30)
     )`);
 
@@ -284,6 +440,7 @@ db.serialize(() => {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         is_private INTEGER DEFAULT 0,
         password_hash TEXT,
+        max_members INTEGER DEFAULT 100,
         FOREIGN KEY (created_by) REFERENCES users(id)
     )`);
 
@@ -311,7 +468,7 @@ db.serialize(() => {
         FOREIGN KEY (user2_id) REFERENCES users(id) ON DELETE CASCADE
     )`);
 
-    // Сообщения с дополнительными полями безопасности
+    // Сообщения
     db.run(`CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         chat_type TEXT NOT NULL CHECK(chat_type IN ('private', 'group')),
@@ -327,7 +484,7 @@ db.serialize(() => {
         reply_to INTEGER,
         edited INTEGER DEFAULT 0,
         deleted INTEGER DEFAULT 0,
-        encrypted_version TEXT DEFAULT '2.0',
+        encrypted_version TEXT DEFAULT '3.0',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -342,6 +499,7 @@ db.serialize(() => {
         expires_at DATETIME,
         ip TEXT,
         user_agent TEXT,
+        last_activity DATETIME,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )`);
 
@@ -350,21 +508,25 @@ db.serialize(() => {
         user_id INTEGER NOT NULL,
         blocked_user_id INTEGER NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        reason TEXT,
         PRIMARY KEY (user_id, blocked_user_id),
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (blocked_user_id) REFERENCES users(id) ON DELETE CASCADE
     )`);
 
-    // Индексы для производительности
+    // Индексы
     db.run(`CREATE INDEX IF NOT EXISTS idx_messages_chat ON messages(chat_type, chat_id, created_at)`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_messages_user ON messages(user_id, created_at)`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_group_members ON group_members(group_id, user_id)`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_private_chats ON private_chats(user1_id, user2_id)`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_users_online ON users(online)`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_messages_deleted ON messages(deleted)`);
 
     console.log('✅ База данных Ultra Secure готова');
     console.log(`🔐 Мастер-ключ: ${SECRET_KEY.substring(0, 8)}...${SECRET_KEY.slice(-8)}`);
+    console.log(`💻 Аппаратный ID: ${HARDWARE_ID.substring(0, 8)}...`);
 });
 
 // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
@@ -399,20 +561,24 @@ async function generateSessionId() {
     let sessionId;
     let exists;
     do {
-        sessionId = crypto.randomBytes(32).toString('hex');
+        sessionId = crypto.randomBytes(48).toString('hex');
         exists = await dbGet('SELECT id FROM sessions WHERE id = ?', [sessionId]);
     } while (exists);
     return sessionId;
 }
 
-// ========== API С ПРОВЕРКАМИ ==========
+// ========== API С МАКСИМАЛЬНОЙ ПРОВЕРКОЙ ==========
 // Проверка имени
 app.get('/api/check-username/:name', async (req, res) => {
     try {
-        const name = sanitize(req.params.name).substring(0, 30);
+        const name = sanitize(req.params.name)
+            .replace(/[<>]/g, '')
+            .substring(0, 30);
+            
         if (!name || name.length < 2) {
             return res.json({ available: false });
         }
+        
         const user = await dbGet('SELECT id FROM users WHERE name = ?', [name]);
         res.json({ available: !user });
     } catch (err) {
@@ -430,6 +596,7 @@ app.get('/api/users', async (req, res) => {
             FROM users 
             WHERE locked_until IS NULL OR locked_until < CURRENT_TIMESTAMP
             ORDER BY name
+            LIMIT 1000
         `);
         res.json(users);
     } catch (err) {
@@ -456,7 +623,7 @@ app.get('/api/users/:id', async (req, res) => {
         if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
         
         // Маскируем телефон
-        user.phone = user.phone.substring(0, 3) + '***' + user.phone.slice(-3);
+        user.phone = user.phone.substring(0, 3) + '****' + user.phone.slice(-3);
         res.json(user);
     } catch (err) {
         logSecurity('get_user_error', err.message, req.ip);
@@ -464,9 +631,16 @@ app.get('/api/users/:id', async (req, res) => {
     }
 });
 
-// ========== ВЕБ-СОКЕТЫ С ЗАЩИТОЙ ==========
+// ========== ВЕБ-СОКЕТЫ С МАКСИМАЛЬНОЙ ЗАЩИТОЙ ==========
 io.use((socket, next) => {
     const clientIp = socket.handshake.address;
+    const userAgent = socket.handshake.headers['user-agent'] || 'unknown';
+    
+    // Проверка на подозрительные User-Agent
+    if (userAgent.length < 10 || userAgent.length > 300) {
+        logSecurity('suspicious_ua', userAgent, clientIp);
+        return next(new Error('Invalid User-Agent'));
+    }
     
     // Проверка на слишком частые подключения
     const now = Date.now();
@@ -474,7 +648,7 @@ io.use((socket, next) => {
         const recent = global.connectionTracker[clientIp] || [];
         const recentConnections = recent.filter(t => now - t < 60000).length;
         
-        if (recentConnections > 5) {
+        if (recentConnections > 3) {
             logSecurity('rate_limit_exceeded', 'Too many connections', clientIp);
             return next(new Error('Слишком частые подключения'));
         }
@@ -491,7 +665,10 @@ io.use((socket, next) => {
 
 io.on('connection', (socket) => {
     const clientIp = socket.handshake.address;
+    const userAgent = socket.handshake.headers['user-agent'] || 'unknown';
+    
     console.log(`👤 Новое подключение: ${clientIp}`);
+    logSecurity('socket_connected', 'New connection', clientIp);
     
     let currentSessionId = null;
     let currentUserId = null;
@@ -499,7 +676,6 @@ io.on('connection', (socket) => {
     socket.on('register', async (userData) => {
         try {
             const { name } = userData;
-            const userAgent = socket.handshake.headers['user-agent'] || 'unknown';
             
             if (!name || typeof name !== 'string' || name.length < 2 || name.length > 30) {
                 logSecurity('invalid_register', 'Invalid name length', clientIp);
@@ -508,22 +684,29 @@ io.on('connection', (socket) => {
             }
 
             // Очистка имени
-            const cleanName = sanitize(name).replace(/[<>]/g, '').substring(0, 30);
+            const cleanName = sanitize(name)
+                .replace(/[<>]/g, '')
+                .substring(0, 30);
             
             // Проверка на заблокированный IP
-            const blocked = await dbGet('SELECT * FROM blocks WHERE user_id = ? AND blocked_user_id = ?', [0, clientIp]);
+            const blocked = await dbGet(
+                'SELECT * FROM blocks WHERE user_id = -1 AND blocked_user_id = ?', 
+                [clientIp]
+            );
+            
             if (blocked) {
                 logSecurity('blocked_ip_attempt', clientIp, clientIp);
                 socket.emit('register_error', 'IP заблокирован');
                 return;
             }
 
+            // Поиск пользователя
             let user = await dbGet('SELECT * FROM users WHERE name = ?', [cleanName]);
 
             if (user) {
-                // Проверка на блокировку пользователя
+                // Проверка на блокировку
                 if (user.locked_until && new Date(user.locked_until) > new Date()) {
-                    socket.emit('register_error', 'Аккаунт временно заблокирован');
+                    socket.emit('register_error', 'Аккаунт заблокирован');
                     return;
                 }
 
@@ -538,8 +721,8 @@ io.on('connection', (socket) => {
                 `, [clientIp, userAgent, currentSessionId, user.id]);
                 
                 await dbRun(`
-                    INSERT INTO sessions (id, user_id, ip, user_agent, expires_at) 
-                    VALUES (?, ?, ?, ?, datetime('now', '+7 days'))
+                    INSERT INTO sessions (id, user_id, ip, user_agent, expires_at, last_activity) 
+                    VALUES (?, ?, ?, ?, datetime('now', '+3 days'), CURRENT_TIMESTAMP)
                 `, [currentSessionId, user.id, clientIp, userAgent]);
 
                 socket.userId = user.id;
@@ -550,12 +733,12 @@ io.on('connection', (socket) => {
                 await sendUserData(socket, user.id);
                 socket.broadcast.emit('user_online', user.id);
                 
-                logSecurity('user_login', `User ${user.id} logged in`, clientIp);
+                logSecurity('user_login', `User ${user.id} logged in`, clientIp, user.id);
                 return;
             }
 
-            // Новый пользователь - генерация уникального имени
-            let baseUsername = `user${crypto.randomInt(1000, 9999)}`;
+            // Новый пользователь
+            const baseUsername = `user${crypto.randomInt(10000, 99999)}`;
             let username = baseUsername;
             let counter = 1;
             
@@ -576,8 +759,8 @@ io.on('connection', (socket) => {
             `, [currentSessionId, newId]);
             
             await dbRun(`
-                INSERT INTO sessions (id, user_id, ip, user_agent, expires_at) 
-                VALUES (?, ?, ?, ?, datetime('now', '+7 days'))
+                INSERT INTO sessions (id, user_id, ip, user_agent, expires_at, last_activity) 
+                VALUES (?, ?, ?, ?, datetime('now', '+3 days'), CURRENT_TIMESTAMP)
             `, [currentSessionId, newId, clientIp, userAgent]);
 
             const newUser = await dbGet('SELECT * FROM users WHERE id = ?', [newId]);
@@ -591,7 +774,7 @@ io.on('connection', (socket) => {
             await sendUserData(socket, newUser.id);
             socket.broadcast.emit('user_online', newUser.id);
             
-            logSecurity('new_user', `New user ${newUser.id} created`, clientIp);
+            logSecurity('new_user', `New user ${newUser.id} created`, clientIp, newUser.id);
 
         } catch (err) {
             console.error('❌ Ошибка регистрации:', err);
@@ -609,6 +792,14 @@ io.on('connection', (socket) => {
                 WHERE gm.user_id = ?
                 GROUP BY g.id
             `, [userId]);
+            
+            // Расшифровываем последние сообщения групп
+            for (let group of groups) {
+                if (group.last_message) {
+                    group.last_message = ultraDecrypt(group.last_message, 'default');
+                }
+            }
+            
             socket.emit('user_groups', groups || []);
 
             const privateChats = await dbAll(`
@@ -619,21 +810,36 @@ io.on('connection', (socket) => {
                        END as other_user_id,
                        u.name as other_user_name,
                        u.avatar as other_user_avatar,
-                       u.online
+                       u.online,
+                       (SELECT text FROM messages WHERE chat_type = 'private' AND chat_id = pc.id ORDER BY created_at DESC LIMIT 1) as last_message,
+                       (SELECT created_at FROM messages WHERE chat_type = 'private' AND chat_id = pc.id ORDER BY created_at DESC LIMIT 1) as last_time
                 FROM private_chats pc
                 JOIN users u ON (CASE WHEN pc.user1_id = ? THEN pc.user2_id ELSE pc.user1_id END) = u.id
                 WHERE pc.user1_id = ? OR pc.user2_id = ?
+                ORDER BY last_time DESC
             `, [userId, userId, userId, userId]);
+            
+            // Расшифровываем последние сообщения
+            for (let chat of privateChats) {
+                if (chat.last_message) {
+                    chat.last_message = ultraDecrypt(chat.last_message, 'default');
+                }
+            }
+            
             socket.emit('user_private_chats', privateChats || []);
 
             const users = await dbAll(`
                 SELECT id, name, avatar, bio, online 
                 FROM users 
                 WHERE locked_until IS NULL OR locked_until < CURRENT_TIMESTAMP
+                LIMIT 1000
             `);
+            
             socket.emit('all_users', users || []);
+            
         } catch (err) {
             console.error('Ошибка отправки данных:', err);
+            logSecurity('send_user_data_error', err.message, null, userId);
         }
     }
 
@@ -654,14 +860,18 @@ io.on('connection', (socket) => {
             if (!chat_type || !chat_id || !user_id || !text) return;
             if (!['private', 'group'].includes(chat_type)) return;
             if (text.length > 2000) return;
-            if (user_id !== socket.userId) return; // Проверка прав
+            if (user_id !== socket.userId) return;
 
             // Шифрование с ID сессии
             const encryptedText = ultraEncrypt(text, socket.sessionId || 'default');
+            if (!encryptedText) {
+                socket.emit('message_error', 'Ошибка шифрования');
+                return;
+            }
 
             const result = await dbRun(`
                 INSERT INTO messages (chat_type, chat_id, user_id, text, encrypted_version) 
-                VALUES (?, ?, ?, ?, '2.0')
+                VALUES (?, ?, ?, ?, '3.0')
             `, [chat_type, chat_id, user_id, encryptedText]);
 
             const message = await dbGet(`
@@ -675,10 +885,16 @@ io.on('connection', (socket) => {
                 message.text = ultraDecrypt(message.text, socket.sessionId || 'default');
                 const room = chat_type === 'group' ? `group_${chat_id}` : `private_${chat_id}`;
                 io.to(room).emit('new_message', message);
+                
+                // Обновляем время последней активности сессии
+                await dbRun(`
+                    UPDATE sessions SET last_activity = CURRENT_TIMESTAMP 
+                    WHERE id = ?
+                `, [socket.sessionId]);
             }
         } catch (err) {
             console.error('❌ Ошибка отправки сообщения:', err);
-            logSecurity('message_error', err.message, clientIp);
+            logSecurity('message_error', err.message, clientIp, socket.userId);
         }
     });
 
@@ -709,7 +925,7 @@ io.on('connection', (socket) => {
                 socket.broadcast.emit('user_offline', socket.userId);
                 console.log(`👋 ${socket.userName} отключился`);
                 
-                logSecurity('user_logout', `User ${socket.userId} disconnected`, clientIp);
+                logSecurity('user_logout', `User ${socket.userId} disconnected`, clientIp, socket.userId);
             } catch (err) {
                 console.error('Ошибка при отключении:', err);
             }
@@ -730,6 +946,12 @@ app.post('/api/groups',
         try {
             const { name, description, userId } = req.body;
 
+            // Проверка существования пользователя
+            const user = await dbGet('SELECT id FROM users WHERE id = ?', [userId]);
+            if (!user) {
+                return res.status(404).json({ error: 'Пользователь не найден' });
+            }
+
             const result = await dbRun(
                 'INSERT INTO groups (name, description, created_by) VALUES (?, ?, ?)',
                 [name, description || '', userId]
@@ -741,7 +963,7 @@ app.post('/api/groups',
                 [groupId, userId, 'admin']
             );
 
-            logSecurity('group_created', `Group ${groupId} created by ${userId}`, req.ip);
+            logSecurity('group_created', `Group ${groupId} created by ${userId}`, req.ip, userId);
             res.json({ id: groupId, name, description });
         } catch (err) {
             logSecurity('group_error', err.message, req.ip);
@@ -767,7 +989,7 @@ app.get('/api/groups/:userId', async (req, res) => {
             ORDER BY g.created_at DESC
         `, [userId]);
         
-        // Расшифровываем последние сообщения для отображения
+        // Расшифровываем последние сообщения
         for (let group of groups) {
             if (group.last_message) {
                 group.last_message = ultraDecrypt(group.last_message, 'default');
@@ -933,7 +1155,7 @@ app.post('/api/upload/voice', uploadLimiter, upload.single('voice'), async (req,
         const room = chat_type === 'group' ? `group_${chat_id}` : `private_${chat_id}`;
         io.to(room).emit('new_message', message);
 
-        logSecurity('voice_uploaded', `Voice message ${result.lastID}`, req.ip);
+        logSecurity('voice_uploaded', `Voice message ${result.lastID}`, req.ip, user_id);
         res.json(message);
     } catch (err) {
         logSecurity('upload_error', err.message, req.ip);
@@ -1025,7 +1247,7 @@ app.post('/api/user/update-name',
             const users = await dbAll('SELECT id, name, avatar, bio, online FROM users');
             io.emit('all_users', users);
 
-            logSecurity('name_updated', `User ${userId} renamed to ${newName}`, req.ip);
+            logSecurity('name_updated', `User ${userId} renamed to ${newName}`, req.ip, userId);
             res.json({ success: true, name: newName });
         } catch (err) {
             logSecurity('update_error', err.message, req.ip);
@@ -1068,7 +1290,9 @@ app.post('/api/user/upload-avatar', uploadLimiter, upload.single('avatar'), asyn
         const oldUser = await dbGet('SELECT avatar FROM users WHERE id = ?', [userId]);
         if (oldUser && oldUser.avatar) {
             const oldPath = path.join(__dirname, 'avatars', oldUser.avatar);
-            if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+            if (fs.existsSync(oldPath)) {
+                fs.unlinkSync(oldPath);
+            }
         }
 
         await dbRun('UPDATE users SET avatar = ? WHERE id = ?', [avatar, userId]);
@@ -1090,7 +1314,9 @@ app.post('/api/user/remove-avatar', async (req, res) => {
         const user = await dbGet('SELECT avatar FROM users WHERE id = ?', [userId]);
         if (user && user.avatar) {
             const filePath = path.join(__dirname, 'avatars', user.avatar);
-            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+            }
         }
 
         await dbRun('UPDATE users SET avatar = NULL WHERE id = ?', [userId]);
@@ -1117,7 +1343,7 @@ app.use((err, req, res, next) => {
     
     if (err instanceof multer.MulterError) {
         if (err.code === 'FILE_TOO_LARGE') {
-            return res.status(413).json({ error: 'Файл слишком большой (макс. 50MB)' });
+            return res.status(413).json({ error: 'Файл слишком большой (макс. 25MB)' });
         }
         return res.status(400).json({ error: 'Ошибка загрузки файла' });
     }
@@ -1125,32 +1351,77 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Внутренняя ошибка сервера' });
 });
 
-// ========== ОЧИСТКА СТАРЫХ СЕССИЙ ==========
+// ========== ОЧИСТКА СТАРЫХ ДАННЫХ ==========
 setInterval(async () => {
     try {
-        const result = await dbRun("DELETE FROM sessions WHERE expires_at < datetime('now')");
-        if (result.changes > 0) {
-            console.log(`🧹 Очищено ${result.changes} старых сессий`);
+        // Очистка старых сессий
+        const sessionsResult = await dbRun("DELETE FROM sessions WHERE expires_at < datetime('now')");
+        if (sessionsResult.changes > 0) {
+            console.log(`🧹 Очищено ${sessionsResult.changes} старых сессий`);
         }
+        
+        // Очистка временных файлов
+        const tempFiles = fs.readdirSync('./temp');
+        const now = Date.now();
+        for (const file of tempFiles) {
+            const filePath = path.join('./temp', file);
+            const stats = fs.statSync(filePath);
+            if (now - stats.mtimeMs > 24 * 60 * 60 * 1000) { // Старше 24 часов
+                fs.unlinkSync(filePath);
+            }
+        }
+        
     } catch (err) {
-        console.error('Ошибка очистки сессий:', err);
+        console.error('Ошибка очистки:', err);
     }
 }, 60 * 60 * 1000); // Каждый час
+
+// ========== БЭКАП БАЗЫ ДАННЫХ ==========
+setInterval(async () => {
+    try {
+        const backupFile = path.join(__dirname, 'backups', `backup-${new Date().toISOString().split('T')[0]}.db`);
+        
+        // Копируем файл базы данных
+        fs.copyFileSync('./database/teleroom_ultra.db', backupFile);
+        
+        // Сжимаем бэкап
+        const data = fs.readFileSync(backupFile);
+        const compressed = zlib.gzipSync(data);
+        fs.writeFileSync(backupFile + '.gz', compressed);
+        fs.unlinkSync(backupFile);
+        
+        // Оставляем только 7 последних бэкапов
+        const backups = fs.readdirSync('./backups')
+            .filter(f => f.endsWith('.gz'))
+            .sort();
+            
+        while (backups.length > 7) {
+            fs.unlinkSync(path.join('./backups', backups.shift()));
+        }
+        
+        console.log('💾 Создан бэкап базы данных');
+    } catch (err) {
+        console.error('Ошибка бэкапа:', err);
+    }
+}, 24 * 60 * 60 * 1000); // Каждый день
 
 // ========== ЗАПУСК ==========
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
-    console.log('\n' + '='.repeat(70));
-    console.log('   🚀 TeleRoom ULTRA SECURE EDITION');
-    console.log('='.repeat(70));
+    console.log('\n' + '='.repeat(80));
+    console.log('   🚀 TeleRoom MEGA ULTRA SUPREME SECURITY EDITION');
+    console.log('='.repeat(80));
     console.log(`   📱 Порт: ${PORT}`);
-    console.log('   🔐 Шифрование: AES-256-GCM + PBKDF2 + SHA256 + zlib');
+    console.log('   🔐 Шифрование: AES-256-GCM + PBKDF2(250k) + SHA512 + zlib');
     console.log('   🛡️ Защита: Helmet, Rate Limiting, Input Validation');
-    console.log('   📊 База: SQLite3 + WAL + Foreign Keys');
-    console.log('   🔑 Мастер-ключ: сохранён в .master.key');
+    console.log('   💻 Аппаратная привязка: MAC + CPU + Hostname');
+    console.log('   📊 База: SQLite3 + WAL + FULL sync + Foreign Keys');
+    console.log('   🔑 Мастер-ключ: зашифрован аппаратным ID');
     console.log('   🧂 Соль: сохранена в .salt');
     console.log('   📝 Логи: /logs/security-*.log');
+    console.log('   💾 Бэкапы: ежедневные в /backups');
+    console.log('   ⏰ Очистка: сессий и временных файлов каждый час');
     console.log('   ✅ Все функции: чаты, группы, файлы, звонки');
-    console.log('   🌐 Русский интерфейс + максимальная безопасность');
-    console.log('='.repeat(70) + '\n');
+    console.log('   🌐 Русский интерфейс + МАКСИМАЛЬНАЯ безопасность');
+    console.log('='.repeat(80) + '\n');
 });
