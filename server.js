@@ -1,4 +1,4 @@
-мconst express = require('express');
+const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const sqlite3 = require('sqlite3').verbose();
@@ -6,9 +6,22 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const { body, validationResult } = require('express-validator');
+const sanitize = require('sanitize-filename');
 
 // ========== КРИПТОГРАФИЧЕСКАЯ ЗАЩИТА ==========
-const SECRET_KEY = crypto.randomBytes(32).toString('hex');
+const KEY_FILE = path.join(__dirname, '.encryption.key');
+let SECRET_KEY;
+if (fs.existsSync(KEY_FILE)) {
+    SECRET_KEY = fs.readFileSync(KEY_FILE, 'utf8');
+} else {
+    SECRET_KEY = crypto.randomBytes(32).toString('hex');
+    fs.writeFileSync(KEY_FILE, SECRET_KEY);
+    console.log('🔑 Новый ключ шифрования создан и сохранён');
+}
+
 const ALGORITHM = 'aes-256-gcm';
 
 function encrypt(text) {
@@ -39,6 +52,7 @@ function decrypt(encryptedData) {
         decrypted += decipher.final('utf8');
         return decrypted;
     } catch (e) {
+        console.error('Ошибка дешифрования:', e.message);
         return encryptedData;
     }
 }
@@ -48,6 +62,28 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: { origin: '*', methods: ['GET', 'POST'] }
+});
+
+// ========== БЕЗОПАСНОСТЬ HELMET ==========
+app.use(helmet({
+    contentSecurityPolicy: false, // отключаем для упрощения, если нужны инлайн-скрипты
+}));
+
+// ========== RATE LIMITING ==========
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 минут
+    max: 100, // максимум 100 запросов с одного IP
+    message: { error: 'Слишком много запросов, попробуйте позже' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+app.use('/api/', apiLimiter); // применяем ко всем /api/*
+
+// Для загрузки файлов можно сделать более щадящий лимит
+const uploadLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 час
+    max: 50,
+    message: { error: 'Слишком много загрузок, попробуйте позже' }
 });
 
 // ========== СОЗДАНИЕ ПАПОК ==========
@@ -76,14 +112,16 @@ const storage = multer.diskStorage({
         else cb(null, './uploads/');
     },
     filename: (req, file, cb) => {
-        const uniqueName = Date.now() + '_' + file.originalname.replace(/[^a-zA-Z0-9.]/g, '_');
+        // Очищаем имя файла от небезопасных символов
+        const cleanName = sanitize(file.originalname) || 'file';
+        const uniqueName = Date.now() + '_' + cleanName.replace(/\s+/g, '_');
         cb(null, uniqueName);
     }
 });
 
 const upload = multer({
     storage,
-    limits: { fileSize: 100 * 1024 * 1024 }
+    limits: { fileSize: 100 * 1024 * 1024 } // 100 MB
 });
 
 // ========== СТАТИЧЕСКИЕ ФАЙЛЫ ==========
@@ -170,8 +208,13 @@ db.serialize(() => {
 });
 
 // ========== АВТОГЕНЕРАЦИЯ ЮЗЕРНЕЙМА ==========
-function generateUsername(id) {
-    return `user${id}`;
+async function generateUniqueUsername(base) {
+    let username = base;
+    let counter = 1;
+    while (await dbGet('SELECT id FROM users WHERE phone = ?', [username])) {
+        username = `${base}_${counter++}`;
+    }
+    return username;
 }
 
 // ========== ВСПОМОГАТЕЛЬНЫЕ АСИНХРОННЫЕ ФУНКЦИИ ==========
@@ -202,10 +245,30 @@ function dbRun(sql, params = []) {
     });
 }
 
+// ========== ВАЛИДАЦИЯ ==========
+const validateName = body('name')
+    .trim()
+    .isLength({ min: 2, max: 30 })
+    .withMessage('Имя должно быть от 2 до 30 символов')
+    .matches(/^[a-zA-Z0-9а-яА-ЯёЁ\s]+$/)
+    .withMessage('Имя содержит недопустимые символы');
+
+const validateUserId = body('userId').isInt().withMessage('Некорректный ID пользователя');
+const validateGroupId = body('groupId').isInt().withMessage('Некорректный ID группы');
+const validateChatId = body('chat_id').isInt().withMessage('Некорректный ID чата');
+const validateChatType = body('chat_type').isIn(['private', 'group']).withMessage('Неверный тип чата');
+const validateMessageText = body('text')
+    .optional()
+    .isLength({ max: 2000 })
+    .withMessage('Сообщение слишком длинное');
+
 // ========== API ПРОВЕРКИ ИМЕНИ ==========
 app.get('/api/check-username/:name', async (req, res) => {
     try {
         const name = req.params.name;
+        if (!name || name.length < 2) {
+            return res.json({ available: false });
+        }
         const user = await dbGet('SELECT id FROM users WHERE name = ?', [name]);
         res.json({ available: !user });
     } catch (err) {
@@ -227,9 +290,12 @@ app.get('/api/users', async (req, res) => {
 
 app.get('/api/users/:id', async (req, res) => {
     try {
+        const id = parseInt(req.params.id);
+        if (isNaN(id)) return res.status(400).json({ error: 'Неверный ID' });
+
         const user = await dbGet(
             'SELECT id, name, phone, avatar, bio, online, last_seen, created_at FROM users WHERE id = ?',
-            [req.params.id]
+            [id]
         );
         if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
         res.json(user);
@@ -239,87 +305,119 @@ app.get('/api/users/:id', async (req, res) => {
     }
 });
 
-app.post('/api/users/update-bio', async (req, res) => {
-    try {
-        const { userId, bio } = req.body;
-        const user = await dbGet('SELECT id FROM users WHERE id = ?', [userId]);
-        if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
+app.post('/api/users/update-bio',
+    validateUserId,
+    body('bio').optional().trim().isLength({ max: 200 }),
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
 
-        await dbRun('UPDATE users SET bio = ? WHERE id = ?', [bio, userId]);
+        try {
+            const { userId, bio } = req.body;
+            const user = await dbGet('SELECT id FROM users WHERE id = ?', [userId]);
+            if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
 
-        const users = await dbAll('SELECT id, name, avatar, bio, online FROM users');
-        io.emit('all_users', users || []);
+            await dbRun('UPDATE users SET bio = ? WHERE id = ?', [bio || '', userId]);
 
-        res.json({ success: true });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Ошибка сервера' });
+            const users = await dbAll('SELECT id, name, avatar, bio, online FROM users');
+            io.emit('all_users', users || []);
+
+            res.json({ success: true });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Ошибка сервера' });
+        }
     }
-});
+);
 
 // ========== API ПРОФИЛЯ ==========
-app.post('/api/user/update-name', async (req, res) => {
-    try {
-        const { userId, newName } = req.body;
-
-        const existing = await dbGet(
-            'SELECT id FROM users WHERE name = ? AND id != ?',
-            [newName, userId]
-        );
-        if (existing) {
-            return res.status(400).json({ error: 'Это имя уже занято!' });
+app.post('/api/user/update-name',
+    validateUserId,
+    validateName,
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ error: errors.array()[0].msg });
         }
 
-        const result = await dbRun('UPDATE users SET name = ? WHERE id = ?', [newName, userId]);
-        if (result.changes === 0) {
-            return res.status(404).json({ error: 'Пользователь не найден' });
+        try {
+            const { userId, newName } = req.body;
+
+            const existing = await dbGet(
+                'SELECT id FROM users WHERE name = ? AND id != ?',
+                [newName, userId]
+            );
+            if (existing) {
+                return res.status(400).json({ error: 'Это имя уже занято!' });
+            }
+
+            const result = await dbRun('UPDATE users SET name = ? WHERE id = ?', [newName, userId]);
+            if (result.changes === 0) {
+                return res.status(404).json({ error: 'Пользователь не найден' });
+            }
+
+            const users = await dbAll('SELECT id, name, avatar, bio, online FROM users');
+            io.emit('all_users', users || []);
+
+            res.json({ success: true, name: newName });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Ошибка сервера' });
         }
-
-        const users = await dbAll('SELECT id, name, avatar, bio, online FROM users');
-        io.emit('all_users', users || []);
-
-        res.json({ success: true, name: newName });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Ошибка сервера' });
     }
-});
+);
 
-app.post('/api/user/update-username', async (req, res) => {
-    try {
-        const { userId, newUsername } = req.body;
-
-        if (!newUsername || newUsername.length < 3) {
-            return res.status(400).json({ error: 'Юзернейм должен быть минимум 3 символа' });
+app.post('/api/user/update-username',
+    validateUserId,
+    body('newUsername')
+        .trim()
+        .isLength({ min: 3, max: 20 })
+        .withMessage('Юзернейм должен быть от 3 до 20 символов')
+        .matches(/^[a-zA-Z0-9_]+$/)
+        .withMessage('Юзернейм может содержать только буквы, цифры и _'),
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ error: errors.array()[0].msg });
         }
 
-        const existing = await dbGet(
-            'SELECT id FROM users WHERE phone = ? AND id != ?',
-            [newUsername, userId]
-        );
-        if (existing) {
-            return res.status(400).json({ error: 'Этот юзернейм уже занят!' });
-        }
+        try {
+            const { userId, newUsername } = req.body;
 
-        const result = await dbRun('UPDATE users SET phone = ? WHERE id = ?', [newUsername, userId]);
-        if (result.changes === 0) {
-            return res.status(404).json({ error: 'Пользователь не найден' });
-        }
+            const existing = await dbGet(
+                'SELECT id FROM users WHERE phone = ? AND id != ?',
+                [newUsername, userId]
+            );
+            if (existing) {
+                return res.status(400).json({ error: 'Этот юзернейм уже занят!' });
+            }
 
-        res.json({ success: true, username: newUsername });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Ошибка сервера' });
+            const result = await dbRun('UPDATE users SET phone = ? WHERE id = ?', [newUsername, userId]);
+            if (result.changes === 0) {
+                return res.status(404).json({ error: 'Пользователь не найден' });
+            }
+
+            res.json({ success: true, username: newUsername });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Ошибка сервера' });
+        }
     }
-});
+);
 
-app.post('/api/user/upload-avatar', upload.single('avatar'), async (req, res) => {
+app.post('/api/user/upload-avatar', uploadLimiter, upload.single('avatar'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'Нет файла' });
     }
 
     try {
         const { userId } = req.body;
+        if (!userId || isNaN(userId)) {
+            return res.status(400).json({ error: 'Неверный ID пользователя' });
+        }
+
         const avatar = req.file.filename;
 
         const user = await dbGet('SELECT id FROM users WHERE id = ?', [userId]);
@@ -339,7 +437,12 @@ app.post('/api/user/upload-avatar', upload.single('avatar'), async (req, res) =>
     }
 });
 
-app.post('/api/user/remove-avatar', async (req, res) => {
+app.post('/api/user/remove-avatar', validateUserId, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ error: 'Неверный ID пользователя' });
+    }
+
     try {
         const { userId } = req.body;
 
@@ -368,35 +471,48 @@ app.post('/api/user/remove-avatar', async (req, res) => {
 });
 
 // ========== API ГРУПП ==========
-app.post('/api/groups', async (req, res) => {
-    try {
-        const { name, description, userId } = req.body;
-
-        const user = await dbGet('SELECT id FROM users WHERE id = ?', [userId]);
-        if (!user) {
-            return res.status(404).json({ error: 'Пользователь не найден' });
+app.post('/api/groups',
+    validateUserId,
+    body('name').trim().isLength({ min: 2, max: 50 }).withMessage('Название группы должно быть от 2 до 50 символов'),
+    body('description').optional().trim().isLength({ max: 200 }),
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ error: errors.array()[0].msg });
         }
 
-        const result = await dbRun(
-            'INSERT INTO groups (name, description, created_by) VALUES (?, ?, ?)',
-            [name, description || '', userId]
-        );
-        const groupId = result.lastID;
+        try {
+            const { name, description, userId } = req.body;
 
-        await dbRun(
-            'INSERT INTO group_members (group_id, user_id, role) VALUES (?, ?, ?)',
-            [groupId, userId, 'admin']
-        );
+            const user = await dbGet('SELECT id FROM users WHERE id = ?', [userId]);
+            if (!user) {
+                return res.status(404).json({ error: 'Пользователь не найден' });
+            }
 
-        res.json({ id: groupId, name, description });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Ошибка сервера' });
+            const result = await dbRun(
+                'INSERT INTO groups (name, description, created_by) VALUES (?, ?, ?)',
+                [name, description || '', userId]
+            );
+            const groupId = result.lastID;
+
+            await dbRun(
+                'INSERT INTO group_members (group_id, user_id, role) VALUES (?, ?, ?)',
+                [groupId, userId, 'admin']
+            );
+
+            res.json({ id: groupId, name, description });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Ошибка сервера' });
+        }
     }
-});
+);
 
 app.get('/api/groups/:userId', async (req, res) => {
     try {
+        const userId = parseInt(req.params.userId);
+        if (isNaN(userId)) return res.status(400).json({ error: 'Неверный ID' });
+
         const groups = await dbAll(`
             SELECT g.*,
                    COUNT(DISTINCT gm.user_id) as members_count,
@@ -407,7 +523,7 @@ app.get('/api/groups/:userId', async (req, res) => {
             WHERE gm.user_id = ?
             GROUP BY g.id
             ORDER BY g.created_at DESC
-        `, [req.params.userId]);
+        `, [userId]);
         res.json(groups || []);
     } catch (err) {
         console.error(err);
@@ -417,13 +533,16 @@ app.get('/api/groups/:userId', async (req, res) => {
 
 app.get('/api/groups/:groupId/members', async (req, res) => {
     try {
+        const groupId = parseInt(req.params.groupId);
+        if (isNaN(groupId)) return res.status(400).json({ error: 'Неверный ID группы' });
+
         const members = await dbAll(`
             SELECT u.id, u.name, u.avatar, u.online, u.last_seen, gm.role, gm.joined_at
             FROM group_members gm
             JOIN users u ON gm.user_id = u.id
             WHERE gm.group_id = ?
             ORDER BY gm.joined_at
-        `, [req.params.groupId]);
+        `, [groupId]);
         res.json(members || []);
     } catch (err) {
         console.error(err);
@@ -431,63 +550,95 @@ app.get('/api/groups/:groupId/members', async (req, res) => {
     }
 });
 
-app.post('/api/groups/add_member', async (req, res) => {
-    try {
-        const { group_id, user_id } = req.body;
-
-        await dbRun(
-            'INSERT OR IGNORE INTO group_members (group_id, user_id) VALUES (?, ?)',
-            [group_id, user_id]
-        );
-        res.json({ success: true });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Ошибка сервера' });
-    }
-});
-
-app.post('/api/groups/update-name', async (req, res) => {
-    try {
-        const { groupId, userId, newName } = req.body;
-
-        const member = await dbGet(
-            'SELECT role FROM group_members WHERE group_id = ? AND user_id = ?',
-            [groupId, userId]
-        );
-        if (!member || member.role !== 'admin') {
-            return res.status(403).json({ error: 'Только админ может менять название' });
+app.post('/api/groups/add_member',
+    validateGroupId,
+    body('user_id').isInt(),
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ error: 'Неверные данные' });
         }
 
-        await dbRun('UPDATE groups SET name = ? WHERE id = ?', [newName, groupId]);
-        res.json({ success: true, name: newName });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Ошибка сервера' });
+        try {
+            const { group_id, user_id } = req.body;
+
+            await dbRun(
+                'INSERT OR IGNORE INTO group_members (group_id, user_id) VALUES (?, ?)',
+                [group_id, user_id]
+            );
+            res.json({ success: true });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Ошибка сервера' });
+        }
     }
-});
+);
 
-app.post('/api/groups/update-description', async (req, res) => {
-    try {
-        const { groupId, userId, newDescription } = req.body;
-
-        const member = await dbGet(
-            'SELECT role FROM group_members WHERE group_id = ? AND user_id = ?',
-            [groupId, userId]
-        );
-        if (!member || member.role !== 'admin') {
-            return res.status(403).json({ error: 'Только админ может менять описание' });
+app.post('/api/groups/update-name',
+    validateGroupId,
+    validateUserId,
+    body('newName').trim().isLength({ min: 2, max: 50 }),
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ error: errors.array()[0].msg });
         }
 
-        await dbRun('UPDATE groups SET description = ? WHERE id = ?', [newDescription, groupId]);
-        res.json({ success: true, description: newDescription });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Ошибка сервера' });
+        try {
+            const { groupId, userId, newName } = req.body;
+
+            const member = await dbGet(
+                'SELECT role FROM group_members WHERE group_id = ? AND user_id = ?',
+                [groupId, userId]
+            );
+            if (!member || member.role !== 'admin') {
+                return res.status(403).json({ error: 'Только админ может менять название' });
+            }
+
+            await dbRun('UPDATE groups SET name = ? WHERE id = ?', [newName, groupId]);
+            res.json({ success: true, name: newName });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Ошибка сервера' });
+        }
     }
-});
+);
+
+app.post('/api/groups/update-description',
+    validateGroupId,
+    validateUserId,
+    body('newDescription').optional().trim().isLength({ max: 200 }),
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ error: errors.array()[0].msg });
+        }
+
+        try {
+            const { groupId, userId, newDescription } = req.body;
+
+            const member = await dbGet(
+                'SELECT role FROM group_members WHERE group_id = ? AND user_id = ?',
+                [groupId, userId]
+            );
+            if (!member || member.role !== 'admin') {
+                return res.status(403).json({ error: 'Только админ может менять описание' });
+            }
+
+            await dbRun('UPDATE groups SET description = ? WHERE id = ?', [newDescription, groupId]);
+            res.json({ success: true, description: newDescription });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Ошибка сервера' });
+        }
+    }
+);
 
 app.get('/api/messages/group/:groupId', async (req, res) => {
     try {
+        const groupId = parseInt(req.params.groupId);
+        if (isNaN(groupId)) return res.status(400).json({ error: 'Неверный ID группы' });
+
         const messages = await dbAll(`
             SELECT m.*, u.name as user_name, u.avatar as user_avatar
             FROM messages m
@@ -495,7 +646,7 @@ app.get('/api/messages/group/:groupId', async (req, res) => {
             WHERE m.chat_type = 'group' AND m.chat_id = ?
             ORDER BY m.created_at ASC
             LIMIT 500
-        `, [req.params.groupId]);
+        `, [groupId]);
 
         const decrypted = messages.map(msg => {
             if (msg.text) msg.text = decrypt(msg.text);
@@ -509,39 +660,50 @@ app.get('/api/messages/group/:groupId', async (req, res) => {
 });
 
 // ========== API ЛИЧНЫХ ЧАТОВ ==========
-app.post('/api/private_chat', async (req, res) => {
-    try {
-        const { user1_id, user2_id } = req.body;
-        if (user1_id === user2_id) {
-            return res.status(400).json({ error: 'Нельзя создать чат с самим собой' });
+app.post('/api/private_chat',
+    body('user1_id').isInt(),
+    body('user2_id').isInt(),
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ error: 'Неверные ID пользователей' });
         }
 
-        const minId = Math.min(user1_id, user2_id);
-        const maxId = Math.max(user1_id, user2_id);
+        try {
+            const { user1_id, user2_id } = req.body;
+            if (user1_id === user2_id) {
+                return res.status(400).json({ error: 'Нельзя создать чат с самим собой' });
+            }
 
-        await dbRun(
-            'INSERT OR IGNORE INTO private_chats (user1_id, user2_id) VALUES (?, ?)',
-            [minId, maxId]
-        );
+            const minId = Math.min(user1_id, user2_id);
+            const maxId = Math.max(user1_id, user2_id);
 
-        const chat = await dbGet(
-            'SELECT id FROM private_chats WHERE user1_id = ? AND user2_id = ?',
-            [minId, maxId]
-        );
-        if (!chat) {
-            return res.status(500).json({ error: 'Не удалось создать чат' });
+            await dbRun(
+                'INSERT OR IGNORE INTO private_chats (user1_id, user2_id) VALUES (?, ?)',
+                [minId, maxId]
+            );
+
+            const chat = await dbGet(
+                'SELECT id FROM private_chats WHERE user1_id = ? AND user2_id = ?',
+                [minId, maxId]
+            );
+            if (!chat) {
+                return res.status(500).json({ error: 'Не удалось создать чат' });
+            }
+
+            res.json({ chat_id: chat.id });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Ошибка сервера' });
         }
-
-        res.json({ chat_id: chat.id });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Ошибка сервера' });
     }
-});
+);
 
 app.get('/api/private_chats/:userId', async (req, res) => {
     try {
         const userId = parseInt(req.params.userId);
+        if (isNaN(userId)) return res.status(400).json({ error: 'Неверный ID' });
+
         const chats = await dbAll(`
             SELECT pc.id,
                    CASE
@@ -568,6 +730,9 @@ app.get('/api/private_chats/:userId', async (req, res) => {
 
 app.get('/api/messages/private/:chatId', async (req, res) => {
     try {
+        const chatId = parseInt(req.params.chatId);
+        if (isNaN(chatId)) return res.status(400).json({ error: 'Неверный ID чата' });
+
         const messages = await dbAll(`
             SELECT m.*, u.name as user_name, u.avatar as user_avatar
             FROM messages m
@@ -575,7 +740,7 @@ app.get('/api/messages/private/:chatId', async (req, res) => {
             WHERE m.chat_type = 'private' AND m.chat_id = ?
             ORDER BY m.created_at ASC
             LIMIT 500
-        `, [req.params.chatId]);
+        `, [chatId]);
 
         const decrypted = messages.map(msg => {
             if (msg.text) msg.text = decrypt(msg.text);
@@ -589,13 +754,20 @@ app.get('/api/messages/private/:chatId', async (req, res) => {
 });
 
 // ========== ЗАГРУЗКА ФАЙЛОВ ==========
-app.post('/api/upload/voice', upload.single('voice'), async (req, res) => {
+app.post('/api/upload/voice', uploadLimiter, upload.single('voice'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'Нет файла' });
     }
 
     try {
         const { chat_type, chat_id, user_id, duration } = req.body;
+        if (!chat_type || !chat_id || !user_id) {
+            return res.status(400).json({ error: 'Не хватает данных' });
+        }
+        if (!['private', 'group'].includes(chat_type)) {
+            return res.status(400).json({ error: 'Неверный тип чата' });
+        }
+
         const voice_url = req.file.filename;
 
         const result = await dbRun(
@@ -620,13 +792,20 @@ app.post('/api/upload/voice', upload.single('voice'), async (req, res) => {
     }
 });
 
-app.post('/api/upload/photo', upload.single('photo'), async (req, res) => {
+app.post('/api/upload/photo', uploadLimiter, upload.single('photo'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'Нет файла' });
     }
 
     try {
         const { chat_type, chat_id, user_id } = req.body;
+        if (!chat_type || !chat_id || !user_id) {
+            return res.status(400).json({ error: 'Не хватает данных' });
+        }
+        if (!['private', 'group'].includes(chat_type)) {
+            return res.status(400).json({ error: 'Неверный тип чата' });
+        }
+
         const photo_url = req.file.filename;
 
         const result = await dbRun(
@@ -652,13 +831,20 @@ app.post('/api/upload/photo', upload.single('photo'), async (req, res) => {
     }
 });
 
-app.post('/api/upload/file', upload.single('file'), async (req, res) => {
+app.post('/api/upload/file', uploadLimiter, upload.single('file'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'Нет файла' });
     }
 
     try {
         const { chat_type, chat_id, user_id } = req.body;
+        if (!chat_type || !chat_id || !user_id) {
+            return res.status(400).json({ error: 'Не хватает данных' });
+        }
+        if (!['private', 'group'].includes(chat_type)) {
+            return res.status(400).json({ error: 'Неверный тип чата' });
+        }
+
         const file_url = req.file.filename;
         const file_name = req.file.originalname;
         const file_size = req.file.size;
@@ -692,7 +878,11 @@ io.on('connection', (socket) => {
 
     socket.on('register', async (userData) => {
         try {
-            const { name } = userData; // <-- ТЕПЕРЬ ТОЛЬКО name, без phone
+            const { name } = userData;
+            if (!name || typeof name !== 'string' || name.length < 2 || name.length > 30) {
+                socket.emit('register_error', 'Имя должно быть от 2 до 30 символов');
+                return;
+            }
             console.log(`📝 Попытка регистрации: ${name}`);
 
             // Проверяем, существует ли пользователь с таким именем
@@ -715,17 +905,16 @@ io.on('connection', (socket) => {
                 return;
             }
 
-            // Создаём нового пользователя
+            // Создаём нового пользователя — генерируем уникальный phone (username)
+            const baseUsername = `user${Date.now()}`;
+            const username = await generateUniqueUsername(baseUsername);
+
             const result = await dbRun(
                 'INSERT INTO users (name, phone) VALUES (?, ?)',
-                [name, '']
+                [name, username]
             );
 
             const newId = result.lastID;
-            const username = generateUsername(newId);
-
-            await dbRun('UPDATE users SET phone = ? WHERE id = ?', [username, newId]);
-
             const newUser = await dbGet('SELECT * FROM users WHERE id = ?', [newId]);
             if (!newUser) {
                 socket.emit('register_error', 'Ошибка при создании');
@@ -781,11 +970,13 @@ io.on('connection', (socket) => {
     }
 
     socket.on('join_group', (groupId) => {
+        if (!groupId || isNaN(groupId)) return;
         socket.join(`group_${groupId}`);
         console.log(`👥 ${socket.userName} присоединился к группе ${groupId}`);
     });
 
     socket.on('join_private_chat', (chatId) => {
+        if (!chatId || isNaN(chatId)) return;
         socket.join(`private_${chatId}`);
         console.log(`💬 ${socket.userName} присоединился к личному чату ${chatId}`);
     });
@@ -795,6 +986,7 @@ io.on('connection', (socket) => {
             const { chat_type, chat_id, user_id, text } = data;
 
             if (!chat_type || !chat_id || !user_id || !text) return;
+            if (!['private', 'group'].includes(chat_type)) return;
             if (text.length > 2000) return;
 
             const encryptedText = encrypt(text);
@@ -822,25 +1014,14 @@ io.on('connection', (socket) => {
     });
 
     socket.on('typing', (data) => {
-        const room = data.chat_type === 'group' ? `group_${data.chat_id}` : `private_${data.chat_id}`;
+        const { chat_type, chat_id, user_id, user_name, is_typing } = data;
+        if (!chat_type || !chat_id || !user_id) return;
+        const room = chat_type === 'group' ? `group_${chat_id}` : `private_${chat_id}`;
         socket.to(room).emit('user_typing', {
-            user_id: data.user_id,
-            user_name: data.user_name
+            user_id,
+            user_name,
+            is_typing: !!is_typing
         });
-    });
-
-    socket.on('update_bio', async (data) => {
-        try {
-            const { userId, bio } = data;
-            if (!userId) return;
-
-            await dbRun('UPDATE users SET bio = ? WHERE id = ?', [bio || '', userId]);
-
-            const users = await dbAll('SELECT id, name, avatar, bio, online FROM users');
-            io.emit('all_users', users || []);
-        } catch (err) {
-            console.error('Ошибка обновления био:', err);
-        }
     });
 
     socket.on('disconnect', async () => {
@@ -883,9 +1064,10 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log('   🚀 TeleRoom PRO — АВТО-ЮЗЕРЫ, ШИФРОВАНИЕ, ЗВОНКИ');
     console.log('='.repeat(60));
     console.log(`   📱 Порт: ${PORT}`);
-    console.log('   🔐 AES-256-GCM');
+    console.log('   🔐 AES-256-GCM (ключ сохранён в .encryption.key)');
+    console.log('   🛡️ Helmet, rate limiting, валидация');
     console.log('   ✅ Вход / Автовход (только name)');
-    console.log('   ✅ Авто-юзернеймы: user1..userN');
+    console.log('   ✅ Авто-юзернеймы: user<timestamp>_N');
     console.log('   ✅ Профили, аватарки, био');
     console.log('   ✅ Группы, личные чаты');
     console.log('   ✅ Голосовые, фото, файлы');
