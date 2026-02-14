@@ -1,4 +1,4 @@
-// ==================== server.js - TeleRoom Telegram Edition ====================
+// ==================== server.js - TeleRoom NEW ====================
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -12,7 +12,7 @@ const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const sanitize = require('sanitize-filename');
 
-// ========== НАСТРОЙКА БЕЗОПАСНОСТИ ==========
+// ========== НАСТРОЙКА ==========
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -21,25 +21,16 @@ const io = socketIo(server, {
     pingInterval: 25000
 });
 
-// Защита helmet
+// Защита
 app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-            fontSrc: ["'self'", "https://fonts.gstatic.com"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
-            imgSrc: ["'self'", "data:", "blob:"],
-            connectSrc: ["'self'", "ws:", "wss:"],
-        }
-    }
+    contentSecurityPolicy: false, // для простоты
 }));
 
 // Rate limiting
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 200,
-    message: { error: 'Слишком много запросов, попробуйте позже' }
+    message: { error: 'Слишком много запросов' }
 });
 app.use('/api/', limiter);
 
@@ -49,7 +40,7 @@ const uploadLimiter = rateLimit({
     message: { error: 'Слишком много загрузок' }
 });
 
-// ========== СОЗДАНИЕ ПАПОК ==========
+// ========== ПАПКИ ==========
 const folders = [
     './uploads/voice',
     './uploads/photos',
@@ -65,7 +56,7 @@ folders.forEach(folder => {
     }
 });
 
-// ========== НАСТРОЙКА ЗАГРУЗКИ ФАЙЛОВ ==========
+// ========== НАСТРОЙКА ЗАГРУЗКИ ==========
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         if (file.fieldname === 'voice') cb(null, './uploads/voice/');
@@ -86,7 +77,7 @@ const upload = multer({
     limits: { fileSize: 50 * 1024 * 1024 } // 50 MB
 });
 
-// ========== СТАТИЧЕСКИЕ ФАЙЛЫ ==========
+// ========== СТАТИКА ==========
 app.use(express.static(__dirname));
 app.use('/uploads', express.static('uploads'));
 app.use('/avatars', express.static('avatars'));
@@ -94,7 +85,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ========== БАЗА ДАННЫХ ==========
-const db = new sqlite3.Database('./database/teleroom.db');
+const db = new sqlite3.Database('./database/teleroom_new.db');
 
 db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS users (
@@ -162,7 +153,7 @@ db.serialize(() => {
     console.log('✅ База данных готова');
 });
 
-// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+// ========== ВСПОМОГАТЕЛЬНЫЕ ==========
 function dbGet(sql, params = []) {
     return new Promise((resolve, reject) => {
         db.get(sql, params, (err, row) => {
@@ -212,7 +203,7 @@ app.get('/api/check-username/:name', async (req, res) => {
     }
 });
 
-// Получить всех пользователей
+// Все пользователи
 app.get('/api/users', async (req, res) => {
     try {
         const users = await dbAll('SELECT id, name, avatar, bio, online, last_seen FROM users ORDER BY name');
@@ -222,7 +213,7 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
-// Получить пользователя по ID
+// Пользователь по ID
 app.get('/api/users/:id', async (req, res) => {
     try {
         const id = parseInt(req.params.id);
@@ -338,7 +329,7 @@ app.post('/api/user/remove-avatar', async (req, res) => {
     }
 });
 
-// ========== API ГРУПП ==========
+// ========== ГРУППЫ ==========
 app.post('/api/groups',
     body('name').trim().isLength({ min: 2, max: 50 }),
     body('description').optional().trim().isLength({ max: 200 }),
@@ -381,7 +372,34 @@ app.get('/api/groups/:userId', async (req, res) => {
     }
 });
 
-// Получить сообщения группы
+app.get('/api/groups/:groupId/members', async (req, res) => {
+    try {
+        const groupId = parseInt(req.params.groupId);
+        if (isNaN(groupId)) return res.status(400).json({ error: 'Неверный ID' });
+
+        const members = await dbAll(`
+            SELECT u.id, u.name, u.avatar, u.online, u.last_seen, gm.role, gm.joined_at
+            FROM group_members gm
+            JOIN users u ON gm.user_id = u.id
+            WHERE gm.group_id = ?
+            ORDER BY gm.joined_at
+        `, [groupId]);
+        res.json(members);
+    } catch (err) {
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+app.post('/api/groups/add_member', async (req, res) => {
+    try {
+        const { group_id, user_id } = req.body;
+        await dbRun('INSERT OR IGNORE INTO group_members (group_id, user_id) VALUES (?, ?)', [group_id, user_id]);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
 app.get('/api/messages/group/:groupId', async (req, res) => {
     try {
         const groupId = parseInt(req.params.groupId);
@@ -402,7 +420,7 @@ app.get('/api/messages/group/:groupId', async (req, res) => {
     }
 });
 
-// ========== API ЛИЧНЫХ ЧАТОВ ==========
+// ========== ЛИЧНЫЕ ЧАТЫ ==========
 app.post('/api/private_chat', async (req, res) => {
     try {
         const { user1_id, user2_id } = req.body;
@@ -543,7 +561,7 @@ app.post('/api/upload/file', uploadLimiter, upload.single('file'), async (req, r
     }
 });
 
-// ========== ВЕБ-СОКЕТЫ ==========
+// ========== СОКЕТЫ ==========
 io.on('connection', (socket) => {
     console.log('👤 Пользователь подключился');
 
@@ -683,10 +701,11 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
     console.log('\n' + '='.repeat(60));
-    console.log('   🚀 TeleRoom — как Telegram');
+    console.log('   🚀 TeleRoom — НОВАЯ ВЕРСИЯ');
     console.log('='.repeat(60));
     console.log(`   📱 Порт: ${PORT}`);
     console.log('   🛡️ Защита: Helmet, Rate Limiting');
-    console.log('   ✅ Все функции: чаты, группы, файлы, звонки');
+    console.log('   ✅ Голосовые, фото, файлы, звонки (демо)');
+    console.log('   ✅ Дизайн как Telegram');
     console.log('='.repeat(60) + '\n');
 });
