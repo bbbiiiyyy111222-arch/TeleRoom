@@ -1,4 +1,4 @@
-// ==================== server.js - TeleRoom NEW ====================
+// ==================== server.js - TeleRoom Final ====================
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -6,7 +6,6 @@ const sqlite3 = require('sqlite3').verbose();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const crypto = require('crypto');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
@@ -21,7 +20,7 @@ const io = socketIo(server, {
     pingInterval: 25000
 });
 
-// Защита
+// Базовая защита
 app.use(helmet({
     contentSecurityPolicy: false, // для простоты
 }));
@@ -85,9 +84,10 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ========== БАЗА ДАННЫХ ==========
-const db = new sqlite3.Database('./database/teleroom_new.db');
+const db = new sqlite3.Database('./database/teleroom.db');
 
 db.serialize(() => {
+    // Пользователи
     db.run(`CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL,
@@ -99,6 +99,7 @@ db.serialize(() => {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
 
+    // Группы
     db.run(`CREATE TABLE IF NOT EXISTS groups (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -109,6 +110,7 @@ db.serialize(() => {
         FOREIGN KEY (created_by) REFERENCES users(id)
     )`);
 
+    // Участники групп
     db.run(`CREATE TABLE IF NOT EXISTS group_members (
         group_id INTEGER NOT NULL,
         user_id INTEGER NOT NULL,
@@ -119,6 +121,7 @@ db.serialize(() => {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )`);
 
+    // Личные чаты
     db.run(`CREATE TABLE IF NOT EXISTS private_chats (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user1_id INTEGER NOT NULL,
@@ -129,6 +132,7 @@ db.serialize(() => {
         FOREIGN KEY (user2_id) REFERENCES users(id) ON DELETE CASCADE
     )`);
 
+    // Сообщения
     db.run(`CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         chat_type TEXT NOT NULL,
@@ -146,6 +150,7 @@ db.serialize(() => {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )`);
 
+    // Индексы
     db.run(`CREATE INDEX IF NOT EXISTS idx_messages_chat ON messages(chat_type, chat_id, created_at)`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_group_members ON group_members(group_id, user_id)`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_private_chats ON private_chats(user1_id, user2_id)`);
@@ -181,13 +186,19 @@ function dbRun(sql, params = []) {
     });
 }
 
-async function generateUniqueUsername(base) {
-    let username = base;
-    let counter = 1;
-    while (await dbGet('SELECT id FROM users WHERE phone = ?', [username])) {
-        username = `${base}_${counter++}`;
+// Генерация следующего свободного username в формате user1, user2, ...
+async function generateNextUsername() {
+    // Найти максимальный номер среди существующих phone вида userN
+    const rows = await dbAll("SELECT phone FROM users WHERE phone GLOB 'user*'");
+    let maxNum = 0;
+    for (const row of rows) {
+        const match = row.phone.match(/^user(\d+)$/);
+        if (match) {
+            const num = parseInt(match[1], 10);
+            if (num > maxNum) maxNum = num;
+        }
     }
-    return username;
+    return `user${maxNum + 1}`;
 }
 
 // ========== API ==========
@@ -267,7 +278,7 @@ app.post('/api/user/update-name',
     }
 );
 
-// Обновить юзернейм
+// Обновить юзернейм (phone)
 app.post('/api/user/update-username',
     body('newUsername').trim().isLength({ min: 3, max: 20 }).matches(/^[a-zA-Z0-9_]+$/),
     async (req, res) => {
@@ -568,13 +579,15 @@ io.on('connection', (socket) => {
     socket.on('register', async (userData) => {
         try {
             const { name } = userData;
-            if (!name || name.length < 2 || name.length > 30) {
+            if (!name || typeof name !== 'string' || name.length < 2 || name.length > 30) {
                 socket.emit('register_error', 'Имя должно быть от 2 до 30 символов');
                 return;
             }
             const cleanName = sanitize(name).substring(0, 30);
 
+            // Поиск существующего пользователя
             let user = await dbGet('SELECT * FROM users WHERE name = ?', [cleanName]);
+
             if (user) {
                 // Автовход
                 socket.userId = user.id;
@@ -586,19 +599,24 @@ io.on('connection', (socket) => {
                 return;
             }
 
-            // Новый пользователь
-            const baseUsername = `user${Date.now()}`;
-            const username = await generateUniqueUsername(baseUsername);
-            const result = await dbRun('INSERT INTO users (name, phone) VALUES (?, ?)', [cleanName, username]);
+            // Новый пользователь - генерируем username по порядку
+            const username = await generateNextUsername();
+
+            const result = await dbRun(
+                'INSERT INTO users (name, phone) VALUES (?, ?)',
+                [cleanName, username]
+            );
+
             const newUser = await dbGet('SELECT * FROM users WHERE id = ?', [result.lastID]);
             socket.userId = newUser.id;
             socket.userName = newUser.name;
             await dbRun('UPDATE users SET online = 1 WHERE id = ?', [newUser.id]);
+
             socket.emit('registered', newUser);
             await sendUserData(socket, newUser.id);
             socket.broadcast.emit('user_online', newUser.id);
         } catch (err) {
-            console.error(err);
+            console.error('Ошибка регистрации:', err);
             socket.emit('register_error', 'Ошибка сервера');
         }
     });
@@ -632,7 +650,7 @@ io.on('connection', (socket) => {
             const users = await dbAll('SELECT id, name, avatar, bio, online FROM users');
             socket.emit('all_users', users);
         } catch (err) {
-            console.error(err);
+            console.error('Ошибка отправки данных:', err);
         }
     }
 
@@ -649,6 +667,7 @@ io.on('connection', (socket) => {
             const { chat_type, chat_id, user_id, text } = data;
             if (!chat_type || !chat_id || !user_id || !text) return;
             if (text.length > 2000) return;
+            if (user_id !== socket.userId) return; // проверка
 
             const result = await dbRun(
                 'INSERT INTO messages (chat_type, chat_id, user_id, text) VALUES (?, ?, ?, ?)',
@@ -660,10 +679,11 @@ io.on('connection', (socket) => {
                 JOIN users u ON m.user_id = u.id
                 WHERE m.id = ?
             `, [result.lastID]);
+
             const room = chat_type === 'group' ? `group_${chat_id}` : `private_${chat_id}`;
             io.to(room).emit('new_message', message);
         } catch (err) {
-            console.error(err);
+            console.error('Ошибка отправки сообщения:', err);
         }
     });
 
@@ -701,11 +721,9 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
     console.log('\n' + '='.repeat(60));
-    console.log('   🚀 TeleRoom — НОВАЯ ВЕРСИЯ');
+    console.log('   🚀 TeleRoom Server Final');
     console.log('='.repeat(60));
     console.log(`   📱 Порт: ${PORT}`);
-    console.log('   🛡️ Защита: Helmet, Rate Limiting');
-    console.log('   ✅ Голосовые, фото, файлы, звонки (демо)');
-    console.log('   ✅ Дизайн как Telegram');
+    console.log('   ✅ Все функции: чаты, группы, файлы, звонки (демо)');
     console.log('='.repeat(60) + '\n');
 });
