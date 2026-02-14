@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TeleRoom — как Telegram</title>
+    <title>TeleRoom — финальная версия</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
@@ -16,7 +16,6 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
-        /* Светлая и тёмная тема */
         :root {
             --bg: #1e1f24;
             --surface: #2b2d33;
@@ -91,11 +90,6 @@
                 box-shadow: 0 20px 40px rgba(0,0,0,0.8);
                 margin: 0 auto;
             }
-            .username { font-size: 16px; }
-            .item-title { font-size: 16px; }
-            .item-sub { font-size: 14px; }
-            .message-input { font-size: 15px; }
-            .btn { font-size: 16px; }
         }
 
         /* Анимации */
@@ -293,7 +287,6 @@
             background: var(--card-hover);
         }
 
-        /* Табы */
         .tabs {
             display: flex;
             background: var(--surface);
@@ -324,7 +317,6 @@
             color: white;
         }
 
-        /* Списки */
         .list-wrapper {
             flex: 1;
             overflow-y: auto;
@@ -497,7 +489,6 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            height: 100%;
         }
         .messages {
             flex: 1;
@@ -516,10 +507,11 @@
         .my-message { align-self: flex-end; }
         .other-message { align-self: flex-start; }
         .bubble {
-            padding: 10px 14px;
+            padding: 8px 12px; /* уменьшено */
             border-radius: 18px 18px 4px 18px;
             background: var(--card);
             border: 1px solid var(--border);
+            font-size: 15px;
         }
         .my-message .bubble {
             background: var(--accent);
@@ -543,16 +535,19 @@
             opacity: 0.7;
             align-self: flex-end;
         }
+
+        /* Индикатор печати */
         .typing-indicator {
             display: flex;
             align-items: center;
             gap: 4px;
-            padding: 8px 16px;
+            padding: 6px 12px;
             background: var(--surface);
             border-radius: 20px;
             align-self: flex-start;
             margin: 0 16px 8px;
             border: 1px solid var(--border);
+            font-size: 13px;
         }
         .typing-dots {
             display: flex;
@@ -572,23 +567,22 @@
             30% { transform: translateY(-5px); }
         }
 
-        /* Панель ввода — прижата к низу, уменьшена */
+        /* Панель ввода — маленькая */
         .input-panel {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
+            gap: 6px;
+            padding: 6px 12px; /* уменьшено */
             background: var(--surface);
             border-top: 1px solid var(--border);
-            margin-top: auto;
         }
         .attach-menu {
             display: flex;
             gap: 4px;
         }
         .attach-btn {
-            width: 38px;
-            height: 38px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             background: var(--card);
             border: 1px solid var(--border);
@@ -598,7 +592,7 @@
             align-items: center;
             justify-content: center;
             transition: 0.15s;
-            font-size: 16px;
+            font-size: 14px;
         }
         .attach-btn:hover {
             background: var(--card-hover);
@@ -607,8 +601,8 @@
         }
         .message-input {
             flex: 1;
-            padding: 10px 14px;
-            border-radius: 24px;
+            padding: 8px 12px; /* уменьшено */
+            border-radius: 20px;
             border: 1px solid var(--border);
             background: var(--card);
             color: var(--text);
@@ -620,8 +614,8 @@
             border-color: var(--accent);
         }
         .send-btn {
-            width: 38px;
-            height: 38px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             background: var(--accent);
             border: none;
@@ -631,15 +625,15 @@
             align-items: center;
             justify-content: center;
             transition: 0.15s;
-            font-size: 16px;
+            font-size: 14px;
         }
         .send-btn:hover {
             background: var(--accent-hover);
             transform: scale(1.05);
         }
         .voice-btn {
-            width: 38px;
-            height: 38px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             background: var(--red);
             border: none;
@@ -649,7 +643,7 @@
             align-items: center;
             justify-content: center;
             transition: 0.15s;
-            font-size: 16px;
+            font-size: 14px;
         }
         .voice-btn.recording {
             animation: pulse 1.5s infinite;
@@ -680,7 +674,6 @@
             border: 3px solid var(--accent);
             position: relative;
         }
-        /* Иконка редактирования только для своего профиля */
         .profile-avatar.editable::after {
             content: '\f030';
             font-family: 'Font Awesome 6 Free';
@@ -719,8 +712,6 @@
             text-align: center;
             margin-bottom: 20px;
             font-size: 15px;
-            max-width: 100%;
-            word-break: break-word;
         }
         .profile-stats {
             display: flex;
@@ -748,7 +739,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 16px;
+            padding: 16px;
             background: var(--card);
             border-radius: 18px;
             border: 1px solid var(--border);
@@ -787,10 +778,8 @@
         }
         .settings-arrow { color: var(--text-muted); font-size: 14px; }
 
-        /* Переключатель темы */
         .theme-switch {
             display: flex;
-            align-items: center;
             gap: 8px;
             margin-bottom: 16px;
         }
@@ -812,7 +801,6 @@
             border-color: var(--accent);
         }
 
-        /* Кнопка выхода */
         .logout-btn {
             background: var(--red);
             color: white;
@@ -880,7 +868,7 @@
         }
         .modal-btn.secondary:hover { background: var(--card-hover); }
 
-        /* ---------- Экран звонка (демо) ---------- */
+        /* ---------- Экран звонка ---------- */
         .call-screen {
             display: none;
             position: fixed;
@@ -940,7 +928,6 @@
         }
         .call-control.decline:hover { transform: rotate(135deg) scale(1.1); }
 
-        /* Утилиты */
         .hidden { display: none !important; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -953,7 +940,7 @@
         <div id="login-screen">
             <div class="login-card">
                 <div class="login-title">TeleRoom</div>
-                <div class="login-sub">вход по имени</div>
+                <div class="login-sub">финальная версия</div>
                 <input type="text" id="login-name" class="input-field" placeholder="Ваше имя" autofocus>
                 <div id="login-error" class="error-message"></div>
                 <button class="btn" onclick="register()">Войти</button>
@@ -993,7 +980,7 @@
             </div>
         </div>
 
-        <!-- ПРАВАЯ ПАНЕЛЬ (ЧАТ / ПРОФИЛЬ) -->
+        <!-- ПРАВАЯ ПАНЕЛЬ -->
         <div id="right-panel" class="right-panel">
             <div class="right-header">
                 <button class="back-btn" onclick="closeRightPanel()"><i class="fas fa-arrow-left"></i></button>
@@ -1005,7 +992,7 @@
             <div class="right-content" id="right-content"></div>
         </div>
 
-        <!-- ЭКРАН ЗВОНКА (ДЕМО) -->
+        <!-- ЭКРАН ЗВОНКА -->
         <div id="call-screen" class="call-screen">
             <div class="call-avatar-large" id="call-avatar">👤</div>
             <div class="call-name-large" id="call-name">Пользователь</div>
@@ -1021,7 +1008,7 @@
             <div class="modal-content">
                 <div class="modal-title">Создать группу</div>
                 <input type="text" id="group-name" class="input-field" placeholder="Название">
-                <input type="text" id="group-description" class="input-field" placeholder="Описание (необязательно)">
+                <input type="text" id="group-description" class="input-field" placeholder="Описание">
                 <div class="modal-actions">
                     <button class="modal-btn secondary" onclick="closeCreateGroupModal()">Отмена</button>
                     <button class="modal-btn primary" onclick="createGroup()">Создать</button>
@@ -1033,13 +1020,10 @@
         <div id="settings-modal" class="modal">
             <div class="modal-content">
                 <div class="modal-title">Настройки</div>
-                
-                <!-- Переключатель темы -->
                 <div class="theme-switch">
                     <button class="theme-btn" id="theme-dark" onclick="setTheme('dark')">Тёмная</button>
                     <button class="theme-btn" id="theme-light" onclick="setTheme('light')">Светлая</button>
                 </div>
-
                 <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;">
                     <div class="avatar" style="width: 80px; height: 80px; font-size: 40px; cursor: pointer;" id="modal-avatar" onclick="document.getElementById('avatarInput').click()">👤</div>
                     <div style="display: flex; gap: 8px; margin-top: 12px;">
@@ -1047,7 +1031,6 @@
                         <button class="modal-btn secondary" style="padding: 8px 16px; background: var(--red);" onclick="removeAvatar()"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
-
                 <div class="settings-item" onclick="editName()">
                     <div class="settings-item-left">
                         <div class="settings-icon"><i class="fas fa-user"></i></div>
@@ -1058,7 +1041,6 @@
                     </div>
                     <i class="fas fa-chevron-right settings-arrow"></i>
                 </div>
-
                 <div class="settings-item" onclick="editUsername()">
                     <div class="settings-item-left">
                         <div class="settings-icon"><i class="fas fa-at"></i></div>
@@ -1069,7 +1051,6 @@
                     </div>
                     <i class="fas fa-chevron-right settings-arrow"></i>
                 </div>
-
                 <div class="settings-item" onclick="editBio()">
                     <div class="settings-item-left">
                         <div class="settings-icon"><i class="fas fa-pen"></i></div>
@@ -1080,10 +1061,7 @@
                     </div>
                     <i class="fas fa-chevron-right settings-arrow"></i>
                 </div>
-
-                <!-- Кнопка выхода -->
-                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Выйти (очистить данные)</button>
-
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Выйти</button>
                 <div class="modal-actions" style="margin-top: 24px;">
                     <button class="modal-btn primary" onclick="closeSettings()">Закрыть</button>
                 </div>
@@ -1141,7 +1119,6 @@
             });
         }
 
-        // Поиск по имени и юзернейму (поле phone)
         function matchesSearch(item, query) {
             if (!query) return true;
             const name = (item.name || '').toLowerCase();
@@ -1151,7 +1128,7 @@
             return name.includes(query) || username.includes(query) || otherName.includes(query) || otherUsername.includes(query);
         }
 
-        // ========== РЕГИСТРАЦИЯ ==========
+        // ========== РЕГИСТРАЦИЯ / АВТО-ВХОД ==========
         function register() {
             const name = document.getElementById('login-name').value.trim();
             if (!name) {
@@ -1182,15 +1159,22 @@
             updateSettingsUI();
         });
 
-        // Выход (очистка)
+        // Авто-вход при загрузке страницы
+        (function autoLogin() {
+            const savedName = localStorage.getItem('teleRoomName');
+            if (savedName) {
+                document.getElementById('login-name').value = savedName;
+                socket.emit('register', { name: savedName });
+            }
+        })();
+
         function logout() {
             localStorage.removeItem('teleRoomName');
             localStorage.removeItem('teleRoomUsername');
-            localStorage.removeItem('teleRoomTheme'); // опционально
             location.reload();
         }
 
-        // ========== ЗАГРУЗКА ДАННЫХ ==========
+        // ========== ЗАГРУЗКА ==========
         function loadGroups() {
             if (!currentUser) return;
             fetch(`/api/groups/${currentUser.id}`)
@@ -1269,10 +1253,8 @@
             const container = document.getElementById('groups-container');
             if (!container) return;
             container.innerHTML = '';
-
             const query = document.getElementById('search').value.toLowerCase().trim();
             const filtered = query ? groups.filter(g => matchesSearch(g, query)) : groups;
-
             if (filtered.length === 0) {
                 container.innerHTML = '<div class="no-results"><i class="fas fa-users-slash"></i><br>Нет групп</div>';
                 return;
@@ -1298,10 +1280,8 @@
             if (!container) return;
             container.innerHTML = '';
             const filtered = allUsers.filter(u => u.id !== currentUser?.id);
-
             const query = document.getElementById('search').value.toLowerCase().trim();
             const filtered2 = query ? filtered.filter(u => matchesSearch(u, query)) : filtered;
-
             if (filtered2.length === 0) {
                 container.innerHTML = '<div class="no-results"><i class="fas fa-address-book"></i><br>Нет контактов</div>';
                 return;
@@ -1312,28 +1292,25 @@
                 div.onclick = () => showUserProfileModal(u.id);
                 const avatarHtml = u.avatar ? `<img src="/avatars/${u.avatar}">` : '👤';
                 const onlineIndicator = u.online ? '<span class="online-badge"></span>' : '';
-                const displayName = u.phone ? `@${u.phone}` : '';
                 div.innerHTML = `
                     <div class="item-avatar" style="position: relative;">
                         ${avatarHtml}${onlineIndicator}
                     </div>
                     <div class="item-info">
                         <div class="item-title">${escapeHTML(u.name)}</div>
-                        <div class="item-sub">${escapeHTML(u.bio || '')} ${escapeHTML(displayName)}</div>
+                        <div class="item-sub">${escapeHTML(u.bio || '')} ${u.phone ? '@' + escapeHTML(u.phone) : ''}</div>
                     </div>
                 `;
                 container.appendChild(div);
             });
         }
 
-        // ========== ПОИСК ==========
         function searchAll() {
             renderChatsList();
             renderGroupsList();
             renderContactsList();
         }
 
-        // ========== ТАБЫ ==========
         function switchTab(tab, el) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
@@ -1466,7 +1443,9 @@
                 renderMessage(m);
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
-            if (m.chat_type === 'private') loadPrivateChats(); else loadGroups();
+            // Обновляем список чатов, чтобы последнее сообщение отображалось и чат поднялся
+            loadPrivateChats();
+            loadGroups();
         });
 
         socket.on('user_typing', (data) => {
@@ -1488,7 +1467,8 @@
             const time = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
             let content = '';
             if (m.voice_url) {
-                content = `<div><i class="fas fa-microphone"></i> Голосовое</div>`;
+                // Для голосовых - кнопка воспроизведения
+                content = `<div><button class="attach-btn" onclick="playVoice('${m.voice_url}', this)"><i class="fas fa-play"></i></button> Голосовое</div>`;
             } else if (m.photo_url) {
                 content = `<img src="/uploads/photos/${m.photo_url}" style="max-width:200px; border-radius:12px; cursor:pointer;" onclick="openImageViewer('/uploads/photos/${m.photo_url}')">`;
             } else if (m.file_url) {
@@ -1725,19 +1705,6 @@
             }
         };
 
-        // ========== ЗВОНКИ (ДЕМО) ==========
-        function openCallScreen() {
-            document.getElementById('call-name').innerText = currentChat ? currentChat.name : 'Пользователь';
-            document.getElementById('call-screen').classList.add('active');
-        }
-        function acceptCall() {
-            alert('Звонок принят! (демо)');
-            document.getElementById('call-screen').classList.remove('active');
-        }
-        function declineCall() {
-            document.getElementById('call-screen').classList.remove('active');
-        }
-
         // ========== ГОЛОСОВЫЕ ==========
         async function toggleVoiceRecording() {
             const btn = document.getElementById('voiceBtn');
@@ -1772,11 +1739,33 @@
             }
         }
 
+        function playVoice(url, btn) {
+            const audio = new Audio(`/uploads/voice/${url}`);
+            audio.play();
+            btn.innerHTML = '<i class="fas fa-pause"></i>';
+            audio.onended = () => {
+                btn.innerHTML = '<i class="fas fa-play"></i>';
+            };
+        }
+
         function openImageViewer(src) {
             const viewer = document.createElement('div');
             viewer.className = 'modal active';
             viewer.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><img src="${src}" style="max-width:90%;max-height:80%;border-radius:12px;"><span style="position:absolute;top:20px;right:20px;color:white;font-size:48px;cursor:pointer;" onclick="this.parentElement.parentElement.remove()">×</span></div>`;
             document.body.appendChild(viewer);
+        }
+
+        // ========== ЗВОНКИ ==========
+        function openCallScreen() {
+            document.getElementById('call-name').innerText = currentChat ? currentChat.name : 'Пользователь';
+            document.getElementById('call-screen').classList.add('active');
+        }
+        function acceptCall() {
+            alert('Звонок принят! (демо)');
+            document.getElementById('call-screen').classList.remove('active');
+        }
+        function declineCall() {
+            document.getElementById('call-screen').classList.remove('active');
         }
 
         function closeRightPanel() {
@@ -1786,7 +1775,7 @@
             if (typingIndicator) typingIndicator.style.display = 'none';
         }
 
-        // ========== СОКЕТ ==========
+        // ========== СОКЕТ ДЛЯ ОНЛАЙН ==========
         socket.on('user_groups', (d) => { groups = d; renderGroupsList(); renderChatsList(); });
         socket.on('user_private_chats', (d) => { privateChats = d; renderChatsList(); });
         socket.on('all_users', (u) => { allUsers = u; renderContactsList(); });
