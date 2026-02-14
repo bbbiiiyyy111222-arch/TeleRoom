@@ -1,4 +1,4 @@
-// ==================== server.js - TeleRoom Ultimate ====================
+// ==================== server.js - TeleRoom Ultimate (исправленный) ====================
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -44,7 +44,7 @@ const folders = [
     './uploads/voice',
     './uploads/photos',
     './uploads/files',
-    './uploads/group_avatars',  // новая папка для аватарок групп
+    './uploads/group_avatars',
     './avatars',
     './database'
 ];
@@ -88,7 +88,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // ========== БАЗА ДАННЫХ ==========
 const db = new sqlite3.Database('./database/teleroom.db');
 
-// Функция для проверки наличия колонки в таблице
+// Функция для проверки наличия колонки в таблице (промис)
 function columnExists(table, column) {
     return new Promise((resolve, reject) => {
         db.all(`PRAGMA table_info(${table})`, (err, rows) => {
@@ -98,89 +98,106 @@ function columnExists(table, column) {
     });
 }
 
-// Инициализация таблиц и добавление недостающих колонок
-db.serialize(async () => {
-    // Пользователи
-    db.run(`CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT UNIQUE NOT NULL,
-        phone TEXT UNIQUE NOT NULL,
-        avatar TEXT,
-        bio TEXT DEFAULT '',
-        online INTEGER DEFAULT 0,
-        last_seen DATETIME DEFAULT CURRENT_TIMESTAMP,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`);
-
-    // Группы
-    db.run(`CREATE TABLE IF NOT EXISTS groups (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        description TEXT,
-        avatar TEXT,
-        created_by INTEGER NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (created_by) REFERENCES users(id)
-    )`);
-
-    // Добавляем колонку avatar, если её нет
+// Инициализация БД через async/await (обёртка)
+(async () => {
     try {
+        // Включаем WAL и внешние ключи
+        await new Promise((resolve, reject) => {
+            db.exec('PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL;', (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+
+        // Создание таблиц (последовательно)
+        const tables = [
+            `CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT UNIQUE NOT NULL,
+                phone TEXT UNIQUE NOT NULL,
+                avatar TEXT,
+                bio TEXT DEFAULT '',
+                online INTEGER DEFAULT 0,
+                last_seen DATETIME DEFAULT CURRENT_TIMESTAMP,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )`,
+            `CREATE TABLE IF NOT EXISTS groups (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                description TEXT,
+                avatar TEXT,
+                created_by INTEGER NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (created_by) REFERENCES users(id)
+            )`,
+            `CREATE TABLE IF NOT EXISTS group_members (
+                group_id INTEGER NOT NULL,
+                user_id INTEGER NOT NULL,
+                role TEXT DEFAULT 'member',
+                joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (group_id, user_id),
+                FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )`,
+            `CREATE TABLE IF NOT EXISTS private_chats (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user1_id INTEGER NOT NULL,
+                user2_id INTEGER NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(user1_id, user2_id),
+                FOREIGN KEY (user1_id) REFERENCES users(id) ON DELETE CASCADE,
+                FOREIGN KEY (user2_id) REFERENCES users(id) ON DELETE CASCADE
+            )`,
+            `CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                chat_type TEXT NOT NULL,
+                chat_id INTEGER NOT NULL,
+                user_id INTEGER NOT NULL,
+                text TEXT,
+                photo_url TEXT,
+                voice_url TEXT,
+                file_url TEXT,
+                file_name TEXT,
+                file_size INTEGER,
+                duration TEXT,
+                reply_to INTEGER,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )`,
+            `CREATE INDEX IF NOT EXISTS idx_messages_chat ON messages(chat_type, chat_id, created_at)`,
+            `CREATE INDEX IF NOT EXISTS idx_group_members ON group_members(group_id, user_id)`,
+            `CREATE INDEX IF NOT EXISTS idx_private_chats ON private_chats(user1_id, user2_id)`
+        ];
+
+        for (const sql of tables) {
+            await new Promise((resolve, reject) => {
+                db.run(sql, (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
+        }
+
+        // Добавление колонки avatar в groups, если её нет
         const hasAvatar = await columnExists('groups', 'avatar');
         if (!hasAvatar) {
-            db.run("ALTER TABLE groups ADD COLUMN avatar TEXT");
-            console.log('✅ Добавлена колонка avatar в таблицу groups');
+            await new Promise((resolve, reject) => {
+                db.run("ALTER TABLE groups ADD COLUMN avatar TEXT", (err) => {
+                    if (err) reject(err);
+                    else {
+                        console.log('✅ Добавлена колонка avatar в таблицу groups');
+                        resolve();
+                    }
+                });
+            });
         }
+
+        console.log('✅ База данных готова');
     } catch (err) {
-        console.error('Ошибка при проверке колонки avatar:', err);
+        console.error('❌ Ошибка инициализации БД:', err);
+        process.exit(1);
     }
-
-    // Участники групп
-    db.run(`CREATE TABLE IF NOT EXISTS group_members (
-        group_id INTEGER NOT NULL,
-        user_id INTEGER NOT NULL,
-        role TEXT DEFAULT 'member',
-        joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (group_id, user_id),
-        FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    )`);
-
-    // Личные чаты
-    db.run(`CREATE TABLE IF NOT EXISTS private_chats (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user1_id INTEGER NOT NULL,
-        user2_id INTEGER NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(user1_id, user2_id),
-        FOREIGN KEY (user1_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (user2_id) REFERENCES users(id) ON DELETE CASCADE
-    )`);
-
-    // Сообщения
-    db.run(`CREATE TABLE IF NOT EXISTS messages (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        chat_type TEXT NOT NULL,
-        chat_id INTEGER NOT NULL,
-        user_id INTEGER NOT NULL,
-        text TEXT,
-        photo_url TEXT,
-        voice_url TEXT,
-        file_url TEXT,
-        file_name TEXT,
-        file_size INTEGER,
-        duration TEXT,
-        reply_to INTEGER,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    )`);
-
-    // Индексы
-    db.run(`CREATE INDEX IF NOT EXISTS idx_messages_chat ON messages(chat_type, chat_id, created_at)`);
-    db.run(`CREATE INDEX IF NOT EXISTS idx_group_members ON group_members(group_id, user_id)`);
-    db.run(`CREATE INDEX IF NOT EXISTS idx_private_chats ON private_chats(user1_id, user2_id)`);
-
-    console.log('✅ База данных готова');
-});
+})();
 
 // ========== ВСПОМОГАТЕЛЬНЫЕ ==========
 function dbGet(sql, params = []) {
@@ -816,7 +833,7 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
     console.log('\n' + '='.repeat(60));
-    console.log('   🚀 TeleRoom Server Ultimate');
+    console.log('   🚀 TeleRoom Server Ultimate (исправленный)');
     console.log('='.repeat(60));
     console.log(`   📱 Порт: ${PORT}`);
     console.log('   ✅ Все функции: чаты, группы, файлы, звонки (демо)');
