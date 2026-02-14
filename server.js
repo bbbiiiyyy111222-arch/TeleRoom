@@ -1,4 +1,4 @@
-// ==================== server.js - TeleRoom Final ====================
+// ==================== server.js - TeleRoom Ultimate ====================
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -22,7 +22,7 @@ const io = socketIo(server, {
 
 // Базовая защита
 app.use(helmet({
-    contentSecurityPolicy: false, // для простоты
+    contentSecurityPolicy: false,
 }));
 
 // Rate limiting
@@ -44,6 +44,7 @@ const folders = [
     './uploads/voice',
     './uploads/photos',
     './uploads/files',
+    './uploads/group_avatars',  // новая папка для аватарок групп
     './avatars',
     './database'
 ];
@@ -62,6 +63,7 @@ const storage = multer.diskStorage({
         else if (file.fieldname === 'photo') cb(null, './uploads/photos/');
         else if (file.fieldname === 'file') cb(null, './uploads/files/');
         else if (file.fieldname === 'avatar') cb(null, './avatars/');
+        else if (file.fieldname === 'groupAvatar') cb(null, './uploads/group_avatars/');
         else cb(null, './uploads/');
     },
     filename: (req, file, cb) => {
@@ -86,7 +88,18 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // ========== БАЗА ДАННЫХ ==========
 const db = new sqlite3.Database('./database/teleroom.db');
 
-db.serialize(() => {
+// Функция для проверки наличия колонки в таблице
+function columnExists(table, column) {
+    return new Promise((resolve, reject) => {
+        db.all(`PRAGMA table_info(${table})`, (err, rows) => {
+            if (err) reject(err);
+            else resolve(rows.some(col => col.name === column));
+        });
+    });
+}
+
+// Инициализация таблиц и добавление недостающих колонок
+db.serialize(async () => {
     // Пользователи
     db.run(`CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -109,6 +122,17 @@ db.serialize(() => {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (created_by) REFERENCES users(id)
     )`);
+
+    // Добавляем колонку avatar, если её нет
+    try {
+        const hasAvatar = await columnExists('groups', 'avatar');
+        if (!hasAvatar) {
+            db.run("ALTER TABLE groups ADD COLUMN avatar TEXT");
+            console.log('✅ Добавлена колонка avatar в таблицу groups');
+        }
+    } catch (err) {
+        console.error('Ошибка при проверке колонки avatar:', err);
+    }
 
     // Участники групп
     db.run(`CREATE TABLE IF NOT EXISTS group_members (
@@ -188,7 +212,6 @@ function dbRun(sql, params = []) {
 
 // Генерация следующего свободного username в формате user1, user2, ...
 async function generateNextUsername() {
-    // Найти максимальный номер среди существующих phone вида userN
     const rows = await dbAll("SELECT phone FROM users WHERE phone GLOB 'user*'");
     let maxNum = 0;
     for (const row of rows) {
@@ -199,6 +222,15 @@ async function generateNextUsername() {
         }
     }
     return `user${maxNum + 1}`;
+}
+
+// Проверка, является ли пользователь админом группы
+async function isGroupAdmin(groupId, userId) {
+    const member = await dbGet(
+        'SELECT role FROM group_members WHERE group_id = ? AND user_id = ?',
+        [groupId, userId]
+    );
+    return member && member.role === 'admin';
 }
 
 // ========== API ==========
@@ -298,7 +330,7 @@ app.post('/api/user/update-username',
     }
 );
 
-// Загрузить аватар
+// Загрузить аватар пользователя
 app.post('/api/user/upload-avatar', uploadLimiter, upload.single('avatar'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'Нет файла' });
 
@@ -322,7 +354,7 @@ app.post('/api/user/upload-avatar', uploadLimiter, upload.single('avatar'), asyn
     }
 });
 
-// Удалить аватар
+// Удалить аватар пользователя
 app.post('/api/user/remove-avatar', async (req, res) => {
     try {
         const { userId } = req.body;
@@ -341,6 +373,7 @@ app.post('/api/user/remove-avatar', async (req, res) => {
 });
 
 // ========== ГРУППЫ ==========
+// Создать группу
 app.post('/api/groups',
     body('name').trim().isLength({ min: 2, max: 50 }),
     body('description').optional().trim().isLength({ max: 200 }),
@@ -360,6 +393,7 @@ app.post('/api/groups',
     }
 );
 
+// Получить группы пользователя
 app.get('/api/groups/:userId', async (req, res) => {
     try {
         const userId = parseInt(req.params.userId);
@@ -383,6 +417,7 @@ app.get('/api/groups/:userId', async (req, res) => {
     }
 });
 
+// Получить участников группы
 app.get('/api/groups/:groupId/members', async (req, res) => {
     try {
         const groupId = parseInt(req.params.groupId);
@@ -401,6 +436,7 @@ app.get('/api/groups/:groupId/members', async (req, res) => {
     }
 });
 
+// Добавить участника в группу
 app.post('/api/groups/add_member', async (req, res) => {
     try {
         const { group_id, user_id } = req.body;
@@ -411,6 +447,73 @@ app.post('/api/groups/add_member', async (req, res) => {
     }
 });
 
+// Обновить название группы (только админ)
+app.post('/api/groups/update-name',
+    body('newName').trim().isLength({ min: 2, max: 50 }),
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).json({ error: 'Некорректное название' });
+
+        try {
+            const { groupId, userId, newName } = req.body;
+            if (!await isGroupAdmin(groupId, userId)) {
+                return res.status(403).json({ error: 'Только админ может менять название' });
+            }
+            await dbRun('UPDATE groups SET name = ? WHERE id = ?', [newName, groupId]);
+            res.json({ success: true, name: newName });
+        } catch (err) {
+            res.status(500).json({ error: 'Ошибка сервера' });
+        }
+    }
+);
+
+// Обновить описание группы (только админ)
+app.post('/api/groups/update-description',
+    body('newDescription').optional().trim().isLength({ max: 200 }),
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).json({ error: 'Слишком длинное описание' });
+
+        try {
+            const { groupId, userId, newDescription } = req.body;
+            if (!await isGroupAdmin(groupId, userId)) {
+                return res.status(403).json({ error: 'Только админ может менять описание' });
+            }
+            await dbRun('UPDATE groups SET description = ? WHERE id = ?', [newDescription || '', groupId]);
+            res.json({ success: true, description: newDescription });
+        } catch (err) {
+            res.status(500).json({ error: 'Ошибка сервера' });
+        }
+    }
+);
+
+// Загрузить аватар группы (только админ)
+app.post('/api/groups/upload-avatar', uploadLimiter, upload.single('groupAvatar'), async (req, res) => {
+    if (!req.file) return res.status(400).json({ error: 'Нет файла' });
+
+    try {
+        const { groupId, userId } = req.body;
+        if (!await isGroupAdmin(groupId, userId)) {
+            return res.status(403).json({ error: 'Только админ может менять аватар' });
+        }
+
+        const avatar = req.file.filename;
+
+        // Удаляем старый аватар группы
+        const group = await dbGet('SELECT avatar FROM groups WHERE id = ?', [groupId]);
+        if (group && group.avatar) {
+            const oldPath = path.join(__dirname, 'uploads/group_avatars', group.avatar);
+            if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        }
+
+        await dbRun('UPDATE groups SET avatar = ? WHERE id = ?', [avatar, groupId]);
+        res.json({ success: true, avatar });
+    } catch (err) {
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+// Сообщения группы
 app.get('/api/messages/group/:groupId', async (req, res) => {
     try {
         const groupId = parseInt(req.params.groupId);
@@ -585,11 +688,9 @@ io.on('connection', (socket) => {
             }
             const cleanName = sanitize(name).substring(0, 30);
 
-            // Поиск существующего пользователя
             let user = await dbGet('SELECT * FROM users WHERE name = ?', [cleanName]);
 
             if (user) {
-                // Автовход
                 socket.userId = user.id;
                 socket.userName = user.name;
                 await dbRun('UPDATE users SET online = 1, last_seen = CURRENT_TIMESTAMP WHERE id = ?', [user.id]);
@@ -599,14 +700,8 @@ io.on('connection', (socket) => {
                 return;
             }
 
-            // Новый пользователь - генерируем username по порядку
             const username = await generateNextUsername();
-
-            const result = await dbRun(
-                'INSERT INTO users (name, phone) VALUES (?, ?)',
-                [cleanName, username]
-            );
-
+            const result = await dbRun('INSERT INTO users (name, phone) VALUES (?, ?)', [cleanName, username]);
             const newUser = await dbGet('SELECT * FROM users WHERE id = ?', [result.lastID]);
             socket.userId = newUser.id;
             socket.userName = newUser.name;
@@ -667,7 +762,7 @@ io.on('connection', (socket) => {
             const { chat_type, chat_id, user_id, text } = data;
             if (!chat_type || !chat_id || !user_id || !text) return;
             if (text.length > 2000) return;
-            if (user_id !== socket.userId) return; // проверка
+            if (user_id !== socket.userId) return;
 
             const result = await dbRun(
                 'INSERT INTO messages (chat_type, chat_id, user_id, text) VALUES (?, ?, ?, ?)',
@@ -721,7 +816,7 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
     console.log('\n' + '='.repeat(60));
-    console.log('   🚀 TeleRoom Server Final');
+    console.log('   🚀 TeleRoom Server Ultimate');
     console.log('='.repeat(60));
     console.log(`   📱 Порт: ${PORT}`);
     console.log('   ✅ Все функции: чаты, группы, файлы, звонки (демо)');
