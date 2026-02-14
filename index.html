@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TeleRoom — финальная версия</title>
+    <title>TeleRoom — мега-апдейт</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
@@ -77,7 +77,6 @@
             transition: background 0.2s;
         }
 
-        /* Адаптация для ПК */
         @media (min-width: 768px) {
             body {
                 background: #0b0c0f;
@@ -92,7 +91,6 @@
             }
         }
 
-        /* Анимации */
         @keyframes slideIn {
             from { transform: translateX(100%); }
             to { transform: translateX(0); }
@@ -228,6 +226,16 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+        .online-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--green);
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            border: 2px solid var(--card);
         }
         .username {
             font-weight: 600;
@@ -507,7 +515,7 @@
         .my-message { align-self: flex-end; }
         .other-message { align-self: flex-start; }
         .bubble {
-            padding: 8px 12px; /* уменьшено */
+            padding: 8px 12px;
             border-radius: 18px 18px 4px 18px;
             background: var(--card);
             border: 1px solid var(--border);
@@ -536,7 +544,6 @@
             align-self: flex-end;
         }
 
-        /* Индикатор печати */
         .typing-indicator {
             display: flex;
             align-items: center;
@@ -567,12 +574,12 @@
             30% { transform: translateY(-5px); }
         }
 
-        /* Панель ввода — маленькая */
+        /* Панель ввода — супер компактная */
         .input-panel {
             display: flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 12px; /* уменьшено */
+            gap: 4px;
+            padding: 6px 12px;
             background: var(--surface);
             border-top: 1px solid var(--border);
         }
@@ -581,8 +588,8 @@
             gap: 4px;
         }
         .attach-btn {
-            width: 34px;
-            height: 34px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: var(--card);
             border: 1px solid var(--border);
@@ -601,7 +608,7 @@
         }
         .message-input {
             flex: 1;
-            padding: 8px 12px; /* уменьшено */
+            padding: 6px 10px;
             border-radius: 20px;
             border: 1px solid var(--border);
             background: var(--card);
@@ -614,8 +621,8 @@
             border-color: var(--accent);
         }
         .send-btn {
-            width: 34px;
-            height: 34px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: var(--accent);
             border: none;
@@ -632,8 +639,8 @@
             transform: scale(1.05);
         }
         .voice-btn {
-            width: 34px;
-            height: 34px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: var(--red);
             border: none;
@@ -649,7 +656,7 @@
             animation: pulse 1.5s infinite;
         }
 
-        /* ---------- Профиль ---------- */
+        /* ---------- Профиль пользователя ---------- */
         .profile-card {
             background: var(--surface);
             border-radius: 24px;
@@ -697,6 +704,16 @@
             height: 100%;
             object-fit: cover;
         }
+        .online-status {
+            color: var(--green);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        .offline-status {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
         .profile-name {
             font-size: 24px;
             font-weight: 700;
@@ -733,6 +750,91 @@
             color: var(--text-muted);
             margin-top: 4px;
         }
+
+        /* ---------- Информация о группе ---------- */
+        .group-info-card {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 24px 16px;
+            border: 1px solid var(--border);
+        }
+        .group-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-active));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            margin: 0 auto 16px;
+            overflow: hidden;
+            border: 3px solid var(--accent);
+            position: relative;
+        }
+        .group-avatar.editable::after {
+            content: '\f030';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            opacity: 0;
+            transition: 0.15s;
+            cursor: pointer;
+        }
+        .group-avatar.editable:hover::after {
+            opacity: 1;
+        }
+        .group-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .group-name {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        .group-description {
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+        .member-list {
+            margin-top: 16px;
+        }
+        .member-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            background: var(--card);
+            border-radius: 18px;
+            margin-bottom: 4px;
+        }
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-active));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            overflow: hidden;
+        }
+        .member-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .member-name { font-weight: 500; }
+        .member-role { font-size: 12px; color: var(--text-muted); }
 
         /* ---------- Настройки ---------- */
         .settings-item {
@@ -868,66 +970,6 @@
         }
         .modal-btn.secondary:hover { background: var(--card-hover); }
 
-        /* ---------- Экран звонка ---------- */
-        .call-screen {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: var(--bg);
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 3000;
-        }
-        .call-screen.active { display: flex; }
-        .call-avatar-large {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-active));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 60px;
-            color: white;
-            margin-bottom: 24px;
-            animation: pulse 2s infinite;
-        }
-        .call-name-large {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        .call-status-large {
-            color: var(--text-muted);
-            margin-bottom: 40px;
-            font-size: 16px;
-        }
-        .call-controls {
-            display: flex;
-            gap: 20px;
-        }
-        .call-control {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            border: none;
-            color: white;
-            font-size: 28px;
-            cursor: pointer;
-            transition: 0.15s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .call-control.accept { background: var(--green); }
-        .call-control.accept:hover { transform: scale(1.1); }
-        .call-control.decline {
-            background: var(--red);
-            transform: rotate(135deg);
-        }
-        .call-control.decline:hover { transform: rotate(135deg) scale(1.1); }
-
         .hidden { display: none !important; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -940,7 +982,7 @@
         <div id="login-screen">
             <div class="login-card">
                 <div class="login-title">TeleRoom</div>
-                <div class="login-sub">финальная версия</div>
+                <div class="login-sub">ультимативная версия</div>
                 <input type="text" id="login-name" class="input-field" placeholder="Ваше имя" autofocus>
                 <div id="login-error" class="error-message"></div>
                 <button class="btn" onclick="register()">Войти</button>
@@ -980,19 +1022,20 @@
             </div>
         </div>
 
-        <!-- ПРАВАЯ ПАНЕЛЬ -->
+        <!-- ПРАВАЯ ПАНЕЛЬ (ЧАТ / ПРОФИЛЬ / ИНФО ГРУППЫ) -->
         <div id="right-panel" class="right-panel">
             <div class="right-header">
                 <button class="back-btn" onclick="closeRightPanel()"><i class="fas fa-arrow-left"></i></button>
                 <div class="right-title" id="right-title">...</div>
                 <div class="right-actions">
-                    <button class="action-btn" id="callBtn" onclick="openCallScreen()"><i class="fas fa-phone"></i></button>
+                    <button class="action-btn" id="callBtn" onclick="openCallScreen()" style="display: none;"><i class="fas fa-phone"></i></button>
+                    <button class="action-btn" id="groupInfoBtn" onclick="openGroupInfo()" style="display: none;"><i class="fas fa-info-circle"></i></button>
                 </div>
             </div>
             <div class="right-content" id="right-content"></div>
         </div>
 
-        <!-- ЭКРАН ЗВОНКА -->
+        <!-- ЭКРАН ЗВОНКА (ДЕМО) -->
         <div id="call-screen" class="call-screen">
             <div class="call-avatar-large" id="call-avatar">👤</div>
             <div class="call-name-large" id="call-name">Пользователь</div>
@@ -1008,10 +1051,38 @@
             <div class="modal-content">
                 <div class="modal-title">Создать группу</div>
                 <input type="text" id="group-name" class="input-field" placeholder="Название">
-                <input type="text" id="group-description" class="input-field" placeholder="Описание">
+                <input type="text" id="group-description" class="input-field" placeholder="Описание (необязательно)">
                 <div class="modal-actions">
                     <button class="modal-btn secondary" onclick="closeCreateGroupModal()">Отмена</button>
                     <button class="modal-btn primary" onclick="createGroup()">Создать</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- МОДАЛКА РЕДАКТИРОВАНИЯ ГРУППЫ -->
+        <div id="edit-group-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-title">Редактировать группу</div>
+                <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;">
+                    <div class="group-avatar editable" id="edit-group-avatar" onclick="document.getElementById('groupAvatarInput').click()">👥</div>
+                    <input type="file" id="groupAvatarInput" accept="image/*" style="display: none;">
+                </div>
+                <input type="text" id="edit-group-name" class="input-field" placeholder="Название группы">
+                <textarea id="edit-group-description" class="input-field" style="height: 80px;" placeholder="Описание"></textarea>
+                <div class="modal-actions">
+                    <button class="modal-btn secondary" onclick="closeEditGroupModal()">Отмена</button>
+                    <button class="modal-btn primary" onclick="saveGroupChanges()">Сохранить</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- МОДАЛКА ДОБАВЛЕНИЯ УЧАСТНИКОВ -->
+        <div id="add-member-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-title">Добавить участника</div>
+                <div id="contacts-for-add" class="list-container" style="max-height: 300px; overflow-y: auto;"></div>
+                <div class="modal-actions">
+                    <button class="modal-btn secondary" onclick="closeAddMemberModal()">Отмена</button>
                 </div>
             </div>
         </div>
@@ -1093,13 +1164,14 @@
         const socket = io();
         let currentUser = null;
         let currentChat = null;
-        let currentChatType = 'private';
+        let currentChatType = 'private'; // 'private' или 'group'
         let groups = [], privateChats = [], allUsers = [];
         let mediaRecorder = null, audioChunks = [], isRecording = false;
         let audioElements = {};
         let viewingUserId = null;
         let typingTimeout = null;
         let currentEditType = null;
+        let currentGroupForEdit = null; // для редактирования группы
 
         // Тема
         let currentTheme = localStorage.getItem('teleRoomTheme') || 'dark';
@@ -1182,6 +1254,7 @@
                 .then(data => { groups = data; renderGroupsList(); renderChatsList(); })
                 .catch(() => { groups = []; renderGroupsList(); renderChatsList(); });
         }
+
         function loadPrivateChats() {
             if (!currentUser) return;
             fetch(`/api/private_chats/${currentUser.id}`)
@@ -1189,6 +1262,7 @@
                 .then(data => { privateChats = data; renderChatsList(); })
                 .catch(() => { privateChats = []; renderChatsList(); });
         }
+
         function loadAllUsers() {
             fetch('/api/users')
                 .then(res => res.json())
@@ -1211,7 +1285,7 @@
                 ...groups.map(g => ({
                     id: g.id, type: 'group', name: g.name,
                     last: g.last_message || 'Нет сообщений',
-                    time: g.last_time, members: g.members_count, phone: ''
+                    time: g.last_time, members: g.members_count, phone: '', avatar: g.avatar
                 }))
             ].sort((a,b) => new Date(b.time||0) - new Date(a.time||0));
 
@@ -1231,7 +1305,14 @@
                     : openGroupChat(item.id, item.name);
 
                 const avatarClass = item.type === 'group' ? 'item-avatar group' : 'item-avatar';
-                const avatarHtml = item.avatar ? `<img src="/avatars/${item.avatar}">` : (item.type === 'private' ? '👤' : '👥');
+                let avatarHtml;
+                if (item.type === 'group' && item.avatar) {
+                    avatarHtml = `<img src="/uploads/group_avatars/${item.avatar}">`;
+                } else if (item.type === 'private' && item.avatar) {
+                    avatarHtml = `<img src="/avatars/${item.avatar}">`;
+                } else {
+                    avatarHtml = item.type === 'private' ? '👤' : '👥';
+                }
                 const onlineIndicator = (item.type === 'private' && item.online) ? '<span class="online-badge"></span>' : '';
                 const badge = item.type === 'group' ? `<span class="item-badge">${item.members}</span>` : '';
 
@@ -1263,8 +1344,9 @@
                 const div = document.createElement('div');
                 div.className = 'list-item';
                 div.onclick = () => openGroupChat(g.id, g.name);
+                let avatarHtml = g.avatar ? `<img src="/uploads/group_avatars/${g.avatar}">` : '👥';
                 div.innerHTML = `
-                    <div class="item-avatar group">👥</div>
+                    <div class="item-avatar group">${avatarHtml}</div>
                     <div class="item-info">
                         <div class="item-title">${escapeHTML(g.name)}</div>
                         <div class="item-sub">${escapeHTML(g.last_message || 'Нет сообщений')}</div>
@@ -1343,6 +1425,130 @@
             .catch(err => console.error(err));
         }
 
+        // Редактирование группы
+        function openEditGroupModal(group) {
+            currentGroupForEdit = group;
+            document.getElementById('edit-group-name').value = group.name;
+            document.getElementById('edit-group-description').value = group.description || '';
+            // Аватарка (если есть)
+            if (group.avatar) {
+                document.getElementById('edit-group-avatar').innerHTML = `<img src="/uploads/group_avatars/${group.avatar}">`;
+            } else {
+                document.getElementById('edit-group-avatar').innerHTML = '👥';
+            }
+            document.getElementById('edit-group-modal').classList.add('active');
+        }
+
+        function closeEditGroupModal() {
+            document.getElementById('edit-group-modal').classList.remove('active');
+        }
+
+        function saveGroupChanges() {
+            if (!currentGroupForEdit) return;
+            const newName = document.getElementById('edit-group-name').value.trim();
+            const newDesc = document.getElementById('edit-group-description').value.trim();
+            if (!newName) return alert('Название не может быть пустым');
+            
+            // Отправляем изменения на сервер (нужны API)
+            // Для имени
+            fetch('/api/groups/update-name', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ groupId: currentGroupForEdit.id, userId: currentUser.id, newName })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    // Обновляем описание
+                    return fetch('/api/groups/update-description', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ groupId: currentGroupForEdit.id, userId: currentUser.id, newDescription: newDesc })
+                    });
+                } else {
+                    throw new Error(data.error);
+                }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Группа обновлена');
+                    closeEditGroupModal();
+                    loadGroups(); // перезагрузить группы
+                }
+            })
+            .catch(err => alert(err.message));
+        }
+
+        // Загрузка аватарки группы
+        document.getElementById('groupAvatarInput').onchange = function(e) {
+            const file = e.target.files[0];
+            if (!file || !currentGroupForEdit) return;
+            const fd = new FormData();
+            fd.append('avatar', file);
+            fd.append('groupId', currentGroupForEdit.id);
+            fd.append('userId', currentUser.id);
+            fetch('/api/groups/upload-avatar', { method: 'POST', body: fd })
+                .then(r => r.json())
+                .then(d => {
+                    if (d.success) {
+                        currentGroupForEdit.avatar = d.avatar;
+                        document.getElementById('edit-group-avatar').innerHTML = `<img src="/uploads/group_avatars/${d.avatar}">`;
+                    }
+                });
+        };
+
+        // Добавление участника
+        function openAddMemberModal() {
+            if (!currentChat || currentChatType !== 'group') return;
+            // Показать список контактов, которых ещё нет в группе
+            const container = document.getElementById('contacts-for-add');
+            container.innerHTML = '';
+            // Загрузить участников группы
+            fetch(`/api/groups/${currentChat.id}/members`)
+                .then(r => r.json())
+                .then(members => {
+                    const memberIds = members.map(m => m.id);
+                    const available = allUsers.filter(u => u.id !== currentUser.id && !memberIds.includes(u.id));
+                    if (available.length === 0) {
+                        container.innerHTML = '<div class="no-results">Нет доступных контактов</div>';
+                    } else {
+                        available.forEach(u => {
+                            const div = document.createElement('div');
+                            div.className = 'list-item';
+                            div.onclick = () => addMemberToGroup(u.id);
+                            div.innerHTML = `
+                                <div class="item-avatar">${u.avatar ? `<img src="/avatars/${u.avatar}">` : '👤'}</div>
+                                <div class="item-info">
+                                    <div class="item-title">${escapeHTML(u.name)}</div>
+                                </div>
+                            `;
+                            container.appendChild(div);
+                        });
+                    }
+                });
+            document.getElementById('add-member-modal').classList.add('active');
+        }
+
+        function addMemberToGroup(userId) {
+            fetch('/api/groups/add_member', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ group_id: currentChat.id, user_id: userId })
+            })
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) {
+                    alert('Участник добавлен');
+                    closeAddMemberModal();
+                }
+            });
+        }
+
+        function closeAddMemberModal() {
+            document.getElementById('add-member-modal').classList.remove('active');
+        }
+
         // ========== ЧАТ ==========
         let messagesContainer = null;
         let chatInput = null;
@@ -1354,6 +1560,9 @@
             document.getElementById('right-title').innerText = otherUserName;
             document.getElementById('main-screen').style.display = 'none';
             document.getElementById('right-panel').classList.add('active');
+            // Показываем кнопку звонка для личного чата
+            document.getElementById('callBtn').style.display = 'flex';
+            document.getElementById('groupInfoBtn').style.display = 'none';
             loadChatContent();
             socket.emit('join_private_chat', chatId);
             loadPrivateMessages(chatId);
@@ -1365,6 +1574,9 @@
             document.getElementById('right-title').innerText = groupName;
             document.getElementById('main-screen').style.display = 'none';
             document.getElementById('right-panel').classList.add('active');
+            // Прячем кнопку звонка для группы, показываем кнопку информации
+            document.getElementById('callBtn').style.display = 'none';
+            document.getElementById('groupInfoBtn').style.display = 'flex';
             loadChatContent();
             socket.emit('join_group', groupId);
             loadGroupMessages(groupId);
@@ -1443,7 +1655,7 @@
                 renderMessage(m);
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
-            // Обновляем список чатов, чтобы последнее сообщение отображалось и чат поднялся
+            // Обновляем списки чатов, чтобы последнее сообщение появилось и чат поднялся наверх
             loadPrivateChats();
             loadGroups();
         });
@@ -1467,7 +1679,6 @@
             const time = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
             let content = '';
             if (m.voice_url) {
-                // Для голосовых - кнопка воспроизведения
                 content = `<div><button class="attach-btn" onclick="playVoice('${m.voice_url}', this)"><i class="fas fa-play"></i></button> Голосовое</div>`;
             } else if (m.photo_url) {
                 content = `<img src="/uploads/photos/${m.photo_url}" style="max-width:200px; border-radius:12px; cursor:pointer;" onclick="openImageViewer('/uploads/photos/${m.photo_url}')">`;
@@ -1481,9 +1692,50 @@
             messagesContainer.appendChild(div);
         }
 
+        // ========== ИНФОРМАЦИЯ О ГРУППЕ ==========
+        function openGroupInfo() {
+            if (!currentChat || currentChatType !== 'group') return;
+            fetch(`/api/groups/${currentChat.id}/members`)
+                .then(r => r.json())
+                .then(members => {
+                    // Найти информацию о группе
+                    const group = groups.find(g => g.id === currentChat.id);
+                    if (!group) return;
+                    let membersHtml = '';
+                    members.forEach(m => {
+                        const isAdmin = m.role === 'admin' ? ' 👑' : '';
+                        membersHtml += `
+                            <div class="member-item">
+                                <div class="member-avatar">${m.avatar ? `<img src="/avatars/${m.avatar}">` : m.name[0].toUpperCase()}</div>
+                                <div class="member-name">${escapeHTML(m.name)}${isAdmin}</div>
+                            </div>
+                        `;
+                    });
+                    const isAdmin = members.find(m => m.id === currentUser.id && m.role === 'admin');
+                    const editButton = isAdmin ? `<button class="btn" style="margin-top:16px;" onclick="openEditGroupModal(${JSON.stringify(group).replace(/"/g, '&quot;')})"><i class="fas fa-edit"></i> Редактировать группу</button>` : '';
+                    const addMemberButton = isAdmin ? `<button class="btn" style="margin-top:8px;" onclick="openAddMemberModal()"><i class="fas fa-user-plus"></i> Добавить участника</button>` : '';
+                    document.getElementById('right-content').innerHTML = `
+                        <div class="group-info-card">
+                            <div class="group-avatar">${group.avatar ? `<img src="/uploads/group_avatars/${group.avatar}">` : '👥'}</div>
+                            <div class="group-name">${escapeHTML(group.name)}</div>
+                            <div class="group-description">${escapeHTML(group.description || 'Нет описания')}</div>
+                            <div class="member-list">
+                                <h3 style="margin-bottom:8px;">Участники (${members.length})</h3>
+                                ${membersHtml}
+                            </div>
+                            ${editButton}
+                            ${addMemberButton}
+                        </div>
+                    `;
+                });
+        }
+
         // ========== ПРОФИЛЬ ==========
         function openMyProfile() {
             if (!currentUser) return;
+            const onlineStatus = '<span class="online-status"><i class="fas fa-circle"></i> В сети</span>';
+            const offlineStatus = '<span class="offline-status"><i class="far fa-circle"></i> Был(а) недавно</span>';
+            const status = currentUser.online ? onlineStatus : offlineStatus;
             document.getElementById('right-content').innerHTML = `
                 <div class="profile-card">
                     <div class="profile-avatar editable" id="my-profile-avatar" onclick="document.getElementById('avatarInput').click()">
@@ -1491,6 +1743,7 @@
                     </div>
                     <div class="profile-name">${escapeHTML(currentUser.name)}</div>
                     <div class="profile-username">@${escapeHTML(currentUser.phone || 'user')}</div>
+                    <div>${status}</div>
                     <div class="profile-bio">${escapeHTML(currentUser.bio) || 'Нет информации'}</div>
                     <div class="profile-stats">
                         <div class="stat"><div class="stat-value">${groups.length}</div><div class="stat-label">Групп</div></div>
@@ -1504,6 +1757,7 @@
             document.getElementById('main-screen').style.display = 'none';
             document.getElementById('right-panel').classList.add('active');
             document.getElementById('callBtn').style.display = 'none';
+            document.getElementById('groupInfoBtn').style.display = 'none';
         }
 
         function showUserProfileModal(userId) {
@@ -1512,11 +1766,13 @@
                 .then(user => {
                     if (!user) return;
                     viewingUserId = user.id;
+                    const onlineStatus = user.online ? '<span class="online-status"><i class="fas fa-circle"></i> В сети</span>' : '<span class="offline-status"><i class="far fa-circle"></i> Был(а) недавно</span>';
                     document.getElementById('right-content').innerHTML = `
                         <div class="profile-card">
                             <div class="profile-avatar">${user.avatar ? `<img src="/avatars/${user.avatar}">` : user.name[0].toUpperCase()}</div>
                             <div class="profile-name">${escapeHTML(user.name)}</div>
                             <div class="profile-username">@${escapeHTML(user.phone)}</div>
+                            <div>${onlineStatus}</div>
                             <div class="profile-bio">${escapeHTML(user.bio) || 'Нет информации'}</div>
                             <button class="btn" onclick="startChatWithProfileUser()"><i class="fas fa-comment"></i> Написать</button>
                         </div>
@@ -1525,6 +1781,7 @@
                     document.getElementById('main-screen').style.display = 'none';
                     document.getElementById('right-panel').classList.add('active');
                     document.getElementById('callBtn').style.display = 'flex';
+                    document.getElementById('groupInfoBtn').style.display = 'none';
                 });
         }
 
@@ -1755,9 +2012,10 @@
             document.body.appendChild(viewer);
         }
 
-        // ========== ЗВОНКИ ==========
+        // ========== ЗВОНКИ (ДЕМО) ==========
         function openCallScreen() {
-            document.getElementById('call-name').innerText = currentChat ? currentChat.name : 'Пользователь';
+            if (currentChatType !== 'private') return; // только личные
+            document.getElementById('call-name').innerText = currentChat.name;
             document.getElementById('call-screen').classList.add('active');
         }
         function acceptCall() {
@@ -1779,8 +2037,20 @@
         socket.on('user_groups', (d) => { groups = d; renderGroupsList(); renderChatsList(); });
         socket.on('user_private_chats', (d) => { privateChats = d; renderChatsList(); });
         socket.on('all_users', (u) => { allUsers = u; renderContactsList(); });
-        socket.on('user_online', (id) => { if (allUsers) { allUsers = allUsers.map(u => { if (u.id === id) u.online = 1; return u; }); renderContactsList(); } });
-        socket.on('user_offline', (id) => { if (allUsers) { allUsers = allUsers.map(u => { if (u.id === id) u.online = 0; return u; }); renderContactsList(); } });
+        socket.on('user_online', (id) => {
+            if (allUsers) {
+                allUsers = allUsers.map(u => { if (u.id === id) u.online = 1; return u; });
+                renderContactsList();
+                renderChatsList(); // чтобы обновить индикаторы в чатах
+            }
+        });
+        socket.on('user_offline', (id) => {
+            if (allUsers) {
+                allUsers = allUsers.map(u => { if (u.id === id) u.online = 0; return u; });
+                renderContactsList();
+                renderChatsList();
+            }
+        });
     </script>
 </body>
 </html>
