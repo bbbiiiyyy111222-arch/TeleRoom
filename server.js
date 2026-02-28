@@ -5,38 +5,39 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
 const PORT = process.env.PORT || 3000;
 
-// Отдаем статические файлы
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 app.use(express.static(path.join(__dirname, '/')));
 
-// Хранилище сообщений
 let messages = [];
 
 io.on('connection', (socket) => {
-    console.log('Кто-то подключился');
-    
-    // Отправляем историю
-    socket.emit('history', messages);
-    
-    // Получаем сообщение
-    socket.on('chatMessage', (data) => {
-        const msg = {
-            user: data.user || 'Аноним',
-            text: data.text,
-            time: new Date().toLocaleTimeString()
-        };
-        
-        messages.push(msg);
-        if (messages.length > 50) messages.shift();
-        
-        // Рассылаем всем
-        io.emit('message', msg);
-    });
+  console.log('Новый пользователь');
+  
+  socket.emit('history', messages);
+  
+  socket.on('chatMessage', (data) => {
+    const msg = {
+      user: data.user || 'Аноним',
+      text: data.text,
+      time: new Date().toLocaleTimeString()
+    };
+    messages.push(msg);
+    io.emit('message', msg);
+  });
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-    console.log(`Сервер запущен на порту ${PORT}`);
+  console.log('СЕРВЕР РАБОТАЕТ НА ПОРТУ', PORT);
 });
