@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoonGrief - Правила, Жалобы и Заявки</title>
+    <title>MoonGrief - форум</title>
     <style>
         * {
             margin: 0;
@@ -12,20 +12,43 @@
         }
         
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #0b0b1f 0%, #1a1a3a 50%, #2a1a4a 100%);
+            font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+            background: radial-gradient(ellipse at top, #1a1a3a, #0b0b1f, #030314);
             min-height: 100vh;
             color: white;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Анимированный фон */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="1" fill="%234facfe" opacity="0.3"/><circle cx="90" cy="30" r="1.5" fill="%23ff6b6b" opacity="0.3"/><circle cx="30" cy="80" r="1" fill="%23a18cd1" opacity="0.3"/><circle cx="70" cy="50" r="1.2" fill="%234facfe" opacity="0.3"/><circle cx="50" cy="20" r="0.8" fill="%23ff6b6b" opacity="0.3"/></svg>');
+            background-size: 200px 200px;
+            pointer-events: none;
+            z-index: -1;
+            animation: float 20s linear infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-20px) rotate(5deg); }
         }
         
         nav {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 1rem;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(5, 5, 20, 0.85);
+            padding: 1rem 2rem;
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid linear-gradient(90deg, #ff6b6b, #4facfe, #a18cd1);
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: 0 5px 40px rgba(0,0,0,0.8);
         }
         
         .nav-container {
@@ -39,74 +62,110 @@
         }
         
         .logo {
-            font-size: 2rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, #ff6b6b, #4facfe);
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff6b6b, #4facfe, #a18cd1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             cursor: pointer;
+            text-shadow: 0 0 40px rgba(79,172,254,0.7);
+            letter-spacing: 2px;
         }
         
         .ip-box {
-            background: rgba(79, 172, 254, 0.2);
-            border: 1px solid #4facfe;
-            padding: 0.5rem 1.5rem;
-            border-radius: 25px;
+            background: linear-gradient(135deg, rgba(255,107,107,0.2), rgba(79,172,254,0.2));
+            border: 2px solid #4facfe;
+            padding: 0.7rem 2rem;
+            border-radius: 50px;
             font-family: monospace;
-            font-size: 1.2rem;
-            color: #4facfe;
+            font-size: 1.3rem;
+            color: #fff;
+            box-shadow: 0 0 30px rgba(79,172,254,0.5);
+            backdrop-filter: blur(5px);
+            font-weight: bold;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .ip-box:hover {
+            transform: scale(1.05);
+            border-color: #ff6b6b;
+            box-shadow: 0 0 40px rgba(255,107,107,0.5);
         }
         
         .user-menu {
             display: flex;
             align-items: center;
             gap: 1rem;
-            flex-wrap: wrap;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 0.8rem;
+        }
+        
+        .auth-btn {
+            background: linear-gradient(135deg, #ff6b6b, #4facfe);
+            border: none;
+            padding: 0.7rem 1.8rem;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            box-shadow: 0 5px 20px rgba(79,172,254,0.3);
+        }
+        
+        .auth-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255,107,107,0.5);
+        }
+        
+        .auth-btn.secondary {
+            background: transparent;
+            border: 2px solid #4facfe;
         }
         
         .user-info {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            background: rgba(255,255,255,0.1);
-            padding: 0.3rem 1rem;
-            border-radius: 25px;
+            gap: 0.8rem;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
             cursor: pointer;
+            border: 1px solid rgba(79,172,254,0.5);
+            transition: all 0.3s;
+        }
+        
+        .user-info:hover {
+            border-color: #ff6b6b;
+            box-shadow: 0 0 30px rgba(255,107,107,0.3);
         }
         
         .user-avatar {
-            width: 30px;
-            height: 30px;
+            width: 35px;
+            height: 35px;
             background: linear-gradient(135deg, #ff6b6b, #4facfe);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 0 15px rgba(79,172,254,0.5);
         }
         
         .admin-badge {
-            background: #ff6b6b;
+            background: linear-gradient(135deg, #ff6b6b, #ff8c8c);
             color: white;
-            padding: 0.2rem 0.5rem;
-            border-radius: 5px;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
             font-size: 0.8rem;
+            font-weight: bold;
             margin-left: 0.5rem;
-        }
-        
-        .nav-links button {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            padding: 0.5rem 1.5rem;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .nav-links button:hover {
-            background: #4facfe;
-            border-color: #4facfe;
-            box-shadow: 0 0 20px #4facfe;
+            box-shadow: 0 0 10px #ff6b6b;
         }
         
         .container {
@@ -115,106 +174,141 @@
             padding: 0 1rem;
         }
         
-        .back-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 30px;
-            cursor: pointer;
-            margin-bottom: 1rem;
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: all 0.3s;
-            font-size: 1rem;
-        }
-        
-        .back-button:hover {
-            background: #4facfe;
-            transform: translateX(-5px);
-        }
-        
-        .back-button::before {
-            content: "←";
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-        
         .hero {
             text-align: center;
-            padding: 2rem;
-            background: rgba(0,0,0,0.2);
-            border-radius: 20px;
+            padding: 3rem 2rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 30px;
             margin-bottom: 2rem;
+            border: 1px solid rgba(79,172,254,0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
         
         .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #ff6b6b, #4facfe);
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff, #4facfe, #ff6b6b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 50px rgba(79,172,254,0.5);
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            color: #ccc;
+            margin-bottom: 1.5rem;
         }
         
         .server-ip {
-            font-size: 2rem;
-            color: #4facfe;
-            margin: 1rem 0;
-            padding: 1rem;
-            border: 2px dashed #4facfe;
-            border-radius: 50px;
+            font-size: 2.2rem;
+            color: #fff;
+            margin: 1.5rem 0;
+            padding: 1rem 3rem;
+            border: 3px dashed #4facfe;
+            border-radius: 60px;
             display: inline-block;
             cursor: pointer;
             transition: all 0.3s;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+            font-weight: bold;
+            text-shadow: 0 0 20px #4facfe;
         }
         
         .server-ip:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px #4facfe;
+            transform: scale(1.1);
+            border-color: #ff6b6b;
+            box-shadow: 0 0 50px rgba(255,107,107,0.5);
         }
         
         .tabs {
             display: flex;
             justify-content: center;
-            gap: 1rem;
+            gap: 1.5rem;
             margin: 2rem 0;
             flex-wrap: wrap;
         }
         
         .tab {
             background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(79,172,254,0.3);
             color: white;
-            padding: 1rem 2rem;
-            border-radius: 30px;
+            padding: 1.2rem 2.5rem;
+            border-radius: 50px;
             cursor: pointer;
-            font-size: 1.1rem;
-            transition: all 0.3s;
+            font-size: 1.2rem;
+            transition: all 0.4s;
+            backdrop-filter: blur(5px);
+            font-weight: 600;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
         
-        .tab:hover, .tab.active {
-            background: #4facfe;
-            border-color: #4facfe;
-            box-shadow: 0 0 20px #4facfe;
+        .tab:hover {
+            background: linear-gradient(135deg, #ff6b6b, #4facfe);
+            border-color: transparent;
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(79,172,254,0.5);
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, #ff6b6b, #4facfe);
+            border-color: transparent;
+            box-shadow: 0 10px 30px rgba(79,172,254,0.5);
         }
         
         .section {
             display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .section.active {
             display: block;
         }
         
-        /* Админ панель - ТОЛЬКО ДЛЯ milk123 */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.05);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(79,172,254,0.3);
+            transition: all 0.3s;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+        
+        .back-button:hover {
+            background: #4facfe;
+            transform: translateX(-10px);
+            box-shadow: 0 0 30px #4facfe;
+        }
+        
+        .back-button::before {
+            content: "←";
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+        
+        /* Админ панель - ТОЛЬКО ДЛЯ АДМИНОВ */
         .admin-section {
-            background: rgba(0,0,0,0.3);
-            border-radius: 20px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 30px;
             padding: 2rem;
             border: 2px solid #ff6b6b;
             margin-top: 1rem;
-            box-shadow: 0 0 30px rgba(255,107,107,0.3);
+            box-shadow: 0 0 50px rgba(255,107,107,0.3);
+            backdrop-filter: blur(10px);
         }
         
         .admin-header {
@@ -228,33 +322,37 @@
         
         .admin-header h2 {
             color: #ff6b6b;
-            font-size: 2rem;
+            font-size: 2.5rem;
+            text-shadow: 0 0 30px #ff6b6b;
         }
         
         .admin-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
             margin-bottom: 2rem;
         }
         
         .stat-card {
             background: rgba(255,107,107,0.1);
-            padding: 1.5rem;
-            border-radius: 10px;
+            padding: 1.8rem;
+            border-radius: 20px;
             text-align: center;
             border: 1px solid #ff6b6b;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255,107,107,0.3);
         }
         
         .stat-card .number {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: bold;
             color: #ff6b6b;
-        }
-        
-        .stat-card .label {
-            color: white;
-            margin-top: 0.5rem;
+            text-shadow: 0 0 20px #ff6b6b;
         }
         
         .admin-tabs {
@@ -266,14 +364,17 @@
         
         .admin-tab {
             background: rgba(255,255,255,0.05);
-            padding: 0.8rem 1.5rem;
-            border-radius: 20px;
+            padding: 1rem 2rem;
+            border-radius: 30px;
             cursor: pointer;
             transition: all 0.3s;
+            border: 1px solid rgba(255,107,107,0.3);
         }
         
         .admin-tab:hover, .admin-tab.active {
             background: #ff6b6b;
+            border-color: #ff6b6b;
+            box-shadow: 0 0 30px #ff6b6b;
         }
         
         .admin-content {
@@ -287,10 +388,17 @@
         /* Карточки для админа */
         .application-card, .complaint-card {
             background: rgba(255,255,255,0.05);
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            border-left: 4px solid #4facfe;
+            padding: 1.8rem;
+            border-radius: 20px;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid #4facfe;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+        }
+        
+        .application-card:hover, .complaint-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 30px rgba(79,172,254,0.2);
         }
         
         .complaint-card {
@@ -307,15 +415,16 @@
         }
         
         .card-title {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: bold;
             color: #4facfe;
         }
         
         .card-status {
-            padding: 0.3rem 1rem;
-            border-radius: 15px;
+            padding: 0.4rem 1.2rem;
+            border-radius: 20px;
             font-size: 0.9rem;
+            font-weight: bold;
         }
         
         .status-pending {
@@ -333,17 +442,10 @@
             color: white;
         }
         
-        .card-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-        
         .card-actions {
             display: flex;
             gap: 1rem;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
             flex-wrap: wrap;
         }
         
@@ -351,47 +453,43 @@
             background: #10b981;
             color: white;
             border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 5px;
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s;
+            font-weight: bold;
+            font-size: 1rem;
         }
         
         .accept-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 15px #10b981;
+            box-shadow: 0 0 25px #10b981;
         }
         
         .reject-btn {
             background: #ef4444;
             color: white;
             border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 5px;
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s;
+            font-weight: bold;
+            font-size: 1rem;
         }
         
         .reject-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 15px #ef4444;
-        }
-        
-        .delete-btn {
-            background: #6b7280;
-            color: white;
-            border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 5px;
-            cursor: pointer;
+            box-shadow: 0 0 25px #ef4444;
         }
         
         /* Правила */
         .rules-section {
             background: rgba(0,0,0,0.3);
-            border-radius: 20px;
+            border-radius: 30px;
             padding: 2rem;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(79,172,254,0.2);
+            backdrop-filter: blur(10px);
         }
         
         .rules-header {
@@ -405,11 +503,13 @@
         
         .rules-header h2 {
             color: #4facfe;
-            font-size: 2rem;
+            font-size: 2.5rem;
+            text-shadow: 0 0 30px #4facfe;
         }
         
         .rules-date {
             color: #888;
+            font-size: 1.1rem;
         }
         
         .rules-content {
@@ -420,40 +520,45 @@
         
         .rules-section-block {
             margin-bottom: 2rem;
-            background: rgba(255,255,255,0.02);
+            background: rgba(255,255,255,0.03);
             padding: 1.5rem;
-            border-radius: 10px;
+            border-radius: 20px;
         }
         
         .rules-section-title {
             color: #ff6b6b;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             margin-bottom: 1rem;
+            text-shadow: 0 0 20px #ff6b6b;
         }
         
         .rule-item {
             margin-bottom: 1rem;
-            padding-left: 1rem;
-            border-left: 2px solid #4facfe;
+            padding-left: 1.5rem;
+            border-left: 3px solid #4facfe;
+            line-height: 1.6;
         }
         
         .rule-number {
             color: #4facfe;
             font-weight: bold;
+            font-size: 1.1rem;
         }
         
         .rule-punishment {
             color: #ff6b6b;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             margin-top: 0.3rem;
+            font-weight: bold;
         }
         
         /* Жалобы */
         .complaints-section {
             background: rgba(0,0,0,0.3);
-            border-radius: 20px;
+            border-radius: 30px;
             padding: 2rem;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(79,172,254,0.2);
+            backdrop-filter: blur(10px);
         }
         
         .complaints-header {
@@ -467,56 +572,69 @@
         
         .complaints-header h2 {
             color: #4facfe;
-            font-size: 2rem;
+            font-size: 2.5rem;
+            text-shadow: 0 0 30px #4facfe;
         }
         
         .new-complaint-btn {
             background: linear-gradient(135deg, #ff6b6b, #4facfe);
             border: none;
-            padding: 1rem 2rem;
-            border-radius: 10px;
+            padding: 1.2rem 2.5rem;
+            border-radius: 50px;
             color: white;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
+            font-size: 1.1rem;
+            box-shadow: 0 5px 20px rgba(79,172,254,0.3);
         }
         
         .new-complaint-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(79,172,254,0.5);
+            box-shadow: 0 10px 40px rgba(79,172,254,0.6);
         }
         
         .complaint-form {
             background: rgba(255,255,255,0.05);
             padding: 2rem;
-            border-radius: 10px;
+            border-radius: 20px;
             margin-bottom: 2rem;
             display: none;
+            border: 1px solid #4facfe;
         }
         
         .complaint-form.active {
             display: block;
+            animation: slideDown 0.4s ease;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .complaint-form h3 {
             color: #4facfe;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
         }
         
         /* Заявки */
         .apply-section {
             background: rgba(0,0,0,0.3);
-            border-radius: 20px;
+            border-radius: 30px;
             padding: 2rem;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(79,172,254,0.2);
+            backdrop-filter: blur(10px);
             margin-top: 1rem;
         }
         
         .apply-section h2 {
             color: #4facfe;
-            margin-bottom: 1.5rem;
-            font-size: 2rem;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
             text-align: center;
+            text-shadow: 0 0 30px #4facfe;
         }
         
         .apply-form {
@@ -540,43 +658,38 @@
             margin-bottom: 0.5rem;
             color: #4facfe;
             font-weight: bold;
+            font-size: 1.1rem;
         }
         
         .form-group input, .form-group textarea {
             width: 100%;
-            padding: 0.8rem;
+            padding: 1rem;
             border: 2px solid rgba(79,172,254,0.3);
-            border-radius: 10px;
+            border-radius: 15px;
             background: rgba(255,255,255,0.05);
             color: white;
             font-size: 1rem;
+            transition: all 0.3s;
         }
         
         .form-group input:focus, .form-group textarea:focus {
             outline: none;
             border-color: #4facfe;
-        }
-        
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
+            box-shadow: 0 0 30px rgba(79,172,254,0.3);
         }
         
         .photo-upload {
             border: 2px dashed #4facfe;
             padding: 2rem;
             text-align: center;
-            border-radius: 10px;
+            border-radius: 15px;
             cursor: pointer;
             transition: all 0.3s;
         }
         
         .photo-upload:hover {
             background: rgba(79,172,254,0.1);
-        }
-        
-        .photo-upload input {
-            display: none;
+            border-color: #ff6b6b;
         }
         
         .photo-preview {
@@ -597,20 +710,21 @@
         .submit-btn {
             background: linear-gradient(135deg, #ff6b6b, #4facfe);
             border: none;
-            padding: 1rem 2rem;
-            border-radius: 10px;
+            padding: 1.2rem 2rem;
+            border-radius: 50px;
             color: white;
             font-weight: bold;
             cursor: pointer;
             width: 100%;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             margin-top: 1rem;
             transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(79,172,254,0.3);
         }
         
         .submit-btn:hover {
             transform: scale(1.02);
-            box-shadow: 0 0 30px rgba(79,172,254,0.5);
+            box-shadow: 0 10px 40px rgba(79,172,254,0.6);
         }
         
         .success-message {
@@ -619,7 +733,7 @@
             border: 2px solid #48bb78;
             color: #48bb78;
             padding: 1rem;
-            border-radius: 10px;
+            border-radius: 15px;
             text-align: center;
             margin-top: 1rem;
             font-weight: bold;
@@ -634,37 +748,44 @@
         
         .complaint-author {
             color: #888;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
         
         .complaint-rule {
             background: rgba(79,172,254,0.1);
-            padding: 0.5rem;
-            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
             margin: 0.5rem 0;
         }
         
         .complaint-photos {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.8rem;
             margin: 1rem 0;
             flex-wrap: wrap;
         }
         
         .complaint-photos img {
-            width: 150px;
-            height: 150px;
+            width: 120px;
+            height: 120px;
             object-fit: cover;
             border-radius: 10px;
             cursor: pointer;
             border: 2px solid #4facfe;
+            transition: all 0.3s;
+        }
+        
+        .complaint-photos img:hover {
+            transform: scale(1.05);
+            border-color: #ff6b6b;
         }
         
         .complaint-text {
             margin: 1rem 0;
             padding: 1rem;
-            background: rgba(0,0,0,0.2);
-            border-radius: 5px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            line-height: 1.6;
         }
         
         /* Модалки */
@@ -675,63 +796,109 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.9);
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            backdrop-filter: blur(10px);
         }
         
         .modal-content {
-            background: #1a1a3a;
-            padding: 2rem;
-            border-radius: 20px;
-            max-width: 500px;
+            background: linear-gradient(135deg, #1a1a3a, #2a1a4a);
+            padding: 3rem;
+            border-radius: 30px;
+            max-width: 450px;
             width: 90%;
-            border: 1px solid #4facfe;
+            border: 2px solid #4facfe;
+            box-shadow: 0 0 60px rgba(79,172,254,0.3);
+            animation: modalPop 0.4s ease;
+        }
+        
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
         
         .modal-content h2 {
             color: #4facfe;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            text-align: center;
         }
         
         .modal-content input {
             width: 100%;
-            padding: 0.8rem;
+            padding: 1rem;
             margin: 0.5rem 0;
-            border: 1px solid #4facfe;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(79,172,254,0.3);
+            border-radius: 15px;
+            background: rgba(255,255,255,0.05);
             color: white;
+            font-size: 1rem;
         }
         
         .modal-content button {
             width: 100%;
-            padding: 0.8rem;
-            margin-top: 1rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
             background: linear-gradient(135deg, #ff6b6b, #4facfe);
             border: none;
-            border-radius: 10px;
+            border-radius: 50px;
             color: white;
             font-weight: bold;
             cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        
+        .modal-content button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 40px rgba(79,172,254,0.5);
         }
         
         .close {
             float: right;
             cursor: pointer;
             color: #ff6b6b;
-            font-size: 1.5rem;
+            font-size: 2rem;
+            transition: all 0.3s;
+        }
+        
+        .close:hover {
+            transform: rotate(90deg);
+            color: #4facfe;
+        }
+        
+        .modal-link {
+            color: #4facfe;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .modal-link:hover {
+            color: #ff6b6b;
+            text-shadow: 0 0 20px #ff6b6b;
         }
         
         #fullImage {
             max-width: 100%;
             max-height: 80vh;
+            border-radius: 10px;
         }
         
         @media (max-width: 768px) {
             .nav-container {
                 flex-direction: column;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .server-ip {
+                font-size: 1.3rem;
+                padding: 0.8rem 1.5rem;
             }
             
             .apply-form {
@@ -742,12 +909,9 @@
                 grid-column: span 1;
             }
             
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .server-ip {
-                font-size: 1.2rem;
+            .tab {
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
             }
         }
     </style>
@@ -755,8 +919,8 @@
 <body>
     <nav>
         <div class="nav-container">
-            <div class="logo" onclick="showSection('main')">🌙 MoonGrief</div>
-            <div class="ip-box">moongrief.aurorix.pro</div>
+            <div class="logo" onclick="showSection('main')">🌙 MoonGrief - форум</div>
+            <div class="ip-box" onclick="copyIP()">moongrief.aurorix.pro</div>
             <div class="user-menu" id="userMenu"></div>
         </div>
     </nav>
@@ -771,6 +935,7 @@
         <div id="mainSection" class="section active">
             <div class="hero">
                 <h1>MoonGrief</h1>
+                <p>Официальный форум сервера</p>
                 <div class="server-ip" onclick="copyIP()">moongrief.aurorix.pro 📋</div>
                 <p>Нажми на IP чтобы скопировать и зайти на сервер</p>
             </div>
@@ -889,7 +1054,7 @@
             </div>
         </div>
         
-        <!-- Админ панель (ТОЛЬКО ДЛЯ milk123) -->
+        <!-- Админ панель (ТОЛЬКО ДЛЯ АДМИНОВ) -->
         <div id="adminSection" class="section">
             <div class="admin-section">
                 <div class="admin-header">
@@ -898,9 +1063,9 @@
                 </div>
                 
                 <div class="admin-tabs">
-                    <div class="admin-tab active" onclick="showAdminTab('applications')">📝 Заявки</div>
-                    <div class="admin-tab" onclick="showAdminTab('complaints')">⚠️ Жалобы</div>
-                    <div class="admin-tab" onclick="showAdminTab('users')">👥 Пользователи</div>
+                    <div class="admin-tab active" onclick="showAdminTab('applications', event)">📝 Заявки</div>
+                    <div class="admin-tab" onclick="showAdminTab('complaints', event)">⚠️ Жалобы</div>
+                    <div class="admin-tab" onclick="showAdminTab('users', event)">👥 Пользователи</div>
                 </div>
                 
                 <div id="adminApplications" class="admin-content active"></div>
@@ -919,7 +1084,7 @@
             <input type="password" placeholder="Пароль" id="loginPass">
             <button onclick="login()">Войти</button>
             <p style="text-align: center; margin-top: 1rem;">
-                Нет аккаунта? <a href="#" onclick="showModal('register'); closeModal('login')" style="color: #4facfe;">Регистрация</a>
+                Нет аккаунта? <a href="#" onclick="showModal('register'); closeModal('login')" class="modal-link">Регистрация</a>
             </p>
         </div>
     </div>
@@ -932,11 +1097,14 @@
             <input type="password" placeholder="Пароль" id="regPass">
             <input type="text" placeholder="Minecraft ник" id="regNick">
             <button onclick="register()">Зарегистрироваться</button>
+            <p style="text-align: center; margin-top: 1rem;">
+                Уже есть аккаунт? <a href="#" onclick="showModal('login'); closeModal('register')" class="modal-link">Войти</a>
+            </p>
         </div>
     </div>
     
     <div id="imageModal" class="modal" onclick="this.style.display='none'">
-        <div class="modal-content" style="max-width: 800px; text-align: center;">
+        <div class="modal-content" style="max-width: 800px; text-align: center; background: transparent; border: none; box-shadow: none;">
             <img id="fullImage" src="">
         </div>
     </div>
@@ -948,6 +1116,9 @@
         let complaints = JSON.parse(localStorage.getItem('complaints')) || [];
         let applications = JSON.parse(localStorage.getItem('applications')) || [];
         let uploadedPhotos = [];
+        
+        // Список админов (по логину)
+        const admins = ['milk123', 'Xchik_', 'milfa'];
         
         // Правила
         const rulesData = {
@@ -1053,8 +1224,10 @@
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
                 updateUserMenu();
-                document.getElementById('complainant').value = currentUser.minecraft;
-                document.getElementById('nickname').value = currentUser.minecraft;
+                document.getElementById('complainant').value = currentUser.minecraft || '';
+                document.getElementById('nickname').value = currentUser.minecraft || '';
+            } else {
+                updateUserMenu();
             }
             updateAdminVisibility();
         }
@@ -1062,28 +1235,34 @@
         function updateUserMenu() {
             let menu = document.getElementById('userMenu');
             if (currentUser) {
+                let isAdmin = admins.includes(currentUser.username);
                 menu.innerHTML = `
                     <div class="user-info">
-                        <div class="user-avatar">${currentUser.minecraft[0]}</div>
-                        <span>${currentUser.minecraft}</span>
-                        ${currentUser.minecraft === 'milk123' ? '<span class="admin-badge">Admin</span>' : ''}
+                        <div class="user-avatar">${(currentUser.minecraft || 'U')[0]}</div>
+                        <span>${currentUser.minecraft || currentUser.username}</span>
+                        ${isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
                     </div>
-                    <button class="nav-links" onclick="logout()">Выйти</button>
+                    <div class="auth-buttons">
+                        <button class="auth-btn" onclick="logout()">Выйти</button>
+                    </div>
                 `;
             } else {
                 menu.innerHTML = `
-                    <button class="nav-links" onclick="showModal('login')">Войти</button>
-                    <button class="nav-links" onclick="showModal('register')">Регистрация</button>
+                    <div class="auth-buttons">
+                        <button class="auth-btn secondary" onclick="showModal('login')">Вход</button>
+                        <button class="auth-btn" onclick="showModal('register')">Регистрация</button>
+                    </div>
                 `;
             }
         }
         
         function updateAdminVisibility() {
-            let adminTab = document.getElementById('adminTab');
-            if (currentUser && currentUser.minecraft === 'milk123') {
-                // Добавляем вкладку админки если её нет
-                let tabs = document.querySelector('.tabs');
-                if (!document.getElementById('adminTab')) {
+            // Добавляем вкладку админки для админов
+            let tabs = document.querySelector('.tabs');
+            let existingTab = document.getElementById('adminTab');
+            
+            if (currentUser && admins.includes(currentUser.username)) {
+                if (!existingTab) {
                     let tab = document.createElement('div');
                     tab.className = 'tab';
                     tab.id = 'adminTab';
@@ -1092,8 +1271,7 @@
                     tabs.appendChild(tab);
                 }
             } else {
-                let tab = document.getElementById('adminTab');
-                if (tab) tab.remove();
+                if (existingTab) existingTab.remove();
             }
         }
         
@@ -1106,7 +1284,7 @@
             
             if (section === 'admin') {
                 updateAdminStats();
-                showAdminTab('applications');
+                showAdminTab('applications', { target: document.querySelector('.admin-tab') });
             } else if (section === 'complaints') {
                 loadComplaints();
             }
@@ -1130,9 +1308,9 @@
         }
         
         function register() {
-            let user = document.getElementById('regUser').value;
-            let pass = document.getElementById('regPass').value;
-            let minecraft = document.getElementById('regNick').value;
+            let user = document.getElementById('regUser').value.trim();
+            let pass = document.getElementById('regPass').value.trim();
+            let minecraft = document.getElementById('regNick').value.trim();
             
             if (user && pass && minecraft) {
                 if (users.find(u => u.username === user)) {
@@ -1157,28 +1335,28 @@
                 closeModal('register');
                 updateUserMenu();
                 updateAdminVisibility();
-                document.getElementById('complainant').value = currentUser.minecraft;
-                document.getElementById('nickname').value = currentUser.minecraft;
+                document.getElementById('complainant').value = currentUser.minecraft || '';
+                document.getElementById('nickname').value = currentUser.minecraft || '';
             } else {
                 alert('❌ Заполните все поля');
             }
         }
         
         function login() {
-            let user = document.getElementById('loginUser').value;
-            let pass = document.getElementById('loginPass').value;
+            let user = document.getElementById('loginUser').value.trim();
+            let pass = document.getElementById('loginPass').value.trim();
             
             let found = users.find(u => u.username === user && u.password === pass);
             
             if (found) {
                 currentUser = found;
                 localStorage.setItem('currentUser', JSON.stringify(found));
-                alert('Добро пожаловать, ' + found.minecraft + '!');
+                alert('Добро пожаловать, ' + (found.minecraft || found.username) + '!');
                 closeModal('login');
                 updateUserMenu();
                 updateAdminVisibility();
-                document.getElementById('complainant').value = currentUser.minecraft;
-                document.getElementById('nickname').value = currentUser.minecraft;
+                document.getElementById('complainant').value = currentUser.minecraft || '';
+                document.getElementById('nickname').value = currentUser.minecraft || '';
             } else {
                 alert('❌ Неверный логин или пароль');
             }
@@ -1227,10 +1405,10 @@
                 return;
             }
             
-            let accused = document.getElementById('accused').value;
-            let ruleNumber = document.getElementById('ruleNumber').value;
-            let description = document.getElementById('description').value;
-            let complainant = document.getElementById('complainant').value;
+            let accused = document.getElementById('accused').value.trim();
+            let ruleNumber = document.getElementById('ruleNumber').value.trim();
+            let description = document.getElementById('description').value.trim();
+            let complainant = document.getElementById('complainant').value.trim();
             
             if (!accused || !ruleNumber || !description) {
                 alert('❌ Заполните все поля');
@@ -1274,7 +1452,7 @@
             }
             
             list.innerHTML = '';
-            complaints.reverse().forEach(c => {
+            complaints.slice().reverse().forEach(c => {
                 let photosHtml = '';
                 if (c.photos && c.photos.length > 0) {
                     photosHtml = '<div class="complaint-photos">';
@@ -1286,9 +1464,9 @@
                 
                 list.innerHTML += `
                     <div class="complaint-card">
-                        <div class="complaint-header">
-                            <span class="complaint-accused">Нарушитель: ${c.accused}</span>
-                            <span class="complaint-status status-${c.status}">${getStatusText(c.status)}</span>
+                        <div class="card-header">
+                            <span class="card-title">Нарушитель: ${c.accused}</span>
+                            <span class="card-status status-${c.status}">${getStatusText(c.status)}</span>
                         </div>
                         <div class="complaint-author">Жалоба от: ${c.complainant} | ${c.date}</div>
                         <div class="complaint-rule">Нарушение: правило ${c.ruleNumber}</div>
@@ -1307,12 +1485,12 @@
                 return;
             }
             
-            let nickname = document.getElementById('nickname').value;
-            let name = document.getElementById('name').value;
-            let age = document.getElementById('age').value;
-            let timezone = document.getElementById('timezone').value;
-            let experience = document.getElementById('experience').value;
-            let why = document.getElementById('why').value;
+            let nickname = document.getElementById('nickname').value.trim();
+            let name = document.getElementById('name').value.trim();
+            let age = document.getElementById('age').value.trim();
+            let timezone = document.getElementById('timezone').value.trim();
+            let experience = document.getElementById('experience').value.trim();
+            let why = document.getElementById('why').value.trim();
             
             if (nickname && name && age && timezone && experience && why) {
                 let application = {
@@ -1373,7 +1551,7 @@
             `;
         }
         
-        function showAdminTab(tab) {
+        function showAdminTab(tab, event) {
             document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.admin-content').forEach(c => c.classList.remove('active'));
             
@@ -1393,20 +1571,18 @@
             }
             
             container.innerHTML = '';
-            applications.reverse().forEach(app => {
+            applications.slice().reverse().forEach(app => {
                 container.innerHTML += `
                     <div class="application-card">
                         <div class="card-header">
                             <span class="card-title">${app.nickname}</span>
                             <span class="card-status status-${app.status}">${getStatusText(app.status)}</span>
                         </div>
-                        <div class="card-info">
-                            <div><strong>Имя:</strong> ${app.name}</div>
-                            <div><strong>Возраст:</strong> ${app.age}</div>
-                            <div><strong>Пояс:</strong> ${app.timezone}</div>
-                            <div><strong>Дата:</strong> ${app.date}</div>
-                        </div>
-                        <div><strong>Опыт:</strong> ${app.experience}</div>
+                        <div><strong>Имя:</strong> ${app.name}</div>
+                        <div><strong>Возраст:</strong> ${app.age}</div>
+                        <div><strong>Пояс:</strong> ${app.timezone}</div>
+                        <div><strong>Дата:</strong> ${app.date}</div>
+                        <div style="margin-top:0.5rem;"><strong>Опыт:</strong> ${app.experience}</div>
                         <div><strong>Почему:</strong> ${app.why}</div>
                         ${app.status === 'pending' ? `
                             <div class="card-actions">
@@ -1427,7 +1603,7 @@
             }
             
             container.innerHTML = '';
-            complaints.reverse().forEach(c => {
+            complaints.slice().reverse().forEach(c => {
                 let photosHtml = '';
                 if (c.photos && c.photos.length > 0) {
                     photosHtml = '<div style="display:flex; gap:0.5rem; margin:0.5rem 0;">';
@@ -1461,31 +1637,32 @@
         
         function loadAdminUsers() {
             let container = document.getElementById('adminUsers');
-            container.innerHTML = '<p style="text-align: center;">Загрузка пользователей...</p>';
+            if (users.length === 0) {
+                container.innerHTML = '<p style="text-align: center;">Нет пользователей</p>';
+                return;
+            }
             
-            setTimeout(() => {
-                if (users.length === 0) {
-                    container.innerHTML = '<p style="text-align: center;">Нет пользователей</p>';
-                    return;
-                }
-                
-                container.innerHTML = '';
-                users.forEach(user => {
-                    container.innerHTML += `
-                        <div class="application-card">
-                            <div class="card-header">
-                                <span class="card-title">${user.minecraft}</span>
-                                ${user.minecraft === 'milk123' ? '<span class="admin-badge">ADMIN</span>' : ''}
-                            </div>
-                            <div><strong>Логин:</strong> ${user.username}</div>
-                            <div><strong>Дата рег:</strong> ${user.registered || 'неизвестно'}</div>
+            container.innerHTML = '';
+            users.forEach(user => {
+                let isAdmin = admins.includes(user.username) ? '<span class="admin-badge" style="margin-left:0.5rem;">ADMIN</span>' : '';
+                container.innerHTML += `
+                    <div class="application-card">
+                        <div class="card-header">
+                            <span class="card-title">${user.minecraft || user.username}</span>
+                            ${isAdmin}
                         </div>
-                    `;
-                });
-            }, 500);
+                        <div><strong>Логин:</strong> ${user.username}</div>
+                        <div><strong>Дата рег:</strong> ${user.registered || 'неизвестно'}</div>
+                    </div>
+                `;
+            });
         }
         
         function handleApplication(id, action) {
+            if (!currentUser || !admins.includes(currentUser.username)) {
+                alert('❌ Только администраторы могут отвечать на заявки');
+                return;
+            }
             let app = applications.find(a => a.id === id);
             if (app) {
                 app.status = action === 'accept' ? 'accepted' : 'rejected';
@@ -1497,6 +1674,10 @@
         }
         
         function handleComplaint(id, action) {
+            if (!currentUser || !admins.includes(currentUser.username)) {
+                alert('❌ Только администраторы могут отвечать на жалобы');
+                return;
+            }
             let complaint = complaints.find(c => c.id === id);
             if (complaint) {
                 complaint.status = action === 'accept' ? 'accepted' : 'rejected';
