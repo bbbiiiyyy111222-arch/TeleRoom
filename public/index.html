@@ -20,7 +20,6 @@
             overflow-x: hidden;
         }
         
-        /* Космический фон с анимацией звезд */
         body::before {
             content: '';
             position: fixed;
@@ -40,7 +39,6 @@
             100% { transform: translateY(-200px) translateX(100px) rotate(10deg); }
         }
         
-        /* Анимированная линия сверху */
         nav::after {
             content: '';
             position: absolute;
@@ -1023,7 +1021,7 @@
             font-size: 1.2rem;
         }
         
-        .form-group input, .form-group textarea {
+        .form-group input, .form-group textarea, .form-group select {
             width: 100%;
             padding: 1.2rem;
             border: 2px solid #ffd700;
@@ -1034,7 +1032,7 @@
             transition: all 0.4s;
         }
         
-        .form-group input:focus, .form-group textarea:focus {
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
             outline: none;
             border-color: #4facfe;
             box-shadow: 0 0 50px #4facfe;
@@ -1153,7 +1151,95 @@
             border-radius: 15px;
             line-height: 1.7;
         }
-        
+
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid #4facfe;
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .filter-btn:hover {
+            background: #4facfe;
+            transform: scale(1.05);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            border-color: transparent;
+        }
+
+        .no-items {
+            text-align: center;
+            padding: 3rem;
+            color: #aaa;
+            font-size: 1.2rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 30px;
+        }
+
+        .response-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .save-response-btn {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: black;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .save-response-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px #ffd700;
+        }
+
+        .cancel-response-btn {
+            background: #666;
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .cancel-response-btn:hover {
+            background: #888;
+            transform: scale(1.05);
+        }
+
+        .complaint-response {
+            background: rgba(255,215,0,0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+            border-left: 4px solid #ffd700;
+        }
+
+        .complaint-response strong {
+            color: #ffd700;
+        }
+
         /* Модалки */
         .modal {
             display: none;
@@ -1259,91 +1345,6 @@
             border-radius: 20px;
         }
 
-        .filter-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid #4facfe;
-            color: white;
-            padding: 0.8rem 2rem;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 1rem;
-        }
-
-        .filter-btn:hover {
-            background: #4facfe;
-            transform: scale(1.05);
-        }
-
-        .filter-btn.active {
-            background: linear-gradient(135deg, #ffd700, #ff8c00);
-            border-color: transparent;
-        }
-
-        .no-items {
-            text-align: center;
-            padding: 3rem;
-            color: #aaa;
-            font-size: 1.2rem;
-        }
-
-        .response-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .save-response-btn {
-            background: linear-gradient(135deg, #ffd700, #ff8c00);
-            color: black;
-            padding: 0.8rem 2rem;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .save-response-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px #ffd700;
-        }
-
-        .cancel-response-btn {
-            background: #666;
-            color: white;
-            padding: 0.8rem 2rem;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .cancel-response-btn:hover {
-            background: #888;
-            transform: scale(1.05);
-        }
-
-        .complaint-response {
-            background: rgba(255,215,0,0.1);
-            padding: 1.5rem;
-            border-radius: 15px;
-            margin: 1rem 0;
-            border-left: 4px solid #ffd700;
-        }
-
-        .complaint-response strong {
-            color: #ffd700;
-        }
-
         @media (max-width: 768px) {
             .nav-container {
                 flex-direction: column;
@@ -1408,8 +1409,8 @@
         <div id="rulesSection" class="section">
             <div class="rules-section">
                 <div class="rules-header">
-                    <h2>📜 Правила</h2>
-                    <div class="rules-date">3 марта 2025</div>
+                    <h2>📜 Правила сервера MoonGrief</h2>
+                    <div class="rules-date">Обновлено: 15 марта 2025</div>
                 </div>
                 <div class="rules-content" id="rulesContent"></div>
             </div>
@@ -1419,45 +1420,46 @@
         <div id="complaintsSection" class="section">
             <div class="complaints-section">
                 <div class="complaints-header">
-                    <h2>⚠️ Жалобы</h2>
+                    <h2>⚠️ Жалобы на игроков</h2>
                     <button class="new-complaint-btn" onclick="toggleComplaintForm()">+ Новая жалоба</button>
                 </div>
                 
                 <div class="complaint-form" id="complaintForm">
-                    <h3>Создать жалобу</h3>
+                    <h3 style="color: #ffd700; margin-bottom: 2rem; text-align: center; font-size: 2rem;">Создание жалобы</h3>
                     <div class="form-group">
-                        <label>Ваш ник:</label>
-                        <input type="text" id="complainant" placeholder="Ваш Minecraft ник">
+                        <label>Ваш Minecraft ник:</label>
+                        <input type="text" id="complainant" placeholder="Ваш ник" value="">
                     </div>
                     <div class="form-group">
-                        <label>Нарушитель:</label>
-                        <input type="text" id="accused" placeholder="Кто нарушил?">
+                        <label>Ник нарушителя:</label>
+                        <input type="text" id="accused" placeholder="Кто нарушил правила?">
                     </div>
                     <div class="form-group">
-                        <label>Правило:</label>
-                        <input type="text" id="ruleNumber" placeholder="Номер правила">
+                        <label>Номер правила:</label>
+                        <input type="text" id="ruleNumber" placeholder="Например: 4.1">
                     </div>
                     <div class="form-group">
-                        <label>Описание:</label>
-                        <textarea id="description" rows="4" placeholder="Опишите ситуацию..."></textarea>
+                        <label>Описание ситуации:</label>
+                        <textarea id="description" rows="5" placeholder="Опишите подробно что произошло..."></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Скриншоты:</label>
+                        <label>Скриншоты (доказательства):</label>
                         <div class="photo-upload" onclick="document.getElementById('photoInput').click()">
                             <input type="file" id="photoInput" multiple accept="image/*" onchange="handlePhotoUpload(event)" style="display: none;">
                             <p>📷 Нажмите чтобы загрузить скриншоты</p>
+                            <p style="font-size: 0.9rem; color: #aaa;">Можно загрузить несколько файлов</p>
                         </div>
                         <div class="photo-preview" id="photoPreview"></div>
                     </div>
                     <button class="submit-btn" onclick="submitComplaint()">Отправить жалобу</button>
                 </div>
                 
-                <!-- Кнопки фильтрации для всех пользователей -->
-                <div class="filter-buttons" id="filterButtons">
-                    <button class="filter-btn active" onclick="filterComplaints('all')">Все</button>
-                    <button class="filter-btn" onclick="filterComplaints('pending')">Ожидает</button>
-                    <button class="filter-btn" onclick="filterComplaints('accepted')">Принято</button>
-                    <button class="filter-btn" onclick="filterComplaints('rejected')">Отклонено</button>
+                <!-- Кнопки фильтрации для всех -->
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterComplaints('all')">Все жалобы</button>
+                    <button class="filter-btn" onclick="filterComplaints('pending')">В ожидании</button>
+                    <button class="filter-btn" onclick="filterComplaints('accepted')">Принятые</button>
+                    <button class="filter-btn" onclick="filterComplaints('rejected')">Отклонённые</button>
                 </div>
                 
                 <div class="complaints-list" id="complaintsList"></div>
@@ -1467,31 +1469,31 @@
         <!-- Заявки -->
         <div id="applySection" class="section">
             <div class="apply-section">
-                <h2>📝 Заявки в Хелперы</h2>
+                <h2>📝 Заявки в команду Helper</h2>
                 <div class="apply-form">
                     <div class="form-group full-width">
-                        <label>Никнейм:</label>
-                        <input type="text" id="nickname" placeholder="Ваш игровой ник">
+                        <label>Ваш Minecraft ник:</label>
+                        <input type="text" id="nickname" placeholder="Ваш игровой ник" value="">
                     </div>
                     <div class="form-group">
-                        <label>Имя:</label>
-                        <input type="text" id="name" placeholder="Ваше имя">
+                        <label>Ваше имя:</label>
+                        <input type="text" id="name" placeholder="Настоящее имя">
                     </div>
                     <div class="form-group">
-                        <label>Возраст:</label>
-                        <input type="number" id="age" placeholder="Ваш возраст">
+                        <label>Ваш возраст:</label>
+                        <input type="number" id="age" placeholder="Сколько лет">
                     </div>
                     <div class="form-group full-width">
                         <label>Часовой пояс:</label>
-                        <input type="text" id="timezone" placeholder="Например: UTC+3">
+                        <input type="text" id="timezone" placeholder="Например: UTC+3 (Москва)">
                     </div>
                     <div class="form-group full-width">
-                        <label>Опыт работы:</label>
-                        <textarea id="experience" rows="3" placeholder="Был ли опыт работы хелпером на других серверах?"></textarea>
+                        <label>Опыт работы на других серверах:</label>
+                        <textarea id="experience" rows="4" placeholder="Был ли опыт работы хелпером/модератором? На каких серверах?"></textarea>
                     </div>
                     <div class="form-group full-width">
                         <label>Почему вы хотите стать хелпером?</label>
-                        <textarea id="why" rows="3" placeholder="Напишите причину"></textarea>
+                        <textarea id="why" rows="4" placeholder="Напишите подробно о своей мотивации..."></textarea>
                     </div>
                     <button class="submit-btn" onclick="submitApplication()">Отправить заявку</button>
                 </div>
@@ -1502,12 +1504,12 @@
         <div id="ownerSection" class="section">
             <div class="owner-section">
                 <div class="owner-header">
-                    <h2>👑 OWNER панель</h2>
+                    <h2>👑 Панель управления</h2>
                     <div class="owner-stats" id="ownerStats"></div>
                 </div>
                 
                 <div class="owner-tabs">
-                    <div class="owner-tab active" onclick="showOwnerTab('applications', event)">📝 Заявки</div>
+                    <div class="owner-tab active" onclick="showOwnerTab('applications', event)">📝 Заявки в Helper</div>
                     <div class="owner-tab" onclick="showOwnerTab('complaints', event)">⚠️ Жалобы</div>
                     <div class="owner-tab" onclick="showOwnerTab('users', event)">👥 Пользователи</div>
                 </div>
@@ -1523,12 +1525,12 @@
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('login')">&times;</span>
-            <h2>Вход</h2>
+            <h2>Вход в аккаунт</h2>
             <input type="text" placeholder="Логин" id="loginUser">
             <input type="password" placeholder="Пароль" id="loginPass">
             <button onclick="login()">Войти</button>
             <p style="text-align: center; margin-top: 1rem;">
-                Нет аккаунта? <a href="#" onclick="showModal('register'); closeModal('login')" class="modal-link">Регистрация</a>
+                Нет аккаунта? <a href="#" onclick="showModal('register'); closeModal('login')" class="modal-link">Зарегистрироваться</a>
             </p>
         </div>
     </div>
@@ -1554,77 +1556,144 @@
     </div>
     
     <script>
-        // Данные
+        // ========== ДАННЫЕ ==========
         let currentUser = null;
         let users = JSON.parse(localStorage.getItem('users')) || [];
         let complaints = JSON.parse(localStorage.getItem('complaints')) || [];
         let applications = JSON.parse(localStorage.getItem('applications')) || [];
         let uploadedPhotos = [];
-        let currentFilter = 'all'; // текущий фильтр
+        let currentFilter = 'all';
         
-        // OWNERы (по логину)
+        // Владельцы (OWNERы)
         const owners = ['milk123', 'Xchik_', 'milfa'];
         
-        // Правила
+        // ========== ПРАВИЛА ==========
         const rulesData = {
             sections: [
                 { 
                     title: "1. Общие положения", 
                     rules: [
                         { num: "1.1", text: "Настоящие правила разработаны администратором сервера MoonGrief и обязательны к исполнению всеми игроками." },
-                        { num: "1.2", text: "Официальные сервера: Moongrief.aurorix.pro." },
-                        { num: "1.3", text: "Решения администрации окончательны и обжалованию не подлежат." },
+                        { num: "1.2", text: "Официальный IP сервера: Moongrief.aurorix.pro" },
+                        { num: "1.3", text: "Решения администрации являются окончательными и обжалованию не подлежат." },
                         { num: "1.4", text: "Запрещена передача аккаунта третьим лицам.", punishment: "Бан навсегда" },
-                        { num: "1.5", text: "Запрещена продажа аккаунтов за реальные деньги.", punishment: "Бан по IP" }
+                        { num: "1.5", text: "Запрещена продажа игровых аккаунтов за реальные деньги.", punishment: "Бан по IP" }
                     ]
                 },
                 { 
                     title: "2. Гриферство", 
                     rules: [
-                        { num: "2.1", text: "Запрещено разрушать постройки других игроков без их согласия.", punishment: "Бан 7 дней + снятие статистики" },
-                        { num: "2.2", text: "Запрещено воровать вещи из сундуков.", punishment: "Бан 3 дня" },
-                        { num: "2.3", text: "Запрещено обкрадывать фермы других игроков.", punishment: "Бан 5 дней" },
-                        { num: "2.4", text: "Запрещено убивать чужих животных.", punishment: "Бан 3 дня" }
+                        { num: "2.1", text: "Запрещено разрушать постройки других игроков без их согласия.", punishment: "Бан на 7 дней + снятие статистики" },
+                        { num: "2.2", text: "Запрещено воровать вещи из чужих сундуков.", punishment: "Бан на 3 дня" },
+                        { num: "2.3", text: "Запрещено обворовывать фермы других игроков.", punishment: "Бан на 5 дней" },
+                        { num: "2.4", text: "Запрещено убивать чужих животных.", punishment: "Бан на 3 дня" },
+                        { num: "2.5", text: "Запрещено ставить лаву и воду на чужих территориях.", punishment: "Бан на 2 дня" }
                     ]
                 },
                 { 
-                    title: "3. Чит-клиенты", 
+                    title: "3. Запрещенные модификации", 
                     rules: [
-                        { num: "3.1", text: "Запрещено использование любых читов и модификаций дающих преимущество.", punishment: "Бан навсегда" },
-                        { num: "3.2", text: "Запрещен X-Ray ресурспаки и текстурпаки.", punishment: "Бан навсегда" },
-                        { num: "3.3", text: "Запрещены макросы и авто-кликеры.", punishment: "Бан 30 дней" },
-                        { num: "3.4", text: "Разрешены только оптимизационные моды (OptiFine, Litematica и т.д.)." }
+                        { num: "3.1", text: "Запрещено использование любых читов и модификаций, дающих преимущество (X-Ray, KillAura, Fly и т.д.).", punishment: "Бан навсегда" },
+                        { num: "3.2", text: "Запрещены X-Ray ресурспаки и текстурпаки.", punishment: "Бан навсегда" },
+                        { num: "3.3", text: "Запрещены макросы и авто-кликеры.", punishment: "Бан на 30 дней" },
+                        { num: "3.4", text: "Разрешены только оптимизационные моды (OptiFine, Litematica, MiniHUD)." }
                     ]
                 },
                 { 
                     title: "4. Чат и общение", 
                     rules: [
-                        { num: "4.1", text: "Запрещён флуд, капс и спам.", punishment: "Мут 2 часа" },
+                        { num: "4.1", text: "Запрещён флуд, капс и спам в чате.", punishment: "Мут на 2 часа" },
                         { num: "4.2", text: "Запрещены оскорбления игроков и администрации.", punishment: "Мут от 6 часов до 7 дней" },
-                        { num: "4.3", text: "Запрещена реклама других серверов.", punishment: "Бан навсегда" },
-                        { num: "4.4", text: "Запрещены провокации и разжигание конфликтов.", punishment: "Мут 1 день" },
-                        { num: "4.5", text: "Запрещены политические и религиозные темы.", punishment: "Мут 3 дня" },
+                        { num: "4.3", text: "Запрещена реклама других серверов и проектов.", punishment: "Бан навсегда" },
+                        { num: "4.4", text: "Запрещены провокации и разжигание конфликтов.", punishment: "Мут на 1 день" },
+                        { num: "4.5", text: "Запрещены политические и религиозные темы.", punishment: "Мут на 3 дня" },
                         { num: "4.6", text: "Запрещены NSFW материалы в любом виде.", punishment: "Бан навсегда" }
                     ]
                 },
                 { 
-                    title: "5. Торговля и экономика", 
+                    title: "5. Экономика и торговля", 
                     rules: [
-                        { num: "5.1", text: "Запрещен обман при торговле.", punishment: "Бан 7 дней + возврат вещей" },
-                        { num: "5.2", text: "Запрещена продажа предметов за реальные деньги.", punishment: "Бан навсегда" },
-                        { num: "5.3", text: "Запрещено использование багов экономики.", punishment: "Бан 30 дней + снятие статистики" }
+                        { num: "5.1", text: "Запрещен обман при торговле (скам).", punishment: "Бан на 7 дней + возврат вещей" },
+                        { num: "5.2", text: "Запрещена продажа игровых предметов за реальные деньги.", punishment: "Бан навсегда" },
+                        { num: "5.3", text: "Запрещено использование багов экономики в свою пользу.", punishment: "Бан на 30 дней + снятие статистики" }
                     ]
                 }
             ]
         };
         
-        // Загрузка
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
         document.addEventListener('DOMContentLoaded', function() {
             loadRules();
             checkAuth();
             loadComplaints();
             updateOwnerStats();
+            
+            // Добавляем тестовые данные если их нет (для демонстрации)
+            if (complaints.length === 0) {
+                addTestComplaints();
+            }
         });
+        
+        // Добавление тестовых жалоб (чтобы было что показывать)
+        function addTestComplaints() {
+            let testComplaints = [
+                {
+                    id: 1001,
+                    complainant: "Steve",
+                    accused: "Griefer123",
+                    ruleNumber: "2.1",
+                    description: "Разрушил мой дом, пока меня не было в сети. Снес все стены и сундуки.",
+                    photos: [],
+                    status: 'pending',
+                    date: '15 марта 2025 г., 14:30',
+                    userId: 'test1',
+                    userMinecraft: 'Steve',
+                    ownerResponse: null
+                },
+                {
+                    id: 1002,
+                    complainant: "Alex",
+                    accused: "XRayUser",
+                    ruleNumber: "3.1",
+                    description: "Игрок на X-Ray, нашел все мои алмазы под землей за 5 минут.",
+                    photos: [],
+                    status: 'accepted',
+                    date: '14 марта 2025 г., 18:45',
+                    userId: 'test2',
+                    userMinecraft: 'Alex',
+                    ownerResponse: 'Проверили логи, игрок забанен. Спасибо за сообщение!'
+                },
+                {
+                    id: 1003,
+                    complainant: "CreeperKing",
+                    accused: "ToxicPlayer",
+                    ruleNumber: "4.2",
+                    description: 'Постоянно оскорбляет в чате, пишет "noob" и матерится.',
+                    photos: [],
+                    status: 'rejected',
+                    date: '13 марта 2025 г., 09:15',
+                    userId: 'test3',
+                    userMinecraft: 'CreeperKing',
+                    ownerResponse: 'Недостаточно доказательств, нужны скриншоты.'
+                },
+                {
+                    id: 1004,
+                    complainant: "Enderman",
+                    accused: "Scammer",
+                    ruleNumber: "5.1",
+                    description: "Обманул при торговле, взял алмазы и не отдал предмет.",
+                    photos: [],
+                    status: 'pending',
+                    date: '16 марта 2025 г., 11:20',
+                    userId: 'test4',
+                    userMinecraft: 'Enderman',
+                    ownerResponse: null
+                }
+            ];
+            
+            complaints = testComplaints;
+            localStorage.setItem('complaints', JSON.stringify(complaints));
+        }
         
         function loadRules() {
             let html = '';
@@ -1632,7 +1701,7 @@
                 html += '<div class="rules-section-block"><div class="rules-section-title">' + section.title + '</div>';
                 section.rules.forEach(rule => {
                     html += '<div class="rule-item"><span class="rule-number">' + rule.num + '</span> ' + rule.text;
-                    if (rule.punishment) html += '<div class="rule-punishment">Наказание: ' + rule.punishment + '</div>';
+                    if (rule.punishment) html += '<div class="rule-punishment">⚡ Наказание: ' + rule.punishment + '</div>';
                     html += '</div>';
                 });
                 html += '</div>';
@@ -1640,6 +1709,7 @@
             document.getElementById('rulesContent').innerHTML = html;
         }
         
+        // ========== АВТОРИЗАЦИЯ ==========
         function checkAuth() {
             let savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
@@ -1687,7 +1757,7 @@
                     tab.className = 'tab';
                     tab.id = 'ownerTab';
                     tab.onclick = function() { showSection('owner'); };
-                    tab.innerHTML = '👑 Owner';
+                    tab.innerHTML = '👑 Owner панель';
                     tabs.appendChild(tab);
                 }
             } else {
@@ -1704,7 +1774,7 @@
                 updateOwnerStats();
                 showOwnerTab('applications', { target: document.querySelector('.owner-tab') });
             } else if (section === 'complaints') {
-                loadComplaints();
+                loadComplaints(); // Перезагружаем жалобы при переходе
             }
         }
         
@@ -1714,7 +1784,7 @@
         
         function copyIP() {
             navigator.clipboard.writeText('moongrief.aurorix.pro');
-            alert('IP скопирован в буфер обмена!');
+            alert('✅ IP скопирован в буфер обмена: moongrief.aurorix.pro');
         }
         
         function showModal(type) {
@@ -1754,9 +1824,9 @@
                 document.getElementById('complainant').value = currentUser.minecraft || '';
                 document.getElementById('nickname').value = currentUser.minecraft || '';
                 
-                alert('✅ Регистрация успешна!');
+                alert('✅ Регистрация успешна! Добро пожаловать на форум!');
             } else {
-                alert('❌ Заполните все поля');
+                alert('❌ Пожалуйста, заполните все поля');
             }
         }
         
@@ -1773,8 +1843,7 @@
                 updateOwnerVisibility();
                 document.getElementById('complainant').value = currentUser.minecraft || '';
                 document.getElementById('nickname').value = currentUser.minecraft || '';
-                loadComplaints();
-                alert('✅ Вход выполнен!');
+                alert('✅ Вход выполнен! Здравствуйте, ' + (currentUser.minecraft || currentUser.username));
             } else {
                 alert('❌ Неверный логин или пароль');
             }
@@ -1786,13 +1855,12 @@
             updateUserMenu();
             updateOwnerVisibility();
             showSection('main');
-            loadComplaints(); // Перезагружаем жалобы (будут видны все, но без кнопки создания)
         }
         
-        // Жалобы
+        // ========== ЖАЛОБЫ ==========
         function toggleComplaintForm() {
             if (!currentUser) {
-                alert('🔒 Для создания жалобы необходимо войти');
+                alert('🔒 Для создания жалобы необходимо войти в аккаунт');
                 showModal('login');
                 return;
             }
@@ -1829,7 +1897,7 @@
             let complainant = document.getElementById('complainant').value.trim();
             
             if (!accused || !ruleNumber || !description) {
-                alert('❌ Заполните все поля!');
+                alert('❌ Заполните все обязательные поля!');
                 return;
             }
             
@@ -1858,9 +1926,9 @@
             uploadedPhotos = [];
             document.getElementById('complaintForm').classList.remove('active');
             
-            loadComplaints();
+            loadComplaints(); // Перезагружаем список
             updateOwnerStats();
-            alert('✅ Жалоба отправлена!');
+            alert('✅ Жалоба успешно отправлена!');
         }
         
         function filterComplaints(filter) {
@@ -1869,29 +1937,20 @@
             // Обновляем активную кнопку
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
-                if (btn.textContent.includes(getFilterText(filter))) {
-                    btn.classList.add('active');
-                }
             });
+            event.target.classList.add('active');
             
             loadComplaints();
-        }
-        
-        function getFilterText(filter) {
-            switch(filter) {
-                case 'all': return 'Все';
-                case 'pending': return 'Ожидает';
-                case 'accepted': return 'Принято';
-                case 'rejected': return 'Отклонено';
-                default: return 'Все';
-            }
         }
         
         function loadComplaints() {
             let list = document.getElementById('complaintsList');
             
-            // Фильтруем жалобы по статусу
+            // ВАЖНО: ВСЕ ЖАЛОБЫ видны ВСЕМ пользователям
+            // Никакой фильтрации по пользователю нет!
             let filteredComplaints = complaints;
+            
+            // Фильтруем только по статусу
             if (currentFilter !== 'all') {
                 filteredComplaints = complaints.filter(c => c.status === currentFilter);
             }
@@ -1927,17 +1986,17 @@
                 
                 // Статус на русском
                 let statusText = c.status === 'pending' ? '⏳ Ожидает рассмотрения' : 
-                                c.status === 'accepted' ? '✅ Принято' : '❌ Отклонено';
+                                c.status === 'accepted' ? '✅ Жалоба принята' : '❌ Жалоба отклонена';
                 
                 list.innerHTML += `
                     <div class="complaint-card">
                         <div class="card-header">
-                            <span class="card-title">Жалоба на ${c.accused}</span>
+                            <span class="card-title">Жалоба на игрока ${c.accused}</span>
                             <span class="card-status status-${c.status}">${statusText}</span>
                         </div>
                         <div><strong>От:</strong> ${c.complainant}</div>
                         <div><strong>Дата:</strong> ${c.date}</div>
-                        <div><strong>Правило:</strong> ${c.ruleNumber}</div>
+                        <div><strong>Нарушенное правило:</strong> ${c.ruleNumber}</div>
                         ${photosHtml}
                         <div><strong>Описание:</strong> ${c.description}</div>
                         ${responseHtml}
@@ -1946,10 +2005,10 @@
             });
         }
         
-        // Заявки
+        // ========== ЗАЯВКИ ==========
         function submitApplication() {
             if (!currentUser) {
-                alert('🔒 Для подачи заявки необходимо войти');
+                alert('🔒 Для подачи заявки необходимо войти в аккаунт');
                 showModal('login');
                 return;
             }
@@ -1962,7 +2021,7 @@
             let why = document.getElementById('why').value.trim();
             
             if (!nickname || !name || !age || !timezone || !experience || !why) {
-                alert('❌ Заполните все поля');
+                alert('❌ Пожалуйста, заполните все поля');
                 return;
             }
             
@@ -1996,7 +2055,7 @@
             updateOwnerStats();
         }
         
-        // OWNER панель
+        // ========== OWNER ПАНЕЛЬ ==========
         function updateOwnerStats() {
             let stats = document.getElementById('ownerStats');
             stats.innerHTML = `
@@ -2053,15 +2112,16 @@
                 complaint.ownerResponse = responseText;
                 localStorage.setItem('complaints', JSON.stringify(complaints));
                 loadOwnerComplaints();
-                loadComplaints(); // Обновляем общий список жалоб
+                loadComplaints(); // Обновляем общий список
                 toggleResponseForm(id, 'comp');
+                alert('✅ Ответ сохранен');
             }
         }
         
         function loadOwnerApplications() {
             let container = document.getElementById('ownerApplications');
             if (applications.length === 0) {
-                container.innerHTML = '<div class="no-items">📭 Заявок нет</div>';
+                container.innerHTML = '<div class="no-items">📭 Заявок пока нет</div>';
                 return;
             }
             
@@ -2083,15 +2143,16 @@
                 container.innerHTML += `
                     <div class="application-card">
                         <div class="card-header">
-                            <span class="card-title">${app.nickname} (${app.userMinecraft})</span>
+                            <span class="card-title">${app.nickname}</span>
                             <span class="card-status status-${app.status}">${statusText}</span>
                         </div>
-                        <div><strong>Имя:</strong> ${app.name}</div>
+                        <div><strong>Майнкрафт ник:</strong> ${app.userMinecraft}</div>
+                        <div><strong>Настоящее имя:</strong> ${app.name}</div>
                         <div><strong>Возраст:</strong> ${app.age}</div>
-                        <div><strong>Пояс:</strong> ${app.timezone}</div>
-                        <div><strong>Дата:</strong> ${app.date}</div>
-                        <div><strong>Опыт:</strong> ${app.experience}</div>
-                        <div><strong>Почему:</strong> ${app.why}</div>
+                        <div><strong>Часовой пояс:</strong> ${app.timezone}</div>
+                        <div><strong>Дата подачи:</strong> ${app.date}</div>
+                        <div><strong>Опыт работы:</strong> ${app.experience}</div>
+                        <div><strong>Мотивация:</strong> ${app.why}</div>
                         ${responseHtml}
                         <div class="card-actions">
                             ${app.status === 'pending' ? `
@@ -2116,7 +2177,7 @@
         function loadOwnerComplaints() {
             let container = document.getElementById('ownerComplaints');
             if (complaints.length === 0) {
-                container.innerHTML = '<div class="no-items">📭 Жалоб нет</div>';
+                container.innerHTML = '<div class="no-items">📭 Жалоб пока нет</div>';
                 return;
             }
             
@@ -2179,7 +2240,7 @@
         function loadOwnerUsers() {
             let container = document.getElementById('ownerUsers');
             if (users.length === 0) {
-                container.innerHTML = '<div class="no-items">👥 Нет пользователей</div>';
+                container.innerHTML = '<div class="no-items">👥 Пользователей пока нет</div>';
                 return;
             }
             
@@ -2211,7 +2272,7 @@
                 localStorage.setItem('applications', JSON.stringify(applications));
                 loadOwnerApplications();
                 updateOwnerStats();
-                alert(`Заявка ${action === 'accept' ? 'принята' : 'отклонена'}`);
+                alert(`✅ Заявка ${action === 'accept' ? 'принята' : 'отклонена'}`);
             }
         }
         
@@ -2223,7 +2284,7 @@
                 loadOwnerComplaints();
                 loadComplaints(); // Обновляем общий список
                 updateOwnerStats();
-                alert(`Жалоба ${action === 'accept' ? 'принята' : 'отклонена'}`);
+                alert(`✅ Жалоба ${action === 'accept' ? 'принята' : 'отклонена'}`);
             }
         }
         
