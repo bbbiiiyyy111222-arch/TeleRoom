@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoonGrief - Правила и Жалобы</title>
+    <title>MoonGrief - Правила, Жалобы и Заявки</title>
     <style>
         * {
             margin: 0;
@@ -276,17 +276,46 @@
             margin-bottom: 1rem;
         }
         
+        /* Заявки в Хелперы */
+        .apply-section {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-top: 2rem;
+        }
+        
+        .apply-section h2 {
+            color: #4facfe;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            text-align: center;
+        }
+        
+        .apply-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
         .form-group {
             margin-bottom: 1rem;
+        }
+        
+        .form-group.full-width {
+            grid-column: span 2;
         }
         
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             color: #4facfe;
+            font-weight: bold;
         }
         
-        .form-group input, .form-group textarea, .form-group select {
+        .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 0.8rem;
             border: 2px solid rgba(79,172,254,0.3);
@@ -295,7 +324,7 @@
             color: white;
         }
         
-        .form-group input:focus, .form-group textarea:focus {
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             outline: none;
             border-color: #4facfe;
         }
@@ -389,6 +418,7 @@
             display: flex;
             gap: 0.5rem;
             margin: 1rem 0;
+            flex-wrap: wrap;
         }
         
         .complaint-photos img {
@@ -416,6 +446,19 @@
             cursor: pointer;
             width: 100%;
             font-size: 1.1rem;
+            margin-top: 1rem;
+        }
+        
+        .success-message {
+            display: none;
+            background: rgba(72, 187, 120, 0.2);
+            border: 2px solid #48bb78;
+            color: #48bb78;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 1rem;
+            font-weight: bold;
         }
         
         /* Модалки */
@@ -476,12 +519,12 @@
         }
         
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
+            .apply-form {
+                grid-template-columns: 1fr;
             }
             
-            .server-ip {
-                font-size: 1.2rem;
+            .form-group.full-width {
+                grid-column: span 1;
             }
         }
     </style>
@@ -507,8 +550,9 @@
             </div>
             
             <div class="tabs">
-                <div class="tab active" onclick="showSection('rules')">📜 Правила</div>
+                <div class="tab" onclick="showSection('rules')">📜 Правила</div>
                 <div class="tab" onclick="showSection('complaints')">⚠️ Жалобы</div>
+                <div class="tab" onclick="showSection('apply')">📝 Заявки в Хелперы</div>
             </div>
         </div>
         
@@ -819,6 +863,63 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Заявки в Хелперы -->
+        <div id="applySection" class="section">
+            <div class="apply-section">
+                <h2>📝 Анкета на Хелпера</h2>
+                
+                <div class="apply-form">
+                    <div class="form-group full-width">
+                        <label>Игровой никнейм:</label>
+                        <input type="text" id="nickname" placeholder="Ваш игровой ник" value="">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Имя:</label>
+                        <input type="text" id="name" placeholder="Ваше настоящее имя">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Сколько лет:</label>
+                        <input type="number" id="age" placeholder="Ваш возраст" min="10" max="100">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>Часовой пояс:</label>
+                        <select id="timezone">
+                            <option value="UTC+3">Москва (UTC+3)</option>
+                            <option value="UTC+2">Калининград (UTC+2)</option>
+                            <option value="UTC+4">Самара (UTC+4)</option>
+                            <option value="UTC+5">Екатеринбург (UTC+5)</option>
+                            <option value="UTC+6">Омск (UTC+6)</option>
+                            <option value="UTC+7">Красноярск (UTC+7)</option>
+                            <option value="UTC+8">Иркутск (UTC+8)</option>
+                            <option value="UTC+9">Якутск (UTC+9)</option>
+                            <option value="UTC+10">Владивосток (UTC+10)</option>
+                            <option value="UTC+11">Магадан (UTC+11)</option>
+                            <option value="UTC+12">Камчатка (UTC+12)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>Опыт работы на должности:</label>
+                        <textarea id="experience" rows="3" placeholder="Расскажите о своем опыте (были ли модератором/хелпером на других серверах, какой опыт администрирования)"></textarea>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>Почему вы хотите стать хелпером?</label>
+                        <textarea id="why" rows="3" placeholder="Напишите почему вы хотите помогать игрокам и стать частью команды MoonGrief"></textarea>
+                    </div>
+                    
+                    <button class="submit-btn" onclick="submitApplication()">Отправить анкету</button>
+                    
+                    <div class="success-message" id="successMessage">
+                        ✅ Анкета отправлена! Администрация рассмотрит её в ближайшее время
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <!-- Модалки -->
@@ -854,6 +955,7 @@
         let currentUser = null;
         let users = JSON.parse(localStorage.getItem('users')) || [];
         let complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+        let applications = JSON.parse(localStorage.getItem('applications')) || [];
         let uploadedPhotos = [];
         
         // Загрузка
@@ -868,6 +970,7 @@
                 currentUser = JSON.parse(savedUser);
                 updateUserMenu();
                 document.getElementById('complainant').value = currentUser.minecraft;
+                document.getElementById('nickname').value = currentUser.minecraft;
             }
         }
         
@@ -899,6 +1002,8 @@
             } else if (section === 'complaints') {
                 document.querySelector('.tab[onclick="showSection(\'complaints\')"]').classList.add('active');
                 loadComplaints();
+            } else if (section === 'apply') {
+                document.querySelector('.tab[onclick="showSection(\'apply\')"]').classList.add('active');
             }
         }
         
@@ -943,6 +1048,7 @@
                 closeModal('register');
                 updateUserMenu();
                 document.getElementById('complainant').value = currentUser.minecraft;
+                document.getElementById('nickname').value = currentUser.minecraft;
             } else {
                 alert('❌ Заполните все поля');
             }
@@ -961,6 +1067,7 @@
                 closeModal('login');
                 updateUserMenu();
                 document.getElementById('complainant').value = currentUser.minecraft;
+                document.getElementById('nickname').value = currentUser.minecraft;
             } else {
                 alert('❌ Неверный логин или пароль');
             }
@@ -973,6 +1080,7 @@
             showSection('main');
         }
         
+        // Жалобы
         function toggleComplaintForm() {
             if (!currentUser) {
                 alert('❌ Сначала войдите или зарегистрируйтесь');
@@ -1075,6 +1183,55 @@
                     </div>
                 `;
             });
+        }
+        
+        // Заявки
+        function submitApplication() {
+            if (!currentUser) {
+                alert('❌ Сначала войдите или зарегистрируйтесь');
+                showModal('login');
+                return;
+            }
+            
+            let nickname = document.getElementById('nickname').value;
+            let name = document.getElementById('name').value;
+            let age = document.getElementById('age').value;
+            let timezone = document.getElementById('timezone').value;
+            let experience = document.getElementById('experience').value;
+            let why = document.getElementById('why').value;
+            
+            if (nickname && name && age && timezone && experience && why) {
+                let application = {
+                    id: Date.now(),
+                    userId: currentUser.username,
+                    nickname: nickname,
+                    name: name,
+                    age: age,
+                    timezone: timezone,
+                    experience: experience,
+                    why: why,
+                    status: 'pending',
+                    date: new Date().toLocaleString()
+                };
+                
+                applications.push(application);
+                localStorage.setItem('applications', JSON.stringify(applications));
+                
+                document.getElementById('successMessage').style.display = 'block';
+                
+                document.getElementById('name').value = '';
+                document.getElementById('age').value = '';
+                document.getElementById('experience').value = '';
+                document.getElementById('why').value = '';
+                
+                setTimeout(() => {
+                    document.getElementById('successMessage').style.display = 'none';
+                }, 5000);
+                
+                alert('✅ Анкета отправлена!');
+            } else {
+                alert('❌ Заполните все поля анкеты!');
+            }
         }
         
         function getStatusText(status) {
