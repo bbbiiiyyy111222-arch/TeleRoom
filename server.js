@@ -1,50 +1,25 @@
 const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
-const path = require('path');
+const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
-
-// Zeabur сам дает порт
 const PORT = process.env.PORT || 3000;
 
-// Раздаем статические файлы
-app.use(express.static(path.join(__dirname, '/')));
+app.use(cors());
+app.use(express.json());
+app.use(express.static('public'));
 
-// Хранилище сообщений
-let messages = [];
-
-io.on('connection', (socket) => {
-    console.log('✅ Новый пользователь подключился');
-    
-    // Отправляем историю новому пользователю
-    socket.emit('history', messages);
-    
-    // Получаем сообщение
-    socket.on('chatMessage', (data) => {
-        const msg = {
-            user: data.user || 'Аноним',
-            text: data.text,
-            time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
-        };
-        
-        messages.push(msg);
-        // Храним только последние 50 сообщений
-        if (messages.length > 50) messages.shift();
-        
-        // Отправляем всем
-        io.emit('message', msg);
-    });
-    
-    socket.on('disconnect', () => {
-        console.log('❌ Пользователь отключился');
-    });
+// Простой тестовый маршрут
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
 });
 
-// Слушаем на всех интерфейсах
-server.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Сервер ЗАПУЩЕН на порту ${PORT}`);
-    console.log(`📱 Открой приложение по адресу: http://localhost:${PORT} (локально)`);
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Server is working!' });
+});
+
+// Запускаем сервер
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Server is running on port ${PORT}`);
+  console.log(`📡 Test API: http://localhost:${PORT}/api/test`);
 });
