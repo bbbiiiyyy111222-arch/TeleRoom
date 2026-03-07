@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MoonGrief - форум</title>
     <style>
+        /* ========== ВСЕ СТИЛИ MoonGrief ========== */
         * {
             margin: 0;
             padding: 0;
@@ -20,7 +21,6 @@
             overflow-x: hidden;
         }
         
-        /* Лунный фон с анимацией */
         body::before {
             content: '';
             position: fixed;
@@ -1367,16 +1367,6 @@
                 font-size: 1.1rem;
             }
         }
-
-        /* Лунные эффекты */
-        .moon-glow {
-            text-shadow: 0 0 30px #ffd700, 0 0 60px #4facfe;
-        }
-        
-        .moon-border {
-            border: 2px solid transparent;
-            border-image: linear-gradient(45deg, #ffd700, #4facfe) 1;
-        }
     </style>
 </head>
 <body>
@@ -1618,7 +1608,7 @@
             loadRules();
             checkAuth();
             
-            // Загружаем жалобы и заявки из localStorage (БЕЗ ТЕСТОВЫХ!)
+            // Загружаем жалобы и заявки из localStorage
             complaints = JSON.parse(localStorage.getItem('complaints')) || [];
             applications = JSON.parse(localStorage.getItem('applications')) || [];
             
@@ -1707,6 +1697,8 @@
                 showOwnerTab('applications', event);
             } else if (section === 'complaints') {
                 loadComplaints();
+            } else if (section === 'apply') {
+                // Ничего особенного
             }
         }
         
