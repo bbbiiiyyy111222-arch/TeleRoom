@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoonGrief - Заявки и Чат</title>
+    <title>MoonGrief - Заявки в Хелперы</title>
     <style>
         * {
             margin: 0;
@@ -42,6 +42,7 @@
             background: linear-gradient(45deg, #ff6b6b, #4facfe);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            cursor: pointer;
         }
         
         .ip-box {
@@ -54,12 +55,37 @@
             color: #4facfe;
         }
         
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.1);
+            padding: 0.3rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+        
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #ff6b6b, #4facfe);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
         .nav-links button {
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
             color: white;
             padding: 0.5rem 1.5rem;
-            margin-left: 0.5rem;
             border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s;
@@ -104,159 +130,352 @@
             cursor: pointer;
         }
         
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-top: 2rem;
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
         }
         
-        .chat-section, .apply-section {
+        .tab {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover, .tab.active {
+            background: #4facfe;
+            border-color: #4facfe;
+            box-shadow: 0 0 20px #4facfe;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        /* Анкета */
+        .apply-section {
             background: rgba(0,0,0,0.3);
             border-radius: 20px;
-            padding: 1.5rem;
+            padding: 2rem;
             border: 1px solid rgba(255,255,255,0.1);
         }
         
-        .chat-section h2, .apply-section h2 {
+        .apply-section h2 {
             color: #4facfe;
-            margin-bottom: 1rem;
-            font-size: 1.8rem;
-        }
-        
-        .chat-messages {
-            height: 300px;
-            overflow-y: auto;
-            background: rgba(0,0,0,0.5);
-            border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .message {
-            margin-bottom: 1rem;
-            padding: 0.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .message strong {
-            color: #ff6b6b;
-        }
-        
-        .message span {
-            color: #888;
-            font-size: 0.8rem;
-            margin-left: 0.5rem;
-        }
-        
-        .chat-input {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .chat-input input {
-            flex: 1;
-            padding: 0.8rem;
-            border: none;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-        
-        .chat-input input::placeholder {
-            color: rgba(255,255,255,0.5);
-        }
-        
-        .chat-input button {
-            padding: 0.8rem 1.5rem;
-            background: #4facfe;
-            border: none;
-            border-radius: 10px;
-            color: white;
-            cursor: pointer;
-        }
-        
-        .online-list {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-        }
-        
-        .online-item {
-            display: inline-block;
-            margin: 0.3rem;
-            padding: 0.3rem 0.8rem;
-            background: rgba(79,172,254,0.2);
-            border-radius: 15px;
-            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            text-align: center;
         }
         
         .apply-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.5rem;
         }
         
-        .apply-form input, .apply-form select, .apply-form textarea {
-            padding: 0.8rem;
-            border: none;
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        
+        .form-group label {
+            color: #4facfe;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 1rem;
+            border: 2px solid rgba(79, 172, 254, 0.3);
             border-radius: 10px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
             color: white;
+            font-size: 1rem;
+            transition: all 0.3s;
         }
         
-        .apply-form textarea {
-            min-height: 100px;
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
+        }
+        
+        .form-group input::placeholder, .form-group textarea::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
             resize: vertical;
         }
         
-        .apply-form button {
-            padding: 1rem;
+        .submit-btn {
+            grid-column: span 2;
+            padding: 1.2rem;
             background: linear-gradient(135deg, #ff6b6b, #4facfe);
             border: none;
             border-radius: 10px;
             color: white;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
             cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
         }
         
-        .staff-list {
-            margin-top: 2rem;
-            padding: 1rem;
+        .submit-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(79, 172, 254, 0.5);
+        }
+        
+        /* Команда */
+        .staff-section {
+            margin-top: 3rem;
+            padding: 2rem;
             background: rgba(0,0,0,0.3);
-            border-radius: 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         
         .staff-title {
-            color: #ff6b6b;
-            font-size: 1.3rem;
-            margin-bottom: 1rem;
+            color: #4facfe;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
         }
         
         .staff-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
         }
         
         .staff-card {
             background: rgba(255,255,255,0.05);
-            padding: 0.8rem;
-            border-radius: 10px;
+            padding: 1.5rem;
+            border-radius: 15px;
             text-align: center;
+            border: 1px solid rgba(79, 172, 254, 0.3);
+            transition: all 0.3s;
+        }
+        
+        .staff-card:hover {
+            transform: translateY(-5px);
+            border-color: #4facfe;
+            box-shadow: 0 10px 30px rgba(79, 172, 254, 0.2);
+        }
+        
+        .staff-card .avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff6b6b, #4facfe);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
         }
         
         .staff-card .name {
             color: #4facfe;
             font-weight: bold;
+            font-size: 1.3rem;
+            margin-bottom: 0.3rem;
         }
         
         .staff-card .role {
-            font-size: 0.8rem;
-            color: #888;
+            color: #ff6b6b;
+            font-size: 1rem;
         }
         
+        /* Админ панель */
+        .admin-section {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .admin-header h2 {
+            color: #4facfe;
+            font-size: 2rem;
+        }
+        
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: rgba(79, 172, 254, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #4facfe;
+        }
+        
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4facfe;
+        }
+        
+        .applications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .application-card {
+            background: rgba(255,255,255,0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #4facfe;
+        }
+        
+        .application-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .application-nick {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #4facfe;
+        }
+        
+        .application-status {
+            padding: 0.3rem 1rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .status-pending {
+            background: #fbbf24;
+            color: #000;
+        }
+        
+        .status-accepted {
+            background: #10b981;
+            color: white;
+        }
+        
+        .status-rejected {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .application-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .application-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+        
+        .action-btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .accept-btn {
+            background: #10b981;
+            color: white;
+        }
+        
+        .reject-btn {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .view-btn {
+            background: #4facfe;
+            color: white;
+        }
+        
+        /* Профиль */
+        .profile-section {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #ff6b6b, #4facfe);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+        }
+        
+        .profile-info h3 {
+            font-size: 2rem;
+            color: #4facfe;
+        }
+        
+        .profile-edit {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            max-width: 600px;
+        }
+        
+        /* Модалки */
         .modal {
             display: none;
             position: fixed;
@@ -276,6 +495,7 @@
             border-radius: 20px;
             max-width: 400px;
             width: 90%;
+            border: 1px solid #4facfe;
         }
         
         .modal-content h2 {
@@ -297,10 +517,11 @@
             width: 100%;
             padding: 0.8rem;
             margin-top: 1rem;
-            background: #4facfe;
+            background: linear-gradient(135deg, #ff6b6b, #4facfe);
             border: none;
             border-radius: 10px;
             color: white;
+            font-weight: bold;
             cursor: pointer;
         }
         
@@ -311,17 +532,38 @@
             font-size: 1.5rem;
         }
         
+        .success-message {
+            display: none;
+            background: rgba(72, 187, 120, 0.2);
+            border: 2px solid #48bb78;
+            color: #48bb78;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+        
+        .admin-badge {
+            background: #4facfe;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+        
         @media (max-width: 768px) {
-            .main-grid {
+            .apply-form {
                 grid-template-columns: 1fr;
             }
             
-            .hero h1 {
-                font-size: 2.5rem;
+            .form-group.full-width {
+                grid-column: span 1;
             }
             
-            .server-ip {
-                font-size: 1.2rem;
+            .submit-btn {
+                grid-column: span 1;
             }
         }
     </style>
@@ -329,102 +571,173 @@
 <body>
     <nav>
         <div class="nav-container">
-            <div class="logo">🌙 MoonGrief</div>
+            <div class="logo" onclick="showSection('main')">🌙 MoonGrief</div>
             <div class="ip-box">moongrief.aurorix.pro</div>
-            <div class="nav-links">
-                <button onclick="showModal('login')">Войти</button>
-                <button onclick="showModal('register')">Регистрация</button>
+            <div class="user-menu" id="userMenu">
+                <!-- Будет заполнено динамически -->
             </div>
         </div>
     </nav>
     
     <div class="container">
-        <div class="hero">
-            <h1>MoonGrief</h1>
-            <div class="server-ip" onclick="copyIP()">moongrief.aurorix.pro 📋</div>
-            <p>Нажми на IP чтобы скопировать</p>
-        </div>
-        
-        <div class="main-grid">
-            <!-- Чат секция -->
-            <div class="chat-section">
-                <h2>💬 Игровой чат</h2>
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message">
-                        <strong>Server:</strong> Добро пожаловать в чат MoonGrief! <span>только что</span>
-                    </div>
-                    <div class="message">
-                        <strong>Admin:</strong> Привет всем! Кто хочет стать модератором? <span>2 мин назад</span>
-                    </div>
-                </div>
-                
-                <div class="chat-input">
-                    <input type="text" id="messageInput" placeholder="Введите сообщение..." onkeypress="if(event.key==='Enter') sendMessage()">
-                    <button onclick="sendMessage()">Отправить</button>
-                </div>
-                
-                <div class="online-list">
-                    <div style="margin-bottom: 0.5rem;">🟢 Онлайн (12):</div>
-                    <span class="online-item">Admin</span>
-                    <span class="online-item">Moderator1</span>
-                    <span class="online-item">Player123</span>
-                    <span class="online-item">BuilderPro</span>
-                    <span class="online-item">GriefMaster</span>
-                </div>
+        <!-- Главная -->
+        <div id="mainSection" class="section active">
+            <div class="hero">
+                <h1>MoonGrief</h1>
+                <div class="server-ip" onclick="copyIP()">moongrief.aurorix.pro 📋</div>
+                <p>Нажми на IP чтобы скопировать и зайти на сервер</p>
             </div>
             
-            <!-- Заявки секция -->
+            <div class="tabs">
+                <div class="tab active" onclick="showSection('apply')">📝 Анкета в Хелперы</div>
+                <div class="tab" onclick="showSection('team')">👥 Команда</div>
+                <div class="tab" id="adminTab" style="display: none;" onclick="showSection('admin')">👑 Админ панель</div>
+            </div>
+        </div>
+        
+        <!-- Анкета -->
+        <div id="applySection" class="section">
             <div class="apply-section">
-                <h2>📝 Заявка в модераторы</h2>
-                <p style="color: #888; margin-bottom: 1rem;">Заполни форму чтобы стать частью команды</p>
+                <h2>📝 Анкета на Хелпера</h2>
                 
                 <div class="apply-form">
-                    <input type="text" id="applyNick" placeholder="Твой Minecraft ник">
-                    <input type="number" id="applyAge" placeholder="Твой возраст">
-                    <input type="text" id="applyDiscord" placeholder="Discord">
-                    <select id="applyExperience">
-                        <option>Был модером на других серверах</option>
-                        <option>Хочу попробовать впервые</option>
-                        <option>Есть опыт администрирования</option>
-                    </select>
-                    <textarea id="applyWhy" placeholder="Почему ты хочешь стать модером?"></textarea>
-                    <button onclick="submitApplication()">Отправить заявку</button>
+                    <div class="form-group full-width">
+                        <label>Игровой никнейм:</label>
+                        <input type="text" id="nickname" placeholder="Ваш игровой ник" value="">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Имя:</label>
+                        <input type="text" id="name" placeholder="Ваше настоящее имя">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Сколько лет:</label>
+                        <input type="number" id="age" placeholder="Ваш возраст" min="10" max="100">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>Часовой пояс:</label>
+                        <select id="timezone">
+                            <option value="UTC+3">Москва (UTC+3)</option>
+                            <option value="UTC+2">Калининград (UTC+2)</option>
+                            <option value="UTC+4">Самара (UTC+4)</option>
+                            <option value="UTC+5">Екатеринбург (UTC+5)</option>
+                            <option value="UTC+6">Омск (UTC+6)</option>
+                            <option value="UTC+7">Красноярск (UTC+7)</option>
+                            <option value="UTC+8">Иркутск (UTC+8)</option>
+                            <option value="UTC+9">Якутск (UTC+9)</option>
+                            <option value="UTC+10">Владивосток (UTC+10)</option>
+                            <option value="UTC+11">Магадан (UTC+11)</option>
+                            <option value="UTC+12">Камчатка (UTC+12)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>Опыт работы на должности:</label>
+                        <textarea id="experience" placeholder="Расскажите о своем опыте (были ли модератором/хелпером на других серверах, какой опыт администрирования)"></textarea>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>Почему вы хотите стать хелпером?</label>
+                        <textarea id="why" placeholder="Напишите почему вы хотите помогать игрокам и стать частью команды MoonGrief"></textarea>
+                    </div>
+                    
+                    <button class="submit-btn" onclick="submitApplication()">Отправить анкету</button>
+                    
+                    <div class="success-message" id="successMessage">
+                        ✅ Анкета отправлена! Администрация рассмотрит её в ближайшее время
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Команда -->
+        <div id="teamSection" class="section">
+            <div class="staff-section">
+                <div class="staff-title">👥 Наша команда</div>
+                <div class="staff-grid" id="teamList">
+                    <!-- Заполняется динамически -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Админ панель -->
+        <div id="adminSection" class="section">
+            <div class="admin-section">
+                <div class="admin-header">
+                    <h2>👑 Админ панель</h2>
+                    <button class="submit-btn" style="width: auto;" onclick="refreshAdmin()">🔄 Обновить</button>
                 </div>
                 
-                <!-- Список модераторов -->
-                <div class="staff-list">
-                    <div class="staff-title">👥 Наша команда</div>
-                    <div class="staff-grid">
-                        <div class="staff-card">
-                            <div class="name">Owner</div>
-                            <div class="role">Владелец</div>
-                        </div>
-                        <div class="staff-card">
-                            <div class="name">Admin1</div>
-                            <div class="role">Главный админ</div>
-                        </div>
-                        <div class="staff-card">
-                            <div class="name">Moder1</div>
-                            <div class="role">Модератор</div>
-                        </div>
-                        <div class="staff-card">
-                            <div class="name">Helper1</div>
-                            <div class="role">Хелпер</div>
-                        </div>
+                <div class="admin-stats" id="adminStats">
+                    <div class="stat-card">
+                        <div class="number" id="totalApps">0</div>
+                        <div>Всего заявок</div>
                     </div>
+                    <div class="stat-card">
+                        <div class="number" id="pendingApps">0</div>
+                        <div>Ожидают</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="acceptedApps">0</div>
+                        <div>Принято</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="teamCount">0</div>
+                        <div>В команде</div>
+                    </div>
+                </div>
+                
+                <div class="applications-list" id="applicationsList">
+                    <!-- Заполняется динамически -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Профиль -->
+        <div id="profileSection" class="section">
+            <div class="profile-section">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profileAvatar">🌙</div>
+                    <div class="profile-info">
+                        <h3 id="profileName">Пользователь</h3>
+                        <p id="profileRole">Игрок</p>
+                        <p id="profileMinecraft">Minecraft: </p>
+                    </div>
+                </div>
+                
+                <h3 style="color: #4facfe; margin-bottom: 1rem;">Редактировать профиль</h3>
+                <div class="profile-edit">
+                    <div class="form-group">
+                        <label>Имя:</label>
+                        <input type="text" id="editName" placeholder="Ваше имя">
+                    </div>
+                    <div class="form-group">
+                        <label>Возраст:</label>
+                        <input type="number" id="editAge" placeholder="Ваш возраст">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Discord:</label>
+                        <input type="text" id="editDiscord" placeholder="Discord">
+                    </div>
+                    <button class="submit-btn" style="grid-column: span 2;" onclick="saveProfile()">Сохранить</button>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Модалки входа/регистрации -->
+    <!-- Модалки -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('login')">&times;</span>
-            <h2>Вход на сервер</h2>
-            <input type="text" placeholder="Никнейм" id="loginUser">
+            <h2>Вход</h2>
+            <input type="text" placeholder="Логин" id="loginUser">
             <input type="password" placeholder="Пароль" id="loginPass">
             <button onclick="login()">Войти</button>
+            <p style="text-align: center; margin-top: 1rem; color: #888;">
+                Нет аккаунта? <a href="#" onclick="showModal('register'); closeModal('login')" style="color: #4facfe;">Регистрация</a>
+            </p>
         </div>
     </div>
     
@@ -432,22 +745,100 @@
         <div class="modal-content">
             <span class="close" onclick="closeModal('register')">&times;</span>
             <h2>Регистрация</h2>
-            <input type="text" placeholder="Никнейм" id="regUser">
+            <input type="text" placeholder="Логин" id="regUser">
             <input type="password" placeholder="Пароль" id="regPass">
             <input type="text" placeholder="Minecraft ник" id="regNick">
+            <input type="text" placeholder="Имя (необязательно)" id="regName">
             <button onclick="register()">Зарегистрироваться</button>
         </div>
     </div>
     
     <script>
+        // Данные
         let currentUser = null;
-        let messages = [
-            { user: 'Server', text: 'Добро пожаловать в чат MoonGrief!', time: new Date() }
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let applications = JSON.parse(localStorage.getItem('applications')) || [];
+        let team = [
+            { name: 'Owner', role: 'Владелец', minecraft: 'Owner', avatar: '👑' },
+            { name: 'Admin1', role: 'Главный админ', minecraft: 'Admin1', avatar: '⚡' },
+            { name: 'Moder1', role: 'Модератор', minecraft: 'Moder1', avatar: '🛡️' },
+            { name: 'Helper1', role: 'Хелпер', minecraft: 'Helper1', avatar: '💬' }
         ];
+        
+        // Загрузка
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            updateTeamDisplay();
+            if (currentUser && currentUser.role === 'admin') {
+                showSection('admin');
+                loadApplications();
+            }
+        });
+        
+        function checkAuth() {
+            let savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateUserMenu();
+                if (currentUser.role === 'admin') {
+                    document.getElementById('adminTab').style.display = 'block';
+                }
+                document.getElementById('nickname').value = currentUser.minecraft;
+            }
+        }
+        
+        function updateUserMenu() {
+            let menu = document.getElementById('userMenu');
+            if (currentUser) {
+                menu.innerHTML = `
+                    <div class="user-info" onclick="showSection('profile')">
+                        <div class="user-avatar">${currentUser.minecraft[0]}</div>
+                        <span>${currentUser.minecraft}</span>
+                        ${currentUser.role === 'admin' ? '<span class="admin-badge">Admin</span>' : ''}
+                    </div>
+                    <button class="nav-links" onclick="logout()">Выйти</button>
+                `;
+            } else {
+                menu.innerHTML = `
+                    <button class="nav-links" onclick="showModal('login')">Войти</button>
+                    <button class="nav-links" onclick="showModal('register')">Регистрация</button>
+                `;
+            }
+        }
+        
+        function updateTeamDisplay() {
+            let teamList = document.getElementById('teamList');
+            teamList.innerHTML = '';
+            team.forEach(member => {
+                teamList.innerHTML += `
+                    <div class="staff-card">
+                        <div class="avatar">${member.avatar}</div>
+                        <div class="name">${member.name}</div>
+                        <div class="role">${member.role}</div>
+                    </div>
+                `;
+            });
+        }
+        
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(section + 'Section').classList.add('active');
+            
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            if (section === 'apply') {
+                document.querySelector('.tab[onclick="showSection(\'apply\')"]').classList.add('active');
+            } else if (section === 'team') {
+                document.querySelector('.tab[onclick="showSection(\'team\')"]').classList.add('active');
+            } else if (section === 'admin') {
+                loadApplications();
+            } else if (section === 'profile') {
+                loadProfile();
+            }
+        }
         
         function copyIP() {
             navigator.clipboard.writeText('moongrief.aurorix.pro');
-            alert('IP скопирован! Заходи на сервер');
+            alert('✅ IP скопирован! Заходи на сервер moongrief.aurorix.pro');
         }
         
         function showModal(type) {
@@ -458,81 +849,263 @@
             document.getElementById(type + 'Modal').style.display = 'none';
         }
         
-        function sendMessage() {
-            let input = document.getElementById('messageInput');
-            let text = input.value.trim();
+        function register() {
+            let user = document.getElementById('regUser').value;
+            let pass = document.getElementById('regPass').value;
+            let minecraft = document.getElementById('regNick').value;
+            let name = document.getElementById('regName').value;
             
-            if (text) {
-                let chatDiv = document.getElementById('chatMessages');
-                let messageDiv = document.createElement('div');
-                messageDiv.className = 'message';
-                messageDiv.innerHTML = `<strong>${currentUser ? currentUser : 'Гость'}:</strong> ${text} <span>только что</span>`;
-                chatDiv.appendChild(messageDiv);
-                input.value = '';
-                chatDiv.scrollTop = chatDiv.scrollHeight;
-            }
-        }
-        
-        function submitApplication() {
-            let nick = document.getElementById('applyNick').value;
-            let age = document.getElementById('applyAge').value;
-            let discord = document.getElementById('applyDiscord').value;
-            let why = document.getElementById('applyWhy').value;
-            
-            if (nick && age && discord && why) {
-                alert('✅ Заявка отправлена! Администрация рассмотрит её в ближайшее время');
+            if (user && pass && minecraft) {
+                // Проверка существования
+                if (users.find(u => u.username === user)) {
+                    alert('❌ Пользователь уже существует');
+                    return;
+                }
                 
-                // Очищаем форму
-                document.getElementById('applyNick').value = '';
-                document.getElementById('applyAge').value = '';
-                document.getElementById('applyDiscord').value = '';
-                document.getElementById('applyWhy').value = '';
+                let newUser = {
+                    username: user,
+                    password: pass,
+                    minecraft: minecraft,
+                    name: name || minecraft,
+                    role: users.length === 0 ? 'admin' : 'user', // Первый пользователь - админ
+                    age: '',
+                    discord: '',
+                    registered: new Date().toLocaleString()
+                };
                 
-                // Добавляем в чат уведомление
-                let chatDiv = document.getElementById('chatMessages');
-                let messageDiv = document.createElement('div');
-                messageDiv.className = 'message';
-                messageDiv.innerHTML = `<strong>System:</strong> Игрок ${nick} подал заявку в модераторы! <span>только что</span>`;
-                chatDiv.appendChild(messageDiv);
+                users.push(newUser);
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                currentUser = newUser;
+                localStorage.setItem('currentUser', JSON.stringify(newUser));
+                
+                alert('✅ Регистрация успешна!');
+                closeModal('register');
+                updateUserMenu();
+                
+                if (newUser.role === 'admin') {
+                    document.getElementById('adminTab').style.display = 'block';
+                }
             } else {
-                alert('❌ Заполни все поля!');
+                alert('❌ Заполните все поля');
             }
         }
         
         function login() {
             let user = document.getElementById('loginUser').value;
-            if (user) {
-                currentUser = user;
-                alert('Добро пожаловать, ' + user + '!');
+            let pass = document.getElementById('loginPass').value;
+            
+            let found = users.find(u => u.username === user && u.password === pass);
+            
+            if (found) {
+                currentUser = found;
+                localStorage.setItem('currentUser', JSON.stringify(found));
+                alert('Добро пожаловать, ' + found.minecraft + '!');
                 closeModal('login');
+                updateUserMenu();
+                
+                if (found.role === 'admin') {
+                    document.getElementById('adminTab').style.display = 'block';
+                    showSection('admin');
+                } else {
+                    showSection('apply');
+                }
+            } else {
+                alert('❌ Неверный логин или пароль');
             }
         }
         
-        function register() {
-            let nick = document.getElementById('regNick').value;
-            if (nick) {
-                currentUser = nick;
-                alert('Регистрация успешна! Теперь ты можешь писать в чат');
-                closeModal('register');
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateUserMenu();
+            document.getElementById('adminTab').style.display = 'none';
+            showSection('main');
+        }
+        
+        function submitApplication() {
+            if (!currentUser) {
+                alert('❌ Сначала войдите или зарегистрируйтесь');
+                showModal('login');
+                return;
+            }
+            
+            let nickname = document.getElementById('nickname').value;
+            let name = document.getElementById('name').value;
+            let age = document.getElementById('age').value;
+            let timezone = document.getElementById('timezone').value;
+            let experience = document.getElementById('experience').value;
+            let why = document.getElementById('why').value;
+            
+            if (nickname && name && age && timezone && experience && why) {
+                let application = {
+                    id: Date.now(),
+                    userId: currentUser.username,
+                    nickname: nickname,
+                    name: name,
+                    age: age,
+                    timezone: timezone,
+                    experience: experience,
+                    why: why,
+                    status: 'pending',
+                    date: new Date().toLocaleString()
+                };
+                
+                applications.push(application);
+                localStorage.setItem('applications', JSON.stringify(applications));
+                
+                document.getElementById('successMessage').style.display = 'block';
+                
+                document.getElementById('nickname').value = currentUser.minecraft;
+                document.getElementById('name').value = '';
+                document.getElementById('age').value = '';
+                document.getElementById('experience').value = '';
+                document.getElementById('why').value = '';
+                
+                setTimeout(() => {
+                    document.getElementById('successMessage').style.display = 'none';
+                }, 5000);
+                
+                if (currentUser.role === 'admin') {
+                    loadApplications();
+                }
+            } else {
+                alert('❌ Заполните все поля анкеты!');
             }
         }
         
-        // Закрытие модалок по клику вне
+        function loadApplications() {
+            let appsList = document.getElementById('applicationsList');
+            let totalApps = applications.length;
+            let pendingApps = applications.filter(a => a.status === 'pending').length;
+            let acceptedApps = applications.filter(a => a.status === 'accepted').length;
+            
+            document.getElementById('totalApps').textContent = totalApps;
+            document.getElementById('pendingApps').textContent = pendingApps;
+            document.getElementById('acceptedApps').textContent = acceptedApps;
+            document.getElementById('teamCount').textContent = team.length;
+            
+            if (applications.length === 0) {
+                appsList.innerHTML = '<p style="text-align: center; color: #888;">Нет заявок</p>';
+                return;
+            }
+            
+            appsList.innerHTML = '';
+            applications.reverse().forEach(app => {
+                appsList.innerHTML += `
+                    <div class="application-card">
+                        <div class="application-header">
+                            <span class="application-nick">${app.nickname}</span>
+                            <span class="application-status status-${app.status}">${getStatusText(app.status)}</span>
+                        </div>
+                        <div class="application-details">
+                            <div><strong>Имя:</strong> ${app.name}</div>
+                            <div><strong>Возраст:</strong> ${app.age}</div>
+                            <div><strong>Пояс:</strong> ${app.timezone}</div>
+                            <div><strong>Дата:</strong> ${app.date}</div>
+                        </div>
+                        <div><strong>Опыт:</strong> ${app.experience}</div>
+                        <div><strong>Почему:</strong> ${app.why}</div>
+                        ${app.status === 'pending' ? `
+                            <div class="application-actions">
+                                <button class="action-btn accept-btn" onclick="handleApplication(${app.id}, 'accept')">✅ Принять</button>
+                                <button class="action-btn reject-btn" onclick="handleApplication(${app.id}, 'reject')">❌ Отклонить</button>
+                                <button class="action-btn view-btn" onclick="viewProfile('${app.userId}')">👤 Профиль</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+        }
+        
+        function handleApplication(id, action) {
+            let app = applications.find(a => a.id === id);
+            if (app) {
+                app.status = action === 'accept' ? 'accepted' : 'rejected';
+                localStorage.setItem('applications', JSON.stringify(applications));
+                
+                if (action === 'accept') {
+                    // Добавляем в команду
+                    team.push({
+                        name: app.nickname,
+                        role: 'Хелпер',
+                        minecraft: app.nickname,
+                        avatar: '💬'
+                    });
+                    updateTeamDisplay();
+                    
+                    // Обновляем роль пользователя
+                    let user = users.find(u => u.username === app.userId);
+                    if (user) {
+                        user.role = 'helper';
+                        localStorage.setItem('users', JSON.stringify(users));
+                    }
+                }
+                
+                loadApplications();
+                alert(`✅ Заявка ${action === 'accept' ? 'принята' : 'отклонена'}`);
+            }
+        }
+        
+        function getStatusText(status) {
+            switch(status) {
+                case 'pending': return '⏳ Ожидает';
+                case 'accepted': return '✅ Принята';
+                case 'rejected': return '❌ Отклонена';
+                default: return status;
+            }
+        }
+        
+        function refreshAdmin() {
+            loadApplications();
+        }
+        
+        function loadProfile() {
+            if (currentUser) {
+                document.getElementById('profileAvatar').textContent = currentUser.minecraft[0];
+                document.getElementById('profileName').textContent = currentUser.name || currentUser.minecraft;
+                document.getElementById('profileRole').textContent = currentUser.role === 'admin' ? 'Администратор' : 'Игрок';
+                document.getElementById('profileMinecraft').textContent = 'Minecraft: ' + currentUser.minecraft;
+                
+                document.getElementById('editName').value = currentUser.name || '';
+                document.getElementById('editAge').value = currentUser.age || '';
+                document.getElementById('editDiscord').value = currentUser.discord || '';
+            }
+        }
+        
+        function saveProfile() {
+            if (currentUser) {
+                currentUser.name = document.getElementById('editName').value;
+                currentUser.age = document.getElementById('editAge').value;
+                currentUser.discord = document.getElementById('editDiscord').value;
+                
+                // Обновляем в массиве
+                let index = users.findIndex(u => u.username === currentUser.username);
+                if (index !== -1) {
+                    users[index] = currentUser;
+                }
+                
+                localStorage.setItem('users', JSON.stringify(users));
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                alert('✅ Профиль сохранен');
+                loadProfile();
+            }
+        }
+        
+        function viewProfile(username) {
+            let user = users.find(u => u.username === username);
+            if (user) {
+                alert(`👤 Профиль ${user.minecraft}\nИмя: ${user.name || 'Не указано'}\nВозраст: ${user.age || 'Не указан'}\nDiscord: ${user.discord || 'Не указан'}\nРоль: ${user.role}\nРегистрация: ${user.registered}`);
+            }
+        }
+        
+        // Закрытие модалок
         window.onclick = function(event) {
             if (event.target.classList.contains('modal')) {
                 event.target.style.display = 'none';
             }
         }
-        
-        // Добавляем тестовые сообщения каждые 30 секунд
-        setInterval(() => {
-            let chatDiv = document.getElementById('chatMessages');
-            let messageDiv = document.createElement('div');
-            messageDiv.className = 'message';
-            messageDiv.innerHTML = `<strong>System:</strong> Онлайн на сервере: 12 игроков <span>только что</span>`;
-            chatDiv.appendChild(messageDiv);
-            chatDiv.scrollTop = chatDiv.scrollHeight;
-        }, 30000);
     </script>
 </body>
 </html>
