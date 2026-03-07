@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeleRoom - Minecraft Сервер</title>
+    <title>MoonGrief - Заявки и Чат</title>
     <style>
         * {
             margin: 0;
@@ -13,15 +13,19 @@
         
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0b0b1f 0%, #1a1a3a 50%, #2a1a4a 100%);
             min-height: 100vh;
             color: white;
         }
         
         nav {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.4);
             padding: 1rem;
             backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
         .nav-container {
@@ -33,25 +37,38 @@
         }
         
         .logo {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: bold;
-            color: white;
+            background: linear-gradient(45deg, #ff6b6b, #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .ip-box {
+            background: rgba(79, 172, 254, 0.2);
+            border: 1px solid #4facfe;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-family: monospace;
+            font-size: 1.2rem;
+            color: #4facfe;
         }
         
         .nav-links button {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
             color: white;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 1.5rem;
             margin-left: 0.5rem;
-            border-radius: 5px;
+            border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s;
         }
         
         .nav-links button:hover {
-            background: white;
-            color: #667eea;
+            background: #4facfe;
+            border-color: #4facfe;
+            box-shadow: 0 0 20px #4facfe;
         }
         
         .container {
@@ -62,76 +79,182 @@
         
         .hero {
             text-align: center;
-            padding: 4rem 0;
+            padding: 2rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 20px;
+            margin-bottom: 2rem;
         }
         
         .hero h1 {
             font-size: 3.5rem;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        .hero p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 2rem;
-        }
-        
-        .btn {
-            background: white;
-            color: #667eea;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin: 0.5rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-        
-        .btn-outline {
-            background: transparent;
-            border: 2px solid white;
-            color: white;
-        }
-        
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-        
-        .feature-card {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            padding: 2rem;
-            border-radius: 15px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ff6b6b, #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
         .server-ip {
-            background: rgba(0,0,0,0.3);
+            font-size: 2rem;
+            color: #4facfe;
+            margin: 1rem 0;
             padding: 1rem;
+            border: 2px dashed #4facfe;
             border-radius: 50px;
             display: inline-block;
-            font-family: monospace;
-            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
             margin-top: 2rem;
-            border: 1px dashed white;
+        }
+        
+        .chat-section, .apply-section {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .chat-section h2, .apply-section h2 {
+            color: #4facfe;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+        
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .message strong {
+            color: #ff6b6b;
+        }
+        
+        .message span {
+            color: #888;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .chat-input input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .chat-input button {
+            padding: 0.8rem 1.5rem;
+            background: #4facfe;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .online-list {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        
+        .online-item {
+            display: inline-block;
+            margin: 0.3rem;
+            padding: 0.3rem 0.8rem;
+            background: rgba(79,172,254,0.2);
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .apply-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .apply-form input, .apply-form select, .apply-form textarea {
+            padding: 0.8rem;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .apply-form textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .apply-form button {
+            padding: 1rem;
+            background: linear-gradient(135deg, #ff6b6b, #4facfe);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+        
+        .staff-list {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        
+        .staff-title {
+            color: #ff6b6b;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        
+        .staff-card {
+            background: rgba(255,255,255,0.05);
+            padding: 0.8rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .staff-card .name {
+            color: #4facfe;
+            font-weight: bold;
+        }
+        
+        .staff-card .role {
+            font-size: 0.8rem;
+            color: #888;
         }
         
         .modal {
@@ -144,43 +267,72 @@
             background: rgba(0,0,0,0.8);
             justify-content: center;
             align-items: center;
+            z-index: 1000;
         }
         
         .modal-content {
-            background: white;
-            color: #333;
+            background: #1a1a3a;
             padding: 2rem;
-            border-radius: 15px;
+            border-radius: 20px;
             max-width: 400px;
             width: 90%;
         }
         
         .modal-content h2 {
+            color: #4facfe;
             margin-bottom: 1rem;
-            color: #667eea;
         }
         
         .modal-content input {
             width: 100%;
             padding: 0.8rem;
             margin: 0.5rem 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            border: 1px solid #4facfe;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .modal-content button {
+            width: 100%;
+            padding: 0.8rem;
+            margin-top: 1rem;
+            background: #4facfe;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
         }
         
         .close {
             float: right;
             cursor: pointer;
+            color: #ff6b6b;
             font-size: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .server-ip {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
 <body>
     <nav>
         <div class="nav-container">
-            <div class="logo">⚡ TeleRoom</div>
+            <div class="logo">🌙 MoonGrief</div>
+            <div class="ip-box">moongrief.aurorix.pro</div>
             <div class="nav-links">
-                <button onclick="showModal('login')">Вход</button>
+                <button onclick="showModal('login')">Войти</button>
                 <button onclick="showModal('register')">Регистрация</button>
             </div>
         </div>
@@ -188,60 +340,116 @@
     
     <div class="container">
         <div class="hero">
-            <h1>Добро пожаловать на TeleRoom!</h1>
-            <p>Лучший Minecraft сервер для настоящих ценителей</p>
-            
-            <div class="server-ip">
-                IP: play.teleroom.ru
-            </div>
-            
-            <div style="margin-top: 2rem;">
-                <button class="btn" onclick="alert('Раздел в разработке')">📝 Подать жалобу</button>
-                <button class="btn btn-outline" onclick="alert('Раздел в разработке')">👥 Команда проекта</button>
-                <button class="btn btn-outline" onclick="alert('Раздел в разработке')">💼 Вакансии</button>
-            </div>
+            <h1>MoonGrief</h1>
+            <div class="server-ip" onclick="copyIP()">moongrief.aurorix.pro 📋</div>
+            <p>Нажми на IP чтобы скопировать</p>
         </div>
         
-        <div class="features">
-            <div class="feature-card">
-                <h3>🎮 Уникальный геймплей</h3>
-                <p>Собственные плагины и механики, которых нет на других серверах</p>
+        <div class="main-grid">
+            <!-- Чат секция -->
+            <div class="chat-section">
+                <h2>💬 Игровой чат</h2>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message">
+                        <strong>Server:</strong> Добро пожаловать в чат MoonGrief! <span>только что</span>
+                    </div>
+                    <div class="message">
+                        <strong>Admin:</strong> Привет всем! Кто хочет стать модератором? <span>2 мин назад</span>
+                    </div>
+                </div>
+                
+                <div class="chat-input">
+                    <input type="text" id="messageInput" placeholder="Введите сообщение..." onkeypress="if(event.key==='Enter') sendMessage()">
+                    <button onclick="sendMessage()">Отправить</button>
+                </div>
+                
+                <div class="online-list">
+                    <div style="margin-bottom: 0.5rem;">🟢 Онлайн (12):</div>
+                    <span class="online-item">Admin</span>
+                    <span class="online-item">Moderator1</span>
+                    <span class="online-item">Player123</span>
+                    <span class="online-item">BuilderPro</span>
+                    <span class="online-item">GriefMaster</span>
+                </div>
             </div>
-            <div class="feature-card">
-                <h3>👮 Активная администрация</h3>
-                <p>Быстрое решение проблем и помощь игрокам 24/7</p>
-            </div>
-            <div class="feature-card">
-                <h3>🏆 Регулярные ивенты</h3>
-                <p>Турниры, конкурсы и раздачи призов каждую неделю</p>
+            
+            <!-- Заявки секция -->
+            <div class="apply-section">
+                <h2>📝 Заявка в модераторы</h2>
+                <p style="color: #888; margin-bottom: 1rem;">Заполни форму чтобы стать частью команды</p>
+                
+                <div class="apply-form">
+                    <input type="text" id="applyNick" placeholder="Твой Minecraft ник">
+                    <input type="number" id="applyAge" placeholder="Твой возраст">
+                    <input type="text" id="applyDiscord" placeholder="Discord">
+                    <select id="applyExperience">
+                        <option>Был модером на других серверах</option>
+                        <option>Хочу попробовать впервые</option>
+                        <option>Есть опыт администрирования</option>
+                    </select>
+                    <textarea id="applyWhy" placeholder="Почему ты хочешь стать модером?"></textarea>
+                    <button onclick="submitApplication()">Отправить заявку</button>
+                </div>
+                
+                <!-- Список модераторов -->
+                <div class="staff-list">
+                    <div class="staff-title">👥 Наша команда</div>
+                    <div class="staff-grid">
+                        <div class="staff-card">
+                            <div class="name">Owner</div>
+                            <div class="role">Владелец</div>
+                        </div>
+                        <div class="staff-card">
+                            <div class="name">Admin1</div>
+                            <div class="role">Главный админ</div>
+                        </div>
+                        <div class="staff-card">
+                            <div class="name">Moder1</div>
+                            <div class="role">Модератор</div>
+                        </div>
+                        <div class="staff-card">
+                            <div class="name">Helper1</div>
+                            <div class="role">Хелпер</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     
-    <!-- Модальное окно входа -->
+    <!-- Модалки входа/регистрации -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('login')">&times;</span>
-            <h2>Вход</h2>
-            <input type="text" placeholder="Логин" id="loginUser">
+            <h2>Вход на сервер</h2>
+            <input type="text" placeholder="Никнейм" id="loginUser">
             <input type="password" placeholder="Пароль" id="loginPass">
-            <button class="btn" style="width: 100%;" onclick="login()">Войти</button>
+            <button onclick="login()">Войти</button>
         </div>
     </div>
     
-    <!-- Модальное окно регистрации -->
     <div id="registerModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('register')">&times;</span>
             <h2>Регистрация</h2>
-            <input type="text" placeholder="Логин" id="regUser">
+            <input type="text" placeholder="Никнейм" id="regUser">
             <input type="password" placeholder="Пароль" id="regPass">
             <input type="text" placeholder="Minecraft ник" id="regNick">
-            <button class="btn" style="width: 100%;" onclick="register()">Зарегистрироваться</button>
+            <button onclick="register()">Зарегистрироваться</button>
         </div>
     </div>
     
     <script>
+        let currentUser = null;
+        let messages = [
+            { user: 'Server', text: 'Добро пожаловать в чат MoonGrief!', time: new Date() }
+        ];
+        
+        function copyIP() {
+            navigator.clipboard.writeText('moongrief.aurorix.pro');
+            alert('IP скопирован! Заходи на сервер');
+        }
+        
         function showModal(type) {
             document.getElementById(type + 'Modal').style.display = 'flex';
         }
@@ -250,22 +458,81 @@
             document.getElementById(type + 'Modal').style.display = 'none';
         }
         
+        function sendMessage() {
+            let input = document.getElementById('messageInput');
+            let text = input.value.trim();
+            
+            if (text) {
+                let chatDiv = document.getElementById('chatMessages');
+                let messageDiv = document.createElement('div');
+                messageDiv.className = 'message';
+                messageDiv.innerHTML = `<strong>${currentUser ? currentUser : 'Гость'}:</strong> ${text} <span>только что</span>`;
+                chatDiv.appendChild(messageDiv);
+                input.value = '';
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+            }
+        }
+        
+        function submitApplication() {
+            let nick = document.getElementById('applyNick').value;
+            let age = document.getElementById('applyAge').value;
+            let discord = document.getElementById('applyDiscord').value;
+            let why = document.getElementById('applyWhy').value;
+            
+            if (nick && age && discord && why) {
+                alert('✅ Заявка отправлена! Администрация рассмотрит её в ближайшее время');
+                
+                // Очищаем форму
+                document.getElementById('applyNick').value = '';
+                document.getElementById('applyAge').value = '';
+                document.getElementById('applyDiscord').value = '';
+                document.getElementById('applyWhy').value = '';
+                
+                // Добавляем в чат уведомление
+                let chatDiv = document.getElementById('chatMessages');
+                let messageDiv = document.createElement('div');
+                messageDiv.className = 'message';
+                messageDiv.innerHTML = `<strong>System:</strong> Игрок ${nick} подал заявку в модераторы! <span>только что</span>`;
+                chatDiv.appendChild(messageDiv);
+            } else {
+                alert('❌ Заполни все поля!');
+            }
+        }
+        
         function login() {
-            alert('Функция входа будет доступна после подключения базы данных');
-            closeModal('login');
+            let user = document.getElementById('loginUser').value;
+            if (user) {
+                currentUser = user;
+                alert('Добро пожаловать, ' + user + '!');
+                closeModal('login');
+            }
         }
         
         function register() {
-            alert('Функция регистрации будет доступна после подключения базы данных');
-            closeModal('register');
+            let nick = document.getElementById('regNick').value;
+            if (nick) {
+                currentUser = nick;
+                alert('Регистрация успешна! Теперь ты можешь писать в чат');
+                closeModal('register');
+            }
         }
         
-        // Закрытие модального окна при клике вне его
+        // Закрытие модалок по клику вне
         window.onclick = function(event) {
             if (event.target.classList.contains('modal')) {
                 event.target.style.display = 'none';
             }
         }
+        
+        // Добавляем тестовые сообщения каждые 30 секунд
+        setInterval(() => {
+            let chatDiv = document.getElementById('chatMessages');
+            let messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerHTML = `<strong>System:</strong> Онлайн на сервере: 12 игроков <span>только что</span>`;
+            chatDiv.appendChild(messageDiv);
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+        }, 30000);
     </script>
 </body>
 </html>
