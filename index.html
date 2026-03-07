@@ -1,256 +1,431 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeleRoom</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0e1621;
-            color: white;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /* Шапка */
-        .header {
-            background: #17212b;
-            padding: 15px;
-            text-align: center;
-            font-weight: bold;
-            color: #2b5278;
-            border-bottom: 1px solid #242f3d;
-        }
-        
-        /* Окно чата */
-        #chat {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        /* Сообщение */
-        .message {
-            background: #17212b;
-            padding: 10px 14px;
-            border-radius: 12px;
-            max-width: 80%;
-            align-self: flex-start;
-            word-break: break-word;
-        }
-        
-        .message.my-message {
-            background: #2b5278;
-            align-self: flex-end;
-        }
-        
-        .message-info {
-            font-size: 11px;
-            color: #6c7883;
-            margin-bottom: 4px;
-        }
-        
-        .my-message .message-info {
-            color: rgba(255,255,255,0.7);
-        }
-        
-        .message-text {
-            font-size: 15px;
-            line-height: 1.4;
-        }
-        
-        /* Панель ввода */
-        .input-area {
-            background: #17212b;
-            padding: 15px;
-            display: flex;
-            gap: 10px;
-            border-top: 1px solid #242f3d;
-        }
-        
-        #username {
-            width: 100px;
-            padding: 12px;
-            background: #242f3d;
-            border: none;
-            color: white;
-            border-radius: 8px;
-            outline: none;
-            font-size: 14px;
-        }
-        
-        #messageInput {
-            flex: 1;
-            padding: 12px;
-            background: #242f3d;
-            border: none;
-            color: white;
-            border-radius: 8px;
-            outline: none;
-            font-size: 16px;
-        }
-        
-        #sendBtn {
-            padding: 12px 24px;
-            background: #2b5278;
-            border: none;
-            color: white;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        
-        #sendBtn:hover {
-            background: #3a6a9e;
-        }
-        
-        #sendBtn:active {
-            transform: scale(0.98);
-        }
-        
-        /* Статус */
-        .status {
-            background: #17212b;
-            padding: 5px 15px;
-            font-size: 12px;
-            color: #6c7883;
-            text-align: center;
-            border-top: 1px solid #242f3d;
-        }
-        
-        /* Адаптация для мобильных */
-        @media (max-width: 600px) {
-            .message {
-                max-width: 90%;
-            }
-            
-            .input-area {
-                padding: 10px;
-            }
-            
-            #username {
-                width: 80px;
-                font-size: 12px;
-            }
-            
-            #sendBtn {
-                padding: 12px 18px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="header">
-        💬 TeleRoom | Чат
-    </div>
-    
-    <div id="chat"></div>
-    
-    <div class="input-area">
-        <input type="text" id="username" placeholder="Имя" maxlength="20" value="User_" + Math.floor(Math.random() * 1000)>
-        <input type="text" id="messageInput" placeholder="Сообщение..." autocomplete="off">
-        <button id="sendBtn">➤</button>
-    </div>
-    
-    <div class="status" id="status">
-        Подключение к серверу...
-    </div>
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const http = require('http');
+const socketIo = require('socket.io');
+require('dotenv').config();
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        // Подключаемся к серверу
-        const socket = io();
-        let myName = '';
-        
-        // Генерируем случайное имя при загрузке
-        window.onload = () => {
-            const randomNum = Math.floor(Math.random() * 1000);
-            document.getElementById('username').value = 'User_' + randomNum;
-            myName = 'User_' + randomNum;
-        };
-        
-        // Обновляем имя при изменении
-        document.getElementById('username').addEventListener('input', (e) => {
-            myName = e.target.value.trim() || 'Аноним';
-        });
-        
-        // Получаем историю сообщений
-        socket.on('history', (messages) => {
-            document.getElementById('chat').innerHTML = '';
-            messages.forEach(msg => addMessage(msg));
-            document.getElementById('status').textContent = `✅ Подключено • ${messages.length} сообщений`;
-        });
-        
-        // Получаем новое сообщение
-        socket.on('message', (msg) => {
-            addMessage(msg);
-        });
-        
-        // Отправка сообщения
-        function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const username = document.getElementById('username').value.trim();
-            
-            if (input.value.trim()) {
-                const messageData = {
-                    user: username || 'Аноним',
-                    text: input.value
-                };
-                
-                socket.emit('chatMessage', messageData);
-                input.value = '';
-            }
-        }
-        
-        // Добавление сообщения в чат
-        function addMessage(msg) {
-            const chat = document.getElementById('chat');
-            const div = document.createElement('div');
-            
-            // Проверяем, наше это сообщение или нет
-            const currentUser = document.getElementById('username').value.trim() || 'Аноним';
-            div.className = 'message' + (msg.user === currentUser ? ' my-message' : '');
-            
-            div.innerHTML = `
-                <div class="message-info">${msg.user} • ${msg.time}</div>
-                <div class="message-text">${msg.text}</div>
-            `;
-            
-            chat.appendChild(div);
-            // Скролл вниз
-            chat.scrollTop = chat.scrollHeight;
-        }
-        
-        // Обработка кнопок
-        document.getElementById('sendBtn').onclick = sendMessage;
-        document.getElementById('messageInput').onkeypress = (e) => {
-            if (e.key === 'Enter') sendMessage();
-        };
-        
-        // Обработка ошибок
-        socket.on('connect_error', (error) => {
-            document.getElementById('status').textContent = '❌ Ошибка подключения к серверу';
-        });
-        
-        socket.on('connect', () => {
-            document.getElementById('status').textContent = '✅ Подключено к серверу';
-        });
-        
-        socket.on('disconnect', () => {
-            document.getElementById('status').textContent = '⚠️ Отключено от сервера';
-        });
-    </script>
-</body>
-</html>
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static('public'));
+
+// Подключение к MongoDB
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/minecraft-forum', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => {
+  console.log('Connected to MongoDB');
+}).catch(err => {
+  console.error('MongoDB connection error:', err);
+});
+
+// Модель пользователя
+const UserSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  minecraftNick: { type: String, required: true },
+  role: { type: String, default: 'user' }, // user, admin, moderator, builder, helper
+  createdAt: { type: Date, default: Date.now },
+  lastLogin: Date,
+  isBanned: { type: Boolean, default: false },
+  discord: String,
+  age: Number,
+  experience: String,
+  position: String, // текущая должность
+  applications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Application' }]
+});
+
+// Модель жалобы
+const ComplaintSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  accusedPlayer: { type: String, required: true },
+  complainant: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  status: { type: String, default: 'pending' },
+  serverName: { type: String, required: true },
+  evidence: [String],
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+  adminNotes: String,
+  assignedAdmin: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  priority: { type: String, default: 'medium' }
+});
+
+// Модель заявки на должность
+const ApplicationSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  position: { type: String, required: true }, // moderator, builder, helper, eventmaker, etc.
+  age: { type: Number, required: true },
+  discord: { type: String, required: true },
+  experience: { type: String, required: true },
+  whyYou: { type: String, required: true }, // почему хотите стать частью команды
+  hoursPlayed: { type: Number, required: true }, // часов в день может играть
+  previousExperience: String, // опыт на других серверах
+  status: { type: String, default: 'pending' }, // pending, reviewed, accepted, rejected
+  reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  reviewComment: String,
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+// Модель должностей
+const PositionSchema = new mongoose.Schema({
+  name: { type: String, required: true }, // moderator, builder, helper
+  displayName: { type: String, required: true }, // Модератор, Строитель, Хелпер
+  description: { type: String, required: true },
+  requirements: [String],
+  isOpen: { type: Boolean, default: true },
+  salary: String, // возможная оплата или бонусы
+  maxApplicants: Number,
+  currentApplicants: { type: Number, default: 0 }
+});
+
+const User = mongoose.model('User', UserSchema);
+const Complaint = mongoose.model('Complaint', ComplaintSchema);
+const Application = mongoose.model('Application', ApplicationSchema);
+const Position = mongoose.model('Position', PositionSchema);
+
+// Middleware для проверки токена
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if (!token) return res.sendStatus(401);
+  
+  jwt.verify(token, process.env.JWT_SECRET || 'secret', (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+};
+
+// Middleware для проверки админа
+const isAdmin = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user || (user.role !== 'admin' && user.role !== 'owner')) {
+      return res.status(403).json({ message: 'Доступ запрещен' });
+    }
+    next();
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Middleware для проверки модератора и выше
+const isModerator = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user || !['admin', 'owner', 'moderator'].includes(user.role)) {
+      return res.status(403).json({ message: 'Доступ запрещен' });
+    }
+    next();
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Регистрация
+app.post('/api/register', async (req, res) => {
+  try {
+    const { username, password, minecraftNick, discord, age } = req.body;
+    
+    const existingUser = await User.findOne({ $or: [{ username }, { minecraftNick }] });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Пользователь уже существует' });
+    }
+    
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({
+      username,
+      password: hashedPassword,
+      minecraftNick,
+      discord,
+      age
+    });
+    
+    await user.save();
+    res.status(201).json({ message: 'Регистрация успешна' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Логин
+app.post('/api/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const user = await User.findOne({ username });
+    
+    if (!user) {
+      return res.status(400).json({ message: 'Неверные данные' });
+    }
+    
+    if (user.isBanned) {
+      return res.status(403).json({ message: 'Вы забанены' });
+    }
+    
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.status(400).json({ message: 'Неверные данные' });
+    }
+    
+    user.lastLogin = new Date();
+    await user.save();
+    
+    const token = jwt.sign(
+      { id: user._id, username: user.username, role: user.role },
+      process.env.JWT_SECRET || 'secret'
+    );
+    
+    res.json({ 
+      token, 
+      user: { 
+        id: user._id,
+        username: user.username,
+        minecraftNick: user.minecraftNick,
+        role: user.role,
+        discord: user.discord
+      } 
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// ============== РОУТЫ ДЛЯ ЖАЛОБ ==============
+
+// Получить все жалобы (админ)
+app.get('/api/complaints', authenticateToken, isModerator, async (req, res) => {
+  try {
+    const complaints = await Complaint.find()
+      .populate('complainant', 'username minecraftNick')
+      .populate('assignedAdmin', 'username')
+      .sort({ createdAt: -1 });
+    res.json(complaints);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Получить жалобы пользователя
+app.get('/api/my-complaints', authenticateToken, async (req, res) => {
+  try {
+    const complaints = await Complaint.find({ complainant: req.user.id })
+      .sort({ createdAt: -1 });
+    res.json(complaints);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Создать жалобу
+app.post('/api/complaints', authenticateToken, async (req, res) => {
+  try {
+    const complaint = new Complaint({
+      ...req.body,
+      complainant: req.user.id
+    });
+    await complaint.save();
+    
+    io.emit('new-complaint', {
+      message: 'Новая жалоба',
+      complaint: complaint
+    });
+    
+    res.status(201).json(complaint);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Обновить жалобу (модератор)
+app.put('/api/complaints/:id', authenticateToken, isModerator, async (req, res) => {
+  try {
+    const complaint = await Complaint.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body, updatedAt: new Date() },
+      { new: true }
+    );
+    res.json(complaint);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// ============== РОУТЫ ДЛЯ ЗАЯВОК НА ДОЛЖНОСТИ ==============
+
+// Получить все доступные должности
+app.get('/api/positions', async (req, res) => {
+  try {
+    const positions = await Position.find({ isOpen: true });
+    res.json(positions);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Создать должность (админ)
+app.post('/api/positions', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const position = new Position(req.body);
+    await position.save();
+    res.status(201).json(position);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Подать заявку на должность
+app.post('/api/applications', authenticateToken, async (req, res) => {
+  try {
+    // Проверяем, нет ли уже активной заявки у пользователя
+    const existingApplication = await Application.findOne({
+      userId: req.user.id,
+      status: { $in: ['pending', 'reviewed'] }
+    });
+    
+    if (existingApplication) {
+      return res.status(400).json({ message: 'У вас уже есть активная заявка' });
+    }
+    
+    const application = new Application({
+      ...req.body,
+      userId: req.user.id
+    });
+    
+    await application.save();
+    
+    // Обновляем пользователя
+    await User.findByIdAndUpdate(req.user.id, {
+      $push: { applications: application._id }
+    });
+    
+    // Обновляем счетчик заявок на должность
+    await Position.findOneAndUpdate(
+      { name: req.body.position },
+      { $inc: { currentApplicants: 1 } }
+    );
+    
+    io.emit('new-application', {
+      message: 'Новая заявка в команду',
+      application: application
+    });
+    
+    res.status(201).json(application);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Получить все заявки (админ/модератор)
+app.get('/api/applications', authenticateToken, isModerator, async (req, res) => {
+  try {
+    const applications = await Application.find()
+      .populate('userId', 'username minecraftNick discord age')
+      .sort({ createdAt: -1 });
+    res.json(applications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Получить свои заявки
+app.get('/api/my-applications', authenticateToken, async (req, res) => {
+  try {
+    const applications = await Application.find({ userId: req.user.id })
+      .sort({ createdAt: -1 });
+    res.json(applications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Рассмотреть заявку (админ/модератор)
+app.put('/api/applications/:id', authenticateToken, isModerator, async (req, res) => {
+  try {
+    const { status, reviewComment } = req.body;
+    
+    const application = await Application.findByIdAndUpdate(
+      req.params.id,
+      {
+        status,
+        reviewComment,
+        reviewedBy: req.user.id,
+        updatedAt: new Date()
+      },
+      { new: true }
+    );
+    
+    // Если заявка одобрена, обновляем роль пользователя
+    if (status === 'accepted') {
+      await User.findByIdAndUpdate(application.userId, {
+        role: application.position,
+        position: application.position
+      });
+    }
+    
+    res.json(application);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// ============== АДМИН СТАТИСТИКА ==============
+
+app.get('/api/admin/stats', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const totalComplaints = await Complaint.countDocuments();
+    const pendingComplaints = await Complaint.countDocuments({ status: 'pending' });
+    const resolvedComplaints = await Complaint.countDocuments({ status: 'resolved' });
+    const totalUsers = await User.countDocuments();
+    
+    const totalApplications = await Application.countDocuments();
+    const pendingApplications = await Application.countDocuments({ status: 'pending' });
+    
+    const teamMembers = await User.countDocuments({
+      role: { $in: ['admin', 'moderator', 'builder', 'helper'] }
+    });
+    
+    res.json({
+      totalComplaints,
+      pendingComplaints,
+      resolvedComplaints,
+      totalUsers,
+      totalApplications,
+      pendingApplications,
+      teamMembers
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Получить всех членов команды
+app.get('/api/team', async (req, res) => {
+  try {
+    const team = await User.find({
+      role: { $in: ['admin', 'moderator', 'builder', 'helper', 'owner'] }
+    }).select('username minecraftNick role position createdAt');
+    
+    res.json(team);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
