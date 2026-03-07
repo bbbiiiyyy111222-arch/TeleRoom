@@ -20,7 +20,7 @@
             overflow-x: hidden;
         }
         
-        /* Анимированный фон с частицами */
+        /* Космический фон с анимацией звезд */
         body::before {
             content: '';
             position: fixed;
@@ -28,28 +28,45 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="2" fill="%234facfe" opacity="0.4"/><circle cx="180" cy="60" r="3" fill="%23ff6b6b" opacity="0.4"/><circle cx="60" cy="160" r="2" fill="%23a18cd1" opacity="0.4"/><circle cx="140" cy="100" r="2.5" fill="%234facfe" opacity="0.4"/><circle cx="100" cy="40" r="1.5" fill="%23ff6b6b" opacity="0.4"/><circle cx="30" cy="120" r="2" fill="%23a18cd1" opacity="0.4"/><circle cx="170" cy="150" r="2" fill="%234facfe" opacity="0.4"/></svg>');
+            background: url('data:image/svg+xml;utf8,<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="2" fill="%23ffffff" opacity="0.8"/><circle cx="180" cy="60" r="3" fill="%23ffd700" opacity="0.8"/><circle cx="60" cy="160" r="2" fill="%234facfe" opacity="0.8"/><circle cx="140" cy="100" r="2.5" fill="%23ff6b6b" opacity="0.8"/><circle cx="100" cy="40" r="1.5" fill="%23ffffff" opacity="0.8"/><circle cx="30" cy="120" r="2" fill="%23ffd700" opacity="0.8"/><circle cx="170" cy="150" r="2" fill="%234facfe" opacity="0.8"/></svg>');
             background-size: 300px 300px;
             pointer-events: none;
             z-index: -1;
-            animation: floatParticles 30s linear infinite;
+            animation: starsMove 50s linear infinite;
         }
         
-        @keyframes floatParticles {
+        @keyframes starsMove {
             0% { transform: translateY(0) translateX(0) rotate(0deg); }
-            50% { transform: translateY(-30px) translateX(20px) rotate(5deg); }
-            100% { transform: translateY(0) translateX(0) rotate(0deg); }
+            100% { transform: translateY(-200px) translateX(100px) rotate(10deg); }
+        }
+        
+        /* Анимированная линия сверху */
+        nav::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff6b6b, #4facfe, #ffd700, transparent);
+            animation: borderGlow 3s infinite;
+        }
+        
+        @keyframes borderGlow {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
         }
         
         nav {
-            background: rgba(8, 8, 25, 0.9);
+            background: rgba(5, 5, 20, 0.95);
             padding: 1rem 2rem;
             backdrop-filter: blur(20px);
-            border-bottom: 2px solid linear-gradient(90deg, #ff6b6b, #4facfe, #a18cd1);
+            border-bottom: 2px solid transparent;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 5px 40px rgba(0,0,0,0.8);
+            box-shadow: 0 5px 50px rgba(0,0,0,0.9);
         }
         
         .nav-container {
@@ -65,20 +82,34 @@
         .logo {
             font-size: 2.5rem;
             font-weight: 900;
-            background: linear-gradient(135deg, #ff6b6b, #4facfe, #a18cd1, #ff6b6b);
+            background: linear-gradient(135deg, #ff6b6b, #4facfe, #ffd700, #ff6b6b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             cursor: pointer;
-            text-shadow: 0 0 40px rgba(79,172,254,0.7);
-            letter-spacing: 2px;
-            animation: gradientShift 3s ease infinite;
+            text-shadow: 0 0 50px rgba(79,172,254,0.7);
+            letter-spacing: 3px;
+            animation: logoGlow 3s ease infinite;
             background-size: 300% 300%;
+            position: relative;
         }
         
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .logo::before {
+            content: '🌙';
+            position: absolute;
+            left: -40px;
+            animation: rotateMoon 4s infinite;
+        }
+        
+        @keyframes rotateMoon {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(10deg); }
+            100% { transform: rotate(0deg); }
+        }
+        
+        @keyframes logoGlow {
+            0% { background-position: 0% 50%; filter: drop-shadow(0 0 20px #4facfe); }
+            50% { background-position: 100% 50%; filter: drop-shadow(0 0 40px #ffd700); }
+            100% { background-position: 0% 50%; filter: drop-shadow(0 0 20px #ff6b6b); }
         }
         
         .ip-box {
@@ -92,14 +123,33 @@
             box-shadow: 0 0 30px rgba(79,172,254,0.5);
             backdrop-filter: blur(5px);
             font-weight: bold;
-            transition: all 0.3s;
+            transition: all 0.4s;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ip-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
         }
         
         .ip-box:hover {
-            transform: scale(1.05);
-            border-color: #ff6b6b;
-            box-shadow: 0 0 40px rgba(255,107,107,0.5);
+            transform: scale(1.1) rotate(2deg);
+            border-color: #ffd700;
+            box-shadow: 0 0 60px rgba(255,215,0,0.6);
         }
         
         .user-menu {
@@ -121,14 +171,34 @@
             color: white;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.4s;
             font-size: 1rem;
             box-shadow: 0 5px 20px rgba(79,172,254,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .auth-btn:hover::after {
+            width: 300px;
+            height: 300px;
         }
         
         .auth-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255,107,107,0.5);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(255,215,0,0.6);
         }
         
         .auth-btn.secondary {
@@ -145,36 +215,58 @@
             border-radius: 50px;
             cursor: pointer;
             border: 1px solid rgba(79,172,254,0.5);
-            transition: all 0.3s;
+            transition: all 0.4s;
+            animation: userPulse 2s infinite;
+        }
+        
+        @keyframes userPulse {
+            0% { border-color: rgba(79,172,254,0.5); }
+            50% { border-color: #ffd700; }
+            100% { border-color: rgba(79,172,254,0.5); }
         }
         
         .user-info:hover {
-            border-color: #ff6b6b;
-            box-shadow: 0 0 30px rgba(255,107,107,0.3);
+            border-color: #ffd700;
+            box-shadow: 0 0 40px rgba(255,215,0,0.4);
+            transform: scale(1.02);
         }
         
         .user-avatar {
             width: 35px;
             height: 35px;
-            background: linear-gradient(135deg, #ff6b6b, #4facfe);
+            background: linear-gradient(135deg, #ff6b6b, #4facfe, #ffd700);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
             font-size: 1.2rem;
-            box-shadow: 0 0 15px rgba(79,172,254,0.5);
+            animation: avatarRotate 3s infinite;
         }
         
-        .admin-badge {
-            background: linear-gradient(135deg, #ff6b6b, #ff8c8c);
-            color: white;
+        @keyframes avatarRotate {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            75% { transform: rotate(-5deg); }
+            100% { transform: rotate(0deg); }
+        }
+        
+        .owner-badge {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: black;
             padding: 0.2rem 0.8rem;
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: bold;
             margin-left: 0.5rem;
-            box-shadow: 0 0 10px #ff6b6b;
+            box-shadow: 0 0 20px #ffd700;
+            animation: badgePulse 1.5s infinite;
+        }
+        
+        @keyframes badgePulse {
+            0% { box-shadow: 0 0 10px #ffd700; }
+            50% { box-shadow: 0 0 30px #ffd700; }
+            100% { box-shadow: 0 0 10px #ffd700; }
         }
         
         .container {
@@ -185,15 +277,21 @@
         
         .hero {
             text-align: center;
-            padding: 3.5rem 2rem;
-            background: rgba(0,0,0,0.3);
-            border-radius: 40px;
-            margin-bottom: 2.5rem;
+            padding: 4rem 2rem;
+            background: rgba(0,0,0,0.4);
+            border-radius: 50px;
+            margin-bottom: 3rem;
             border: 1px solid rgba(79,172,254,0.3);
             backdrop-filter: blur(15px);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            box-shadow: 0 20px 80px rgba(0,0,0,0.8);
             position: relative;
             overflow: hidden;
+            animation: heroAppear 1s ease;
+        }
+        
+        @keyframes heroAppear {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
         
         .hero::before {
@@ -203,57 +301,77 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(79,172,254,0.1), transparent);
-            animation: shine 6s infinite;
+            background: linear-gradient(45deg, transparent, rgba(255,215,0,0.1), rgba(79,172,254,0.1), transparent);
+            animation: heroShine 5s infinite;
         }
         
-        @keyframes shine {
+        @keyframes heroShine {
             0% { transform: rotate(0deg) translateX(-100%); }
             100% { transform: rotate(45deg) translateX(100%); }
         }
         
         .hero h1 {
-            font-size: 4.5rem;
+            font-size: 5rem;
             margin-bottom: 1rem;
-            background: linear-gradient(135deg, #fff, #4facfe, #ff6b6b);
+            background: linear-gradient(135deg, #fff, #4facfe, #ffd700, #ff6b6b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 60px rgba(79,172,254,0.5);
+            text-shadow: 0 0 80px rgba(79,172,254,0.5);
+            animation: titleFloat 3s infinite;
+        }
+        
+        @keyframes titleFloat {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
         }
         
         .hero p {
-            font-size: 1.4rem;
-            color: #ddd;
+            font-size: 1.5rem;
+            color: #eee;
             margin-bottom: 1.5rem;
+            animation: textGlow 2s infinite;
+        }
+        
+        @keyframes textGlow {
+            0% { text-shadow: 0 0 10px #4facfe; }
+            50% { text-shadow: 0 0 30px #ffd700; }
+            100% { text-shadow: 0 0 10px #4facfe; }
         }
         
         .server-ip {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             color: #fff;
-            margin: 1.5rem 0;
-            padding: 1rem 3.5rem;
-            border: 3px dashed #4facfe;
-            border-radius: 60px;
+            margin: 2rem 0;
+            padding: 1.2rem 4rem;
+            border: 3px dashed #ffd700;
+            border-radius: 70px;
             display: inline-block;
             cursor: pointer;
-            transition: all 0.3s;
-            background: rgba(0,0,0,0.3);
+            transition: all 0.5s;
+            background: rgba(0,0,0,0.4);
             backdrop-filter: blur(5px);
             font-weight: bold;
-            text-shadow: 0 0 20px #4facfe;
+            animation: ipPulse 2s infinite;
+        }
+        
+        @keyframes ipPulse {
+            0% { border-color: #4facfe; box-shadow: 0 0 30px #4facfe; }
+            50% { border-color: #ffd700; box-shadow: 0 0 60px #ffd700; }
+            100% { border-color: #4facfe; box-shadow: 0 0 30px #4facfe; }
         }
         
         .server-ip:hover {
-            transform: scale(1.1);
+            transform: scale(1.15) rotate(2deg);
             border-color: #ff6b6b;
-            box-shadow: 0 0 60px rgba(255,107,107,0.6);
+            box-shadow: 0 0 80px rgba(255,107,107,0.7);
         }
         
         .tabs {
             display: flex;
             justify-content: center;
-            gap: 1.5rem;
-            margin: 2.5rem 0;
+            gap: 2rem;
+            margin: 3rem 0;
             flex-wrap: wrap;
         }
         
@@ -261,38 +379,61 @@
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(79,172,254,0.3);
             color: white;
-            padding: 1.2rem 2.8rem;
-            border-radius: 50px;
+            padding: 1.2rem 3rem;
+            border-radius: 60px;
             cursor: pointer;
-            font-size: 1.2rem;
-            transition: all 0.4s;
+            font-size: 1.3rem;
+            transition: all 0.5s;
             backdrop-filter: blur(5px);
             font-weight: 600;
-            letter-spacing: 1px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.4);
+            box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,215,0,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .tab:hover::before {
+            left: 100%;
         }
         
         .tab:hover {
-            background: linear-gradient(135deg, #ff6b6b, #4facfe);
+            background: linear-gradient(135deg, #ff6b6b, #4facfe, #ffd700);
             border-color: transparent;
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 40px rgba(79,172,254,0.6);
+            transform: translateY(-8px) scale(1.08);
+            box-shadow: 0 20px 50px rgba(255,215,0,0.6);
         }
         
         .tab.active {
-            background: linear-gradient(135deg, #ff6b6b, #4facfe);
+            background: linear-gradient(135deg, #ffd700, #ff6b6b);
             border-color: transparent;
-            box-shadow: 0 10px 30px rgba(79,172,254,0.6);
+            box-shadow: 0 10px 40px rgba(255,215,0,0.8);
+            animation: tabActive 2s infinite;
+        }
+        
+        @keyframes tabActive {
+            0% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+            100% { filter: brightness(1); }
         }
         
         .section {
             display: none;
-            animation: fadeIn 0.5s ease;
+            animation: sectionAppear 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes sectionAppear {
+            from { opacity: 0; transform: translateY(30px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
         
         .section.active {
@@ -305,130 +446,228 @@
             gap: 0.5rem;
             background: rgba(255,255,255,0.05);
             color: white;
-            padding: 1rem 2.2rem;
-            border-radius: 50px;
+            padding: 1rem 2.5rem;
+            border-radius: 60px;
             cursor: pointer;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             border: 1px solid rgba(79,172,254,0.3);
-            transition: all 0.3s;
-            font-size: 1.1rem;
+            transition: all 0.4s;
+            font-size: 1.2rem;
             backdrop-filter: blur(5px);
+            animation: backButtonFloat 2s infinite;
+        }
+        
+        @keyframes backButtonFloat {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
         }
         
         .back-button:hover {
-            background: #4facfe;
-            transform: translateX(-10px);
-            box-shadow: 0 0 40px #4facfe;
+            background: #ffd700;
+            color: black;
+            transform: translateX(-15px);
+            box-shadow: 0 0 50px #ffd700;
         }
         
         .back-button::before {
             content: "←";
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             font-weight: bold;
         }
         
-        /* Админ панель - ТОЛЬКО ДЛЯ АДМИНОВ */
-        .admin-section {
-            background: rgba(0,0,0,0.4);
-            border-radius: 40px;
-            padding: 2.5rem;
-            border: 2px solid #ff6b6b;
+        /* OWNER панель */
+        .owner-section {
+            background: rgba(0,0,0,0.5);
+            border-radius: 50px;
+            padding: 3rem;
+            border: 3px solid #ffd700;
             margin-top: 1rem;
-            box-shadow: 0 0 70px rgba(255,107,107,0.4);
+            box-shadow: 0 0 100px rgba(255,215,0,0.4);
             backdrop-filter: blur(15px);
+            animation: ownerGlow 3s infinite;
         }
         
-        .admin-header {
+        @keyframes ownerGlow {
+            0% { border-color: #ffd700; box-shadow: 0 0 70px rgba(255,215,0,0.4); }
+            50% { border-color: #ff6b6b; box-shadow: 0 0 100px rgba(255,107,107,0.4); }
+            100% { border-color: #ffd700; box-shadow: 0 0 70px rgba(255,215,0,0.4); }
+        }
+        
+        .owner-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2.5rem;
+            margin-bottom: 3rem;
             flex-wrap: wrap;
             gap: 1rem;
         }
         
-        .admin-header h2 {
-            color: #ff6b6b;
-            font-size: 2.8rem;
-            text-shadow: 0 0 40px #ff6b6b;
+        .owner-header h2 {
+            color: #ffd700;
+            font-size: 3rem;
+            text-shadow: 0 0 60px #ffd700;
+            animation: ownerTitle 2s infinite;
         }
         
-        .admin-stats {
+        @keyframes ownerTitle {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .owner-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
         }
         
         .stat-card {
-            background: rgba(255,107,107,0.1);
-            padding: 2rem;
-            border-radius: 25px;
+            background: rgba(255,215,0,0.1);
+            padding: 2.2rem;
+            border-radius: 30px;
             text-align: center;
-            border: 1px solid #ff6b6b;
+            border: 1px solid #ffd700;
             backdrop-filter: blur(5px);
-            transition: all 0.3s;
+            transition: all 0.4s;
+            animation: statAppear 0.8s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        @keyframes statAppear {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,215,0,0.2), transparent);
+            animation: statPulse 3s infinite;
+        }
+        
+        @keyframes statPulse {
+            0% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.2); opacity: 0.6; }
+            100% { transform: scale(1); opacity: 0.3; }
         }
         
         .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(255,107,107,0.4);
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 50px rgba(255,215,0,0.5);
         }
         
         .stat-card .number {
-            font-size: 2.8rem;
+            font-size: 3.2rem;
             font-weight: bold;
-            color: #ff6b6b;
-            text-shadow: 0 0 30px #ff6b6b;
+            color: #ffd700;
+            text-shadow: 0 0 40px #ffd700;
+            animation: numberFloat 2s infinite;
         }
         
-        .admin-tabs {
+        @keyframes numberFloat {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
+        }
+        
+        .owner-tabs {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 2.5rem;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
             flex-wrap: wrap;
         }
         
-        .admin-tab {
+        .owner-tab {
             background: rgba(255,255,255,0.05);
-            padding: 1rem 2.5rem;
-            border-radius: 40px;
+            padding: 1.2rem 3rem;
+            border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s;
-            border: 1px solid rgba(255,107,107,0.3);
-            font-size: 1.1rem;
+            transition: all 0.4s;
+            border: 1px solid rgba(255,215,0,0.3);
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
         }
         
-        .admin-tab:hover, .admin-tab.active {
-            background: #ff6b6b;
-            border-color: #ff6b6b;
-            box-shadow: 0 0 40px #ff6b6b;
-            transform: scale(1.05);
+        .owner-tab::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
         }
         
-        .admin-content {
+        .owner-tab:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .owner-tab:hover, .owner-tab.active {
+            background: #ffd700;
+            color: black;
+            border-color: #ffd700;
+            box-shadow: 0 0 50px #ffd700;
+            transform: scale(1.08);
+        }
+        
+        .owner-content {
             display: none;
         }
         
-        .admin-content.active {
+        .owner-content.active {
             display: block;
         }
         
-        /* Карточки для админа */
+        /* Карточки */
         .application-card, .complaint-card {
             background: rgba(255,255,255,0.05);
-            padding: 2rem;
-            border-radius: 25px;
-            margin-bottom: 1.8rem;
-            border-left: 6px solid #4facfe;
+            padding: 2.2rem;
+            border-radius: 30px;
+            margin-bottom: 2rem;
+            border-left: 8px solid #4facfe;
             backdrop-filter: blur(5px);
-            transition: all 0.3s;
+            transition: all 0.5s;
+            animation: cardAppear 0.6s ease;
             position: relative;
+            overflow: hidden;
+        }
+        
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .application-card::before, .complaint-card::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: linear-gradient(45deg, transparent, rgba(255,215,0,0.1), transparent);
+            animation: cardShine 5s infinite;
+        }
+        
+        @keyframes cardShine {
+            0% { transform: rotate(0deg) translateX(-100%); }
+            100% { transform: rotate(45deg) translateX(100%); }
         }
         
         .application-card:hover, .complaint-card:hover {
-            transform: translateX(5px) translateY(-2px);
-            box-shadow: 0 15px 40px rgba(79,172,254,0.3);
+            transform: translateX(10px) translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(79,172,254,0.4);
         }
         
         .complaint-card {
@@ -439,22 +678,36 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
             flex-wrap: wrap;
             gap: 0.5rem;
         }
         
         .card-title {
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: #4facfe;
+            animation: titleColor 3s infinite;
+        }
+        
+        @keyframes titleColor {
+            0% { color: #4facfe; }
+            50% { color: #ffd700; }
+            100% { color: #4facfe; }
         }
         
         .card-status {
-            padding: 0.5rem 1.5rem;
-            border-radius: 30px;
-            font-size: 1rem;
+            padding: 0.6rem 1.8rem;
+            border-radius: 40px;
+            font-size: 1.1rem;
             font-weight: bold;
+            animation: statusPulse 2s infinite;
+        }
+        
+        @keyframes statusPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
         
         .status-pending {
@@ -472,135 +725,130 @@
             color: white;
         }
         
-        .admin-response {
-            background: rgba(79,172,254,0.1);
-            padding: 1.2rem;
-            border-radius: 15px;
-            margin: 1rem 0;
-            border-left: 3px solid #4facfe;
+        .owner-response {
+            background: rgba(255,215,0,0.15);
+            padding: 1.5rem;
+            border-radius: 20px;
+            margin: 1.2rem 0;
+            border-left: 4px solid #ffd700;
+            animation: responseGlow 2s infinite;
         }
         
-        .admin-response strong {
-            color: #4facfe;
+        @keyframes responseGlow {
+            0% { box-shadow: 0 0 10px rgba(255,215,0,0.3); }
+            50% { box-shadow: 0 0 30px rgba(255,215,0,0.6); }
+            100% { box-shadow: 0 0 10px rgba(255,215,0,0.3); }
         }
         
-        .response-text {
-            margin-top: 0.5rem;
-            font-style: italic;
-            color: #ddd;
+        .owner-response strong {
+            color: #ffd700;
         }
         
         .card-actions {
             display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
+            gap: 1.2rem;
+            margin-top: 2rem;
             flex-wrap: wrap;
+        }
+        
+        .accept-btn, .reject-btn, .delete-btn, .respond-btn {
+            padding: 0.9rem 2.5rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.4s;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border: none;
+            animation: btnAppear 0.5s ease;
+        }
+        
+        @keyframes btnAppear {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
         
         .accept-btn {
             background: #10b981;
             color: white;
-            border: none;
-            padding: 0.8rem 2.2rem;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: bold;
-            font-size: 1rem;
         }
         
         .accept-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px #10b981;
+            transform: scale(1.1) rotate(2deg);
+            box-shadow: 0 0 40px #10b981;
         }
         
         .reject-btn {
             background: #ef4444;
             color: white;
-            border: none;
-            padding: 0.8rem 2.2rem;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: bold;
-            font-size: 1rem;
         }
         
         .reject-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px #ef4444;
+            transform: scale(1.1) rotate(-2deg);
+            box-shadow: 0 0 40px #ef4444;
         }
         
         .delete-btn {
             background: #6b7280;
             color: white;
-            border: none;
-            padding: 0.8rem 2.2rem;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: bold;
-            font-size: 1rem;
-            margin-left: auto;
         }
         
         .delete-btn:hover {
             background: #ef4444;
-            transform: scale(1.05);
-            box-shadow: 0 0 30px #ef4444;
+            transform: scale(1.1);
+            box-shadow: 0 0 40px #ef4444;
         }
         
         .respond-btn {
-            background: #4facfe;
-            color: white;
-            border: none;
-            padding: 0.8rem 2.2rem;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: bold;
-            font-size: 1rem;
+            background: #ffd700;
+            color: black;
         }
         
         .respond-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px #4facfe;
+            transform: scale(1.1);
+            box-shadow: 0 0 50px #ffd700;
         }
         
         .response-form {
-            background: rgba(255,255,255,0.05);
-            padding: 1.5rem;
-            border-radius: 15px;
-            margin: 1rem 0;
+            background: rgba(255,215,0,0.1);
+            padding: 2rem;
+            border-radius: 20px;
+            margin: 1.2rem 0;
             display: none;
+            animation: formAppear 0.4s ease;
+        }
+        
+        @keyframes formAppear {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .response-form.active {
             display: block;
-            animation: slideDown 0.3s ease;
         }
         
         .response-form textarea {
             width: 100%;
-            padding: 1rem;
-            border: 2px solid rgba(79,172,254,0.3);
-            border-radius: 15px;
-            background: rgba(255,255,255,0.05);
+            padding: 1.2rem;
+            border: 2px solid #ffd700;
+            border-radius: 20px;
+            background: rgba(0,0,0,0.3);
             color: white;
-            font-size: 1rem;
-            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            margin-bottom: 1.2rem;
+            transition: all 0.3s;
         }
         
         .response-form textarea:focus {
             outline: none;
             border-color: #4facfe;
+            box-shadow: 0 0 40px #4facfe;
         }
         
         /* Правила */
         .rules-section {
-            background: rgba(0,0,0,0.3);
-            border-radius: 40px;
-            padding: 2.5rem;
+            background: rgba(0,0,0,0.4);
+            border-radius: 50px;
+            padding: 3rem;
             border: 1px solid rgba(79,172,254,0.3);
             backdrop-filter: blur(15px);
         }
@@ -609,19 +857,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2.5rem;
+            margin-bottom: 3rem;
             flex-wrap: wrap;
             gap: 1rem;
         }
         
         .rules-header h2 {
             color: #4facfe;
-            font-size: 2.8rem;
-            text-shadow: 0 0 40px #4facfe;
+            font-size: 3rem;
+            text-shadow: 0 0 60px #4facfe;
         }
         
         .rules-date {
-            color: #aaa;
+            color: #ccc;
             font-size: 1.2rem;
         }
         
@@ -632,44 +880,50 @@
         }
         
         .rules-section-block {
-            margin-bottom: 2.5rem;
+            margin-bottom: 3rem;
             background: rgba(255,255,255,0.03);
-            padding: 2rem;
-            border-radius: 25px;
+            padding: 2.5rem;
+            border-radius: 30px;
+            animation: blockAppear 0.8s ease;
+        }
+        
+        @keyframes blockAppear {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .rules-section-title {
-            color: #ff6b6b;
-            font-size: 2rem;
-            margin-bottom: 1.2rem;
-            text-shadow: 0 0 25px #ff6b6b;
+            color: #ffd700;
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 40px #ffd700;
         }
         
         .rule-item {
-            margin-bottom: 1.2rem;
-            padding-left: 1.5rem;
-            border-left: 3px solid #4facfe;
-            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            padding-left: 2rem;
+            border-left: 4px solid #4facfe;
+            line-height: 1.7;
         }
         
         .rule-number {
             color: #4facfe;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
         }
         
         .rule-punishment {
-            color: #ff6b6b;
-            font-size: 1rem;
-            margin-top: 0.3rem;
+            color: #ffd700;
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
             font-weight: bold;
         }
         
         /* Жалобы */
         .complaints-section {
-            background: rgba(0,0,0,0.3);
-            border-radius: 40px;
-            padding: 2.5rem;
+            background: rgba(0,0,0,0.4);
+            border-radius: 50px;
+            padding: 3rem;
             border: 1px solid rgba(79,172,254,0.3);
             backdrop-filter: blur(15px);
         }
@@ -678,65 +932,60 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2.5rem;
+            margin-bottom: 3rem;
             flex-wrap: wrap;
             gap: 1rem;
         }
         
         .complaints-header h2 {
             color: #4facfe;
-            font-size: 2.8rem;
-            text-shadow: 0 0 40px #4facfe;
+            font-size: 3rem;
+            text-shadow: 0 0 60px #4facfe;
         }
         
         .new-complaint-btn {
-            background: linear-gradient(135deg, #ff6b6b, #4facfe);
+            background: linear-gradient(135deg, #ff6b6b, #4facfe, #ffd700);
             border: none;
-            padding: 1.2rem 2.8rem;
-            border-radius: 50px;
+            padding: 1.3rem 3.2rem;
+            border-radius: 60px;
             color: white;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
-            font-size: 1.2rem;
-            box-shadow: 0 5px 25px rgba(79,172,254,0.4);
+            transition: all 0.5s;
+            font-size: 1.3rem;
+            box-shadow: 0 5px 30px rgba(79,172,254,0.4);
+            animation: btnPulse 2s infinite;
+        }
+        
+        @keyframes btnPulse {
+            0% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+            100% { filter: brightness(1); }
         }
         
         .new-complaint-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 15px 50px rgba(79,172,254,0.7);
+            transform: scale(1.1) rotate(2deg);
+            box-shadow: 0 20px 60px rgba(255,215,0,0.8);
         }
         
         .complaint-form {
             background: rgba(255,255,255,0.05);
-            padding: 2.5rem;
-            border-radius: 25px;
-            margin-bottom: 2.5rem;
+            padding: 3rem;
+            border-radius: 30px;
+            margin-bottom: 3rem;
             display: none;
-            border: 1px solid #4facfe;
+            border: 1px solid #ffd700;
         }
         
         .complaint-form.active {
             display: block;
-            animation: slideDown 0.4s ease;
-        }
-        
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .complaint-form h3 {
-            color: #4facfe;
-            margin-bottom: 2rem;
-            font-size: 2rem;
         }
         
         /* Заявки */
         .apply-section {
-            background: rgba(0,0,0,0.3);
-            border-radius: 40px;
-            padding: 2.5rem;
+            background: rgba(0,0,0,0.4);
+            border-radius: 50px;
+            padding: 3rem;
             border: 1px solid rgba(79,172,254,0.3);
             backdrop-filter: blur(15px);
             margin-top: 1rem;
@@ -744,17 +993,17 @@
         
         .apply-section h2 {
             color: #4facfe;
-            margin-bottom: 2.5rem;
-            font-size: 2.8rem;
+            margin-bottom: 3rem;
+            font-size: 3rem;
             text-align: center;
-            text-shadow: 0 0 40px #4facfe;
+            text-shadow: 0 0 60px #4facfe;
         }
         
         .apply-form {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1.8rem;
-            max-width: 900px;
+            gap: 2rem;
+            max-width: 1000px;
             margin: 0 auto;
         }
         
@@ -769,7 +1018,7 @@
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #4facfe;
+            color: #ffd700;
             font-weight: bold;
             font-size: 1.2rem;
         }
@@ -777,32 +1026,34 @@
         .form-group input, .form-group textarea {
             width: 100%;
             padding: 1.2rem;
-            border: 2px solid rgba(79,172,254,0.3);
+            border: 2px solid #ffd700;
             border-radius: 20px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.3);
             color: white;
-            font-size: 1rem;
-            transition: all 0.3s;
+            font-size: 1.1rem;
+            transition: all 0.4s;
         }
         
         .form-group input:focus, .form-group textarea:focus {
             outline: none;
             border-color: #4facfe;
-            box-shadow: 0 0 40px rgba(79,172,254,0.4);
+            box-shadow: 0 0 50px #4facfe;
+            transform: scale(1.02);
         }
         
         .photo-upload {
-            border: 2px dashed #4facfe;
-            padding: 2.5rem;
+            border: 3px dashed #ffd700;
+            padding: 3rem;
             text-align: center;
-            border-radius: 20px;
+            border-radius: 25px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.4s;
         }
         
         .photo-upload:hover {
-            background: rgba(79,172,254,0.1);
-            border-color: #ff6b6b;
+            background: rgba(255,215,0,0.2);
+            border-color: #4facfe;
+            transform: scale(1.02);
         }
         
         .photo-preview {
@@ -813,50 +1064,50 @@
         }
         
         .photo-preview img {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             object-fit: cover;
-            border-radius: 10px;
-            border: 2px solid #4facfe;
+            border-radius: 15px;
+            border: 3px solid #ffd700;
+            animation: photoAppear 0.4s ease;
+        }
+        
+        @keyframes photoAppear {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
         
         .submit-btn {
-            background: linear-gradient(135deg, #ff6b6b, #4facfe);
+            background: linear-gradient(135deg, #ffd700, #ff6b6b, #4facfe);
             border: none;
-            padding: 1.5rem 2.5rem;
-            border-radius: 60px;
+            padding: 1.5rem 3rem;
+            border-radius: 70px;
             color: white;
             font-weight: bold;
             cursor: pointer;
             width: 100%;
-            font-size: 1.3rem;
-            margin-top: 1.5rem;
-            transition: all 0.3s;
-            box-shadow: 0 5px 25px rgba(79,172,254,0.4);
+            font-size: 1.4rem;
+            margin-top: 2rem;
+            transition: all 0.5s;
+            box-shadow: 0 5px 30px rgba(79,172,254,0.4);
+            animation: submitPulse 2s infinite;
+        }
+        
+        @keyframes submitPulse {
+            0% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+            100% { filter: brightness(1); }
         }
         
         .submit-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 15px 50px rgba(79,172,254,0.7);
-        }
-        
-        .success-message {
-            display: none;
-            background: rgba(72, 187, 120, 0.2);
-            border: 2px solid #48bb78;
-            color: #48bb78;
-            padding: 1.2rem;
-            border-radius: 20px;
-            text-align: center;
-            margin-top: 1.5rem;
-            font-weight: bold;
-            font-size: 1.1rem;
+            transform: scale(1.05);
+            box-shadow: 0 20px 70px rgba(255,215,0,0.8);
         }
         
         .complaints-list {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.5rem;
             margin-top: 2rem;
         }
         
@@ -874,7 +1125,7 @@
         
         .complaint-photos {
             display: flex;
-            gap: 0.8rem;
+            gap: 1rem;
             margin: 1rem 0;
             flex-wrap: wrap;
         }
@@ -883,23 +1134,24 @@
             width: 120px;
             height: 120px;
             object-fit: cover;
-            border-radius: 10px;
+            border-radius: 15px;
             cursor: pointer;
             border: 2px solid #4facfe;
-            transition: all 0.3s;
+            transition: all 0.4s;
         }
         
         .complaint-photos img:hover {
-            transform: scale(1.05);
-            border-color: #ff6b6b;
+            transform: scale(1.1) rotate(2deg);
+            border-color: #ffd700;
+            box-shadow: 0 0 40px #ffd700;
         }
         
         .complaint-text {
             margin: 1rem 0;
-            padding: 1rem;
-            background: rgba(0,0,0,0.3);
+            padding: 1.2rem;
+            background: rgba(0,0,0,0.4);
             border-radius: 15px;
-            line-height: 1.6;
+            line-height: 1.7;
         }
         
         /* Модалки */
@@ -910,33 +1162,39 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.95);
+            background: rgba(0,0,0,0.98);
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(20px);
+            animation: modalBg 0.3s ease;
+        }
+        
+        @keyframes modalBg {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         .modal-content {
             background: linear-gradient(135deg, #1a1a3a, #2a1a4a);
-            padding: 3.5rem;
-            border-radius: 40px;
-            max-width: 500px;
+            padding: 4rem;
+            border-radius: 60px;
+            max-width: 550px;
             width: 90%;
-            border: 2px solid #4facfe;
-            box-shadow: 0 0 80px rgba(79,172,254,0.4);
-            animation: modalPop 0.4s ease;
+            border: 3px solid #ffd700;
+            box-shadow: 0 0 100px rgba(255,215,0,0.5);
+            animation: modalPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
         
         @keyframes modalPop {
-            from { opacity: 0; transform: scale(0.8); }
+            from { opacity: 0; transform: scale(0.6); }
             to { opacity: 1; transform: scale(1); }
         }
         
         .modal-content h2 {
-            color: #4facfe;
-            margin-bottom: 2rem;
-            font-size: 2.2rem;
+            color: #ffd700;
+            margin-bottom: 2.5rem;
+            font-size: 2.5rem;
             text-align: center;
         }
         
@@ -944,61 +1202,61 @@
             width: 100%;
             padding: 1.2rem;
             margin: 0.5rem 0;
-            border: 2px solid rgba(79,172,254,0.3);
-            border-radius: 20px;
+            border: 2px solid #ffd700;
+            border-radius: 30px;
             background: rgba(255,255,255,0.05);
             color: white;
-            font-size: 1rem;
+            font-size: 1.1rem;
         }
         
         .modal-content button {
             width: 100%;
             padding: 1.2rem;
-            margin-top: 1.5rem;
-            background: linear-gradient(135deg, #ff6b6b, #4facfe);
+            margin-top: 2rem;
+            background: linear-gradient(135deg, #ffd700, #ff6b6b);
             border: none;
             border-radius: 60px;
-            color: white;
+            color: black;
             font-weight: bold;
             cursor: pointer;
-            font-size: 1.2rem;
-            transition: all 0.3s;
+            font-size: 1.3rem;
+            transition: all 0.4s;
         }
         
         .modal-content button:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 50px rgba(79,172,254,0.6);
+            transform: scale(1.05);
+            box-shadow: 0 0 60px #ffd700;
         }
         
         .close {
             float: right;
             cursor: pointer;
-            color: #ff6b6b;
-            font-size: 2.2rem;
-            transition: all 0.3s;
+            color: #ffd700;
+            font-size: 2.5rem;
+            transition: all 0.4s;
         }
         
         .close:hover {
-            transform: rotate(90deg);
-            color: #4facfe;
+            transform: rotate(180deg) scale(1.2);
+            color: #ff6b6b;
         }
         
         .modal-link {
-            color: #4facfe;
+            color: #ffd700;
             text-decoration: none;
             font-weight: bold;
             transition: all 0.3s;
         }
         
         .modal-link:hover {
-            color: #ff6b6b;
-            text-shadow: 0 0 25px #ff6b6b;
+            color: #4facfe;
+            text-shadow: 0 0 30px #4facfe;
         }
         
         #fullImage {
             max-width: 100%;
             max-height: 80vh;
-            border-radius: 15px;
+            border-radius: 20px;
         }
         
         @media (max-width: 768px) {
@@ -1007,12 +1265,12 @@
             }
             
             .hero h1 {
-                font-size: 2.8rem;
+                font-size: 3rem;
             }
             
             .server-ip {
-                font-size: 1.4rem;
-                padding: 0.8rem 1.8rem;
+                font-size: 1.6rem;
+                padding: 1rem 2rem;
             }
             
             .apply-form {
@@ -1024,12 +1282,8 @@
             }
             
             .tab {
-                padding: 1rem 1.8rem;
-                font-size: 1rem;
-            }
-            
-            .admin-header h2 {
-                font-size: 2rem;
+                padding: 1rem 2rem;
+                font-size: 1.1rem;
             }
         }
     </style>
@@ -1044,9 +1298,9 @@
     </nav>
     
     <div class="container">
-        <!-- Кнопка назад (будет видна не на главной) -->
+        <!-- Кнопка назад -->
         <div id="backButtonContainer" style="display: none;">
-            <div class="back-button" onclick="goBack()">Вернуться на главную</div>
+            <div class="back-button" onclick="goBack()"></div>
         </div>
         
         <!-- Главная -->
@@ -1055,13 +1309,13 @@
                 <h1>MoonGrief</h1>
                 <p>Официальный форум сервера</p>
                 <div class="server-ip" onclick="copyIP()">moongrief.aurorix.pro 📋</div>
-                <p>Нажми на IP чтобы скопировать и зайти на сервер</p>
+                <p>Нажми на IP чтобы скопировать</p>
             </div>
             
             <div class="tabs">
                 <div class="tab" onclick="showSection('rules')">📜 Правила</div>
                 <div class="tab" onclick="showSection('complaints')">⚠️ Жалобы</div>
-                <div class="tab" onclick="showSection('apply')">📝 Заявки в Хелперы</div>
+                <div class="tab" onclick="showSection('apply')">📝 Заявки</div>
             </div>
         </div>
         
@@ -1069,10 +1323,9 @@
         <div id="rulesSection" class="section">
             <div class="rules-section">
                 <div class="rules-header">
-                    <h2>📜 Правила сервера MoonGrief</h2>
+                    <h2>📜 Правила</h2>
                     <div class="rules-date">3 марта 2025</div>
                 </div>
-                
                 <div class="rules-content" id="rulesContent"></div>
             </div>
         </div>
@@ -1081,114 +1334,95 @@
         <div id="complaintsSection" class="section">
             <div class="complaints-section">
                 <div class="complaints-header">
-                    <h2>⚠️ Жалобы на игроков</h2>
-                    <button class="new-complaint-btn" onclick="toggleComplaintForm()">+ Новая жалоба</button>
+                    <h2>⚠️ Жалобы</h2>
+                    <button class="new-complaint-btn" onclick="toggleComplaintForm()">+ Новая</button>
                 </div>
                 
-                <!-- Форма жалобы -->
                 <div class="complaint-form" id="complaintForm">
                     <h3>Создать жалобу</h3>
-                    
                     <div class="form-group">
-                        <label>Ваш никнейм:</label>
+                        <label>Ваш ник:</label>
                         <input type="text" id="complainant" placeholder="Ваш Minecraft ник">
                     </div>
-                    
                     <div class="form-group">
-                        <label>Ник нарушителя:</label>
+                        <label>Нарушитель:</label>
                         <input type="text" id="accused" placeholder="Кто нарушил?">
                     </div>
-                    
                     <div class="form-group">
-                        <label>Что нарушил? (номер правила):</label>
-                        <input type="text" id="ruleNumber" placeholder="Например: 4.4, 5.2 и т.д.">
+                        <label>Правило:</label>
+                        <input type="text" id="ruleNumber" placeholder="Номер правила">
                     </div>
-                    
                     <div class="form-group">
-                        <label>Описание нарушения:</label>
-                        <textarea id="description" rows="4" placeholder="Опишите подробно что произошло..."></textarea>
+                        <label>Описание:</label>
+                        <textarea id="description" rows="4" placeholder="Опишите..."></textarea>
                     </div>
-                    
                     <div class="form-group">
-                        <label>Доказательства (скриншоты):</label>
+                        <label>Скриншоты:</label>
                         <div class="photo-upload" onclick="document.getElementById('photoInput').click()">
                             <input type="file" id="photoInput" multiple accept="image/*" onchange="handlePhotoUpload(event)">
-                            <p>📷 Нажмите чтобы загрузить скриншоты</p>
-                            <p style="font-size: 0.8rem; color: #888;">Можно загрузить несколько файлов</p>
+                            <p>📷 Загрузить</p>
                         </div>
                         <div class="photo-preview" id="photoPreview"></div>
                     </div>
-                    
-                    <button class="submit-btn" onclick="submitComplaint()">Отправить жалобу</button>
+                    <button class="submit-btn" onclick="submitComplaint()">Отправить</button>
                 </div>
                 
-                <!-- Список жалоб -->
                 <div class="complaints-list" id="complaintsList"></div>
             </div>
         </div>
         
-        <!-- Заявки в Хелперы -->
+        <!-- Заявки -->
         <div id="applySection" class="section">
             <div class="apply-section">
-                <h2>📝 Анкета на Хелпера</h2>
-                
+                <h2>📝 Заявки в Хелперы</h2>
                 <div class="apply-form">
                     <div class="form-group full-width">
-                        <label>Игровой никнейм:</label>
+                        <label>Никнейм:</label>
                         <input type="text" id="nickname" placeholder="Ваш игровой ник">
                     </div>
-                    
                     <div class="form-group">
                         <label>Имя:</label>
-                        <input type="text" id="name" placeholder="Ваше настоящее имя">
+                        <input type="text" id="name" placeholder="Ваше имя">
                     </div>
-                    
                     <div class="form-group">
-                        <label>Сколько лет:</label>
-                        <input type="number" id="age" placeholder="Ваш возраст" min="10" max="100">
+                        <label>Возраст:</label>
+                        <input type="number" id="age" placeholder="Ваш возраст">
                     </div>
-                    
                     <div class="form-group full-width">
                         <label>Часовой пояс:</label>
-                        <input type="text" id="timezone" placeholder="Например: UTC+3, Москва">
+                        <input type="text" id="timezone" placeholder="Например: UTC+3">
                     </div>
-                    
                     <div class="form-group full-width">
-                        <label>Опыт работы на должности:</label>
-                        <textarea id="experience" rows="3" placeholder="Расскажите о своем опыте"></textarea>
+                        <label>Опыт:</label>
+                        <textarea id="experience" rows="3" placeholder="Опыт работы"></textarea>
                     </div>
-                    
                     <div class="form-group full-width">
-                        <label>Почему вы хотите стать хелпером?</label>
-                        <textarea id="why" rows="3" placeholder="Напишите почему вы хотите помогать игрокам"></textarea>
+                        <label>Почему вы?</label>
+                        <textarea id="why" rows="3" placeholder="Почему хотите стать хелпером?"></textarea>
                     </div>
-                    
-                    <button class="submit-btn" onclick="submitApplication()">Отправить анкету</button>
-                    
-                    <div class="success-message" id="successMessage">
-                        ✅ Анкета отправлена! Администрация рассмотрит её в ближайшее время
-                    </div>
+                    <button class="submit-btn" onclick="submitApplication()">Отправить</button>
+                    <div class="success-message" id="successMessage">✅ Отправлено!</div>
                 </div>
             </div>
         </div>
         
-        <!-- Админ панель (ТОЛЬКО ДЛЯ АДМИНОВ) -->
-        <div id="adminSection" class="section">
-            <div class="admin-section">
-                <div class="admin-header">
-                    <h2>👑 Админ панель</h2>
-                    <div class="admin-stats" id="adminStats"></div>
+        <!-- OWNER панель -->
+        <div id="ownerSection" class="section">
+            <div class="owner-section">
+                <div class="owner-header">
+                    <h2>👑 OWNER панель</h2>
+                    <div class="owner-stats" id="ownerStats"></div>
                 </div>
                 
-                <div class="admin-tabs">
-                    <div class="admin-tab active" onclick="showAdminTab('applications', event)">📝 Заявки</div>
-                    <div class="admin-tab" onclick="showAdminTab('complaints', event)">⚠️ Жалобы</div>
-                    <div class="admin-tab" onclick="showAdminTab('users', event)">👥 Пользователи</div>
+                <div class="owner-tabs">
+                    <div class="owner-tab active" onclick="showOwnerTab('applications', event)">📝 Заявки</div>
+                    <div class="owner-tab" onclick="showOwnerTab('complaints', event)">⚠️ Жалобы</div>
+                    <div class="owner-tab" onclick="showOwnerTab('users', event)">👥 Пользователи</div>
                 </div>
                 
-                <div id="adminApplications" class="admin-content active"></div>
-                <div id="adminComplaints" class="admin-content"></div>
-                <div id="adminUsers" class="admin-content"></div>
+                <div id="ownerApplications" class="owner-content active"></div>
+                <div id="ownerComplaints" class="owner-content"></div>
+                <div id="ownerUsers" class="owner-content"></div>
             </div>
         </div>
     </div>
@@ -1222,7 +1456,7 @@
     </div>
     
     <div id="imageModal" class="modal" onclick="this.style.display='none'">
-        <div class="modal-content" style="max-width: 800px; text-align: center; background: transparent; border: none; box-shadow: none;">
+        <div class="modal-content" style="max-width: 800px; text-align: center; background: transparent; border: none;">
             <img id="fullImage" src="">
         </div>
     </div>
@@ -1235,79 +1469,22 @@
         let applications = JSON.parse(localStorage.getItem('applications')) || [];
         let uploadedPhotos = [];
         
-        // Список админов (по ЛОГИНУ)
-        const admins = ['milk123', 'Xchik_', 'milfa'];
+        // OWNERы (по логину)
+        const owners = ['milk123', 'Xchik_', 'milfa'];
         
         // Правила
         const rulesData = {
             sections: [
-                {
-                    title: "1. Общие положения",
-                    rules: [
-                        { num: "1.1", text: "Настоящие правила разработаны администратором сервера MoonGrief и действуют на всех существующих игровых режимах." },
-                        { num: "1.2", text: "Официальные сервера расположены по адресам: Moongrief.aurorix.pro. Другие домены не относятся к проекту. Регистрируясь на проекте, вы автоматически соглашаетесь с этими правилами и правилами всех игровых режимов." },
-                        { num: "1.3", text: "Решения администрации являются окончательными и не подлежат обсуждению. Главная администрация имеет право наказывать за нарушения, не предусмотренные в этих правилах." },
-                        { num: "1.4", text: "Администрация не компенсирует потерю ресурсов, вызванную техническими сбоями (лагами, багами), действиями читеров или других игроков." },
-                        { num: "1.5", text: "Запрещённые действия: продажа/взлом аккаунтов, распространение личных данных, намеренный вред серверу, продажа игровых предметов за реальные деньги.", punishment: "Бан игрока по Айпи. Бан игрового аккаунта." },
-                        { num: "1.6", text: "Игроки обязаны проявлять уважение к администрации сервера." },
-                        { num: "1.7", text: "Администрация проекта может вносить изменения в правила без предварительного уведомления игроков." }
-                    ]
-                },
-                {
-                    title: "2. Аккаунт и никнейм",
-                    rules: [
-                        { num: "2.1", text: "Игровой никнейм должен соответствовать установленным правилам." },
-                        { num: "2.1.1", text: "Запрещены ники, похожие на никнеймы администрации." },
-                        { num: "2.1.2", text: "Запрещены ники, оскорбляющие других игроков." },
-                        { num: "2.1.3", text: "Запрещены ники с запрещённым ПО, националистическими символами." },
-                        { num: "2.2", text: "Сохраняйте чеки после покупки платных дополнений." }
-                    ]
-                },
-                {
-                    title: "3. Донат и пожертвования",
-                    rules: [
-                        { num: "3.1", text: "Участие в проекте является бесплатным." },
-                        { num: "3.2", text: "Игроки могут добровольно поддерживать развитие проекта." },
-                        { num: "3.3", text: "При проблемах с платежом обращаться в техподдержку." },
-                        { num: "3.4", text: "Пожертвования не подлежат возврату." },
-                        { num: "3.5", text: "Покупка платных групп не даёт право нарушать правила." }
-                    ]
-                },
-                {
-                    title: "4. Чат и общение",
-                    rules: [
-                        { num: "4.1", text: "Запрещён флуд и бессмысленные сообщения.", punishment: "Мут на 2 часа" },
-                        { num: "4.2", text: "Запрещён обход мута через /bc.", punishment: "Бан на 1 день" },
-                        { num: "4.3", text: "Запрещён CAPS (более 50% текста).", punishment: "Мут на 2 часа" },
-                        { num: "4.4", text: "Запрещены оскорбления и угрозы.", punishment: "Мут на 2 часа" },
-                        { num: "4.4.1", text: "Запрещены оскорбления родителей.", punishment: "Мут на 6 часов" },
-                        { num: "4.5", text: "Запрещён призыв к суициду.", punishment: "Мут на 1 день" },
-                        { num: "4.6", text: "Запрещено оскорбление проекта.", punishment: "Мут на 1 день" },
-                        { num: "4.7", text: "Запрещено попрошайничество.", punishment: "Мут на 2 часа" },
-                        { num: "4.8", text: "Запрещена дезинформация.", punishment: "Мут на 1 день" },
-                        { num: "4.9", text: "Запрещено упоминание сторонних проектов.", punishment: "Мут на 2 часа" },
-                        { num: "4.9.1", text: "Запрещена реклама сторонних ресурсов.", punishment: "Бан на 14 дней" }
-                    ]
-                },
-                {
-                    title: "5. Запрещённый софт и читы",
-                    rules: [
-                        { num: "5.2", text: "Запрещено использование стороннего ПО, дающего преимущество.", punishment: "Бан на 50 дней" },
-                        { num: "5.2.1", text: "Признание в использовании читов.", punishment: "Бан на 40 дней" },
-                        { num: "5.3", text: "Запрещена совместная игра с читерами.", punishment: "Бан на 14 дней" }
-                    ]
-                },
-                {
-                    title: "6. Игровой процесс",
-                    rules: [
-                        { num: "6.1", text: "Запрещены лаг-машины.", punishment: "Бан на 7 дней" },
-                        { num: "6.2", text: "Расстояние от варпа до ловушки - не менее 10 блоков.", punishment: "Бан на 1 день" },
-                        { num: "6.3", text: "Запрещён спам /spec.", punishment: "Бан на 1 час" },
-                        { num: "6.4", text: "Подача ложных жалоб запрещена." },
-                        { num: "6.5", text: "Запрещены ловушки без выхода.", punishment: "Бан на 1 день" },
-                        { num: "6.6", text: "Блокировка по Айпи не обжалуется." }
-                    ]
-                }
+                { title: "1. Общие положения", rules: [
+                    { num: "1.1", text: "Настоящие правила разработаны администратором сервера MoonGrief." },
+                    { num: "1.2", text: "Официальные сервера: Moongrief.aurorix.pro." },
+                    { num: "1.3", text: "Решения администрации окончательны." },
+                    { num: "1.5", text: "Запрещена продажа аккаунтов.", punishment: "Бан по Айпи" }
+                ]},
+                { title: "4. Чат", rules: [
+                    { num: "4.1", text: "Запрещён флуд.", punishment: "Мут 2ч" },
+                    { num: "4.4", text: "Запрещены оскорбления.", punishment: "Мут 2ч" }
+                ]}
             ]
         };
         
@@ -1316,20 +1493,16 @@
             loadRules();
             checkAuth();
             loadComplaints();
-            updateAdminStats();
+            updateOwnerStats();
         });
         
         function loadRules() {
             let html = '';
             rulesData.sections.forEach(section => {
-                html += '<div class="rules-section-block">';
-                html += `<div class="rules-section-title">${section.title}</div>`;
+                html += '<div class="rules-section-block"><div class="rules-section-title">' + section.title + '</div>';
                 section.rules.forEach(rule => {
-                    html += '<div class="rule-item">';
-                    html += `<span class="rule-number">${rule.num}</span> ${rule.text}`;
-                    if (rule.punishment) {
-                        html += `<div class="rule-punishment">Наказание: ${rule.punishment}</div>`;
-                    }
+                    html += '<div class="rule-item"><span class="rule-number">' + rule.num + '</span> ' + rule.text;
+                    if (rule.punishment) html += '<div class="rule-punishment">' + rule.punishment + '</div>';
                     html += '</div>';
                 });
                 html += '</div>';
@@ -1347,18 +1520,18 @@
             } else {
                 updateUserMenu();
             }
-            updateAdminVisibility();
+            updateOwnerVisibility();
         }
         
         function updateUserMenu() {
             let menu = document.getElementById('userMenu');
             if (currentUser) {
-                let isAdmin = admins.includes(currentUser.username);
+                let isOwner = owners.includes(currentUser.username);
                 menu.innerHTML = `
                     <div class="user-info">
                         <div class="user-avatar">${(currentUser.minecraft || 'U')[0]}</div>
                         <span>${currentUser.minecraft || currentUser.username}</span>
-                        ${isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
+                        ${isOwner ? '<span class="owner-badge">OWNER</span>' : ''}
                     </div>
                     <div class="auth-buttons">
                         <button class="auth-btn" onclick="logout()">Выйти</button>
@@ -1374,18 +1547,17 @@
             }
         }
         
-        function updateAdminVisibility() {
-            // Добавляем вкладку админки для админов
+        function updateOwnerVisibility() {
             let tabs = document.querySelector('.tabs');
-            let existingTab = document.getElementById('adminTab');
+            let existingTab = document.getElementById('ownerTab');
             
-            if (currentUser && admins.includes(currentUser.username)) {
+            if (currentUser && owners.includes(currentUser.username)) {
                 if (!existingTab) {
                     let tab = document.createElement('div');
                     tab.className = 'tab';
-                    tab.id = 'adminTab';
-                    tab.onclick = function() { showSection('admin'); };
-                    tab.innerHTML = '👑 Админ панель';
+                    tab.id = 'ownerTab';
+                    tab.onclick = function() { showSection('owner'); };
+                    tab.innerHTML = '👑 Owner';
                     tabs.appendChild(tab);
                 }
             } else {
@@ -1396,13 +1568,11 @@
         function showSection(section) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(section + 'Section').classList.add('active');
-            
-            // Показываем кнопку назад (кроме главной)
             document.getElementById('backButtonContainer').style.display = section === 'main' ? 'none' : 'block';
             
-            if (section === 'admin') {
-                updateAdminStats();
-                showAdminTab('applications', { target: document.querySelector('.admin-tab') });
+            if (section === 'owner') {
+                updateOwnerStats();
+                showOwnerTab('applications', { target: document.querySelector('.owner-tab') });
             } else if (section === 'complaints') {
                 loadComplaints();
             }
@@ -1414,7 +1584,6 @@
         
         function copyIP() {
             navigator.clipboard.writeText('moongrief.aurorix.pro');
-            alert('✅ IP скопирован! Заходи на сервер moongrief.aurorix.pro');
         }
         
         function showModal(type) {
@@ -1445,14 +1614,12 @@
                 
                 users.push(newUser);
                 localStorage.setItem('users', JSON.stringify(users));
-                
                 currentUser = newUser;
                 localStorage.setItem('currentUser', JSON.stringify(newUser));
                 
-                alert('✅ Регистрация успешна!');
                 closeModal('register');
                 updateUserMenu();
-                updateAdminVisibility();
+                updateOwnerVisibility();
                 document.getElementById('complainant').value = currentUser.minecraft || '';
                 document.getElementById('nickname').value = currentUser.minecraft || '';
             } else {
@@ -1463,16 +1630,14 @@
         function login() {
             let user = document.getElementById('loginUser').value.trim();
             let pass = document.getElementById('loginPass').value.trim();
-            
             let found = users.find(u => u.username === user && u.password === pass);
             
             if (found) {
                 currentUser = found;
                 localStorage.setItem('currentUser', JSON.stringify(found));
-                alert('Добро пожаловать, ' + (found.minecraft || found.username) + '!');
                 closeModal('login');
                 updateUserMenu();
-                updateAdminVisibility();
+                updateOwnerVisibility();
                 document.getElementById('complainant').value = currentUser.minecraft || '';
                 document.getElementById('nickname').value = currentUser.minecraft || '';
             } else {
@@ -1484,14 +1649,13 @@
             currentUser = null;
             localStorage.removeItem('currentUser');
             updateUserMenu();
-            updateAdminVisibility();
+            updateOwnerVisibility();
             showSection('main');
         }
         
         // Жалобы
         function toggleComplaintForm() {
             if (!currentUser) {
-                alert('❌ Сначала войдите или зарегистрируйтесь');
                 showModal('login');
                 return;
             }
@@ -1517,21 +1681,14 @@
         }
         
         function submitComplaint() {
-            if (!currentUser) {
-                alert('❌ Сначала войдите');
-                showModal('login');
-                return;
-            }
+            if (!currentUser) return;
             
             let accused = document.getElementById('accused').value.trim();
             let ruleNumber = document.getElementById('ruleNumber').value.trim();
             let description = document.getElementById('description').value.trim();
             let complainant = document.getElementById('complainant').value.trim();
             
-            if (!accused || !ruleNumber || !description) {
-                alert('❌ Заполните все поля');
-                return;
-            }
+            if (!accused || !ruleNumber || !description) return;
             
             let complaint = {
                 id: Date.now(),
@@ -1542,14 +1699,12 @@
                 photos: uploadedPhotos,
                 status: 'pending',
                 date: new Date().toLocaleString(),
-                userId: currentUser.username,
-                adminResponse: null
+                userId: currentUser.username
             };
             
             complaints.push(complaint);
             localStorage.setItem('complaints', JSON.stringify(complaints));
             
-            // Очистка
             document.getElementById('accused').value = '';
             document.getElementById('ruleNumber').value = '';
             document.getElementById('description').value = '';
@@ -1557,16 +1712,14 @@
             uploadedPhotos = [];
             document.getElementById('complaintForm').classList.remove('active');
             
-            alert('✅ Жалоба отправлена!');
             loadComplaints();
-            updateAdminStats();
+            updateOwnerStats();
         }
         
         function loadComplaints() {
             let list = document.getElementById('complaintsList');
-            
             if (complaints.length === 0) {
-                list.innerHTML = '<p style="text-align: center; color: #888;">Жалоб пока нет</p>';
+                list.innerHTML = '<p style="text-align: center;">Жалоб пока нет</p>';
                 return;
             }
             
@@ -1581,27 +1734,16 @@
                     photosHtml += '</div>';
                 }
                 
-                let responseHtml = '';
-                if (c.adminResponse) {
-                    responseHtml = `
-                        <div class="admin-response">
-                            <strong>Ответ администрации:</strong>
-                            <div class="response-text">${c.adminResponse}</div>
-                        </div>
-                    `;
-                }
-                
                 list.innerHTML += `
                     <div class="complaint-card">
                         <div class="card-header">
-                            <span class="card-title">Нарушитель: ${c.accused}</span>
+                            <span class="card-title">${c.accused}</span>
                             <span class="card-status status-${c.status}">${getStatusText(c.status)}</span>
                         </div>
-                        <div class="complaint-author">Жалоба от: ${c.complainant} | ${c.date}</div>
-                        <div class="complaint-rule">Нарушение: правило ${c.ruleNumber}</div>
+                        <div>От: ${c.complainant} | ${c.date}</div>
+                        <div>Правило: ${c.ruleNumber}</div>
                         ${photosHtml}
-                        <div class="complaint-text">${c.description}</div>
-                        ${responseHtml}
+                        <div>${c.description}</div>
                     </div>
                 `;
             });
@@ -1610,7 +1752,6 @@
         // Заявки
         function submitApplication() {
             if (!currentUser) {
-                alert('❌ Сначала войдите или зарегистрируйтесь');
                 showModal('login');
                 return;
             }
@@ -1633,15 +1774,13 @@
                     experience: experience,
                     why: why,
                     status: 'pending',
-                    date: new Date().toLocaleString(),
-                    adminResponse: null
+                    date: new Date().toLocaleString()
                 };
                 
                 applications.push(application);
                 localStorage.setItem('applications', JSON.stringify(applications));
                 
                 document.getElementById('successMessage').style.display = 'block';
-                
                 document.getElementById('name').value = '';
                 document.getElementById('age').value = '';
                 document.getElementById('timezone').value = '';
@@ -1650,71 +1789,45 @@
                 
                 setTimeout(() => {
                     document.getElementById('successMessage').style.display = 'none';
-                }, 5000);
+                }, 2000);
                 
-                alert('✅ Анкета отправлена!');
-                updateAdminStats();
-            } else {
-                alert('❌ Заполните все поля анкеты!');
+                updateOwnerStats();
             }
         }
         
-        // Админ панель
-        function updateAdminStats() {
-            let stats = document.getElementById('adminStats');
+        // OWNER панель
+        function updateOwnerStats() {
+            let stats = document.getElementById('ownerStats');
             stats.innerHTML = `
-                <div class="stat-card">
-                    <div class="number">${applications.length}</div>
-                    <div class="label">Всего заявок</div>
-                </div>
-                <div class="stat-card">
-                    <div class="number">${applications.filter(a => a.status === 'pending').length}</div>
-                    <div class="label">Новых заявок</div>
-                </div>
-                <div class="stat-card">
-                    <div class="number">${complaints.length}</div>
-                    <div class="label">Всего жалоб</div>
-                </div>
-                <div class="stat-card">
-                    <div class="number">${complaints.filter(c => c.status === 'pending').length}</div>
-                    <div class="label">Новых жалоб</div>
-                </div>
+                <div class="stat-card"><div class="number">${applications.length}</div><div>Заявок</div></div>
+                <div class="stat-card"><div class="number">${applications.filter(a => a.status === 'pending').length}</div><div>Новых</div></div>
+                <div class="stat-card"><div class="number">${complaints.length}</div><div>Жалоб</div></div>
+                <div class="stat-card"><div class="number">${complaints.filter(c => c.status === 'pending').length}</div><div>Новых</div></div>
             `;
         }
         
-        function showAdminTab(tab, event) {
-            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.admin-content').forEach(c => c.classList.remove('active'));
-            
+        function showOwnerTab(tab, event) {
+            document.querySelectorAll('.owner-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.owner-content').forEach(c => c.classList.remove('active'));
             event.target.classList.add('active');
-            document.getElementById('admin' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+            document.getElementById('owner' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
             
-            if (tab === 'applications') loadAdminApplications();
-            if (tab === 'complaints') loadAdminComplaints();
-            if (tab === 'users') loadAdminUsers();
+            if (tab === 'applications') loadOwnerApplications();
+            if (tab === 'complaints') loadOwnerComplaints();
+            if (tab === 'users') loadOwnerUsers();
         }
         
-        function loadAdminApplications() {
-            let container = document.getElementById('adminApplications');
+        function loadOwnerApplications() {
+            let container = document.getElementById('ownerApplications');
             if (applications.length === 0) {
-                container.innerHTML = '<p style="text-align: center;">Заявок пока нет</p>';
+                container.innerHTML = '<p style="text-align: center;">Заявок нет</p>';
                 return;
             }
             
             container.innerHTML = '';
             applications.slice().reverse().forEach(app => {
-                let responseHtml = '';
-                if (app.adminResponse) {
-                    responseHtml = `
-                        <div class="admin-response">
-                            <strong>Ваш ответ:</strong>
-                            <div class="response-text">${app.adminResponse}</div>
-                        </div>
-                    `;
-                }
-                
                 container.innerHTML += `
-                    <div class="application-card" id="app-${app.id}">
+                    <div class="application-card">
                         <div class="card-header">
                             <span class="card-title">${app.nickname}</span>
                             <span class="card-status status-${app.status}">${getStatusText(app.status)}</span>
@@ -1723,17 +1836,9 @@
                         <div><strong>Возраст:</strong> ${app.age}</div>
                         <div><strong>Пояс:</strong> ${app.timezone}</div>
                         <div><strong>Дата:</strong> ${app.date}</div>
-                        <div style="margin-top:0.5rem;"><strong>Опыт:</strong> ${app.experience}</div>
+                        <div><strong>Опыт:</strong> ${app.experience}</div>
                         <div><strong>Почему:</strong> ${app.why}</div>
-                        ${responseHtml}
-                        
-                        <div class="response-form" id="responseForm-${app.id}">
-                            <textarea id="responseText-${app.id}" placeholder="Напишите ответ на заявку..."></textarea>
-                            <button class="accept-btn" onclick="submitApplicationResponse(${app.id})">Отправить ответ</button>
-                        </div>
-                        
                         <div class="card-actions">
-                            <button class="respond-btn" onclick="toggleResponseForm(${app.id})">💬 Ответить</button>
                             ${app.status === 'pending' ? `
                                 <button class="accept-btn" onclick="handleApplication(${app.id}, 'accept')">✅ Принять</button>
                                 <button class="reject-btn" onclick="handleApplication(${app.id}, 'reject')">❌ Отклонить</button>
@@ -1745,10 +1850,10 @@
             });
         }
         
-        function loadAdminComplaints() {
-            let container = document.getElementById('adminComplaints');
+        function loadOwnerComplaints() {
+            let container = document.getElementById('ownerComplaints');
             if (complaints.length === 0) {
-                container.innerHTML = '<p style="text-align: center;">Жалоб пока нет</p>';
+                container.innerHTML = '<p style="text-align: center;">Жалоб нет</p>';
                 return;
             }
             
@@ -1763,18 +1868,8 @@
                     photosHtml += '</div>';
                 }
                 
-                let responseHtml = '';
-                if (c.adminResponse) {
-                    responseHtml = `
-                        <div class="admin-response">
-                            <strong>Ваш ответ:</strong>
-                            <div class="response-text">${c.adminResponse}</div>
-                        </div>
-                    `;
-                }
-                
                 container.innerHTML += `
-                    <div class="complaint-card" id="comp-${c.id}">
+                    <div class="complaint-card">
                         <div class="card-header">
                             <span class="card-title">${c.accused}</span>
                             <span class="card-status status-${c.status}">${getStatusText(c.status)}</span>
@@ -1783,16 +1878,8 @@
                         <div><strong>Правило:</strong> ${c.ruleNumber}</div>
                         <div><strong>Дата:</strong> ${c.date}</div>
                         ${photosHtml}
-                        <div style="margin:0.5rem 0;">${c.description}</div>
-                        ${responseHtml}
-                        
-                        <div class="response-form" id="responseForm-${c.id}">
-                            <textarea id="responseText-${c.id}" placeholder="Напишите ответ на жалобу..."></textarea>
-                            <button class="accept-btn" onclick="submitComplaintResponse(${c.id})">Отправить ответ</button>
-                        </div>
-                        
+                        <div>${c.description}</div>
                         <div class="card-actions">
-                            <button class="respond-btn" onclick="toggleResponseForm(${c.id})">💬 Ответить</button>
                             ${c.status === 'pending' ? `
                                 <button class="accept-btn" onclick="handleComplaint(${c.id}, 'accept')">✅ Принять</button>
                                 <button class="reject-btn" onclick="handleComplaint(${c.id}, 'reject')">❌ Отклонить</button>
@@ -1804,8 +1891,8 @@
             });
         }
         
-        function loadAdminUsers() {
-            let container = document.getElementById('adminUsers');
+        function loadOwnerUsers() {
+            let container = document.getElementById('ownerUsers');
             if (users.length === 0) {
                 container.innerHTML = '<p style="text-align: center;">Нет пользователей</p>';
                 return;
@@ -1813,139 +1900,58 @@
             
             container.innerHTML = '';
             users.forEach(user => {
-                let isAdmin = admins.includes(user.username) ? '<span class="admin-badge" style="margin-left:0.5rem;">ADMIN</span>' : '';
+                let isOwner = owners.includes(user.username) ? '<span class="owner-badge">OWNER</span>' : '';
                 container.innerHTML += `
                     <div class="application-card">
                         <div class="card-header">
                             <span class="card-title">${user.minecraft || user.username}</span>
-                            ${isAdmin}
+                            ${isOwner}
                         </div>
-                        <div><strong>Логин:</strong> ${user.username}</div>
-                        <div><strong>Дата рег:</strong> ${user.registered || 'неизвестно'}</div>
+                        <div>Логин: ${user.username}</div>
+                        <div>Дата: ${user.registered || 'неизвестно'}</div>
                     </div>
                 `;
             });
         }
         
-        function toggleResponseForm(id) {
-            let form = document.getElementById(`responseForm-${id}`);
-            form.classList.toggle('active');
-        }
-        
-        function submitApplicationResponse(id) {
-            if (!currentUser || !admins.includes(currentUser.username)) {
-                alert('❌ Только администраторы могут отвечать');
-                return;
-            }
-            
-            let responseText = document.getElementById(`responseText-${id}`).value.trim();
-            if (!responseText) {
-                alert('❌ Введите текст ответа');
-                return;
-            }
-            
-            let app = applications.find(a => a.id === id);
-            if (app) {
-                app.adminResponse = responseText;
-                localStorage.setItem('applications', JSON.stringify(applications));
-                document.getElementById(`responseForm-${id}`).classList.remove('active');
-                loadAdminApplications();
-                alert('✅ Ответ отправлен');
-            }
-        }
-        
-        function submitComplaintResponse(id) {
-            if (!currentUser || !admins.includes(currentUser.username)) {
-                alert('❌ Только администраторы могут отвечать');
-                return;
-            }
-            
-            let responseText = document.getElementById(`responseText-${id}`).value.trim();
-            if (!responseText) {
-                alert('❌ Введите текст ответа');
-                return;
-            }
-            
-            let complaint = complaints.find(c => c.id === id);
-            if (complaint) {
-                complaint.adminResponse = responseText;
-                localStorage.setItem('complaints', JSON.stringify(complaints));
-                document.getElementById(`responseForm-${id}`).classList.remove('active');
-                loadAdminComplaints();
-                loadComplaints();
-                alert('✅ Ответ отправлен');
-            }
-        }
-        
         function handleApplication(id, action) {
-            if (!currentUser || !admins.includes(currentUser.username)) {
-                alert('❌ Только администраторы могут отвечать на заявки');
-                return;
-            }
             let app = applications.find(a => a.id === id);
             if (app) {
                 app.status = action === 'accept' ? 'accepted' : 'rejected';
                 localStorage.setItem('applications', JSON.stringify(applications));
-                loadAdminApplications();
-                updateAdminStats();
-                alert(`✅ Заявка ${action === 'accept' ? 'принята' : 'отклонена'}`);
+                loadOwnerApplications();
+                updateOwnerStats();
             }
         }
         
         function handleComplaint(id, action) {
-            if (!currentUser || !admins.includes(currentUser.username)) {
-                alert('❌ Только администраторы могут отвечать на жалобы');
-                return;
-            }
             let complaint = complaints.find(c => c.id === id);
             if (complaint) {
                 complaint.status = action === 'accept' ? 'accepted' : 'rejected';
                 localStorage.setItem('complaints', JSON.stringify(complaints));
-                loadAdminComplaints();
+                loadOwnerComplaints();
                 loadComplaints();
-                updateAdminStats();
-                alert(`✅ Жалоба ${action === 'accept' ? 'принята' : 'отклонена'}`);
+                updateOwnerStats();
             }
         }
         
         function deleteApplication(id) {
-            if (!currentUser || !admins.includes(currentUser.username)) {
-                alert('❌ Только администраторы могут удалять');
-                return;
-            }
-            
-            if (confirm('Вы уверены, что хотите удалить эту заявку?')) {
-                applications = applications.filter(a => a.id !== id);
-                localStorage.setItem('applications', JSON.stringify(applications));
-                loadAdminApplications();
-                updateAdminStats();
-                alert('✅ Заявка удалена');
-            }
+            applications = applications.filter(a => a.id !== id);
+            localStorage.setItem('applications', JSON.stringify(applications));
+            loadOwnerApplications();
+            updateOwnerStats();
         }
         
         function deleteComplaint(id) {
-            if (!currentUser || !admins.includes(currentUser.username)) {
-                alert('❌ Только администраторы могут удалять');
-                return;
-            }
-            
-            if (confirm('Вы уверены, что хотите удалить эту жалобу?')) {
-                complaints = complaints.filter(c => c.id !== id);
-                localStorage.setItem('complaints', JSON.stringify(complaints));
-                loadAdminComplaints();
-                loadComplaints();
-                updateAdminStats();
-                alert('✅ Жалоба удалена');
-            }
+            complaints = complaints.filter(c => c.id !== id);
+            localStorage.setItem('complaints', JSON.stringify(complaints));
+            loadOwnerComplaints();
+            loadComplaints();
+            updateOwnerStats();
         }
         
         function getStatusText(status) {
-            switch(status) {
-                case 'pending': return '⏳ Ожидает';
-                case 'accepted': return '✅ Принята';
-                case 'rejected': return '❌ Отклонена';
-                default: return status;
-            }
+            return status === 'pending' ? '⏳' : status === 'accepted' ? '✅' : '❌';
         }
         
         function showFullImage(src) {
@@ -1953,7 +1959,6 @@
             document.getElementById('imageModal').style.display = 'flex';
         }
         
-        // Закрытие модалок
         window.onclick = function(event) {
             if (event.target.classList.contains('modal')) {
                 event.target.style.display = 'none';
