@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoonGrief - Заявки в Хелперы</title>
+    <title>MoonGrief - Правила и Жалобы</title>
     <style>
         * {
             margin: 0;
@@ -29,7 +29,7 @@
         }
         
         .nav-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
@@ -98,7 +98,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 2rem auto;
             padding: 0 1rem;
         }
@@ -163,225 +163,204 @@
             display: block;
         }
         
-        /* Анкета */
-        .apply-section {
+        /* Правила */
+        .rules-section {
             background: rgba(0,0,0,0.3);
             border-radius: 20px;
             padding: 2rem;
             border: 1px solid rgba(255,255,255,0.1);
         }
         
-        .apply-section h2 {
-            color: #4facfe;
-            margin-bottom: 1.5rem;
-            font-size: 2rem;
-            text-align: center;
-        }
-        
-        .apply-form {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        
-        .form-group.full-width {
-            grid-column: span 2;
-        }
-        
-        .form-group label {
-            color: #4facfe;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-        
-        .form-group input, .form-group select, .form-group textarea {
-            padding: 1rem;
-            border: 2px solid rgba(79, 172, 254, 0.3);
-            border-radius: 10px;
-            background: rgba(255,255,255,0.05);
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-        
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: #4facfe;
-            box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
-        }
-        
-        .form-group input::placeholder, .form-group textarea::placeholder {
-            color: rgba(255,255,255,0.3);
-        }
-        
-        .form-group textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-        
-        .submit-btn {
-            grid-column: span 2;
-            padding: 1.2rem;
-            background: linear-gradient(135deg, #ff6b6b, #4facfe);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 1rem;
-        }
-        
-        .submit-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 30px rgba(79, 172, 254, 0.5);
-        }
-        
-        /* Команда */
-        .staff-section {
-            margin-top: 3rem;
-            padding: 2rem;
-            background: rgba(0,0,0,0.3);
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .staff-title {
-            color: #4facfe;
-            font-size: 2rem;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-        
-        .staff-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .staff-card {
-            background: rgba(255,255,255,0.05);
-            padding: 1.5rem;
-            border-radius: 15px;
-            text-align: center;
-            border: 1px solid rgba(79, 172, 254, 0.3);
-            transition: all 0.3s;
-        }
-        
-        .staff-card:hover {
-            transform: translateY(-5px);
-            border-color: #4facfe;
-            box-shadow: 0 10px 30px rgba(79, 172, 254, 0.2);
-        }
-        
-        .staff-card .avatar {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #ff6b6b, #4facfe);
-            border-radius: 50%;
-            margin: 0 auto 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: white;
-        }
-        
-        .staff-card .name {
-            color: #4facfe;
-            font-weight: bold;
-            font-size: 1.3rem;
-            margin-bottom: 0.3rem;
-        }
-        
-        .staff-card .role {
-            color: #ff6b6b;
-            font-size: 1rem;
-        }
-        
-        /* Админ панель */
-        .admin-section {
-            background: rgba(0,0,0,0.3);
-            border-radius: 20px;
-            padding: 2rem;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .admin-header {
+        .rules-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
         }
         
-        .admin-header h2 {
+        .rules-header h2 {
             color: #4facfe;
             font-size: 2rem;
         }
         
-        .admin-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
+        .rules-date {
+            color: #888;
+        }
+        
+        .rules-content {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 1rem;
+        }
+        
+        .rules-section-block {
+            margin-bottom: 2rem;
+            background: rgba(255,255,255,0.02);
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+        
+        .rules-section-title {
+            color: #ff6b6b;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .rule-item {
+            margin-bottom: 1rem;
+            padding-left: 1rem;
+            border-left: 2px solid #4facfe;
+        }
+        
+        .rule-number {
+            color: #4facfe;
+            font-weight: bold;
+        }
+        
+        .rule-punishment {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+        
+        /* Жалобы */
+        .complaints-section {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .complaints-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 2rem;
         }
         
-        .stat-card {
-            background: rgba(79, 172, 254, 0.1);
-            padding: 1.5rem;
-            border-radius: 10px;
-            text-align: center;
-            border: 1px solid #4facfe;
+        .complaints-header h2 {
+            color: #4facfe;
+            font-size: 2rem;
         }
         
-        .stat-card .number {
-            font-size: 2rem;
+        .new-complaint-btn {
+            background: linear-gradient(135deg, #ff6b6b, #4facfe);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            color: white;
             font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .new-complaint-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(79,172,254,0.5);
+        }
+        
+        .complaint-form {
+            background: rgba(255,255,255,0.05);
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            display: none;
+        }
+        
+        .complaint-form.active {
+            display: block;
+        }
+        
+        .complaint-form h3 {
+            color: #4facfe;
+            margin-bottom: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
             color: #4facfe;
         }
         
-        .applications-list {
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid rgba(79,172,254,0.3);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            color: white;
+        }
+        
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+        
+        .photo-upload {
+            border: 2px dashed #4facfe;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
+        .photo-upload input {
+            display: none;
+        }
+        
+        .photo-preview {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        
+        .photo-preview img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        
+        .complaints-list {
             display: flex;
             flex-direction: column;
             gap: 1rem;
+            margin-top: 2rem;
         }
         
-        .application-card {
+        .complaint-card {
             background: rgba(255,255,255,0.05);
             padding: 1.5rem;
             border-radius: 10px;
             border-left: 4px solid #4facfe;
         }
         
-        .application-header {
+        .complaint-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
         }
         
-        .application-nick {
+        .complaint-accused {
             font-size: 1.3rem;
             font-weight: bold;
-            color: #4facfe;
+            color: #ff6b6b;
         }
         
-        .application-status {
+        .complaint-author {
+            color: #888;
+        }
+        
+        .complaint-status {
             padding: 0.3rem 1rem;
             border-radius: 15px;
             font-size: 0.9rem;
-            background: rgba(255,255,255,0.1);
         }
         
         .status-pending {
@@ -399,80 +378,44 @@
             color: white;
         }
         
-        .application-details {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
+        .complaint-rule {
+            background: rgba(79,172,254,0.1);
+            padding: 0.5rem;
+            border-radius: 5px;
+            margin: 0.5rem 0;
+        }
+        
+        .complaint-photos {
+            display: flex;
+            gap: 0.5rem;
             margin: 1rem 0;
         }
         
-        .application-actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-        }
-        
-        .action-btn {
-            padding: 0.5rem 1.5rem;
-            border: none;
-            border-radius: 5px;
+        .complaint-photos img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
             cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
         }
         
-        .accept-btn {
-            background: #10b981;
-            color: white;
+        .complaint-text {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 5px;
         }
         
-        .reject-btn {
-            background: #ef4444;
-            color: white;
-        }
-        
-        .view-btn {
-            background: #4facfe;
-            color: white;
-        }
-        
-        /* Профиль */
-        .profile-section {
-            background: rgba(0,0,0,0.3);
-            border-radius: 20px;
-            padding: 2rem;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
+        .submit-btn {
             background: linear-gradient(135deg, #ff6b6b, #4facfe);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
             color: white;
-        }
-        
-        .profile-info h3 {
-            font-size: 2rem;
-            color: #4facfe;
-        }
-        
-        .profile-edit {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            max-width: 600px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1rem;
         }
         
         /* Модалки */
@@ -493,7 +436,7 @@
             background: #1a1a3a;
             padding: 2rem;
             border-radius: 20px;
-            max-width: 400px;
+            max-width: 500px;
             width: 90%;
             border: 1px solid #4facfe;
         }
@@ -503,7 +446,7 @@
             margin-bottom: 1rem;
         }
         
-        .modal-content input {
+        .modal-content input, .modal-content textarea {
             width: 100%;
             padding: 0.8rem;
             margin: 0.5rem 0;
@@ -532,38 +475,13 @@
             font-size: 1.5rem;
         }
         
-        .success-message {
-            display: none;
-            background: rgba(72, 187, 120, 0.2);
-            border: 2px solid #48bb78;
-            color: #48bb78;
-            padding: 1rem;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 1rem;
-            font-weight: bold;
-        }
-        
-        .admin-badge {
-            background: #4facfe;
-            color: white;
-            padding: 0.2rem 0.5rem;
-            border-radius: 5px;
-            font-size: 0.8rem;
-            margin-left: 0.5rem;
-        }
-        
         @media (max-width: 768px) {
-            .apply-form {
-                grid-template-columns: 1fr;
+            .hero h1 {
+                font-size: 2rem;
             }
             
-            .form-group.full-width {
-                grid-column: span 1;
-            }
-            
-            .submit-btn {
-                grid-column: span 1;
+            .server-ip {
+                font-size: 1.2rem;
             }
         }
     </style>
@@ -574,7 +492,7 @@
             <div class="logo" onclick="showSection('main')">🌙 MoonGrief</div>
             <div class="ip-box">moongrief.aurorix.pro</div>
             <div class="user-menu" id="userMenu">
-                <!-- Будет заполнено динамически -->
+                <!-- Заполняется динамически -->
             </div>
         </div>
     </nav>
@@ -589,139 +507,315 @@
             </div>
             
             <div class="tabs">
-                <div class="tab active" onclick="showSection('apply')">📝 Анкета в Хелперы</div>
-                <div class="tab" onclick="showSection('team')">👥 Команда</div>
-                <div class="tab" id="adminTab" style="display: none;" onclick="showSection('admin')">👑 Админ панель</div>
+                <div class="tab active" onclick="showSection('rules')">📜 Правила</div>
+                <div class="tab" onclick="showSection('complaints')">⚠️ Жалобы</div>
             </div>
         </div>
         
-        <!-- Анкета -->
-        <div id="applySection" class="section">
-            <div class="apply-section">
-                <h2>📝 Анкета на Хелпера</h2>
+        <!-- Правила -->
+        <div id="rulesSection" class="section">
+            <div class="rules-section">
+                <div class="rules-header">
+                    <h2>📜 Правила сервера MoonGrief</h2>
+                    <div class="rules-date">3 марта 2025</div>
+                </div>
                 
-                <div class="apply-form">
-                    <div class="form-group full-width">
-                        <label>Игровой никнейм:</label>
-                        <input type="text" id="nickname" placeholder="Ваш игровой ник" value="">
+                <div class="rules-content">
+                    <!-- 1. Общие положения -->
+                    <div class="rules-section-block">
+                        <div class="rules-section-title">1. Общие положения</div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">1.1</span> Настоящие правила разработаны администратором сервера MoonGrief и действуют на всех существующих игровых режимах.
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">1.2</span> Официальные сервера расположены по адресам: Moongrief.aurorix.pro. Другие домены не относятся к проекту. Регистрируясь на проекте, вы автоматически соглашаетесь с этими правилами и правилами всех игровых режимов.
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">1.3</span> Решения администрации являются окончательными и не подлежат обсуждению. Главная администрация имеет право наказывать за нарушения, не предусмотренные в этих правилах. Все жалобы на администрацию в разделе "Форум" рассматриваться не будут.
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">1.4</span> Администрация не компенсирует потерю ресурсов, вызванную техническими сбоями (лагами, багами), действиями читеров или других игроков, но за падения сервера Администрация может выдавать риллики.
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">1.5</span> Запрещённые действия:
+                            <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                                <li>▸ Продажа, взлом, попытки взлома, передача и покупка аккаунтов вне официального сайта.</li>
+                                <li>▸ Распространение личных данных других игроков.</li>
+                                <li>▸ Намеренный вред серверу.</li>
+                                <li>▸ Продажа игровых предметов или услуг за реальные деньги.</li>
+                            </ul>
+                            <div class="rule-punishment">Наказание: Бан игрока по Айпи. Бан игрового аккаунта.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">1.6</span> Игроки обязаны проявлять уважение к администрации сервера. Любые оскорбления, угрозы или неуважительное поведение в сторону администраторов будут наказываться.
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">1.7</span> Администрация проекта может вносить изменения в правила без предварительного уведомления игроков. Незнание правил не освобождает от ответственности за их нарушение.
+                        </div>
+                    </div>
+                    
+                    <!-- 2. Аккаунт и никнейм -->
+                    <div class="rules-section-block">
+                        <div class="rules-section-title">2. Аккаунт и никнейм</div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">2.1</span> Игровой никнейм должен соответствовать установленным правилам. Любой ник, нарушающий эти правила, приведёт к блокировке аккаунта навсегда.
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">2.1.1</span> Запрещены ники, похожие на никнеймы администрации.
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">2.1.2</span> Запрещены ники, оскорбляющие других игроков.
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">2.1.3</span> Запрещены ники, содержащие названия запрещённого ПО, националистические или религиозные символы и экстремистские лозунги (например: "FLauncher", "Catlavan", "Ghitler1488").
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">2.2</span> Сохраняйте чеки, выданные системой после покупки платных дополнений (групп, кейсов, донатной валюты). Они понадобятся для подтверждения покупки.
+                        </div>
+                    </div>
+                    
+                    <!-- 3. Донат и пожертвования -->
+                    <div class="rules-section-block">
+                        <div class="rules-section-title">3. Донат и пожертвования</div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">3.1</span> Участие в проекте является бесплатным.
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">3.2</span> Игроки могут добровольно поддерживать развитие проекта, делая пожертвования. В благодарность за пожертвования предоставляются внутриигровые услуги.
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">3.3</span> При возникновении проблем с платежом или неполучении услуги после оплаты следует обратиться в техническую поддержку.
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">3.4</span> Пожертвования на развитие сервера являются добровольными и не подлежат возврату; это не является коммерческой сделкой.
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">3.5</span> Покупка платных групп не даёт игрокам право нарушать правила сервера.
+                        </div>
+                    </div>
+                    
+                    <!-- 4. Чат и общение -->
+                    <div class="rules-section-block">
+                        <div class="rules-section-title">4. Чат и общение</div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">4.1</span> Запрещено организовывать флуд и отправлять бессмысленные комбинации символов (например: "aaaaaaaaaaaaaa", "hahahahhahahahah"). Сообщение не должно превышать 10 символов. Также запрещены 3 сообщения с похожим смыслом, отправленные в одном окне чата.
+                            <div class="rule-punishment">Наказание: Мут на 2 часа.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">4.2</span> Запрещено обходить мут с помощью команды /bc в целях уклонения от наказания.
+                            <div class="rule-punishment">Наказание: Бан на 1 день.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">4.3</span> Запрещено использовать текст с верхним регистром (CAPS), превышающим 50% от всего текста, если сообщение содержит более 5 символов.
+                            <div class="rule-punishment">Наказание: Мут на 2 часа.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">4.4</span> Запрещены чрезмерные и грубые оскорбления, унижения и угрозы в адрес игроков.
+                            <div class="rule-punishment">Наказание: Мут на 2 часа.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">4.4.1</span> Запрещены оскорбления и угрозы в адрес родителей (своих или чужих).
+                            <div class="rule-punishment">Наказание: Мут на 6 часов.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">4.4.2</span> Запрещено упоминание родителей (своих или чужих).
+                            <div class="rule-punishment">Наказание: Мут на 3 часа.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">4.5</span> Призыв к суициду запрещён.
+                            <div class="rule-punishment">Наказание: Мут на 1 день.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">4.6</span> Оскорбление проекта и использование оскорбительных названий в любом виде чата запрещены.
+                            <div class="rule-punishment">Наказание: Мут на 1 день.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">4.7</span> Попрошайничество ресурсов или повышения доната у администрации запрещено (исключение: Xchik_,Milfochka_ezka).
+                            <div class="rule-punishment">Наказание: Мут на 2 часа.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">4.7.1</span> Попрошайничество ресурсов или валюты у игроков/команды проекта запрещено.
+                            <div class="rule-punishment">Наказание: Мут на 1 час.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">4.8</span> Распространение дезинформации запрещено.
+                            <div class="rule-punishment">Наказание: Мут на 1 день.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">4.8.1</span> Выдача себя за администрацию.
+                            <div class="rule-punishment">Наказание: Мут на 1 час.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">4.9</span> Упоминание сторонних проектов запрещено. Исключение: короткие названия дуэль-серверов (пт, бромик, пвп, сатурн).
+                            <div class="rule-punishment">Наказание: Мут на 2 часа.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">4.9.1</span> Запрещена реклама сторонних ресурсов в чате (Публикации связанные с MoonGrief рекламировать разрешено, не нарушая другие правила) Исключение: короткие названия дуэль-серверов (пт, бромик, пвп, сатурн).
+                            <div class="rule-punishment">Наказание: Бан на 14 дней.</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 5. Запрещённый софт и читы -->
+                    <div class="rules-section-block">
+                        <div class="rules-section-title">5. Запрещённый софт и читы</div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">5.2</span> Запрещено использование стороннего ПО, дающего преимущество над другими игроками. Неадекватное поведение во время проверки также считается нарушением (задержка или ведение проверяющего в заблуждение). Также, игра с читами на ансофт-грифе запрещена. Если у игрока были установлены или использованы читы в течение последних 14 дней — это также считается нарушением.
+                            <div class="rule-punishment">Наказание: Бан на 50 дней.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">5.2.1</span> Признание в использовании читов при проверке (в любом виде чата AnyDesk, Discord).
+                            <div class="rule-punishment">Наказание: Бан на 40 дней.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">5.3</span> Запрещена совместная игра с игроками, нарушившими правило 5.2.
+                            <div class="rule-punishment">Наказание: Бан на 14 дней.</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 6. Игровой процесс -->
+                    <div class="rules-section-block">
+                        <div class="rules-section-title">6. Игровой процесс</div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">6.1</span> Строительство лаг-машин и постройка, способные нанести вред работе сервера (лава-касты, заливы лавой) запрещены.
+                            <div class="rule-punishment">Наказание: Бан на 7 дней.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">6.2</span> Расстояние от варпа до ловушки должно составлять не менее 10 блоков.
+                            <div class="rule-punishment">Наказание: Бан на 1 день, снос ловушки и удаление варпа.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">6.2.1</span> Запрещен закрытый варп без открытого пространства размером 3х3 полных блока.
+                            <div class="rule-punishment">Наказание: Бан на 1 день, снос ловушки и удаление варпа.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">6.3</span> Использование команды /spec в шуточных целях или же спамом командой.
+                            <div class="rule-punishment">Наказание: Бан на 1 час.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">6.4</span> Подача ложных жалоб (на собственных тиммейтов), жалобы с оскорблением/унижением второго лица или жалобы с оскорблением администрации/команды проекта.
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">6.5</span> Запрещено строительство ловушек без возможности выхода за счёт ограничений, выдвинутые сервером. Например, стойки для брони/рамки и т.д.
+                            <div class="rule-punishment">Наказание: снос варпа + бан на 1 день.</div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-number">6.6</span> Блокировку по Айпи, т.е. чёрный список проекта обжаловать никак нельзя, покупка "Разбана" не поможет, блокировка выдаётся только главной администрацией. Связь по поводу блокировки за "6.6" @waixzelz (TG).
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Жалобы -->
+        <div id="complaintsSection" class="section">
+            <div class="complaints-section">
+                <div class="complaints-header">
+                    <h2>⚠️ Жалобы на игроков</h2>
+                    <button class="new-complaint-btn" onclick="toggleComplaintForm()">+ Новая жалоба</button>
+                </div>
+                
+                <!-- Форма жалобы -->
+                <div class="complaint-form" id="complaintForm">
+                    <h3>Создать жалобу</h3>
+                    
+                    <div class="form-group">
+                        <label>Ваш никнейм:</label>
+                        <input type="text" id="complainant" placeholder="Ваш Minecraft ник" value="">
                     </div>
                     
                     <div class="form-group">
-                        <label>Имя:</label>
-                        <input type="text" id="name" placeholder="Ваше настоящее имя">
+                        <label>Ник нарушителя:</label>
+                        <input type="text" id="accused" placeholder="Кто нарушил?">
                     </div>
                     
                     <div class="form-group">
-                        <label>Сколько лет:</label>
-                        <input type="number" id="age" placeholder="Ваш возраст" min="10" max="100">
-                    </div>
-                    
-                    <div class="form-group full-width">
-                        <label>Часовой пояс:</label>
-                        <select id="timezone">
-                            <option value="UTC+3">Москва (UTC+3)</option>
-                            <option value="UTC+2">Калининград (UTC+2)</option>
-                            <option value="UTC+4">Самара (UTC+4)</option>
-                            <option value="UTC+5">Екатеринбург (UTC+5)</option>
-                            <option value="UTC+6">Омск (UTC+6)</option>
-                            <option value="UTC+7">Красноярск (UTC+7)</option>
-                            <option value="UTC+8">Иркутск (UTC+8)</option>
-                            <option value="UTC+9">Якутск (UTC+9)</option>
-                            <option value="UTC+10">Владивосток (UTC+10)</option>
-                            <option value="UTC+11">Магадан (UTC+11)</option>
-                            <option value="UTC+12">Камчатка (UTC+12)</option>
+                        <label>Что нарушил? (номер правила):</label>
+                        <select id="ruleNumber">
+                            <option value="1.5">1.5 - Продажа/взлом аккаунтов</option>
+                            <option value="1.6">1.6 - Неуважение к администрации</option>
+                            <option value="4.1">4.1 - Флуд</option>
+                            <option value="4.2">4.2 - Обход мута</option>
+                            <option value="4.3">4.3 - CAPS</option>
+                            <option value="4.4">4.4 - Оскорбления</option>
+                            <option value="4.4.1">4.4.1 - Оскорбление родителей</option>
+                            <option value="4.5">4.5 - Призыв к суициду</option>
+                            <option value="4.6">4.6 - Оскорбление проекта</option>
+                            <option value="4.7">4.7 - Попрошайничество</option>
+                            <option value="4.8">4.8 - Дезинформация</option>
+                            <option value="4.9">4.9 - Упоминание сторонних проектов</option>
+                            <option value="4.9.1">4.9.1 - Реклама</option>
+                            <option value="5.2">5.2 - Использование читов</option>
+                            <option value="5.3">5.3 - Совместная игра с читерами</option>
+                            <option value="6.1">6.1 - Лаг-машины</option>
+                            <option value="6.2">6.2 - Ловушки у варпа</option>
+                            <option value="6.3">6.3 - Спам /spec</option>
+                            <option value="6.5">6.5 - Ловушки без выхода</option>
+                            <option value="other">Другое</option>
                         </select>
                     </div>
                     
-                    <div class="form-group full-width">
-                        <label>Опыт работы на должности:</label>
-                        <textarea id="experience" placeholder="Расскажите о своем опыте (были ли модератором/хелпером на других серверах, какой опыт администрирования)"></textarea>
-                    </div>
-                    
-                    <div class="form-group full-width">
-                        <label>Почему вы хотите стать хелпером?</label>
-                        <textarea id="why" placeholder="Напишите почему вы хотите помогать игрокам и стать частью команды MoonGrief"></textarea>
-                    </div>
-                    
-                    <button class="submit-btn" onclick="submitApplication()">Отправить анкету</button>
-                    
-                    <div class="success-message" id="successMessage">
-                        ✅ Анкета отправлена! Администрация рассмотрит её в ближайшее время
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Команда -->
-        <div id="teamSection" class="section">
-            <div class="staff-section">
-                <div class="staff-title">👥 Наша команда</div>
-                <div class="staff-grid" id="teamList">
-                    <!-- Заполняется динамически -->
-                </div>
-            </div>
-        </div>
-        
-        <!-- Админ панель -->
-        <div id="adminSection" class="section">
-            <div class="admin-section">
-                <div class="admin-header">
-                    <h2>👑 Админ панель</h2>
-                    <button class="submit-btn" style="width: auto;" onclick="refreshAdmin()">🔄 Обновить</button>
-                </div>
-                
-                <div class="admin-stats" id="adminStats">
-                    <div class="stat-card">
-                        <div class="number" id="totalApps">0</div>
-                        <div>Всего заявок</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="number" id="pendingApps">0</div>
-                        <div>Ожидают</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="number" id="acceptedApps">0</div>
-                        <div>Принято</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="number" id="teamCount">0</div>
-                        <div>В команде</div>
-                    </div>
-                </div>
-                
-                <div class="applications-list" id="applicationsList">
-                    <!-- Заполняется динамически -->
-                </div>
-            </div>
-        </div>
-        
-        <!-- Профиль -->
-        <div id="profileSection" class="section">
-            <div class="profile-section">
-                <div class="profile-header">
-                    <div class="profile-avatar" id="profileAvatar">🌙</div>
-                    <div class="profile-info">
-                        <h3 id="profileName">Пользователь</h3>
-                        <p id="profileRole">Игрок</p>
-                        <p id="profileMinecraft">Minecraft: </p>
-                    </div>
-                </div>
-                
-                <h3 style="color: #4facfe; margin-bottom: 1rem;">Редактировать профиль</h3>
-                <div class="profile-edit">
                     <div class="form-group">
-                        <label>Имя:</label>
-                        <input type="text" id="editName" placeholder="Ваше имя">
+                        <label>Описание нарушения:</label>
+                        <textarea id="description" rows="4" placeholder="Опишите подробно что произошло..."></textarea>
                     </div>
+                    
                     <div class="form-group">
-                        <label>Возраст:</label>
-                        <input type="number" id="editAge" placeholder="Ваш возраст">
+                        <label>Доказательства (скриншоты):</label>
+                        <div class="photo-upload" onclick="document.getElementById('photoInput').click()">
+                            <input type="file" id="photoInput" multiple accept="image/*" onchange="handlePhotoUpload(event)">
+                            <p>📷 Нажмите чтобы загрузить скриншоты</p>
+                            <p style="font-size: 0.8rem; color: #888;">Можно загрузить несколько файлов</p>
+                        </div>
+                        <div class="photo-preview" id="photoPreview"></div>
                     </div>
-                    <div class="form-group full-width">
-                        <label>Discord:</label>
-                        <input type="text" id="editDiscord" placeholder="Discord">
-                    </div>
-                    <button class="submit-btn" style="grid-column: span 2;" onclick="saveProfile()">Сохранить</button>
+                    
+                    <button class="submit-btn" onclick="submitComplaint()">Отправить жалобу</button>
+                </div>
+                
+                <!-- Список жалоб -->
+                <div class="complaints-list" id="complaintsList">
+                    <!-- Заполняется динамически -->
                 </div>
             </div>
         </div>
@@ -735,9 +829,6 @@
             <input type="text" placeholder="Логин" id="loginUser">
             <input type="password" placeholder="Пароль" id="loginPass">
             <button onclick="login()">Войти</button>
-            <p style="text-align: center; margin-top: 1rem; color: #888;">
-                Нет аккаунта? <a href="#" onclick="showModal('register'); closeModal('login')" style="color: #4facfe;">Регистрация</a>
-            </p>
         </div>
     </div>
     
@@ -748,8 +839,13 @@
             <input type="text" placeholder="Логин" id="regUser">
             <input type="password" placeholder="Пароль" id="regPass">
             <input type="text" placeholder="Minecraft ник" id="regNick">
-            <input type="text" placeholder="Имя (необязательно)" id="regName">
             <button onclick="register()">Зарегистрироваться</button>
+        </div>
+    </div>
+    
+    <div id="imageModal" class="modal" onclick="this.style.display='none'">
+        <div class="modal-content" style="max-width: 800px; text-align: center;">
+            <img id="fullImage" src="" style="max-width: 100%; max-height: 80vh;">
         </div>
     </div>
     
@@ -757,22 +853,13 @@
         // Данные
         let currentUser = null;
         let users = JSON.parse(localStorage.getItem('users')) || [];
-        let applications = JSON.parse(localStorage.getItem('applications')) || [];
-        let team = [
-            { name: 'Owner', role: 'Владелец', minecraft: 'Owner', avatar: '👑' },
-            { name: 'Admin1', role: 'Главный админ', minecraft: 'Admin1', avatar: '⚡' },
-            { name: 'Moder1', role: 'Модератор', minecraft: 'Moder1', avatar: '🛡️' },
-            { name: 'Helper1', role: 'Хелпер', minecraft: 'Helper1', avatar: '💬' }
-        ];
+        let complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+        let uploadedPhotos = [];
         
         // Загрузка
         document.addEventListener('DOMContentLoaded', function() {
             checkAuth();
-            updateTeamDisplay();
-            if (currentUser && currentUser.role === 'admin') {
-                showSection('admin');
-                loadApplications();
-            }
+            loadComplaints();
         });
         
         function checkAuth() {
@@ -780,10 +867,7 @@
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
                 updateUserMenu();
-                if (currentUser.role === 'admin') {
-                    document.getElementById('adminTab').style.display = 'block';
-                }
-                document.getElementById('nickname').value = currentUser.minecraft;
+                document.getElementById('complainant').value = currentUser.minecraft;
             }
         }
         
@@ -791,10 +875,9 @@
             let menu = document.getElementById('userMenu');
             if (currentUser) {
                 menu.innerHTML = `
-                    <div class="user-info" onclick="showSection('profile')">
+                    <div class="user-info">
                         <div class="user-avatar">${currentUser.minecraft[0]}</div>
                         <span>${currentUser.minecraft}</span>
-                        ${currentUser.role === 'admin' ? '<span class="admin-badge">Admin</span>' : ''}
                     </div>
                     <button class="nav-links" onclick="logout()">Выйти</button>
                 `;
@@ -806,33 +889,16 @@
             }
         }
         
-        function updateTeamDisplay() {
-            let teamList = document.getElementById('teamList');
-            teamList.innerHTML = '';
-            team.forEach(member => {
-                teamList.innerHTML += `
-                    <div class="staff-card">
-                        <div class="avatar">${member.avatar}</div>
-                        <div class="name">${member.name}</div>
-                        <div class="role">${member.role}</div>
-                    </div>
-                `;
-            });
-        }
-        
         function showSection(section) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(section + 'Section').classList.add('active');
             
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            if (section === 'apply') {
-                document.querySelector('.tab[onclick="showSection(\'apply\')"]').classList.add('active');
-            } else if (section === 'team') {
-                document.querySelector('.tab[onclick="showSection(\'team\')"]').classList.add('active');
-            } else if (section === 'admin') {
-                loadApplications();
-            } else if (section === 'profile') {
-                loadProfile();
+            if (section === 'rules') {
+                document.querySelector('.tab[onclick="showSection(\'rules\')"]').classList.add('active');
+            } else if (section === 'complaints') {
+                document.querySelector('.tab[onclick="showSection(\'complaints\')"]').classList.add('active');
+                loadComplaints();
             }
         }
         
@@ -853,10 +919,8 @@
             let user = document.getElementById('regUser').value;
             let pass = document.getElementById('regPass').value;
             let minecraft = document.getElementById('regNick').value;
-            let name = document.getElementById('regName').value;
             
             if (user && pass && minecraft) {
-                // Проверка существования
                 if (users.find(u => u.username === user)) {
                     alert('❌ Пользователь уже существует');
                     return;
@@ -866,11 +930,7 @@
                     username: user,
                     password: pass,
                     minecraft: minecraft,
-                    name: name || minecraft,
-                    role: users.length === 0 ? 'admin' : 'user', // Первый пользователь - админ
-                    age: '',
-                    discord: '',
-                    registered: new Date().toLocaleString()
+                    role: users.length === 0 ? 'admin' : 'user'
                 };
                 
                 users.push(newUser);
@@ -882,10 +942,7 @@
                 alert('✅ Регистрация успешна!');
                 closeModal('register');
                 updateUserMenu();
-                
-                if (newUser.role === 'admin') {
-                    document.getElementById('adminTab').style.display = 'block';
-                }
+                document.getElementById('complainant').value = currentUser.minecraft;
             } else {
                 alert('❌ Заполните все поля');
             }
@@ -903,13 +960,7 @@
                 alert('Добро пожаловать, ' + found.minecraft + '!');
                 closeModal('login');
                 updateUserMenu();
-                
-                if (found.role === 'admin') {
-                    document.getElementById('adminTab').style.display = 'block';
-                    showSection('admin');
-                } else {
-                    showSection('apply');
-                }
+                document.getElementById('complainant').value = currentUser.minecraft;
             } else {
                 alert('❌ Неверный логин или пароль');
             }
@@ -919,185 +970,125 @@
             currentUser = null;
             localStorage.removeItem('currentUser');
             updateUserMenu();
-            document.getElementById('adminTab').style.display = 'none';
             showSection('main');
         }
         
-        function submitApplication() {
+        function toggleComplaintForm() {
             if (!currentUser) {
                 alert('❌ Сначала войдите или зарегистрируйтесь');
                 showModal('login');
                 return;
             }
+            document.getElementById('complaintForm').classList.toggle('active');
+        }
+        
+        function handlePhotoUpload(event) {
+            let files = event.target.files;
+            let preview = document.getElementById('photoPreview');
+            preview.innerHTML = '';
+            uploadedPhotos = [];
             
-            let nickname = document.getElementById('nickname').value;
-            let name = document.getElementById('name').value;
-            let age = document.getElementById('age').value;
-            let timezone = document.getElementById('timezone').value;
-            let experience = document.getElementById('experience').value;
-            let why = document.getElementById('why').value;
-            
-            if (nickname && name && age && timezone && experience && why) {
-                let application = {
-                    id: Date.now(),
-                    userId: currentUser.username,
-                    nickname: nickname,
-                    name: name,
-                    age: age,
-                    timezone: timezone,
-                    experience: experience,
-                    why: why,
-                    status: 'pending',
-                    date: new Date().toLocaleString()
-                };
-                
-                applications.push(application);
-                localStorage.setItem('applications', JSON.stringify(applications));
-                
-                document.getElementById('successMessage').style.display = 'block';
-                
-                document.getElementById('nickname').value = currentUser.minecraft;
-                document.getElementById('name').value = '';
-                document.getElementById('age').value = '';
-                document.getElementById('experience').value = '';
-                document.getElementById('why').value = '';
-                
-                setTimeout(() => {
-                    document.getElementById('successMessage').style.display = 'none';
-                }, 5000);
-                
-                if (currentUser.role === 'admin') {
-                    loadApplications();
+            for (let file of files) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let img = document.createElement('img');
+                    img.src = e.target.result;
+                    preview.appendChild(img);
+                    uploadedPhotos.push(e.target.result);
                 }
-            } else {
-                alert('❌ Заполните все поля анкеты!');
+                reader.readAsDataURL(file);
             }
         }
         
-        function loadApplications() {
-            let appsList = document.getElementById('applicationsList');
-            let totalApps = applications.length;
-            let pendingApps = applications.filter(a => a.status === 'pending').length;
-            let acceptedApps = applications.filter(a => a.status === 'accepted').length;
-            
-            document.getElementById('totalApps').textContent = totalApps;
-            document.getElementById('pendingApps').textContent = pendingApps;
-            document.getElementById('acceptedApps').textContent = acceptedApps;
-            document.getElementById('teamCount').textContent = team.length;
-            
-            if (applications.length === 0) {
-                appsList.innerHTML = '<p style="text-align: center; color: #888;">Нет заявок</p>';
+        function submitComplaint() {
+            if (!currentUser) {
+                alert('❌ Сначала войдите');
+                showModal('login');
                 return;
             }
             
-            appsList.innerHTML = '';
-            applications.reverse().forEach(app => {
-                appsList.innerHTML += `
-                    <div class="application-card">
-                        <div class="application-header">
-                            <span class="application-nick">${app.nickname}</span>
-                            <span class="application-status status-${app.status}">${getStatusText(app.status)}</span>
+            let accused = document.getElementById('accused').value;
+            let ruleNumber = document.getElementById('ruleNumber').value;
+            let description = document.getElementById('description').value;
+            let complainant = document.getElementById('complainant').value;
+            
+            if (!accused || !description) {
+                alert('❌ Заполните все поля');
+                return;
+            }
+            
+            let complaint = {
+                id: Date.now(),
+                complainant: complainant,
+                accused: accused,
+                ruleNumber: ruleNumber,
+                description: description,
+                photos: uploadedPhotos,
+                status: 'pending',
+                date: new Date().toLocaleString(),
+                userId: currentUser.username
+            };
+            
+            complaints.push(complaint);
+            localStorage.setItem('complaints', JSON.stringify(complaints));
+            
+            // Очистка
+            document.getElementById('accused').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('photoPreview').innerHTML = '';
+            uploadedPhotos = [];
+            document.getElementById('complaintForm').classList.remove('active');
+            
+            alert('✅ Жалоба отправлена!');
+            loadComplaints();
+        }
+        
+        function loadComplaints() {
+            let list = document.getElementById('complaintsList');
+            
+            if (complaints.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #888;">Жалоб пока нет</p>';
+                return;
+            }
+            
+            list.innerHTML = '';
+            complaints.reverse().forEach(c => {
+                let photosHtml = '';
+                if (c.photos && c.photos.length > 0) {
+                    photosHtml = '<div class="complaint-photos">';
+                    c.photos.forEach(photo => {
+                        photosHtml += `<img src="${photo}" onclick="showFullImage('${photo}')">`;
+                    });
+                    photosHtml += '</div>';
+                }
+                
+                list.innerHTML += `
+                    <div class="complaint-card">
+                        <div class="complaint-header">
+                            <span class="complaint-accused">Нарушитель: ${c.accused}</span>
+                            <span class="complaint-status status-${c.status}">${getStatusText(c.status)}</span>
                         </div>
-                        <div class="application-details">
-                            <div><strong>Имя:</strong> ${app.name}</div>
-                            <div><strong>Возраст:</strong> ${app.age}</div>
-                            <div><strong>Пояс:</strong> ${app.timezone}</div>
-                            <div><strong>Дата:</strong> ${app.date}</div>
-                        </div>
-                        <div><strong>Опыт:</strong> ${app.experience}</div>
-                        <div><strong>Почему:</strong> ${app.why}</div>
-                        ${app.status === 'pending' ? `
-                            <div class="application-actions">
-                                <button class="action-btn accept-btn" onclick="handleApplication(${app.id}, 'accept')">✅ Принять</button>
-                                <button class="action-btn reject-btn" onclick="handleApplication(${app.id}, 'reject')">❌ Отклонить</button>
-                                <button class="action-btn view-btn" onclick="viewProfile('${app.userId}')">👤 Профиль</button>
-                            </div>
-                        ` : ''}
+                        <div class="complaint-author">Жалоба от: ${c.complainant} | ${c.date}</div>
+                        <div class="complaint-rule">Нарушение: правило ${c.ruleNumber}</div>
+                        ${photosHtml}
+                        <div class="complaint-text">${c.description}</div>
                     </div>
                 `;
             });
         }
         
-        function handleApplication(id, action) {
-            let app = applications.find(a => a.id === id);
-            if (app) {
-                app.status = action === 'accept' ? 'accepted' : 'rejected';
-                localStorage.setItem('applications', JSON.stringify(applications));
-                
-                if (action === 'accept') {
-                    // Добавляем в команду
-                    team.push({
-                        name: app.nickname,
-                        role: 'Хелпер',
-                        minecraft: app.nickname,
-                        avatar: '💬'
-                    });
-                    updateTeamDisplay();
-                    
-                    // Обновляем роль пользователя
-                    let user = users.find(u => u.username === app.userId);
-                    if (user) {
-                        user.role = 'helper';
-                        localStorage.setItem('users', JSON.stringify(users));
-                    }
-                }
-                
-                loadApplications();
-                alert(`✅ Заявка ${action === 'accept' ? 'принята' : 'отклонена'}`);
-            }
-        }
-        
         function getStatusText(status) {
             switch(status) {
-                case 'pending': return '⏳ Ожидает';
+                case 'pending': return '⏳ На рассмотрении';
                 case 'accepted': return '✅ Принята';
                 case 'rejected': return '❌ Отклонена';
                 default: return status;
             }
         }
         
-        function refreshAdmin() {
-            loadApplications();
-        }
-        
-        function loadProfile() {
-            if (currentUser) {
-                document.getElementById('profileAvatar').textContent = currentUser.minecraft[0];
-                document.getElementById('profileName').textContent = currentUser.name || currentUser.minecraft;
-                document.getElementById('profileRole').textContent = currentUser.role === 'admin' ? 'Администратор' : 'Игрок';
-                document.getElementById('profileMinecraft').textContent = 'Minecraft: ' + currentUser.minecraft;
-                
-                document.getElementById('editName').value = currentUser.name || '';
-                document.getElementById('editAge').value = currentUser.age || '';
-                document.getElementById('editDiscord').value = currentUser.discord || '';
-            }
-        }
-        
-        function saveProfile() {
-            if (currentUser) {
-                currentUser.name = document.getElementById('editName').value;
-                currentUser.age = document.getElementById('editAge').value;
-                currentUser.discord = document.getElementById('editDiscord').value;
-                
-                // Обновляем в массиве
-                let index = users.findIndex(u => u.username === currentUser.username);
-                if (index !== -1) {
-                    users[index] = currentUser;
-                }
-                
-                localStorage.setItem('users', JSON.stringify(users));
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                
-                alert('✅ Профиль сохранен');
-                loadProfile();
-            }
-        }
-        
-        function viewProfile(username) {
-            let user = users.find(u => u.username === username);
-            if (user) {
-                alert(`👤 Профиль ${user.minecraft}\nИмя: ${user.name || 'Не указано'}\nВозраст: ${user.age || 'Не указан'}\nDiscord: ${user.discord || 'Не указан'}\nРоль: ${user.role}\nРегистрация: ${user.registered}`);
-            }
+        function showFullImage(src) {
+            document.getElementById('fullImage').src = src;
+            document.getElementById('imageModal').style.display = 'flex';
         }
         
         // Закрытие модалок
