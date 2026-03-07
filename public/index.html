@@ -20,6 +20,7 @@
             overflow-x: hidden;
         }
         
+        /* Лунный фон с анимацией */
         body::before {
             content: '';
             position: fixed;
@@ -1366,6 +1367,16 @@
                 font-size: 1.1rem;
             }
         }
+
+        /* Лунные эффекты */
+        .moon-glow {
+            text-shadow: 0 0 30px #ffd700, 0 0 60px #4facfe;
+        }
+        
+        .moon-border {
+            border: 2px solid transparent;
+            border-image: linear-gradient(45deg, #ffd700, #4facfe) 1;
+        }
     </style>
 </head>
 <body>
@@ -1550,8 +1561,8 @@
         let uploadedPhotos = [];
         let currentFilter = 'all';
         
-        // Владельцы (OWNERы)
-        const owners = ['milk123', 'Xchik_', 'milfa'];
+        // Владельцы (OWNERы) - ИЗМЕНИТЕ НА СВОИ ЛОГИНЫ!
+        const owners = ['milk123', 'Xchik_', 'milfa', 'admin'];
         
         // ========== ПРАВИЛА ==========
         const rulesData = {
@@ -1607,131 +1618,13 @@
             loadRules();
             checkAuth();
             
-            // Загружаем жалобы и заявки из localStorage
+            // Загружаем жалобы и заявки из localStorage (БЕЗ ТЕСТОВЫХ!)
             complaints = JSON.parse(localStorage.getItem('complaints')) || [];
             applications = JSON.parse(localStorage.getItem('applications')) || [];
-            
-            // Добавляем тестовые данные если их нет
-            if (complaints.length === 0) {
-                addTestComplaints();
-            }
-            if (applications.length === 0) {
-                addTestApplications();
-            }
             
             loadComplaints();
             updateOwnerStats();
         });
-        
-        function addTestComplaints() {
-            let testComplaints = [
-                {
-                    id: 1001,
-                    complainant: "Steve",
-                    accused: "Griefer123",
-                    ruleNumber: "2.1",
-                    description: "Разрушил мой дом, пока меня не было в сети. Снес все стены и сундуки.",
-                    photos: [],
-                    status: 'pending',
-                    date: '15 марта 2025 г., 14:30',
-                    userId: 'test1',
-                    userMinecraft: 'Steve',
-                    ownerResponse: null
-                },
-                {
-                    id: 1002,
-                    complainant: "Alex",
-                    accused: "XRayUser",
-                    ruleNumber: "3.1",
-                    description: "Игрок на X-Ray, нашел все мои алмазы под землей за 5 минут.",
-                    photos: [],
-                    status: 'accepted',
-                    date: '14 марта 2025 г., 18:45',
-                    userId: 'test2',
-                    userMinecraft: 'Alex',
-                    ownerResponse: 'Проверили логи, игрок забанен. Спасибо за сообщение!'
-                },
-                {
-                    id: 1003,
-                    complainant: "CreeperKing",
-                    accused: "ToxicPlayer",
-                    ruleNumber: "4.2",
-                    description: 'Постоянно оскорбляет в чате, пишет "noob" и матерится.',
-                    photos: [],
-                    status: 'rejected',
-                    date: '13 марта 2025 г., 09:15',
-                    userId: 'test3',
-                    userMinecraft: 'CreeperKing',
-                    ownerResponse: 'Недостаточно доказательств, нужны скриншоты.'
-                },
-                {
-                    id: 1004,
-                    complainant: "Enderman",
-                    accused: "Scammer",
-                    ruleNumber: "5.1",
-                    description: "Обманул при торговле, взял алмазы и не отдал предмет.",
-                    photos: [],
-                    status: 'pending',
-                    date: '16 марта 2025 г., 11:20',
-                    userId: 'test4',
-                    userMinecraft: 'Enderman',
-                    ownerResponse: null
-                }
-            ];
-            
-            complaints = testComplaints;
-            localStorage.setItem('complaints', JSON.stringify(complaints));
-        }
-        
-        function addTestApplications() {
-            let testApplications = [
-                {
-                    id: 2001,
-                    userId: 'test5',
-                    userMinecraft: 'BuilderPro',
-                    nickname: 'BuilderPro',
-                    name: 'Алексей',
-                    age: '19',
-                    timezone: 'UTC+3',
-                    experience: 'Был хелпером на сервере MineWorld 6 месяцев',
-                    why: 'Хочу помогать игрокам и поддерживать порядок на сервере',
-                    status: 'pending',
-                    date: '15 марта 2025 г., 10:30',
-                    ownerResponse: null
-                },
-                {
-                    id: 2002,
-                    userId: 'test6',
-                    userMinecraft: 'HelperMaster',
-                    nickname: 'HelperMaster',
-                    name: 'Дмитрий',
-                    age: '21',
-                    timezone: 'UTC+3',
-                    experience: 'Администратор на проекте CraftBoom (1 год)',
-                    why: 'Имею большой опыт модерации, хочу применить его здесь',
-                    status: 'accepted',
-                    date: '14 марта 2025 г., 15:20',
-                    ownerResponse: 'Заявка принята! Свяжитесь с администрацией в Discord'
-                },
-                {
-                    id: 2003,
-                    userId: 'test7',
-                    userMinecraft: 'Newbie',
-                    nickname: 'Newbie',
-                    name: 'Иван',
-                    age: '14',
-                    timezone: 'UTC+5',
-                    experience: 'Опыта нет',
-                    why: 'Просто хочу попробовать',
-                    status: 'rejected',
-                    date: '13 марта 2025 г., 08:45',
-                    ownerResponse: 'Слишком маленький возраст, попробуйте через год'
-                }
-            ];
-            
-            applications = testApplications;
-            localStorage.setItem('applications', JSON.stringify(applications));
-        }
         
         function loadRules() {
             let html = '';
@@ -1810,7 +1703,6 @@
             
             if (section === 'owner') {
                 updateOwnerStats();
-                // Показываем заявки по умолчанию
                 let event = { target: document.querySelector('.owner-tab') };
                 showOwnerTab('applications', event);
             } else if (section === 'complaints') {
@@ -2132,6 +2024,7 @@
                 localStorage.setItem('applications', JSON.stringify(applications));
                 loadOwnerApplications();
                 toggleResponseForm(id, 'app');
+                alert('✅ Ответ сохранен');
             }
         }
         
