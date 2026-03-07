@@ -1,1 +1,271 @@
-
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeleRoom - Minecraft Сервер</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        nav {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .nav-links button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            margin-left: 0.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-links button:hover {
+            background: white;
+            color: #667eea;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .feature-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .server-ip {
+            background: rgba(0,0,0,0.3);
+            padding: 1rem;
+            border-radius: 50px;
+            display: inline-block;
+            font-family: monospace;
+            font-size: 1.2rem;
+            margin-top: 2rem;
+            border: 1px dashed white;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            color: #333;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .modal-content h2 {
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+        
+        .modal-content input {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .close {
+            float: right;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="logo">⚡ TeleRoom</div>
+            <div class="nav-links">
+                <button onclick="showModal('login')">Вход</button>
+                <button onclick="showModal('register')">Регистрация</button>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="hero">
+            <h1>Добро пожаловать на TeleRoom!</h1>
+            <p>Лучший Minecraft сервер для настоящих ценителей</p>
+            
+            <div class="server-ip">
+                IP: play.teleroom.ru
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <button class="btn" onclick="alert('Раздел в разработке')">📝 Подать жалобу</button>
+                <button class="btn btn-outline" onclick="alert('Раздел в разработке')">👥 Команда проекта</button>
+                <button class="btn btn-outline" onclick="alert('Раздел в разработке')">💼 Вакансии</button>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <h3>🎮 Уникальный геймплей</h3>
+                <p>Собственные плагины и механики, которых нет на других серверах</p>
+            </div>
+            <div class="feature-card">
+                <h3>👮 Активная администрация</h3>
+                <p>Быстрое решение проблем и помощь игрокам 24/7</p>
+            </div>
+            <div class="feature-card">
+                <h3>🏆 Регулярные ивенты</h3>
+                <p>Турниры, конкурсы и раздачи призов каждую неделю</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно входа -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('login')">&times;</span>
+            <h2>Вход</h2>
+            <input type="text" placeholder="Логин" id="loginUser">
+            <input type="password" placeholder="Пароль" id="loginPass">
+            <button class="btn" style="width: 100%;" onclick="login()">Войти</button>
+        </div>
+    </div>
+    
+    <!-- Модальное окно регистрации -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('register')">&times;</span>
+            <h2>Регистрация</h2>
+            <input type="text" placeholder="Логин" id="regUser">
+            <input type="password" placeholder="Пароль" id="regPass">
+            <input type="text" placeholder="Minecraft ник" id="regNick">
+            <button class="btn" style="width: 100%;" onclick="register()">Зарегистрироваться</button>
+        </div>
+    </div>
+    
+    <script>
+        function showModal(type) {
+            document.getElementById(type + 'Modal').style.display = 'flex';
+        }
+        
+        function closeModal(type) {
+            document.getElementById(type + 'Modal').style.display = 'none';
+        }
+        
+        function login() {
+            alert('Функция входа будет доступна после подключения базы данных');
+            closeModal('login');
+        }
+        
+        function register() {
+            alert('Функция регистрации будет доступна после подключения базы данных');
+            closeModal('register');
+        }
+        
+        // Закрытие модального окна при клике вне его
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
