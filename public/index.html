@@ -20,7 +20,7 @@
             overflow-x: hidden;
         }
         
-        /* Анимированный фон */
+        /* Анимированный фон с частицами */
         body::before {
             content: '';
             position: fixed;
@@ -28,20 +28,21 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="1" fill="%234facfe" opacity="0.3"/><circle cx="90" cy="30" r="1.5" fill="%23ff6b6b" opacity="0.3"/><circle cx="30" cy="80" r="1" fill="%23a18cd1" opacity="0.3"/><circle cx="70" cy="50" r="1.2" fill="%234facfe" opacity="0.3"/><circle cx="50" cy="20" r="0.8" fill="%23ff6b6b" opacity="0.3"/></svg>');
-            background-size: 200px 200px;
+            background: url('data:image/svg+xml;utf8,<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="2" fill="%234facfe" opacity="0.4"/><circle cx="180" cy="60" r="3" fill="%23ff6b6b" opacity="0.4"/><circle cx="60" cy="160" r="2" fill="%23a18cd1" opacity="0.4"/><circle cx="140" cy="100" r="2.5" fill="%234facfe" opacity="0.4"/><circle cx="100" cy="40" r="1.5" fill="%23ff6b6b" opacity="0.4"/><circle cx="30" cy="120" r="2" fill="%23a18cd1" opacity="0.4"/><circle cx="170" cy="150" r="2" fill="%234facfe" opacity="0.4"/></svg>');
+            background-size: 300px 300px;
             pointer-events: none;
             z-index: -1;
-            animation: float 20s linear infinite;
+            animation: floatParticles 30s linear infinite;
         }
         
-        @keyframes float {
-            0% { transform: translateY(0) rotate(0deg); }
-            100% { transform: translateY(-20px) rotate(5deg); }
+        @keyframes floatParticles {
+            0% { transform: translateY(0) translateX(0) rotate(0deg); }
+            50% { transform: translateY(-30px) translateX(20px) rotate(5deg); }
+            100% { transform: translateY(0) translateX(0) rotate(0deg); }
         }
         
         nav {
-            background: rgba(5, 5, 20, 0.85);
+            background: rgba(8, 8, 25, 0.9);
             padding: 1rem 2rem;
             backdrop-filter: blur(20px);
             border-bottom: 2px solid linear-gradient(90deg, #ff6b6b, #4facfe, #a18cd1);
@@ -64,12 +65,20 @@
         .logo {
             font-size: 2.5rem;
             font-weight: 900;
-            background: linear-gradient(135deg, #ff6b6b, #4facfe, #a18cd1);
+            background: linear-gradient(135deg, #ff6b6b, #4facfe, #a18cd1, #ff6b6b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             cursor: pointer;
             text-shadow: 0 0 40px rgba(79,172,254,0.7);
             letter-spacing: 2px;
+            animation: gradientShift 3s ease infinite;
+            background-size: 300% 300%;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         
         .ip-box {
@@ -176,35 +185,53 @@
         
         .hero {
             text-align: center;
-            padding: 3rem 2rem;
+            padding: 3.5rem 2rem;
             background: rgba(0,0,0,0.3);
-            border-radius: 30px;
-            margin-bottom: 2rem;
-            border: 1px solid rgba(79,172,254,0.2);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border-radius: 40px;
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(79,172,254,0.3);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(79,172,254,0.1), transparent);
+            animation: shine 6s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: rotate(0deg) translateX(-100%); }
+            100% { transform: rotate(45deg) translateX(100%); }
         }
         
         .hero h1 {
-            font-size: 4rem;
+            font-size: 4.5rem;
             margin-bottom: 1rem;
             background: linear-gradient(135deg, #fff, #4facfe, #ff6b6b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 50px rgba(79,172,254,0.5);
+            text-shadow: 0 0 60px rgba(79,172,254,0.5);
         }
         
         .hero p {
-            font-size: 1.3rem;
-            color: #ccc;
+            font-size: 1.4rem;
+            color: #ddd;
             margin-bottom: 1.5rem;
         }
         
         .server-ip {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             color: #fff;
             margin: 1.5rem 0;
-            padding: 1rem 3rem;
+            padding: 1rem 3.5rem;
             border: 3px dashed #4facfe;
             border-radius: 60px;
             display: inline-block;
@@ -219,14 +246,14 @@
         .server-ip:hover {
             transform: scale(1.1);
             border-color: #ff6b6b;
-            box-shadow: 0 0 50px rgba(255,107,107,0.5);
+            box-shadow: 0 0 60px rgba(255,107,107,0.6);
         }
         
         .tabs {
             display: flex;
             justify-content: center;
             gap: 1.5rem;
-            margin: 2rem 0;
+            margin: 2.5rem 0;
             flex-wrap: wrap;
         }
         
@@ -234,7 +261,7 @@
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(79,172,254,0.3);
             color: white;
-            padding: 1.2rem 2.5rem;
+            padding: 1.2rem 2.8rem;
             border-radius: 50px;
             cursor: pointer;
             font-size: 1.2rem;
@@ -242,20 +269,20 @@
             backdrop-filter: blur(5px);
             font-weight: 600;
             letter-spacing: 1px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.4);
         }
         
         .tab:hover {
             background: linear-gradient(135deg, #ff6b6b, #4facfe);
             border-color: transparent;
             transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 40px rgba(79,172,254,0.5);
+            box-shadow: 0 15px 40px rgba(79,172,254,0.6);
         }
         
         .tab.active {
             background: linear-gradient(135deg, #ff6b6b, #4facfe);
             border-color: transparent;
-            box-shadow: 0 10px 30px rgba(79,172,254,0.5);
+            box-shadow: 0 10px 30px rgba(79,172,254,0.6);
         }
         
         .section {
@@ -278,7 +305,7 @@
             gap: 0.5rem;
             background: rgba(255,255,255,0.05);
             color: white;
-            padding: 1rem 2rem;
+            padding: 1rem 2.2rem;
             border-radius: 50px;
             cursor: pointer;
             margin-bottom: 1.5rem;
@@ -291,7 +318,7 @@
         .back-button:hover {
             background: #4facfe;
             transform: translateX(-10px);
-            box-shadow: 0 0 30px #4facfe;
+            box-shadow: 0 0 40px #4facfe;
         }
         
         .back-button::before {
@@ -303,40 +330,40 @@
         /* Админ панель - ТОЛЬКО ДЛЯ АДМИНОВ */
         .admin-section {
             background: rgba(0,0,0,0.4);
-            border-radius: 30px;
-            padding: 2rem;
+            border-radius: 40px;
+            padding: 2.5rem;
             border: 2px solid #ff6b6b;
             margin-top: 1rem;
-            box-shadow: 0 0 50px rgba(255,107,107,0.3);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 0 70px rgba(255,107,107,0.4);
+            backdrop-filter: blur(15px);
         }
         
         .admin-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             flex-wrap: wrap;
             gap: 1rem;
         }
         
         .admin-header h2 {
             color: #ff6b6b;
-            font-size: 2.5rem;
-            text-shadow: 0 0 30px #ff6b6b;
+            font-size: 2.8rem;
+            text-shadow: 0 0 40px #ff6b6b;
         }
         
         .admin-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1.5rem;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
         
         .stat-card {
             background: rgba(255,107,107,0.1);
-            padding: 1.8rem;
-            border-radius: 20px;
+            padding: 2rem;
+            border-radius: 25px;
             text-align: center;
             border: 1px solid #ff6b6b;
             backdrop-filter: blur(5px);
@@ -345,36 +372,38 @@
         
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(255,107,107,0.3);
+            box-shadow: 0 15px 40px rgba(255,107,107,0.4);
         }
         
         .stat-card .number {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             font-weight: bold;
             color: #ff6b6b;
-            text-shadow: 0 0 20px #ff6b6b;
+            text-shadow: 0 0 30px #ff6b6b;
         }
         
         .admin-tabs {
             display: flex;
             gap: 1rem;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             flex-wrap: wrap;
         }
         
         .admin-tab {
             background: rgba(255,255,255,0.05);
-            padding: 1rem 2rem;
-            border-radius: 30px;
+            padding: 1rem 2.5rem;
+            border-radius: 40px;
             cursor: pointer;
             transition: all 0.3s;
             border: 1px solid rgba(255,107,107,0.3);
+            font-size: 1.1rem;
         }
         
         .admin-tab:hover, .admin-tab.active {
             background: #ff6b6b;
             border-color: #ff6b6b;
-            box-shadow: 0 0 30px #ff6b6b;
+            box-shadow: 0 0 40px #ff6b6b;
+            transform: scale(1.05);
         }
         
         .admin-content {
@@ -388,17 +417,18 @@
         /* Карточки для админа */
         .application-card, .complaint-card {
             background: rgba(255,255,255,0.05);
-            padding: 1.8rem;
-            border-radius: 20px;
-            margin-bottom: 1.5rem;
-            border-left: 5px solid #4facfe;
+            padding: 2rem;
+            border-radius: 25px;
+            margin-bottom: 1.8rem;
+            border-left: 6px solid #4facfe;
             backdrop-filter: blur(5px);
             transition: all 0.3s;
+            position: relative;
         }
         
         .application-card:hover, .complaint-card:hover {
-            transform: translateX(5px);
-            box-shadow: 0 10px 30px rgba(79,172,254,0.2);
+            transform: translateX(5px) translateY(-2px);
+            box-shadow: 0 15px 40px rgba(79,172,254,0.3);
         }
         
         .complaint-card {
@@ -415,15 +445,15 @@
         }
         
         .card-title {
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             font-weight: bold;
             color: #4facfe;
         }
         
         .card-status {
-            padding: 0.4rem 1.2rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            font-size: 1rem;
             font-weight: bold;
         }
         
@@ -442,6 +472,24 @@
             color: white;
         }
         
+        .admin-response {
+            background: rgba(79,172,254,0.1);
+            padding: 1.2rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+            border-left: 3px solid #4facfe;
+        }
+        
+        .admin-response strong {
+            color: #4facfe;
+        }
+        
+        .response-text {
+            margin-top: 0.5rem;
+            font-style: italic;
+            color: #ddd;
+        }
+        
         .card-actions {
             display: flex;
             gap: 1rem;
@@ -453,8 +501,8 @@
             background: #10b981;
             color: white;
             border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 10px;
+            padding: 0.8rem 2.2rem;
+            border-radius: 15px;
             cursor: pointer;
             transition: all 0.3s;
             font-weight: bold;
@@ -463,15 +511,15 @@
         
         .accept-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 25px #10b981;
+            box-shadow: 0 0 30px #10b981;
         }
         
         .reject-btn {
             background: #ef4444;
             color: white;
             border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 10px;
+            padding: 0.8rem 2.2rem;
+            border-radius: 15px;
             cursor: pointer;
             transition: all 0.3s;
             font-weight: bold;
@@ -480,36 +528,101 @@
         
         .reject-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 25px #ef4444;
+            box-shadow: 0 0 30px #ef4444;
+        }
+        
+        .delete-btn {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 0.8rem 2.2rem;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 1rem;
+            margin-left: auto;
+        }
+        
+        .delete-btn:hover {
+            background: #ef4444;
+            transform: scale(1.05);
+            box-shadow: 0 0 30px #ef4444;
+        }
+        
+        .respond-btn {
+            background: #4facfe;
+            color: white;
+            border: none;
+            padding: 0.8rem 2.2rem;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        
+        .respond-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px #4facfe;
+        }
+        
+        .response-form {
+            background: rgba(255,255,255,0.05);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+            display: none;
+        }
+        
+        .response-form.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .response-form textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(79,172,254,0.3);
+            border-radius: 15px;
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .response-form textarea:focus {
+            outline: none;
+            border-color: #4facfe;
         }
         
         /* Правила */
         .rules-section {
             background: rgba(0,0,0,0.3);
-            border-radius: 30px;
-            padding: 2rem;
-            border: 1px solid rgba(79,172,254,0.2);
-            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            padding: 2.5rem;
+            border: 1px solid rgba(79,172,254,0.3);
+            backdrop-filter: blur(15px);
         }
         
         .rules-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             flex-wrap: wrap;
             gap: 1rem;
         }
         
         .rules-header h2 {
             color: #4facfe;
-            font-size: 2.5rem;
-            text-shadow: 0 0 30px #4facfe;
+            font-size: 2.8rem;
+            text-shadow: 0 0 40px #4facfe;
         }
         
         .rules-date {
-            color: #888;
-            font-size: 1.1rem;
+            color: #aaa;
+            font-size: 1.2rem;
         }
         
         .rules-content {
@@ -519,21 +632,21 @@
         }
         
         .rules-section-block {
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             background: rgba(255,255,255,0.03);
-            padding: 1.5rem;
-            border-radius: 20px;
+            padding: 2rem;
+            border-radius: 25px;
         }
         
         .rules-section-title {
             color: #ff6b6b;
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 20px #ff6b6b;
+            font-size: 2rem;
+            margin-bottom: 1.2rem;
+            text-shadow: 0 0 25px #ff6b6b;
         }
         
         .rule-item {
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
             padding-left: 1.5rem;
             border-left: 3px solid #4facfe;
             line-height: 1.6;
@@ -542,12 +655,12 @@
         .rule-number {
             color: #4facfe;
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
         }
         
         .rule-punishment {
             color: #ff6b6b;
-            font-size: 0.95rem;
+            font-size: 1rem;
             margin-top: 0.3rem;
             font-weight: bold;
         }
@@ -555,50 +668,50 @@
         /* Жалобы */
         .complaints-section {
             background: rgba(0,0,0,0.3);
-            border-radius: 30px;
-            padding: 2rem;
-            border: 1px solid rgba(79,172,254,0.2);
-            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            padding: 2.5rem;
+            border: 1px solid rgba(79,172,254,0.3);
+            backdrop-filter: blur(15px);
         }
         
         .complaints-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             flex-wrap: wrap;
             gap: 1rem;
         }
         
         .complaints-header h2 {
             color: #4facfe;
-            font-size: 2.5rem;
-            text-shadow: 0 0 30px #4facfe;
+            font-size: 2.8rem;
+            text-shadow: 0 0 40px #4facfe;
         }
         
         .new-complaint-btn {
             background: linear-gradient(135deg, #ff6b6b, #4facfe);
             border: none;
-            padding: 1.2rem 2.5rem;
+            padding: 1.2rem 2.8rem;
             border-radius: 50px;
             color: white;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 1.1rem;
-            box-shadow: 0 5px 20px rgba(79,172,254,0.3);
+            font-size: 1.2rem;
+            box-shadow: 0 5px 25px rgba(79,172,254,0.4);
         }
         
         .new-complaint-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 10px 40px rgba(79,172,254,0.6);
+            box-shadow: 0 15px 50px rgba(79,172,254,0.7);
         }
         
         .complaint-form {
             background: rgba(255,255,255,0.05);
-            padding: 2rem;
-            border-radius: 20px;
-            margin-bottom: 2rem;
+            padding: 2.5rem;
+            border-radius: 25px;
+            margin-bottom: 2.5rem;
             display: none;
             border: 1px solid #4facfe;
         }
@@ -615,33 +728,33 @@
         
         .complaint-form h3 {
             color: #4facfe;
-            margin-bottom: 1.5rem;
-            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            font-size: 2rem;
         }
         
         /* Заявки */
         .apply-section {
             background: rgba(0,0,0,0.3);
-            border-radius: 30px;
-            padding: 2rem;
-            border: 1px solid rgba(79,172,254,0.2);
-            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            padding: 2.5rem;
+            border: 1px solid rgba(79,172,254,0.3);
+            backdrop-filter: blur(15px);
             margin-top: 1rem;
         }
         
         .apply-section h2 {
             color: #4facfe;
-            margin-bottom: 2rem;
-            font-size: 2.5rem;
+            margin-bottom: 2.5rem;
+            font-size: 2.8rem;
             text-align: center;
-            text-shadow: 0 0 30px #4facfe;
+            text-shadow: 0 0 40px #4facfe;
         }
         
         .apply-form {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            max-width: 800px;
+            gap: 1.8rem;
+            max-width: 900px;
             margin: 0 auto;
         }
         
@@ -658,14 +771,14 @@
             margin-bottom: 0.5rem;
             color: #4facfe;
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
         }
         
         .form-group input, .form-group textarea {
             width: 100%;
-            padding: 1rem;
+            padding: 1.2rem;
             border: 2px solid rgba(79,172,254,0.3);
-            border-radius: 15px;
+            border-radius: 20px;
             background: rgba(255,255,255,0.05);
             color: white;
             font-size: 1rem;
@@ -675,14 +788,14 @@
         .form-group input:focus, .form-group textarea:focus {
             outline: none;
             border-color: #4facfe;
-            box-shadow: 0 0 30px rgba(79,172,254,0.3);
+            box-shadow: 0 0 40px rgba(79,172,254,0.4);
         }
         
         .photo-upload {
             border: 2px dashed #4facfe;
-            padding: 2rem;
+            padding: 2.5rem;
             text-align: center;
-            border-radius: 15px;
+            border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s;
         }
@@ -710,21 +823,21 @@
         .submit-btn {
             background: linear-gradient(135deg, #ff6b6b, #4facfe);
             border: none;
-            padding: 1.2rem 2rem;
-            border-radius: 50px;
+            padding: 1.5rem 2.5rem;
+            border-radius: 60px;
             color: white;
             font-weight: bold;
             cursor: pointer;
             width: 100%;
-            font-size: 1.2rem;
-            margin-top: 1rem;
+            font-size: 1.3rem;
+            margin-top: 1.5rem;
             transition: all 0.3s;
-            box-shadow: 0 5px 20px rgba(79,172,254,0.3);
+            box-shadow: 0 5px 25px rgba(79,172,254,0.4);
         }
         
         .submit-btn:hover {
             transform: scale(1.02);
-            box-shadow: 0 10px 40px rgba(79,172,254,0.6);
+            box-shadow: 0 15px 50px rgba(79,172,254,0.7);
         }
         
         .success-message {
@@ -732,11 +845,12 @@
             background: rgba(72, 187, 120, 0.2);
             border: 2px solid #48bb78;
             color: #48bb78;
-            padding: 1rem;
-            border-radius: 15px;
+            padding: 1.2rem;
+            border-radius: 20px;
             text-align: center;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
             font-weight: bold;
+            font-size: 1.1rem;
         }
         
         .complaints-list {
@@ -747,8 +861,8 @@
         }
         
         .complaint-author {
-            color: #888;
-            font-size: 0.95rem;
+            color: #aaa;
+            font-size: 1rem;
         }
         
         .complaint-rule {
@@ -784,7 +898,7 @@
             margin: 1rem 0;
             padding: 1rem;
             background: rgba(0,0,0,0.3);
-            border-radius: 10px;
+            border-radius: 15px;
             line-height: 1.6;
         }
         
@@ -796,21 +910,21 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
         }
         
         .modal-content {
             background: linear-gradient(135deg, #1a1a3a, #2a1a4a);
-            padding: 3rem;
-            border-radius: 30px;
-            max-width: 450px;
+            padding: 3.5rem;
+            border-radius: 40px;
+            max-width: 500px;
             width: 90%;
             border: 2px solid #4facfe;
-            box-shadow: 0 0 60px rgba(79,172,254,0.3);
+            box-shadow: 0 0 80px rgba(79,172,254,0.4);
             animation: modalPop 0.4s ease;
         }
         
@@ -821,17 +935,17 @@
         
         .modal-content h2 {
             color: #4facfe;
-            margin-bottom: 1.5rem;
-            font-size: 2rem;
+            margin-bottom: 2rem;
+            font-size: 2.2rem;
             text-align: center;
         }
         
         .modal-content input {
             width: 100%;
-            padding: 1rem;
+            padding: 1.2rem;
             margin: 0.5rem 0;
             border: 2px solid rgba(79,172,254,0.3);
-            border-radius: 15px;
+            border-radius: 20px;
             background: rgba(255,255,255,0.05);
             color: white;
             font-size: 1rem;
@@ -839,28 +953,28 @@
         
         .modal-content button {
             width: 100%;
-            padding: 1rem;
+            padding: 1.2rem;
             margin-top: 1.5rem;
             background: linear-gradient(135deg, #ff6b6b, #4facfe);
             border: none;
-            border-radius: 50px;
+            border-radius: 60px;
             color: white;
             font-weight: bold;
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             transition: all 0.3s;
         }
         
         .modal-content button:hover {
             transform: scale(1.02);
-            box-shadow: 0 0 40px rgba(79,172,254,0.5);
+            box-shadow: 0 0 50px rgba(79,172,254,0.6);
         }
         
         .close {
             float: right;
             cursor: pointer;
             color: #ff6b6b;
-            font-size: 2rem;
+            font-size: 2.2rem;
             transition: all 0.3s;
         }
         
@@ -878,13 +992,13 @@
         
         .modal-link:hover {
             color: #ff6b6b;
-            text-shadow: 0 0 20px #ff6b6b;
+            text-shadow: 0 0 25px #ff6b6b;
         }
         
         #fullImage {
             max-width: 100%;
             max-height: 80vh;
-            border-radius: 10px;
+            border-radius: 15px;
         }
         
         @media (max-width: 768px) {
@@ -893,12 +1007,12 @@
             }
             
             .hero h1 {
-                font-size: 2.5rem;
+                font-size: 2.8rem;
             }
             
             .server-ip {
-                font-size: 1.3rem;
-                padding: 0.8rem 1.5rem;
+                font-size: 1.4rem;
+                padding: 0.8rem 1.8rem;
             }
             
             .apply-form {
@@ -910,8 +1024,12 @@
             }
             
             .tab {
-                padding: 1rem 1.5rem;
+                padding: 1rem 1.8rem;
                 font-size: 1rem;
+            }
+            
+            .admin-header h2 {
+                font-size: 2rem;
             }
         }
     </style>
@@ -1117,7 +1235,7 @@
         let applications = JSON.parse(localStorage.getItem('applications')) || [];
         let uploadedPhotos = [];
         
-        // Список админов (по логину)
+        // Список админов (по ЛОГИНУ)
         const admins = ['milk123', 'Xchik_', 'milfa'];
         
         // Правила
@@ -1424,7 +1542,8 @@
                 photos: uploadedPhotos,
                 status: 'pending',
                 date: new Date().toLocaleString(),
-                userId: currentUser.username
+                userId: currentUser.username,
+                adminResponse: null
             };
             
             complaints.push(complaint);
@@ -1462,6 +1581,16 @@
                     photosHtml += '</div>';
                 }
                 
+                let responseHtml = '';
+                if (c.adminResponse) {
+                    responseHtml = `
+                        <div class="admin-response">
+                            <strong>Ответ администрации:</strong>
+                            <div class="response-text">${c.adminResponse}</div>
+                        </div>
+                    `;
+                }
+                
                 list.innerHTML += `
                     <div class="complaint-card">
                         <div class="card-header">
@@ -1472,6 +1601,7 @@
                         <div class="complaint-rule">Нарушение: правило ${c.ruleNumber}</div>
                         ${photosHtml}
                         <div class="complaint-text">${c.description}</div>
+                        ${responseHtml}
                     </div>
                 `;
             });
@@ -1503,7 +1633,8 @@
                     experience: experience,
                     why: why,
                     status: 'pending',
-                    date: new Date().toLocaleString()
+                    date: new Date().toLocaleString(),
+                    adminResponse: null
                 };
                 
                 applications.push(application);
@@ -1572,8 +1703,18 @@
             
             container.innerHTML = '';
             applications.slice().reverse().forEach(app => {
+                let responseHtml = '';
+                if (app.adminResponse) {
+                    responseHtml = `
+                        <div class="admin-response">
+                            <strong>Ваш ответ:</strong>
+                            <div class="response-text">${app.adminResponse}</div>
+                        </div>
+                    `;
+                }
+                
                 container.innerHTML += `
-                    <div class="application-card">
+                    <div class="application-card" id="app-${app.id}">
                         <div class="card-header">
                             <span class="card-title">${app.nickname}</span>
                             <span class="card-status status-${app.status}">${getStatusText(app.status)}</span>
@@ -1584,12 +1725,21 @@
                         <div><strong>Дата:</strong> ${app.date}</div>
                         <div style="margin-top:0.5rem;"><strong>Опыт:</strong> ${app.experience}</div>
                         <div><strong>Почему:</strong> ${app.why}</div>
-                        ${app.status === 'pending' ? `
-                            <div class="card-actions">
+                        ${responseHtml}
+                        
+                        <div class="response-form" id="responseForm-${app.id}">
+                            <textarea id="responseText-${app.id}" placeholder="Напишите ответ на заявку..."></textarea>
+                            <button class="accept-btn" onclick="submitApplicationResponse(${app.id})">Отправить ответ</button>
+                        </div>
+                        
+                        <div class="card-actions">
+                            <button class="respond-btn" onclick="toggleResponseForm(${app.id})">💬 Ответить</button>
+                            ${app.status === 'pending' ? `
                                 <button class="accept-btn" onclick="handleApplication(${app.id}, 'accept')">✅ Принять</button>
                                 <button class="reject-btn" onclick="handleApplication(${app.id}, 'reject')">❌ Отклонить</button>
-                            </div>
-                        ` : ''}
+                            ` : ''}
+                            <button class="delete-btn" onclick="deleteApplication(${app.id})">🗑️ Удалить</button>
+                        </div>
                     </div>
                 `;
             });
@@ -1613,8 +1763,18 @@
                     photosHtml += '</div>';
                 }
                 
+                let responseHtml = '';
+                if (c.adminResponse) {
+                    responseHtml = `
+                        <div class="admin-response">
+                            <strong>Ваш ответ:</strong>
+                            <div class="response-text">${c.adminResponse}</div>
+                        </div>
+                    `;
+                }
+                
                 container.innerHTML += `
-                    <div class="complaint-card">
+                    <div class="complaint-card" id="comp-${c.id}">
                         <div class="card-header">
                             <span class="card-title">${c.accused}</span>
                             <span class="card-status status-${c.status}">${getStatusText(c.status)}</span>
@@ -1624,12 +1784,21 @@
                         <div><strong>Дата:</strong> ${c.date}</div>
                         ${photosHtml}
                         <div style="margin:0.5rem 0;">${c.description}</div>
-                        ${c.status === 'pending' ? `
-                            <div class="card-actions">
+                        ${responseHtml}
+                        
+                        <div class="response-form" id="responseForm-${c.id}">
+                            <textarea id="responseText-${c.id}" placeholder="Напишите ответ на жалобу..."></textarea>
+                            <button class="accept-btn" onclick="submitComplaintResponse(${c.id})">Отправить ответ</button>
+                        </div>
+                        
+                        <div class="card-actions">
+                            <button class="respond-btn" onclick="toggleResponseForm(${c.id})">💬 Ответить</button>
+                            ${c.status === 'pending' ? `
                                 <button class="accept-btn" onclick="handleComplaint(${c.id}, 'accept')">✅ Принять</button>
                                 <button class="reject-btn" onclick="handleComplaint(${c.id}, 'reject')">❌ Отклонить</button>
-                            </div>
-                        ` : ''}
+                            ` : ''}
+                            <button class="delete-btn" onclick="deleteComplaint(${c.id})">🗑️ Удалить</button>
+                        </div>
                     </div>
                 `;
             });
@@ -1656,6 +1825,56 @@
                     </div>
                 `;
             });
+        }
+        
+        function toggleResponseForm(id) {
+            let form = document.getElementById(`responseForm-${id}`);
+            form.classList.toggle('active');
+        }
+        
+        function submitApplicationResponse(id) {
+            if (!currentUser || !admins.includes(currentUser.username)) {
+                alert('❌ Только администраторы могут отвечать');
+                return;
+            }
+            
+            let responseText = document.getElementById(`responseText-${id}`).value.trim();
+            if (!responseText) {
+                alert('❌ Введите текст ответа');
+                return;
+            }
+            
+            let app = applications.find(a => a.id === id);
+            if (app) {
+                app.adminResponse = responseText;
+                localStorage.setItem('applications', JSON.stringify(applications));
+                document.getElementById(`responseForm-${id}`).classList.remove('active');
+                loadAdminApplications();
+                alert('✅ Ответ отправлен');
+            }
+        }
+        
+        function submitComplaintResponse(id) {
+            if (!currentUser || !admins.includes(currentUser.username)) {
+                alert('❌ Только администраторы могут отвечать');
+                return;
+            }
+            
+            let responseText = document.getElementById(`responseText-${id}`).value.trim();
+            if (!responseText) {
+                alert('❌ Введите текст ответа');
+                return;
+            }
+            
+            let complaint = complaints.find(c => c.id === id);
+            if (complaint) {
+                complaint.adminResponse = responseText;
+                localStorage.setItem('complaints', JSON.stringify(complaints));
+                document.getElementById(`responseForm-${id}`).classList.remove('active');
+                loadAdminComplaints();
+                loadComplaints();
+                alert('✅ Ответ отправлен');
+            }
         }
         
         function handleApplication(id, action) {
@@ -1686,6 +1905,37 @@
                 loadComplaints();
                 updateAdminStats();
                 alert(`✅ Жалоба ${action === 'accept' ? 'принята' : 'отклонена'}`);
+            }
+        }
+        
+        function deleteApplication(id) {
+            if (!currentUser || !admins.includes(currentUser.username)) {
+                alert('❌ Только администраторы могут удалять');
+                return;
+            }
+            
+            if (confirm('Вы уверены, что хотите удалить эту заявку?')) {
+                applications = applications.filter(a => a.id !== id);
+                localStorage.setItem('applications', JSON.stringify(applications));
+                loadAdminApplications();
+                updateAdminStats();
+                alert('✅ Заявка удалена');
+            }
+        }
+        
+        function deleteComplaint(id) {
+            if (!currentUser || !admins.includes(currentUser.username)) {
+                alert('❌ Только администраторы могут удалять');
+                return;
+            }
+            
+            if (confirm('Вы уверены, что хотите удалить эту жалобу?')) {
+                complaints = complaints.filter(c => c.id !== id);
+                localStorage.setItem('complaints', JSON.stringify(complaints));
+                loadAdminComplaints();
+                loadComplaints();
+                updateAdminStats();
+                alert('✅ Жалоба удалена');
             }
         }
         
