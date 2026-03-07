@@ -1258,7 +1258,92 @@
             max-height: 80vh;
             border-radius: 20px;
         }
-        
+
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid #4facfe;
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .filter-btn:hover {
+            background: #4facfe;
+            transform: scale(1.05);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            border-color: transparent;
+        }
+
+        .no-items {
+            text-align: center;
+            padding: 3rem;
+            color: #aaa;
+            font-size: 1.2rem;
+        }
+
+        .response-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .save-response-btn {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: black;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .save-response-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px #ffd700;
+        }
+
+        .cancel-response-btn {
+            background: #666;
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .cancel-response-btn:hover {
+            background: #888;
+            transform: scale(1.05);
+        }
+
+        .complaint-response {
+            background: rgba(255,215,0,0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+            border-left: 4px solid #ffd700;
+        }
+
+        .complaint-response strong {
+            color: #ffd700;
+        }
+
         @media (max-width: 768px) {
             .nav-container {
                 flex-direction: column;
@@ -1335,7 +1420,7 @@
             <div class="complaints-section">
                 <div class="complaints-header">
                     <h2>⚠️ Жалобы</h2>
-                    <button class="new-complaint-btn" onclick="toggleComplaintForm()">+ Новая</button>
+                    <button class="new-complaint-btn" onclick="toggleComplaintForm()">+ Новая жалоба</button>
                 </div>
                 
                 <div class="complaint-form" id="complaintForm">
@@ -1354,17 +1439,25 @@
                     </div>
                     <div class="form-group">
                         <label>Описание:</label>
-                        <textarea id="description" rows="4" placeholder="Опишите..."></textarea>
+                        <textarea id="description" rows="4" placeholder="Опишите ситуацию..."></textarea>
                     </div>
                     <div class="form-group">
                         <label>Скриншоты:</label>
                         <div class="photo-upload" onclick="document.getElementById('photoInput').click()">
-                            <input type="file" id="photoInput" multiple accept="image/*" onchange="handlePhotoUpload(event)">
-                            <p>📷 Загрузить</p>
+                            <input type="file" id="photoInput" multiple accept="image/*" onchange="handlePhotoUpload(event)" style="display: none;">
+                            <p>📷 Нажмите чтобы загрузить скриншоты</p>
                         </div>
                         <div class="photo-preview" id="photoPreview"></div>
                     </div>
-                    <button class="submit-btn" onclick="submitComplaint()">Отправить</button>
+                    <button class="submit-btn" onclick="submitComplaint()">Отправить жалобу</button>
+                </div>
+                
+                <!-- Кнопки фильтрации для всех пользователей -->
+                <div class="filter-buttons" id="filterButtons">
+                    <button class="filter-btn active" onclick="filterComplaints('all')">Все</button>
+                    <button class="filter-btn" onclick="filterComplaints('pending')">Ожидает</button>
+                    <button class="filter-btn" onclick="filterComplaints('accepted')">Принято</button>
+                    <button class="filter-btn" onclick="filterComplaints('rejected')">Отклонено</button>
                 </div>
                 
                 <div class="complaints-list" id="complaintsList"></div>
@@ -1393,15 +1486,14 @@
                         <input type="text" id="timezone" placeholder="Например: UTC+3">
                     </div>
                     <div class="form-group full-width">
-                        <label>Опыт:</label>
-                        <textarea id="experience" rows="3" placeholder="Опыт работы"></textarea>
+                        <label>Опыт работы:</label>
+                        <textarea id="experience" rows="3" placeholder="Был ли опыт работы хелпером на других серверах?"></textarea>
                     </div>
                     <div class="form-group full-width">
-                        <label>Почему вы?</label>
-                        <textarea id="why" rows="3" placeholder="Почему хотите стать хелпером?"></textarea>
+                        <label>Почему вы хотите стать хелпером?</label>
+                        <textarea id="why" rows="3" placeholder="Напишите причину"></textarea>
                     </div>
-                    <button class="submit-btn" onclick="submitApplication()">Отправить</button>
-                    <div class="success-message" id="successMessage">✅ Отправлено!</div>
+                    <button class="submit-btn" onclick="submitApplication()">Отправить заявку</button>
                 </div>
             </div>
         </div>
@@ -1457,7 +1549,7 @@
     
     <div id="imageModal" class="modal" onclick="this.style.display='none'">
         <div class="modal-content" style="max-width: 800px; text-align: center; background: transparent; border: none;">
-            <img id="fullImage" src="">
+            <img id="fullImage" src="" style="max-width: 100%; max-height: 80vh;">
         </div>
     </div>
     
@@ -1468,6 +1560,7 @@
         let complaints = JSON.parse(localStorage.getItem('complaints')) || [];
         let applications = JSON.parse(localStorage.getItem('applications')) || [];
         let uploadedPhotos = [];
+        let currentFilter = 'all'; // текущий фильтр
         
         // OWNERы (по логину)
         const owners = ['milk123', 'Xchik_', 'milfa'];
@@ -1475,16 +1568,53 @@
         // Правила
         const rulesData = {
             sections: [
-                { title: "1. Общие положения", rules: [
-                    { num: "1.1", text: "Настоящие правила разработаны администратором сервера MoonGrief." },
-                    { num: "1.2", text: "Официальные сервера: Moongrief.aurorix.pro." },
-                    { num: "1.3", text: "Решения администрации окончательны." },
-                    { num: "1.5", text: "Запрещена продажа аккаунтов.", punishment: "Бан по Айпи" }
-                ]},
-                { title: "4. Чат", rules: [
-                    { num: "4.1", text: "Запрещён флуд.", punishment: "Мут 2ч" },
-                    { num: "4.4", text: "Запрещены оскорбления.", punishment: "Мут 2ч" }
-                ]}
+                { 
+                    title: "1. Общие положения", 
+                    rules: [
+                        { num: "1.1", text: "Настоящие правила разработаны администратором сервера MoonGrief и обязательны к исполнению всеми игроками." },
+                        { num: "1.2", text: "Официальные сервера: Moongrief.aurorix.pro." },
+                        { num: "1.3", text: "Решения администрации окончательны и обжалованию не подлежат." },
+                        { num: "1.4", text: "Запрещена передача аккаунта третьим лицам.", punishment: "Бан навсегда" },
+                        { num: "1.5", text: "Запрещена продажа аккаунтов за реальные деньги.", punishment: "Бан по IP" }
+                    ]
+                },
+                { 
+                    title: "2. Гриферство", 
+                    rules: [
+                        { num: "2.1", text: "Запрещено разрушать постройки других игроков без их согласия.", punishment: "Бан 7 дней + снятие статистики" },
+                        { num: "2.2", text: "Запрещено воровать вещи из сундуков.", punishment: "Бан 3 дня" },
+                        { num: "2.3", text: "Запрещено обкрадывать фермы других игроков.", punishment: "Бан 5 дней" },
+                        { num: "2.4", text: "Запрещено убивать чужих животных.", punishment: "Бан 3 дня" }
+                    ]
+                },
+                { 
+                    title: "3. Чит-клиенты", 
+                    rules: [
+                        { num: "3.1", text: "Запрещено использование любых читов и модификаций дающих преимущество.", punishment: "Бан навсегда" },
+                        { num: "3.2", text: "Запрещен X-Ray ресурспаки и текстурпаки.", punishment: "Бан навсегда" },
+                        { num: "3.3", text: "Запрещены макросы и авто-кликеры.", punishment: "Бан 30 дней" },
+                        { num: "3.4", text: "Разрешены только оптимизационные моды (OptiFine, Litematica и т.д.)." }
+                    ]
+                },
+                { 
+                    title: "4. Чат и общение", 
+                    rules: [
+                        { num: "4.1", text: "Запрещён флуд, капс и спам.", punishment: "Мут 2 часа" },
+                        { num: "4.2", text: "Запрещены оскорбления игроков и администрации.", punishment: "Мут от 6 часов до 7 дней" },
+                        { num: "4.3", text: "Запрещена реклама других серверов.", punishment: "Бан навсегда" },
+                        { num: "4.4", text: "Запрещены провокации и разжигание конфликтов.", punishment: "Мут 1 день" },
+                        { num: "4.5", text: "Запрещены политические и религиозные темы.", punishment: "Мут 3 дня" },
+                        { num: "4.6", text: "Запрещены NSFW материалы в любом виде.", punishment: "Бан навсегда" }
+                    ]
+                },
+                { 
+                    title: "5. Торговля и экономика", 
+                    rules: [
+                        { num: "5.1", text: "Запрещен обман при торговле.", punishment: "Бан 7 дней + возврат вещей" },
+                        { num: "5.2", text: "Запрещена продажа предметов за реальные деньги.", punishment: "Бан навсегда" },
+                        { num: "5.3", text: "Запрещено использование багов экономики.", punishment: "Бан 30 дней + снятие статистики" }
+                    ]
+                }
             ]
         };
         
@@ -1502,7 +1632,7 @@
                 html += '<div class="rules-section-block"><div class="rules-section-title">' + section.title + '</div>';
                 section.rules.forEach(rule => {
                     html += '<div class="rule-item"><span class="rule-number">' + rule.num + '</span> ' + rule.text;
-                    if (rule.punishment) html += '<div class="rule-punishment">' + rule.punishment + '</div>';
+                    if (rule.punishment) html += '<div class="rule-punishment">Наказание: ' + rule.punishment + '</div>';
                     html += '</div>';
                 });
                 html += '</div>';
@@ -1584,6 +1714,7 @@
         
         function copyIP() {
             navigator.clipboard.writeText('moongrief.aurorix.pro');
+            alert('IP скопирован в буфер обмена!');
         }
         
         function showModal(type) {
@@ -1601,7 +1732,7 @@
             
             if (user && pass && minecraft) {
                 if (users.find(u => u.username === user)) {
-                    alert('❌ Пользователь уже существует');
+                    alert('❌ Пользователь с таким логином уже существует');
                     return;
                 }
                 
@@ -1622,6 +1753,8 @@
                 updateOwnerVisibility();
                 document.getElementById('complainant').value = currentUser.minecraft || '';
                 document.getElementById('nickname').value = currentUser.minecraft || '';
+                
+                alert('✅ Регистрация успешна!');
             } else {
                 alert('❌ Заполните все поля');
             }
@@ -1640,6 +1773,8 @@
                 updateOwnerVisibility();
                 document.getElementById('complainant').value = currentUser.minecraft || '';
                 document.getElementById('nickname').value = currentUser.minecraft || '';
+                loadComplaints();
+                alert('✅ Вход выполнен!');
             } else {
                 alert('❌ Неверный логин или пароль');
             }
@@ -1651,11 +1786,13 @@
             updateUserMenu();
             updateOwnerVisibility();
             showSection('main');
+            loadComplaints(); // Перезагружаем жалобы (будут видны все, но без кнопки создания)
         }
         
         // Жалобы
         function toggleComplaintForm() {
             if (!currentUser) {
+                alert('🔒 Для создания жалобы необходимо войти');
                 showModal('login');
                 return;
             }
@@ -1681,14 +1818,20 @@
         }
         
         function submitComplaint() {
-            if (!currentUser) return;
+            if (!currentUser) {
+                showModal('login');
+                return;
+            }
             
             let accused = document.getElementById('accused').value.trim();
             let ruleNumber = document.getElementById('ruleNumber').value.trim();
             let description = document.getElementById('description').value.trim();
             let complainant = document.getElementById('complainant').value.trim();
             
-            if (!accused || !ruleNumber || !description) return;
+            if (!accused || !ruleNumber || !description) {
+                alert('❌ Заполните все поля!');
+                return;
+            }
             
             let complaint = {
                 id: Date.now(),
@@ -1699,12 +1842,15 @@
                 photos: uploadedPhotos,
                 status: 'pending',
                 date: new Date().toLocaleString(),
-                userId: currentUser.username
+                userId: currentUser.username,
+                userMinecraft: currentUser.minecraft,
+                ownerResponse: null
             };
             
             complaints.push(complaint);
             localStorage.setItem('complaints', JSON.stringify(complaints));
             
+            // Очищаем форму
             document.getElementById('accused').value = '';
             document.getElementById('ruleNumber').value = '';
             document.getElementById('description').value = '';
@@ -1714,17 +1860,51 @@
             
             loadComplaints();
             updateOwnerStats();
+            alert('✅ Жалоба отправлена!');
+        }
+        
+        function filterComplaints(filter) {
+            currentFilter = filter;
+            
+            // Обновляем активную кнопку
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(getFilterText(filter))) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            loadComplaints();
+        }
+        
+        function getFilterText(filter) {
+            switch(filter) {
+                case 'all': return 'Все';
+                case 'pending': return 'Ожидает';
+                case 'accepted': return 'Принято';
+                case 'rejected': return 'Отклонено';
+                default: return 'Все';
+            }
         }
         
         function loadComplaints() {
             let list = document.getElementById('complaintsList');
-            if (complaints.length === 0) {
-                list.innerHTML = '<p style="text-align: center;">Жалоб пока нет</p>';
+            
+            // Фильтруем жалобы по статусу
+            let filteredComplaints = complaints;
+            if (currentFilter !== 'all') {
+                filteredComplaints = complaints.filter(c => c.status === currentFilter);
+            }
+            
+            if (filteredComplaints.length === 0) {
+                list.innerHTML = '<div class="no-items">📭 Жалоб пока нет</div>';
                 return;
             }
             
             list.innerHTML = '';
-            complaints.slice().reverse().forEach(c => {
+            
+            // Сортируем от новых к старым
+            filteredComplaints.slice().reverse().forEach(c => {
                 let photosHtml = '';
                 if (c.photos && c.photos.length > 0) {
                     photosHtml = '<div class="complaint-photos">';
@@ -1734,16 +1914,33 @@
                     photosHtml += '</div>';
                 }
                 
+                // Добавляем ответ админа если есть
+                let responseHtml = '';
+                if (c.ownerResponse) {
+                    responseHtml = `
+                        <div class="complaint-response">
+                            <strong>👑 Ответ администрации:</strong><br>
+                            ${c.ownerResponse}
+                        </div>
+                    `;
+                }
+                
+                // Статус на русском
+                let statusText = c.status === 'pending' ? '⏳ Ожидает рассмотрения' : 
+                                c.status === 'accepted' ? '✅ Принято' : '❌ Отклонено';
+                
                 list.innerHTML += `
                     <div class="complaint-card">
                         <div class="card-header">
-                            <span class="card-title">${c.accused}</span>
-                            <span class="card-status status-${c.status}">${getStatusText(c.status)}</span>
+                            <span class="card-title">Жалоба на ${c.accused}</span>
+                            <span class="card-status status-${c.status}">${statusText}</span>
                         </div>
-                        <div>От: ${c.complainant} | ${c.date}</div>
-                        <div>Правило: ${c.ruleNumber}</div>
+                        <div><strong>От:</strong> ${c.complainant}</div>
+                        <div><strong>Дата:</strong> ${c.date}</div>
+                        <div><strong>Правило:</strong> ${c.ruleNumber}</div>
                         ${photosHtml}
-                        <div>${c.description}</div>
+                        <div><strong>Описание:</strong> ${c.description}</div>
+                        ${responseHtml}
                     </div>
                 `;
             });
@@ -1752,6 +1949,7 @@
         // Заявки
         function submitApplication() {
             if (!currentUser) {
+                alert('🔒 Для подачи заявки необходимо войти');
                 showModal('login');
                 return;
             }
@@ -1763,46 +1961,49 @@
             let experience = document.getElementById('experience').value.trim();
             let why = document.getElementById('why').value.trim();
             
-            if (nickname && name && age && timezone && experience && why) {
-                let application = {
-                    id: Date.now(),
-                    userId: currentUser.username,
-                    nickname: nickname,
-                    name: name,
-                    age: age,
-                    timezone: timezone,
-                    experience: experience,
-                    why: why,
-                    status: 'pending',
-                    date: new Date().toLocaleString()
-                };
-                
-                applications.push(application);
-                localStorage.setItem('applications', JSON.stringify(applications));
-                
-                document.getElementById('successMessage').style.display = 'block';
-                document.getElementById('name').value = '';
-                document.getElementById('age').value = '';
-                document.getElementById('timezone').value = '';
-                document.getElementById('experience').value = '';
-                document.getElementById('why').value = '';
-                
-                setTimeout(() => {
-                    document.getElementById('successMessage').style.display = 'none';
-                }, 2000);
-                
-                updateOwnerStats();
+            if (!nickname || !name || !age || !timezone || !experience || !why) {
+                alert('❌ Заполните все поля');
+                return;
             }
+            
+            let application = {
+                id: Date.now(),
+                userId: currentUser.username,
+                userMinecraft: currentUser.minecraft,
+                nickname: nickname,
+                name: name,
+                age: age,
+                timezone: timezone,
+                experience: experience,
+                why: why,
+                status: 'pending',
+                date: new Date().toLocaleString(),
+                ownerResponse: null
+            };
+            
+            applications.push(application);
+            localStorage.setItem('applications', JSON.stringify(applications));
+            
+            // Очищаем форму
+            document.getElementById('nickname').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('age').value = '';
+            document.getElementById('timezone').value = '';
+            document.getElementById('experience').value = '';
+            document.getElementById('why').value = '';
+            
+            alert('✅ Заявка отправлена! Ожидайте решения администрации.');
+            updateOwnerStats();
         }
         
         // OWNER панель
         function updateOwnerStats() {
             let stats = document.getElementById('ownerStats');
             stats.innerHTML = `
-                <div class="stat-card"><div class="number">${applications.length}</div><div>Заявок</div></div>
-                <div class="stat-card"><div class="number">${applications.filter(a => a.status === 'pending').length}</div><div>Новых</div></div>
-                <div class="stat-card"><div class="number">${complaints.length}</div><div>Жалоб</div></div>
-                <div class="stat-card"><div class="number">${complaints.filter(c => c.status === 'pending').length}</div><div>Новых</div></div>
+                <div class="stat-card"><div class="number">${applications.length}</div><div>Всего заявок</div></div>
+                <div class="stat-card"><div class="number">${applications.filter(a => a.status === 'pending').length}</div><div>Новых заявок</div></div>
+                <div class="stat-card"><div class="number">${complaints.length}</div><div>Всего жалоб</div></div>
+                <div class="stat-card"><div class="number">${complaints.filter(c => c.status === 'pending').length}</div><div>Новых жалоб</div></div>
             `;
         }
         
@@ -1817,20 +2018,73 @@
             if (tab === 'users') loadOwnerUsers();
         }
         
+        function toggleResponseForm(id, type) {
+            let form = document.getElementById(`response-form-${type}-${id}`);
+            if (form) {
+                form.classList.toggle('active');
+            }
+        }
+        
+        function saveApplicationResponse(id) {
+            let responseText = document.getElementById(`response-text-app-${id}`).value.trim();
+            if (!responseText) {
+                alert('Введите ответ');
+                return;
+            }
+            
+            let application = applications.find(a => a.id === id);
+            if (application) {
+                application.ownerResponse = responseText;
+                localStorage.setItem('applications', JSON.stringify(applications));
+                loadOwnerApplications();
+                toggleResponseForm(id, 'app');
+            }
+        }
+        
+        function saveComplaintResponse(id) {
+            let responseText = document.getElementById(`response-text-comp-${id}`).value.trim();
+            if (!responseText) {
+                alert('Введите ответ');
+                return;
+            }
+            
+            let complaint = complaints.find(c => c.id === id);
+            if (complaint) {
+                complaint.ownerResponse = responseText;
+                localStorage.setItem('complaints', JSON.stringify(complaints));
+                loadOwnerComplaints();
+                loadComplaints(); // Обновляем общий список жалоб
+                toggleResponseForm(id, 'comp');
+            }
+        }
+        
         function loadOwnerApplications() {
             let container = document.getElementById('ownerApplications');
             if (applications.length === 0) {
-                container.innerHTML = '<p style="text-align: center;">Заявок нет</p>';
+                container.innerHTML = '<div class="no-items">📭 Заявок нет</div>';
                 return;
             }
             
             container.innerHTML = '';
             applications.slice().reverse().forEach(app => {
+                let responseHtml = '';
+                if (app.ownerResponse) {
+                    responseHtml = `
+                        <div class="owner-response">
+                            <strong>👑 Ваш ответ:</strong><br>
+                            ${app.ownerResponse}
+                        </div>
+                    `;
+                }
+                
+                let statusText = app.status === 'pending' ? '⏳ Ожидает' : 
+                                app.status === 'accepted' ? '✅ Принято' : '❌ Отклонено';
+                
                 container.innerHTML += `
                     <div class="application-card">
                         <div class="card-header">
-                            <span class="card-title">${app.nickname}</span>
-                            <span class="card-status status-${app.status}">${getStatusText(app.status)}</span>
+                            <span class="card-title">${app.nickname} (${app.userMinecraft})</span>
+                            <span class="card-status status-${app.status}">${statusText}</span>
                         </div>
                         <div><strong>Имя:</strong> ${app.name}</div>
                         <div><strong>Возраст:</strong> ${app.age}</div>
@@ -1838,12 +2092,21 @@
                         <div><strong>Дата:</strong> ${app.date}</div>
                         <div><strong>Опыт:</strong> ${app.experience}</div>
                         <div><strong>Почему:</strong> ${app.why}</div>
+                        ${responseHtml}
                         <div class="card-actions">
                             ${app.status === 'pending' ? `
                                 <button class="accept-btn" onclick="handleApplication(${app.id}, 'accept')">✅ Принять</button>
                                 <button class="reject-btn" onclick="handleApplication(${app.id}, 'reject')">❌ Отклонить</button>
                             ` : ''}
+                            <button class="respond-btn" onclick="toggleResponseForm(${app.id}, 'app')">📝 Ответить</button>
                             <button class="delete-btn" onclick="deleteApplication(${app.id})">🗑️ Удалить</button>
+                        </div>
+                        <div id="response-form-app-${app.id}" class="response-form">
+                            <textarea id="response-text-app-${app.id}" rows="3" placeholder="Напишите ответ на заявку..."></textarea>
+                            <div class="response-buttons">
+                                <button class="save-response-btn" onclick="saveApplicationResponse(${app.id})">Сохранить ответ</button>
+                                <button class="cancel-response-btn" onclick="toggleResponseForm(${app.id}, 'app')">Отмена</button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1853,7 +2116,7 @@
         function loadOwnerComplaints() {
             let container = document.getElementById('ownerComplaints');
             if (complaints.length === 0) {
-                container.innerHTML = '<p style="text-align: center;">Жалоб нет</p>';
+                container.innerHTML = '<div class="no-items">📭 Жалоб нет</div>';
                 return;
             }
             
@@ -1861,30 +2124,52 @@
             complaints.slice().reverse().forEach(c => {
                 let photosHtml = '';
                 if (c.photos && c.photos.length > 0) {
-                    photosHtml = '<div style="display:flex; gap:0.5rem; margin:0.5rem 0;">';
+                    photosHtml = '<div style="display:flex; gap:0.5rem; margin:0.5rem 0; flex-wrap:wrap;">';
                     c.photos.forEach(photo => {
-                        photosHtml += `<img src="${photo}" style="width:50px; height:50px; object-fit:cover; border-radius:5px; cursor:pointer;" onclick="showFullImage('${photo}')">`;
+                        photosHtml += `<img src="${photo}" style="width:80px; height:80px; object-fit:cover; border-radius:10px; cursor:pointer; border:2px solid #4facfe;" onclick="showFullImage('${photo}')">`;
                     });
                     photosHtml += '</div>';
                 }
                 
+                let responseHtml = '';
+                if (c.ownerResponse) {
+                    responseHtml = `
+                        <div class="owner-response">
+                            <strong>👑 Ваш ответ:</strong><br>
+                            ${c.ownerResponse}
+                        </div>
+                    `;
+                }
+                
+                let statusText = c.status === 'pending' ? '⏳ Ожидает' : 
+                                c.status === 'accepted' ? '✅ Принято' : '❌ Отклонено';
+                
                 container.innerHTML += `
                     <div class="complaint-card">
                         <div class="card-header">
-                            <span class="card-title">${c.accused}</span>
-                            <span class="card-status status-${c.status}">${getStatusText(c.status)}</span>
+                            <span class="card-title">Жалоба на ${c.accused}</span>
+                            <span class="card-status status-${c.status}">${statusText}</span>
                         </div>
                         <div><strong>От:</strong> ${c.complainant}</div>
                         <div><strong>Правило:</strong> ${c.ruleNumber}</div>
                         <div><strong>Дата:</strong> ${c.date}</div>
                         ${photosHtml}
-                        <div>${c.description}</div>
+                        <div><strong>Описание:</strong> ${c.description}</div>
+                        ${responseHtml}
                         <div class="card-actions">
                             ${c.status === 'pending' ? `
                                 <button class="accept-btn" onclick="handleComplaint(${c.id}, 'accept')">✅ Принять</button>
                                 <button class="reject-btn" onclick="handleComplaint(${c.id}, 'reject')">❌ Отклонить</button>
                             ` : ''}
+                            <button class="respond-btn" onclick="toggleResponseForm(${c.id}, 'comp')">📝 Ответить</button>
                             <button class="delete-btn" onclick="deleteComplaint(${c.id})">🗑️ Удалить</button>
+                        </div>
+                        <div id="response-form-comp-${c.id}" class="response-form">
+                            <textarea id="response-text-comp-${c.id}" rows="3" placeholder="Напишите ответ на жалобу..."></textarea>
+                            <div class="response-buttons">
+                                <button class="save-response-btn" onclick="saveComplaintResponse(${c.id})">Сохранить ответ</button>
+                                <button class="cancel-response-btn" onclick="toggleResponseForm(${c.id}, 'comp')">Отмена</button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1894,21 +2179,26 @@
         function loadOwnerUsers() {
             let container = document.getElementById('ownerUsers');
             if (users.length === 0) {
-                container.innerHTML = '<p style="text-align: center;">Нет пользователей</p>';
+                container.innerHTML = '<div class="no-items">👥 Нет пользователей</div>';
                 return;
             }
             
             container.innerHTML = '';
             users.forEach(user => {
                 let isOwner = owners.includes(user.username) ? '<span class="owner-badge">OWNER</span>' : '';
+                let userComplaints = complaints.filter(c => c.userId === user.username).length;
+                let userApplications = applications.filter(a => a.userId === user.username).length;
+                
                 container.innerHTML += `
                     <div class="application-card">
                         <div class="card-header">
                             <span class="card-title">${user.minecraft || user.username}</span>
                             ${isOwner}
                         </div>
-                        <div>Логин: ${user.username}</div>
-                        <div>Дата: ${user.registered || 'неизвестно'}</div>
+                        <div><strong>Логин:</strong> ${user.username}</div>
+                        <div><strong>Minecraft ник:</strong> ${user.minecraft}</div>
+                        <div><strong>Дата регистрации:</strong> ${user.registered || 'неизвестно'}</div>
+                        <div><strong>Активность:</strong> Жалоб: ${userComplaints} | Заявок: ${userApplications}</div>
                     </div>
                 `;
             });
@@ -1921,6 +2211,7 @@
                 localStorage.setItem('applications', JSON.stringify(applications));
                 loadOwnerApplications();
                 updateOwnerStats();
+                alert(`Заявка ${action === 'accept' ? 'принята' : 'отклонена'}`);
             }
         }
         
@@ -1930,28 +2221,29 @@
                 complaint.status = action === 'accept' ? 'accepted' : 'rejected';
                 localStorage.setItem('complaints', JSON.stringify(complaints));
                 loadOwnerComplaints();
-                loadComplaints();
+                loadComplaints(); // Обновляем общий список
                 updateOwnerStats();
+                alert(`Жалоба ${action === 'accept' ? 'принята' : 'отклонена'}`);
             }
         }
         
         function deleteApplication(id) {
-            applications = applications.filter(a => a.id !== id);
-            localStorage.setItem('applications', JSON.stringify(applications));
-            loadOwnerApplications();
-            updateOwnerStats();
+            if (confirm('Вы уверены, что хотите удалить эту заявку?')) {
+                applications = applications.filter(a => a.id !== id);
+                localStorage.setItem('applications', JSON.stringify(applications));
+                loadOwnerApplications();
+                updateOwnerStats();
+            }
         }
         
         function deleteComplaint(id) {
-            complaints = complaints.filter(c => c.id !== id);
-            localStorage.setItem('complaints', JSON.stringify(complaints));
-            loadOwnerComplaints();
-            loadComplaints();
-            updateOwnerStats();
-        }
-        
-        function getStatusText(status) {
-            return status === 'pending' ? '⏳' : status === 'accepted' ? '✅' : '❌';
+            if (confirm('Вы уверены, что хотите удалить эту жалобу?')) {
+                complaints = complaints.filter(c => c.id !== id);
+                localStorage.setItem('complaints', JSON.stringify(complaints));
+                loadOwnerComplaints();
+                loadComplaints(); // Обновляем общий список
+                updateOwnerStats();
+            }
         }
         
         function showFullImage(src) {
@@ -1959,6 +2251,7 @@
             document.getElementById('imageModal').style.display = 'flex';
         }
         
+        // Закрытие модалок по клику вне
         window.onclick = function(event) {
             if (event.target.classList.contains('modal')) {
                 event.target.style.display = 'none';
