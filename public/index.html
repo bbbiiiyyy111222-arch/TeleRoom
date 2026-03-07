@@ -474,7 +474,6 @@
             font-weight: bold;
         }
         
-        /* OWNER панель */
         .owner-section {
             background: rgba(0,0,0,0.5);
             border-radius: 50px;
@@ -628,7 +627,6 @@
             display: block;
         }
         
-        /* Карточки */
         .application-card, .complaint-card {
             background: rgba(255,255,255,0.05);
             padding: 2.2rem;
@@ -842,7 +840,6 @@
             box-shadow: 0 0 40px #4facfe;
         }
         
-        /* Правила */
         .rules-section {
             background: rgba(0,0,0,0.4);
             border-radius: 50px;
@@ -917,7 +914,6 @@
             font-weight: bold;
         }
         
-        /* Жалобы */
         .complaints-section {
             background: rgba(0,0,0,0.4);
             border-radius: 50px;
@@ -979,7 +975,6 @@
             display: block;
         }
         
-        /* Заявки */
         .apply-section {
             background: rgba(0,0,0,0.4);
             border-radius: 50px;
@@ -1240,7 +1235,6 @@
             color: #ffd700;
         }
 
-        /* Модалки */
         .modal {
             display: none;
             position: fixed;
@@ -1384,12 +1378,10 @@
     </nav>
     
     <div class="container">
-        <!-- Кнопка назад -->
         <div id="backButtonContainer" style="display: none;">
             <div class="back-button" onclick="goBack()"></div>
         </div>
         
-        <!-- Главная -->
         <div id="mainSection" class="section active">
             <div class="hero">
                 <h1>MoonGrief</h1>
@@ -1405,7 +1397,6 @@
             </div>
         </div>
         
-        <!-- Правила -->
         <div id="rulesSection" class="section">
             <div class="rules-section">
                 <div class="rules-header">
@@ -1416,7 +1407,6 @@
             </div>
         </div>
         
-        <!-- Жалобы -->
         <div id="complaintsSection" class="section">
             <div class="complaints-section">
                 <div class="complaints-header">
@@ -1454,7 +1444,6 @@
                     <button class="submit-btn" onclick="submitComplaint()">Отправить жалобу</button>
                 </div>
                 
-                <!-- Кнопки фильтрации для всех -->
                 <div class="filter-buttons">
                     <button class="filter-btn active" onclick="filterComplaints('all')">Все жалобы</button>
                     <button class="filter-btn" onclick="filterComplaints('pending')">В ожидании</button>
@@ -1466,7 +1455,6 @@
             </div>
         </div>
         
-        <!-- Заявки -->
         <div id="applySection" class="section">
             <div class="apply-section">
                 <h2>📝 Заявки в команду Helper</h2>
@@ -1500,7 +1488,6 @@
             </div>
         </div>
         
-        <!-- OWNER панель -->
         <div id="ownerSection" class="section">
             <div class="owner-section">
                 <div class="owner-header">
@@ -1521,7 +1508,6 @@
         </div>
     </div>
     
-    <!-- Модалки -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('login')">&times;</span>
@@ -1586,8 +1572,7 @@
                         { num: "2.1", text: "Запрещено разрушать постройки других игроков без их согласия.", punishment: "Бан на 7 дней + снятие статистики" },
                         { num: "2.2", text: "Запрещено воровать вещи из чужих сундуков.", punishment: "Бан на 3 дня" },
                         { num: "2.3", text: "Запрещено обворовывать фермы других игроков.", punishment: "Бан на 5 дней" },
-                        { num: "2.4", text: "Запрещено убивать чужих животных.", punishment: "Бан на 3 дня" },
-                        { num: "2.5", text: "Запрещено ставить лаву и воду на чужих территориях.", punishment: "Бан на 2 дня" }
+                        { num: "2.4", text: "Запрещено убивать чужих животных.", punishment: "Бан на 3 дня" }
                     ]
                 },
                 { 
@@ -1595,8 +1580,7 @@
                     rules: [
                         { num: "3.1", text: "Запрещено использование любых читов и модификаций, дающих преимущество (X-Ray, KillAura, Fly и т.д.).", punishment: "Бан навсегда" },
                         { num: "3.2", text: "Запрещены X-Ray ресурспаки и текстурпаки.", punishment: "Бан навсегда" },
-                        { num: "3.3", text: "Запрещены макросы и авто-кликеры.", punishment: "Бан на 30 дней" },
-                        { num: "3.4", text: "Разрешены только оптимизационные моды (OptiFine, Litematica, MiniHUD)." }
+                        { num: "3.3", text: "Запрещены макросы и авто-кликеры.", punishment: "Бан на 30 дней" }
                     ]
                 },
                 { 
@@ -1605,17 +1589,14 @@
                         { num: "4.1", text: "Запрещён флуд, капс и спам в чате.", punishment: "Мут на 2 часа" },
                         { num: "4.2", text: "Запрещены оскорбления игроков и администрации.", punishment: "Мут от 6 часов до 7 дней" },
                         { num: "4.3", text: "Запрещена реклама других серверов и проектов.", punishment: "Бан навсегда" },
-                        { num: "4.4", text: "Запрещены провокации и разжигание конфликтов.", punishment: "Мут на 1 день" },
-                        { num: "4.5", text: "Запрещены политические и религиозные темы.", punishment: "Мут на 3 дня" },
-                        { num: "4.6", text: "Запрещены NSFW материалы в любом виде.", punishment: "Бан навсегда" }
+                        { num: "4.4", text: "Запрещены провокации и разжигание конфликтов.", punishment: "Мут на 1 день" }
                     ]
                 },
                 { 
                     title: "5. Экономика и торговля", 
                     rules: [
                         { num: "5.1", text: "Запрещен обман при торговле (скам).", punishment: "Бан на 7 дней + возврат вещей" },
-                        { num: "5.2", text: "Запрещена продажа игровых предметов за реальные деньги.", punishment: "Бан навсегда" },
-                        { num: "5.3", text: "Запрещено использование багов экономики в свою пользу.", punishment: "Бан на 30 дней + снятие статистики" }
+                        { num: "5.2", text: "Запрещена продажа игровых предметов за реальные деньги.", punishment: "Бан навсегда" }
                     ]
                 }
             ]
@@ -1625,16 +1606,23 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadRules();
             checkAuth();
-            loadComplaints();
-            updateOwnerStats();
             
-            // Добавляем тестовые данные если их нет (для демонстрации)
+            // Загружаем жалобы и заявки из localStorage
+            complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+            applications = JSON.parse(localStorage.getItem('applications')) || [];
+            
+            // Добавляем тестовые данные если их нет
             if (complaints.length === 0) {
                 addTestComplaints();
             }
+            if (applications.length === 0) {
+                addTestApplications();
+            }
+            
+            loadComplaints();
+            updateOwnerStats();
         });
         
-        // Добавление тестовых жалоб (чтобы было что показывать)
         function addTestComplaints() {
             let testComplaints = [
                 {
@@ -1693,6 +1681,56 @@
             
             complaints = testComplaints;
             localStorage.setItem('complaints', JSON.stringify(complaints));
+        }
+        
+        function addTestApplications() {
+            let testApplications = [
+                {
+                    id: 2001,
+                    userId: 'test5',
+                    userMinecraft: 'BuilderPro',
+                    nickname: 'BuilderPro',
+                    name: 'Алексей',
+                    age: '19',
+                    timezone: 'UTC+3',
+                    experience: 'Был хелпером на сервере MineWorld 6 месяцев',
+                    why: 'Хочу помогать игрокам и поддерживать порядок на сервере',
+                    status: 'pending',
+                    date: '15 марта 2025 г., 10:30',
+                    ownerResponse: null
+                },
+                {
+                    id: 2002,
+                    userId: 'test6',
+                    userMinecraft: 'HelperMaster',
+                    nickname: 'HelperMaster',
+                    name: 'Дмитрий',
+                    age: '21',
+                    timezone: 'UTC+3',
+                    experience: 'Администратор на проекте CraftBoom (1 год)',
+                    why: 'Имею большой опыт модерации, хочу применить его здесь',
+                    status: 'accepted',
+                    date: '14 марта 2025 г., 15:20',
+                    ownerResponse: 'Заявка принята! Свяжитесь с администрацией в Discord'
+                },
+                {
+                    id: 2003,
+                    userId: 'test7',
+                    userMinecraft: 'Newbie',
+                    nickname: 'Newbie',
+                    name: 'Иван',
+                    age: '14',
+                    timezone: 'UTC+5',
+                    experience: 'Опыта нет',
+                    why: 'Просто хочу попробовать',
+                    status: 'rejected',
+                    date: '13 марта 2025 г., 08:45',
+                    ownerResponse: 'Слишком маленький возраст, попробуйте через год'
+                }
+            ];
+            
+            applications = testApplications;
+            localStorage.setItem('applications', JSON.stringify(applications));
         }
         
         function loadRules() {
@@ -1772,9 +1810,11 @@
             
             if (section === 'owner') {
                 updateOwnerStats();
-                showOwnerTab('applications', { target: document.querySelector('.owner-tab') });
+                // Показываем заявки по умолчанию
+                let event = { target: document.querySelector('.owner-tab') };
+                showOwnerTab('applications', event);
             } else if (section === 'complaints') {
-                loadComplaints(); // Перезагружаем жалобы при переходе
+                loadComplaints();
             }
         }
         
@@ -1918,7 +1958,6 @@
             complaints.push(complaint);
             localStorage.setItem('complaints', JSON.stringify(complaints));
             
-            // Очищаем форму
             document.getElementById('accused').value = '';
             document.getElementById('ruleNumber').value = '';
             document.getElementById('description').value = '';
@@ -1926,7 +1965,7 @@
             uploadedPhotos = [];
             document.getElementById('complaintForm').classList.remove('active');
             
-            loadComplaints(); // Перезагружаем список
+            loadComplaints();
             updateOwnerStats();
             alert('✅ Жалоба успешно отправлена!');
         }
@@ -1934,7 +1973,6 @@
         function filterComplaints(filter) {
             currentFilter = filter;
             
-            // Обновляем активную кнопку
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
@@ -1946,11 +1984,9 @@
         function loadComplaints() {
             let list = document.getElementById('complaintsList');
             
-            // ВАЖНО: ВСЕ ЖАЛОБЫ видны ВСЕМ пользователям
-            // Никакой фильтрации по пользователю нет!
-            let filteredComplaints = complaints;
+            complaints = JSON.parse(localStorage.getItem('complaints')) || [];
             
-            // Фильтруем только по статусу
+            let filteredComplaints = complaints;
             if (currentFilter !== 'all') {
                 filteredComplaints = complaints.filter(c => c.status === currentFilter);
             }
@@ -1962,7 +1998,6 @@
             
             list.innerHTML = '';
             
-            // Сортируем от новых к старым
             filteredComplaints.slice().reverse().forEach(c => {
                 let photosHtml = '';
                 if (c.photos && c.photos.length > 0) {
@@ -1973,7 +2008,6 @@
                     photosHtml += '</div>';
                 }
                 
-                // Добавляем ответ админа если есть
                 let responseHtml = '';
                 if (c.ownerResponse) {
                     responseHtml = `
@@ -1984,7 +2018,6 @@
                     `;
                 }
                 
-                // Статус на русском
                 let statusText = c.status === 'pending' ? '⏳ Ожидает рассмотрения' : 
                                 c.status === 'accepted' ? '✅ Жалоба принята' : '❌ Жалоба отклонена';
                 
@@ -2043,7 +2076,6 @@
             applications.push(application);
             localStorage.setItem('applications', JSON.stringify(applications));
             
-            // Очищаем форму
             document.getElementById('nickname').value = '';
             document.getElementById('name').value = '';
             document.getElementById('age').value = '';
@@ -2057,6 +2089,9 @@
         
         // ========== OWNER ПАНЕЛЬ ==========
         function updateOwnerStats() {
+            complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+            applications = JSON.parse(localStorage.getItem('applications')) || [];
+            
             let stats = document.getElementById('ownerStats');
             stats.innerHTML = `
                 <div class="stat-card"><div class="number">${applications.length}</div><div>Всего заявок</div></div>
@@ -2112,7 +2147,7 @@
                 complaint.ownerResponse = responseText;
                 localStorage.setItem('complaints', JSON.stringify(complaints));
                 loadOwnerComplaints();
-                loadComplaints(); // Обновляем общий список
+                loadComplaints();
                 toggleResponseForm(id, 'comp');
                 alert('✅ Ответ сохранен');
             }
@@ -2120,6 +2155,9 @@
         
         function loadOwnerApplications() {
             let container = document.getElementById('ownerApplications');
+            
+            applications = JSON.parse(localStorage.getItem('applications')) || [];
+            
             if (applications.length === 0) {
                 container.innerHTML = '<div class="no-items">📭 Заявок пока нет</div>';
                 return;
@@ -2176,6 +2214,9 @@
         
         function loadOwnerComplaints() {
             let container = document.getElementById('ownerComplaints');
+            
+            complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+            
             if (complaints.length === 0) {
                 container.innerHTML = '<div class="no-items">📭 Жалоб пока нет</div>';
                 return;
@@ -2282,7 +2323,7 @@
                 complaint.status = action === 'accept' ? 'accepted' : 'rejected';
                 localStorage.setItem('complaints', JSON.stringify(complaints));
                 loadOwnerComplaints();
-                loadComplaints(); // Обновляем общий список
+                loadComplaints();
                 updateOwnerStats();
                 alert(`✅ Жалоба ${action === 'accept' ? 'принята' : 'отклонена'}`);
             }
@@ -2302,7 +2343,7 @@
                 complaints = complaints.filter(c => c.id !== id);
                 localStorage.setItem('complaints', JSON.stringify(complaints));
                 loadOwnerComplaints();
-                loadComplaints(); // Обновляем общий список
+                loadComplaints();
                 updateOwnerStats();
             }
         }
@@ -2312,7 +2353,6 @@
             document.getElementById('imageModal').style.display = 'flex';
         }
         
-        // Закрытие модалок по клику вне
         window.onclick = function(event) {
             if (event.target.classList.contains('modal')) {
                 event.target.style.display = 'none';
