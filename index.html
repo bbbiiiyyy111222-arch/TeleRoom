@@ -1,431 +1,672 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const http = require('http');
-const socketIo = require('socket.io');
-require('dotenv').config();
-
-const app = express();
-const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
-});
-
-app.use(cors());
-app.use(express.json());
-app.use(express.static('public'));
-
-// Подключение к MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/minecraft-forum', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => {
-  console.log('Connected to MongoDB');
-}).catch(err => {
-  console.error('MongoDB connection error:', err);
-});
-
-// Модель пользователя
-const UserSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  minecraftNick: { type: String, required: true },
-  role: { type: String, default: 'user' }, // user, admin, moderator, builder, helper
-  createdAt: { type: Date, default: Date.now },
-  lastLogin: Date,
-  isBanned: { type: Boolean, default: false },
-  discord: String,
-  age: Number,
-  experience: String,
-  position: String, // текущая должность
-  applications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Application' }]
-});
-
-// Модель жалобы
-const ComplaintSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  accusedPlayer: { type: String, required: true },
-  complainant: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  status: { type: String, default: 'pending' },
-  serverName: { type: String, required: true },
-  evidence: [String],
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-  adminNotes: String,
-  assignedAdmin: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  priority: { type: String, default: 'medium' }
-});
-
-// Модель заявки на должность
-const ApplicationSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  position: { type: String, required: true }, // moderator, builder, helper, eventmaker, etc.
-  age: { type: Number, required: true },
-  discord: { type: String, required: true },
-  experience: { type: String, required: true },
-  whyYou: { type: String, required: true }, // почему хотите стать частью команды
-  hoursPlayed: { type: Number, required: true }, // часов в день может играть
-  previousExperience: String, // опыт на других серверах
-  status: { type: String, default: 'pending' }, // pending, reviewed, accepted, rejected
-  reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  reviewComment: String,
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
-});
-
-// Модель должностей
-const PositionSchema = new mongoose.Schema({
-  name: { type: String, required: true }, // moderator, builder, helper
-  displayName: { type: String, required: true }, // Модератор, Строитель, Хелпер
-  description: { type: String, required: true },
-  requirements: [String],
-  isOpen: { type: Boolean, default: true },
-  salary: String, // возможная оплата или бонусы
-  maxApplicants: Number,
-  currentApplicants: { type: Number, default: 0 }
-});
-
-const User = mongoose.model('User', UserSchema);
-const Complaint = mongoose.model('Complaint', ComplaintSchema);
-const Application = mongoose.model('Application', ApplicationSchema);
-const Position = mongoose.model('Position', PositionSchema);
-
-// Middleware для проверки токена
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  
-  if (!token) return res.sendStatus(401);
-  
-  jwt.verify(token, process.env.JWT_SECRET || 'secret', (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-};
-
-// Middleware для проверки админа
-const isAdmin = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user.id);
-    if (!user || (user.role !== 'admin' && user.role !== 'owner')) {
-      return res.status(403).json({ message: 'Доступ запрещен' });
-    }
-    next();
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Middleware для проверки модератора и выше
-const isModerator = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user.id);
-    if (!user || !['admin', 'owner', 'moderator'].includes(user.role)) {
-      return res.status(403).json({ message: 'Доступ запрещен' });
-    }
-    next();
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Регистрация
-app.post('/api/register', async (req, res) => {
-  try {
-    const { username, password, minecraftNick, discord, age } = req.body;
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Жалобы и Команда</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            cursor: pointer;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-left: 2rem;
+        }
+        
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .nav-tab:hover {
+            background: #f0f0f0;
+        }
+        
+        .nav-tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+        
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #38a169;
+        }
+        
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .hero {
+            text-align: center;
+            color: white;
+            padding: 4rem 0;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-card h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card p {
+            color: #666;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-top: 2rem;
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .section-title {
+            color: #333;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+        
+        .positions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .position-card {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .position-card:hover {
+            border-color: #667eea;
+            transform: scale(1.02);
+        }
+        
+        .position-card h3 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .position-card .salary {
+            color: #48bb78;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .position-card .requirements {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+        
+        .position-card .requirements li {
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .team-member {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .team-member .avatar {
+            width: 100px;
+            height: 100px;
+            background: #667eea;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+        
+        .team-member .role {
+            color: #667eea;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .team-member .since {
+            color: #999;
+            font-size: 0.9rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-content h2 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .close {
+            float: right;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s;
+        }
+        
+        .close:hover {
+            color: #333;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .complaint-card,
+        .application-card {
+            background: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+        
+        .complaint-header,
+        .application-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #ffeeba;
+            color: #856404;
+        }
+        
+        .status-reviewed {
+            background: #b8daff;
+            color: #004085;
+        }
+        
+        .status-accepted {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-resolved {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .admin-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-card .stat-label {
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tabs {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="logo" onclick="showSection('home')">⚡ Minecraft Project</div>
+            <div class="nav-tabs">
+                <div class="nav-tab active" onclick="showSection('home')">Главная</div>
+                <div class="nav-tab" onclick="showSection('complaints')">Жалобы</div>
+                <div class="nav-tab" onclick="showSection('team')">Команда</div>
+                <div class="nav-tab" onclick="showSection('applications')">Вакансии</div>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <!-- Будут заполнены динамически -->
+            </div>
+        </div>
+    </nav>
     
-    const existingUser = await User.findOne({ $or: [{ username }, { minecraftNick }] });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Пользователь уже существует' });
-    }
+    <div class="container">
+        <!-- Главная секция -->
+        <div id="homeSection" class="section active">
+            <div class="hero">
+                <h1>Minecraft Project</h1>
+                <p>Присоединяйся к лучшему Minecraft серверу!</p>
+                <button class="btn btn-primary" onclick="showSection('applications')">Подать заявку в команду</button>
+            </div>
+            
+            <div class="features">
+                <div class="feature-card">
+                    <h3>👥 Дружное сообщество</h3>
+                    <p>Более 1000 активных игроков каждый день</p>
+                </div>
+                <div class="feature-card">
+                    <h3>⚡ Уникальные механики</h3>
+                    <p>Собственные плагины и особенности</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🏆 Регулярные ивенты</h3>
+                    <p>Турниры, конкурсы и раздачи призов</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Секция жалоб -->
+        <div id="complaintsSection" class="section">
+            <h2 class="section-title">📝 Жалобы на игроков</h2>
+            <button class="btn btn-primary" onclick="showNewComplaint()" style="margin-bottom: 1rem;">Создать жалобу</button>
+            <div id="complaintsList"></div>
+        </div>
+        
+        <!-- Секция команды -->
+        <div id="teamSection" class="section">
+            <h2 class="section-title">👥 Наша команда</h2>
+            <div id="teamList" class="team-grid"></div>
+        </div>
+        
+        <!-- Секция вакансий -->
+        <div id="applicationsSection" class="section">
+            <h2 class="section-title">💼 Вакансии в команду</h2>
+            <div id="positionsList" class="positions-grid"></div>
+            <div id="userApplicationsList" style="margin-top: 2rem;"></div>
+        </div>
+    </div>
     
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({
-      username,
-      password: hashedPassword,
-      minecraftNick,
-      discord,
-      age
-    });
+    <!-- Модальное окно входа -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Вход в систему</h2>
+            <div id="loginAlert"></div>
+            <div class="form-group">
+                <label>Имя пользователя</label>
+                <input type="text" id="loginUsername" required>
+            </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" id="loginPassword" required>
+            </div>
+            <button class="btn btn-primary" onclick="login()">Войти</button>
+        </div>
+    </div>
     
-    await user.save();
-    res.status(201).json({ message: 'Регистрация успешна' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Логин
-app.post('/api/login', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username });
+    <!-- Модальное окно регистрации -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('registerModal')">&times;</span>
+            <h2>Регистрация</h2>
+            <div id="registerAlert"></div>
+            <div class="form-group">
+                <label>Имя пользователя</label>
+                <input type="text" id="regUsername" required>
+            </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" id="regPassword" required>
+            </div>
+            <div class="form-group">
+                <label>Minecraft ник</label>
+                <input type="text" id="regMinecraftNick" required>
+            </div>
+            <div class="form-group">
+                <label>Discord (опционально)</label>
+                <input type="text" id="regDiscord">
+            </div>
+            <div class="form-group">
+                <label>Возраст</label>
+                <input type="number" id="regAge" min="10" max="100">
+            </div>
+            <button class="btn btn-primary" onclick="register()">Зарегистрироваться</button>
+        </div>
+    </div>
     
-    if (!user) {
-      return res.status(400).json({ message: 'Неверные данные' });
-    }
+    <!-- Модальное окно создания жалобы -->
+    <div id="complaintModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('complaintModal')">&times;</span>
+            <h2>Создать жалобу</h2>
+            <div id="complaintAlert"></div>
+            <div class="form-group">
+                <label>Заголовок</label>
+                <input type="text" id="complaintTitle" required>
+            </div>
+            <div class="form-group">
+                <label>Описание</label>
+                <textarea id="complaintDescription" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Нарушитель</label>
+                <input type="text" id="complaintAccused" required>
+            </div>
+            <div class="form-group">
+                <label>Название сервера</label>
+                <input type="text" id="complaintServer" required>
+            </div>
+            <div class="form-group">
+                <label>Приоритет</label>
+                <select id="complaintPriority">
+                    <option value="low">Низкий</option>
+                    <option value="medium" selected>Средний</option>
+                    <option value="high">Высокий</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="createComplaint()">Отправить</button>
+        </div>
+    </div>
     
-    if (user.isBanned) {
-      return res.status(403).json({ message: 'Вы забанены' });
-    }
+    <!-- Модальное окно подачи заявки -->
+    <div id="applicationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('applicationModal')">&times;</span>
+            <h2>Подать заявку в команду</h2>
+            <div id="applicationAlert"></div>
+            <div class="form-group">
+                <label>Должность</label>
+                <select id="appPosition" required>
+                    <option value="">Выберите должность</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ваш возраст</label>
+                <input type="number" id="appAge" min="10" max="100" required>
+            </div>
+            <div class="form-group">
+                <label>Discord</label>
+                <input type="text" id="appDiscord" required>
+            </div>
+            <div class="form-group">
+                <label>Сколько часов в день можете играть?</label>
+                <input type="number" id="appHours" min="1" max="24" required>
+            </div>
+            <div class="form-group">
+                <label>Опыт на других серверах</label>
+                <textarea id="appExperience" placeholder="Расскажите о своем опыте..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Почему вы хотите стать частью команды?</label>
+                <textarea id="appWhy" required></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="submitApplication()">Отправить заявку</button>
+        </div>
+    </div>
     
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-      return res.status(400).json({ message: 'Неверные данные' });
-    }
-    
-    user.lastLogin = new Date();
-    await user.save();
-    
-    const token = jwt.sign(
-      { id: user._id, username: user.username, role: user.role },
-      process.env.JWT_SECRET || 'secret'
-    );
-    
-    res.json({ 
-      token, 
-      user: { 
-        id: user._id,
-        username: user.username,
-        minecraftNick: user.minecraftNick,
-        role: user.role,
-        discord: user.discord
-      } 
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// ============== РОУТЫ ДЛЯ ЖАЛОБ ==============
-
-// Получить все жалобы (админ)
-app.get('/api/complaints', authenticateToken, isModerator, async (req, res) => {
-  try {
-    const complaints = await Complaint.find()
-      .populate('complainant', 'username minecraftNick')
-      .populate('assignedAdmin', 'username')
-      .sort({ createdAt: -1 });
-    res.json(complaints);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Получить жалобы пользователя
-app.get('/api/my-complaints', authenticateToken, async (req, res) => {
-  try {
-    const complaints = await Complaint.find({ complainant: req.user.id })
-      .sort({ createdAt: -1 });
-    res.json(complaints);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Создать жалобу
-app.post('/api/complaints', authenticateToken, async (req, res) => {
-  try {
-    const complaint = new Complaint({
-      ...req.body,
-      complainant: req.user.id
-    });
-    await complaint.save();
-    
-    io.emit('new-complaint', {
-      message: 'Новая жалоба',
-      complaint: complaint
-    });
-    
-    res.status(201).json(complaint);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Обновить жалобу (модератор)
-app.put('/api/complaints/:id', authenticateToken, isModerator, async (req, res) => {
-  try {
-    const complaint = await Complaint.findByIdAndUpdate(
-      req.params.id,
-      { ...req.body, updatedAt: new Date() },
-      { new: true }
-    );
-    res.json(complaint);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// ============== РОУТЫ ДЛЯ ЗАЯВОК НА ДОЛЖНОСТИ ==============
-
-// Получить все доступные должности
-app.get('/api/positions', async (req, res) => {
-  try {
-    const positions = await Position.find({ isOpen: true });
-    res.json(positions);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Создать должность (админ)
-app.post('/api/positions', authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const position = new Position(req.body);
-    await position.save();
-    res.status(201).json(position);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Подать заявку на должность
-app.post('/api/applications', authenticateToken, async (req, res) => {
-  try {
-    // Проверяем, нет ли уже активной заявки у пользователя
-    const existingApplication = await Application.findOne({
-      userId: req.user.id,
-      status: { $in: ['pending', 'reviewed'] }
-    });
-    
-    if (existingApplication) {
-      return res.status(400).json({ message: 'У вас уже есть активная заявка' });
-    }
-    
-    const application = new Application({
-      ...req.body,
-      userId: req.user.id
-    });
-    
-    await application.save();
-    
-    // Обновляем пользователя
-    await User.findByIdAndUpdate(req.user.id, {
-      $push: { applications: application._id }
-    });
-    
-    // Обновляем счетчик заявок на должность
-    await Position.findOneAndUpdate(
-      { name: req.body.position },
-      { $inc: { currentApplicants: 1 } }
-    );
-    
-    io.emit('new-application', {
-      message: 'Новая заявка в команду',
-      application: application
-    });
-    
-    res.status(201).json(application);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Получить все заявки (админ/модератор)
-app.get('/api/applications', authenticateToken, isModerator, async (req, res) => {
-  try {
-    const applications = await Application.find()
-      .populate('userId', 'username minecraftNick discord age')
-      .sort({ createdAt: -1 });
-    res.json(applications);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Получить свои заявки
-app.get('/api/my-applications', authenticateToken, async (req, res) => {
-  try {
-    const applications = await Application.find({ userId: req.user.id })
-      .sort({ createdAt: -1 });
-    res.json(applications);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Рассмотреть заявку (админ/модератор)
-app.put('/api/applications/:id', authenticateToken, isModerator, async (req, res) => {
-  try {
-    const { status, reviewComment } = req.body;
-    
-    const application = await Application.findByIdAndUpdate(
-      req.params.id,
-      {
-        status,
-        reviewComment,
-        reviewedBy: req.user.id,
-        updatedAt: new Date()
-      },
-      { new: true }
-    );
-    
-    // Если заявка одобрена, обновляем роль пользователя
-    if (status === 'accepted') {
-      await User.findByIdAndUpdate(application.userId, {
-        role: application.position,
-        position: application.position
-      });
-    }
-    
-    res.json(application);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// ============== АДМИН СТАТИСТИКА ==============
-
-app.get('/api/admin/stats', authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const totalComplaints = await Complaint.countDocuments();
-    const pendingComplaints = await Complaint.countDocuments({ status: 'pending' });
-    const resolvedComplaints = await Complaint.countDocuments({ status: 'resolved' });
-    const totalUsers = await User.countDocuments();
-    
-    const totalApplications = await Application.countDocuments();
-    const pendingApplications = await Application.countDocuments({ status: 'pending' });
-    
-    const teamMembers = await User.countDocuments({
-      role: { $in: ['admin', 'moderator', 'builder', 'helper'] }
-    });
-    
-    res.json({
-      totalComplaints,
-      pendingComplaints,
-      resolvedComplaints,
-      totalUsers,
-      totalApplications,
-      pendingApplications,
-      teamMembers
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Получить всех членов команды
-app.get('/api/team', async (req, res) => {
-  try {
-    const team = await User.find({
-      role: { $in: ['admin', 'moderator', 'builder', 'helper', 'owner'] }
-    }).select('username minecraftNick role position createdAt');
-    
-    res.json(team);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+    <script>
+        let currentUser = null;
+        let token = localStorage.getItem('token');
+        
+        // Проверяем токен при загрузке
+        if (token) {
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                currentUser = payload;
+                updateUI();
+            } catch (e) {
+                localStorage.removeItem('token');
+            }
+        }
+        
+        function updateUI() {
+            const navLinks = document.getElementById('navLinks');
+            if (currentUser) {
+                navLinks.innerHTML = `
+                    <div class="user-info">
+                        <div class="user-avatar">${currentUser.username[0].toUpperCase()}</div>
+                        <span>${currentUser.username} (${currentUser
