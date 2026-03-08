@@ -1,523 +1,92 @@
-// ==============================================
-// АДМИН ПАНЕЛЬ MOONGRIEF - ЛУННАЯ ВЕРСИЯ
-// ==============================================
-
-// Данные
-let complaints = [];
-let applications = [];
-let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
-
-// ВСЕ OWNER
-const OWNERS = ['milfa', 'milk123', 'Xchik_'];
-
-// Загрузка
-document.addEventListener('DOMContentLoaded', async function() {
-    if (!currentUser || !OWNERS.includes(currentUser.username)) {
-        alert('🌙 У вас нет доступа!');
-        window.location.href = 'index.html';
-        return;
-    }
-    
-    document.getElementById('adminName').innerHTML = `🌙 ${currentUser.username} (OWNER)`;
-    await loadAdminData();
-    startAutoUpdate();
-});
-
-// Автообновление каждые 20 секунд
-let updateInterval;
-function startAutoUpdate() {
-    if (updateInterval) clearInterval(updateInterval);
-    updateInterval = setInterval(async () => {
-        await loadAdminData();
-    }, 20000);
-}
-
-// Выход
-function logout() {
-    localStorage.removeItem('currentUser');
-    window.location.href = 'index.html';
-}
-
-// Загрузка данных
-async function loadAdminData() {
-    await loadComplaints();
-    await loadApplications();
-    updateStats();
-}
-
-// Обновление статистики
-async function updateStats() {
-    complaints = await window.getComplaints() || [];
-    applications = await window.getApplications() || [];
-    
-    document.getElementById('newComplaints').innerHTML = complaints.filter(c => c.status === 'new').length;
-    document.getElementById('newApplications').innerHTML = applications.filter(a => a.status === 'new').length;
-    document.getElementById('total').innerHTML = complaints.length + applications.length;
-}
-
-// ==============================================
-// ЗАГРУЗКА ЖАЛОБ
-// ==============================================
-
-async function loadComplaints() {
-    const container = document.getElementById('adminComplaints');
-    if (!container) return;
-    
-    complaints = await window.getComplaints() || [];
-    
-    if (complaints.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">🌙</div>
-                <h3>НЕТ ЖАЛОБ</h3>
-                <p>Пока никто не подавал жалоб</p>
-            </div>
-        `;
-        return;
-    }
-    
-    let html = '<div class="cards-grid">';
-    complaints.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(c => {
-        html += createComplaintCard(c);
-    });
-    html += '</div>';
-    
-    container.innerHTML = html;
-}
-
-// ==============================================
-// ЗАГРУЗКА АНКЕТ
-// ==============================================
-
-async function loadApplications() {
-    const container = document.getElementById('adminApplications');
-    if (!container) return;
-    
-    applications = await window.getApplications() || [];
-    
-    if (applications.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">🌙</div>
-                <h3>НЕТ АНКЕТ</h3>
-                <p>Пока никто не подавал заявки</p>
-            </div>
-        `;
-        return;
-    }
-    
-    let html = '<div class="cards-grid">';
-    applications.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(a => {
-        html += createApplicationCard(a);
-    });
-    html += '</div>';
-    
-    container.innerHTML = html;
-}
-
-// ==============================================
-// КАРТОЧКА ЖАЛОБЫ
-// ==============================================
-
-function createComplaintCard(c) {
-    let statusClass = '';
-    let statusText = '';
-    let statusIcon = '';
-    let buttons = '';
-    
-    switch(c.status) {
-        case 'new':
-            statusClass = 'status-new';
-            statusText = 'НОВАЯ';
-            statusIcon = '🆕';
-            buttons = `
-                <button onclick="acceptComplaint(${c.id})" class="btn-action btn-accept">
-                    <span>✅</span> ПРИНЯТЬ
-                </button>
-                <button onclick="rejectComplaint(${c.id})" class="btn-action btn-reject">
-                    <span>❌</span> ОТКЛОНИТЬ
-                </button>
-                <button onclick="openResponseModal('complaint', ${c.id})" class="btn-action btn-respond">
-                    <span>📝</span> ОТВЕТИТЬ
-                </button>
-            `;
-            break;
-        case 'accepted':
-            statusClass = 'status-accepted';
-            statusText = 'ПРИНЯТА';
-            statusIcon = '✅';
-            buttons = `
-                <span class="status-badge accepted">✓ ПРИНЯТО</span>
-                <button onclick="openResponseModal('complaint', ${c.id})" class="btn-action btn-respond small">
-                    <span>📝</span> ОТВЕТИТЬ
-                </button>
-            `;
-            break;
-        case 'rejected':
-            statusClass = 'status-rejected';
-            statusText = 'ОТКЛОНЕНА';
-            statusIcon = '❌';
-            buttons = `
-                <span class="status-badge rejected">✗ ОТКЛОНЕНО</span>
-                <button onclick="openResponseModal('complaint', ${c.id})" class="btn-action btn-respond small">
-                    <span>📝</span> ОТВЕТИТЬ
-                </button>
-            `;
-            break;
-        case 'resolved':
-            statusClass = 'status-resolved';
-            statusText = 'ОТВЕЧЕНО';
-            statusIcon = '📝';
-            buttons = `
-                <span class="status-badge resolved">✓ ОТВЕЧЕНО</span>
-                <button onclick="openResponseModal('complaint', ${c.id})" class="btn-action btn-respond small">
-                    <span>📝</span> ОТВЕТИТЬ СНОВА
-                </button>
-            `;
-            break;
-    }
-    
-    return `
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">
-                    <span class="card-icon">⚠️</span>
-                    <span>${c.title || 'Жалоба'}</span>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌙 MOONGRIEF - ЛУННАЯ АДМИН ПАНЕЛЬ</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- ШАПКА -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🌙 MOONGRIEF ADMIN</h1>
                 </div>
-                <div class="status ${statusClass}">
-                    <span class="status-icon">${statusIcon}</span>
-                    <span>${statusText}</span>
-                </div>
-            </div>
-            
-            <div class="card-body">
-                <div class="info-item">
-                    <span class="info-label">👤 От:</span>
-                    <span class="info-value">${c.author}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">🎯 На:</span>
-                    <span class="info-value">${c.against}</span>
-                </div>
-                <div class="info-item full">
-                    <span class="info-label">📝 Описание:</span>
-                    <span class="info-value">${c.description}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">📅 Дата:</span>
-                    <span class="info-value">${new Date(c.date).toLocaleString()}</span>
-                </div>
-                
-                ${c.response ? `
-                <div class="response">
-                    <div class="response-label">💬 Ответ:</div>
-                    <div class="response-text">${c.response}</div>
-                </div>
-                ` : ''}
-            </div>
-            
-            <div class="card-footer">
-                <div class="buttons-group">
-                    ${buttons}
+                <div class="auth">
+                    <span id="adminName" class="moon-glow"></span>
+                    <button onclick="logout()" class="btn-moon logout-btn">
+                        <span>🌙</span>
+                        <span>ВЫЙТИ</span>
+                    </button>
                 </div>
             </div>
         </div>
-    `;
-}
+    </header>
 
-// ==============================================
-// КАРТОЧКА АНКЕТЫ
-// ==============================================
-
-function createApplicationCard(a) {
-    let statusClass = '';
-    let statusText = '';
-    let statusIcon = '';
-    let buttons = '';
-    
-    switch(a.status) {
-        case 'new':
-            statusClass = 'status-new';
-            statusText = 'НОВАЯ';
-            statusIcon = '🆕';
-            buttons = `
-                <button onclick="acceptApplication(${a.id})" class="btn-action btn-accept">
-                    <span>✅</span> ПРИНЯТЬ
-                </button>
-                <button onclick="rejectApplication(${a.id})" class="btn-action btn-reject">
-                    <span>❌</span> ОТКЛОНИТЬ
-                </button>
-                <button onclick="openResponseModal('application', ${a.id})" class="btn-action btn-respond">
-                    <span>📝</span> ОТВЕТИТЬ
-                </button>
-            `;
-            break;
-        case 'accepted':
-            statusClass = 'status-accepted';
-            statusText = 'ПРИНЯТА';
-            statusIcon = '✅';
-            buttons = `
-                <span class="status-badge accepted">✓ ПРИНЯТО</span>
-                <button onclick="openResponseModal('application', ${a.id})" class="btn-action btn-respond small">
-                    <span>📝</span> ОТВЕТИТЬ
-                </button>
-            `;
-            break;
-        case 'rejected':
-            statusClass = 'status-rejected';
-            statusText = 'ОТКЛОНЕНА';
-            statusIcon = '❌';
-            buttons = `
-                <span class="status-badge rejected">✗ ОТКЛОНЕНО</span>
-                <button onclick="openResponseModal('application', ${a.id})" class="btn-action btn-respond small">
-                    <span>📝</span> ОТВЕТИТЬ
-                </button>
-            `;
-            break;
-        case 'resolved':
-            statusClass = 'status-resolved';
-            statusText = 'ОТВЕЧЕНО';
-            statusIcon = '📝';
-            buttons = `
-                <span class="status-badge resolved">✓ ОТВЕЧЕНО</span>
-                <button onclick="openResponseModal('application', ${a.id})" class="btn-action btn-respond small">
-                    <span>📝</span> ОТВЕТИТЬ СНОВА
-                </button>
-            `;
-            break;
-    }
-    
-    return `
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">
-                    <span class="card-icon">👮</span>
-                    <span>АНКЕТА НА ХЕЛПЕРА</span>
-                </div>
-                <div class="status ${statusClass}">
-                    <span class="status-icon">${statusIcon}</span>
-                    <span>${statusText}</span>
-                </div>
-            </div>
-            
-            <div class="card-body">
-                <div class="info-item">
-                    <span class="info-label">🎮 Ник:</span>
-                    <span class="info-value">${a.nickname || 'Нет'}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">👤 Имя:</span>
-                    <span class="info-value">${a.name || 'Нет'}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">📅 Возраст:</span>
-                    <span class="info-value">${a.age || 'Нет'}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">🌍 Часовой пояс:</span>
-                    <span class="info-value">${a.timezone || 'Нет'}</span>
-                </div>
-                <div class="info-item full">
-                    <span class="info-label">💼 Опыт:</span>
-                    <span class="info-value">${a.experience || 'Нет'}</span>
-                </div>
-                <div class="info-item full">
-                    <span class="info-label">❓ Мотивация:</span>
-                    <span class="info-value">${a.reason || 'Нет'}</span>
-                </div>
-                ${a.additional ? `
-                <div class="info-item full">
-                    <span class="info-label">📝 Дополнительно:</span>
-                    <span class="info-value">${a.additional}</span>
-                </div>
-                ` : ''}
-                <div class="info-item">
-                    <span class="info-label">👤 От:</span>
-                    <span class="info-value">${a.author || 'Нет'}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">📅 Дата:</span>
-                    <span class="info-value">${new Date(a.date).toLocaleString()}</span>
-                </div>
-                
-                ${a.response ? `
-                <div class="response">
-                    <div class="response-label">💬 Ответ:</div>
-                    <div class="response-text">${a.response}</div>
-                </div>
-                ` : ''}
-            </div>
-            
-            <div class="card-footer">
-                <div class="buttons-group">
-                    ${buttons}
-                </div>
-            </div>
+    <!-- НАВИГАЦИЯ -->
+    <nav class="nav">
+        <div class="container">
+            <a href="index.html" class="nav-link">🌙 ГЛАВНАЯ</a>
+            <a href="admin.html" class="nav-link active">🌙 АДМИН ПАНЕЛЬ</a>
         </div>
-    `;
-}
+    </nav>
 
-// ==============================================
-// ДЕЙСТВИЯ С ЖАЛОБАМИ
-// ==============================================
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <main class="main">
+        <div class="container">
+            <!-- СТАТИСТИКА -->
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>НОВЫЕ ЖАЛОБЫ</h3>
+                    <span id="newComplaints">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>НОВЫЕ АНКЕТЫ</h3>
+                    <span id="newApplications">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>ВСЕГО</h3>
+                    <span id="total">0</span>
+                </div>
+            </div>
 
-async function acceptComplaint(id) {
-    const complaint = complaints.find(c => c.id === id);
-    if (!complaint) return;
-    
-    if (complaint.status !== 'new') {
-        alert('❌ Эту жалобу уже обработали!');
-        return;
-    }
-    
-    const result = await window.updateComplaint(id, { status: 'accepted' });
-    if (result) {
-        await loadAdminData();
-        showNotification('✅ Жалоба принята', 'success');
-    }
-}
+            <!-- ТАБЫ -->
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="showAdminTab('complaints')">🌙 ЖАЛОБЫ</button>
+                <button class="tab-btn" onclick="showAdminTab('applications')">🌙 АНКЕТЫ</button>
+            </div>
 
-async function rejectComplaint(id) {
-    const complaint = complaints.find(c => c.id === id);
-    if (!complaint) return;
-    
-    if (complaint.status !== 'new') {
-        alert('❌ Эту жалобу уже обработали!');
-        return;
-    }
-    
-    const result = await window.updateComplaint(id, { status: 'rejected' });
-    if (result) {
-        await loadAdminData();
-        showNotification('❌ Жалоба отклонена', 'error');
-    }
-}
+            <!-- ЖАЛОБЫ -->
+            <div id="adminComplaints" class="tab-content active"></div>
+            
+            <!-- АНКЕТЫ -->
+            <div id="adminApplications" class="tab-content"></div>
+        </div>
+    </main>
 
-// ==============================================
-// ДЕЙСТВИЯ С АНКЕТАМИ
-// ==============================================
+    <!-- МОДАЛКА ОТВЕТА -->
+    <div id="responseModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeResponseModal()">×</span>
+            <h2>🌙 ОТВЕТ НА ОБРАЩЕНИЕ</h2>
+            <form id="responseForm" onsubmit="sendResponse(event)">
+                <input type="hidden" id="responseId">
+                <input type="hidden" id="responseType">
+                <textarea id="responseText" placeholder="ВВЕДИТЕ ОТВЕТ..." required class="textarea" rows="6"></textarea>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn">🌙 ОТПРАВИТЬ</button>
+                    <button type="button" onclick="closeResponseModal()" class="btn btn-gray">🌙 ОТМЕНА</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-async function acceptApplication(id) {
-    const application = applications.find(a => a.id === id);
-    if (!application) return;
-    
-    if (application.status !== 'new') {
-        alert('❌ Эту анкету уже обработали!');
-        return;
-    }
-    
-    const result = await window.updateApplication(id, { status: 'accepted' });
-    if (result) {
-        await loadAdminData();
-        showNotification('✅ Анкета принята', 'success');
-    }
-}
-
-async function rejectApplication(id) {
-    const application = applications.find(a => a.id === id);
-    if (!application) return;
-    
-    if (application.status !== 'new') {
-        alert('❌ Эту анкету уже обработали!');
-        return;
-    }
-    
-    const result = await window.updateApplication(id, { status: 'rejected' });
-    if (result) {
-        await loadAdminData();
-        showNotification('❌ Анкета отклонена', 'error');
-    }
-}
-
-// ==============================================
-// МОДАЛКА ОТВЕТА
-// ==============================================
-
-function openResponseModal(type, id) {
-    document.getElementById('responseModal').style.display = 'block';
-    document.getElementById('responseId').value = id;
-    document.getElementById('responseType').value = type;
-    
-    const title = type === 'complaint' ? 'ОТВЕТ НА ЖАЛОБУ' : 'ОТВЕТ НА АНКЕТУ';
-    document.querySelector('#responseModal h2').innerHTML = `🌙 ${title}`;
-}
-
-function closeResponseModal() {
-    document.getElementById('responseModal').style.display = 'none';
-    document.getElementById('responseForm').reset();
-}
-
-async function sendResponse(event) {
-    event.preventDefault();
-    
-    const id = Number(document.getElementById('responseId').value);
-    const type = document.getElementById('responseType').value;
-    const response = document.getElementById('responseText').value;
-    
-    if (!response) {
-        showNotification('Введите ответ!', 'error');
-        return;
-    }
-    
-    let result;
-    if (type === 'complaint') {
-        result = await window.updateComplaint(id, { 
-            response: response,
-            status: 'resolved' 
-        });
-    } else {
-        result = await window.updateApplication(id, { 
-            response: response,
-            status: 'resolved' 
-        });
-    }
-    
-    if (result) {
-        closeResponseModal();
-        await loadAdminData();
-        showNotification('✅ Ответ отправлен', 'success');
-    }
-}
-
-// ==============================================
-// УВЕДОМЛЕНИЯ
-// ==============================================
-
-function showNotification(message, type) {
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <span class="notif-icon">${type === 'success' ? '✅' : '❌'}</span>
-        <span class="notif-text">${message}</span>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 10);
-    
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => {
-            notification.remove();
-        }, 300);
-    }, 3000);
-}
-
-// ==============================================
-// ПЕРЕКЛЮЧЕНИЕ ТАБОВ
-// ==============================================
-
-function showAdminTab(tabName) {
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    
-    event.target.classList.add('active');
-    document.getElementById('admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
-}
+    <!-- СКРИПТЫ -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="db.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
