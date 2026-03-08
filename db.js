@@ -85,22 +85,57 @@ window.updateUserPassword = async function(username, password) {
     }
 }
 
-// Функции для жалоб
-window.getComplaints = async function() {
+// Функции для жалоб - УДАЛЕНИЕ (ИСПРАВЛЕНО)
+window.deleteComplaint = async function(id) {
     try {
+        console.log('🗑️ Удаляем жалобу с ID:', id, 'тип:', typeof id);
+        
+        // Преобразуем ID в число
+        const numericId = Number(id);
+        console.log('🔢 Числовой ID:', numericId);
+        
         const { data, error } = await supabaseClient
             .from('complaints')
-            .select('*')
-            .order('date', { ascending: false });
+            .delete()
+            .eq('id', numericId);
         
         if (error) {
-            console.error('Ошибка загрузки жалоб:', error);
-            return [];
+            console.error('❌ Ошибка удаления жалобы:', error);
+            return false;
         }
-        return data || [];
+        
+        console.log('✅ Жалоба удалена, ответ:', data);
+        return true; // Всегда возвращаем true при успехе
     } catch (e) {
-        console.error('Исключение:', e);
-        return [];
+        console.error('❌ Исключение при удалении:', e);
+        return false;
+    }
+}
+
+// Функции для заявок - УДАЛЕНИЕ (ИСПРАВЛЕНО)
+window.deleteApplication = async function(id) {
+    try {
+        console.log('🗑️ Удаляем заявку с ID:', id, 'тип:', typeof id);
+        
+        // Преобразуем ID в число
+        const numericId = Number(id);
+        console.log('🔢 Числовой ID:', numericId);
+        
+        const { data, error } = await supabaseClient
+            .from('applications')
+            .delete()
+            .eq('id', numericId);
+        
+        if (error) {
+            console.error('❌ Ошибка удаления заявки:', error);
+            return false;
+        }
+        
+        console.log('✅ Заявка удалена, ответ:', data);
+        return true; // Всегда возвращаем true при успехе
+    } catch (e) {
+        console.error('❌ Исключение при удалении:', e);
+        return false;
     }
 }
 
