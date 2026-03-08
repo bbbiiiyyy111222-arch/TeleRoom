@@ -18,8 +18,8 @@
                 <div class="auth">
                     <span id="adminName" class="moon-glow"></span>
                     <button onclick="logout()" class="btn-moon logout-btn">
-                        <span>🌙</span>
-                        <span>ВЫЙТИ</span>
+                        <span class="btn-icon">🌙</span>
+                        <span class="btn-text">ВЫЙТИ</span>
                     </button>
                 </div>
             </div>
@@ -38,47 +38,79 @@
     <main class="main">
         <div class="container">
             <!-- СТАТИСТИКА -->
-            <div class="stats">
-                <div class="stat-card">
-                    <h3>НОВЫЕ ЖАЛОБЫ</h3>
-                    <span id="newComplaints">0</span>
+            <div class="moon-stats">
+                <div class="moon-stat-card">
+                    <div class="moon-stat-icon">⚠️</div>
+                    <div class="moon-stat-info">
+                        <h3>НОВЫЕ ЖАЛОБЫ</h3>
+                        <span id="newComplaints" class="moon-stat-number">0</span>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h3>НОВЫЕ АНКЕТЫ</h3>
-                    <span id="newApplications">0</span>
+                <div class="moon-stat-card">
+                    <div class="moon-stat-icon">👮</div>
+                    <div class="moon-stat-info">
+                        <h3>НОВЫЕ АНКЕТЫ</h3>
+                        <span id="newApplications" class="moon-stat-number">0</span>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h3>ВСЕГО</h3>
-                    <span id="total">0</span>
+                <div class="moon-stat-card">
+                    <div class="moon-stat-icon">🌙</div>
+                    <div class="moon-stat-info">
+                        <h3>ВСЕГО</h3>
+                        <span id="total" class="moon-stat-number">0</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- ТАБЫ -->
-            <div class="admin-tabs">
-                <button class="tab-btn active" onclick="showAdminTab('complaints')">🌙 ЖАЛОБЫ</button>
-                <button class="tab-btn" onclick="showAdminTab('applications')">🌙 АНКЕТЫ</button>
+            <!-- КРАСИВЫЕ ТАБЫ -->
+            <div class="moon-tabs">
+                <button class="moon-tab-btn active" onclick="showAdminTab('complaints')">
+                    <span class="tab-icon">⚠️</span>
+                    <span class="tab-text">ЖАЛОБЫ</span>
+                    <span class="tab-count" id="complaintsCount">0</span>
+                </button>
+                <button class="moon-tab-btn" onclick="showAdminTab('applications')">
+                    <span class="tab-icon">👮</span>
+                    <span class="tab-text">АНКЕТЫ</span>
+                    <span class="tab-count" id="applicationsCount">0</span>
+                </button>
             </div>
 
             <!-- ЖАЛОБЫ -->
-            <div id="adminComplaints" class="tab-content active"></div>
+            <div id="adminComplaints" class="moon-tab-content active">
+                <h2 class="moon-section-title">🌙 УПРАВЛЕНИЕ ЖАЛОБАМИ</h2>
+                <div id="complaintsList" class="moon-cards"></div>
+            </div>
             
             <!-- АНКЕТЫ -->
-            <div id="adminApplications" class="tab-content"></div>
+            <div id="adminApplications" class="moon-tab-content">
+                <h2 class="moon-section-title">🌙 УПРАВЛЕНИЕ АНКЕТАМИ</h2>
+                <div id="applicationsList" class="moon-cards"></div>
+            </div>
         </div>
     </main>
 
-    <!-- МОДАЛКА ОТВЕТА -->
-    <div id="responseModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeResponseModal()">×</span>
-            <h2>🌙 ОТВЕТ НА ОБРАЩЕНИЕ</h2>
-            <form id="responseForm" onsubmit="sendResponse(event)">
+    <!-- КРАСИВАЯ МОДАЛКА ОТВЕТА -->
+    <div id="responseModal" class="moon-modal">
+        <div class="moon-modal-content">
+            <span class="moon-close" onclick="closeResponseModal()">×</span>
+            <h2 class="moon-modal-title">🌙 ОТВЕТ НА ОБРАЩЕНИЕ</h2>
+            <form id="responseForm" onsubmit="sendResponse(event)" class="moon-modal-form">
                 <input type="hidden" id="responseId">
                 <input type="hidden" id="responseType">
-                <textarea id="responseText" placeholder="ВВЕДИТЕ ОТВЕТ..." required class="textarea" rows="6"></textarea>
-                <div class="modal-buttons">
-                    <button type="submit" class="btn">🌙 ОТПРАВИТЬ</button>
-                    <button type="button" onclick="closeResponseModal()" class="btn btn-gray">🌙 ОТМЕНА</button>
+                <div class="moon-form-group">
+                    <label class="moon-label">💬 ВАШ ОТВЕТ</label>
+                    <textarea id="responseText" placeholder="ВВЕДИТЕ ТЕКСТ ОТВЕТА..." required class="moon-textarea" rows="6"></textarea>
+                </div>
+                <div class="moon-modal-buttons">
+                    <button type="submit" class="moon-btn moon-btn-primary">
+                        <span class="btn-icon">🌙</span>
+                        <span class="btn-text">ОТПРАВИТЬ</span>
+                    </button>
+                    <button type="button" onclick="closeResponseModal()" class="moon-btn moon-btn-secondary">
+                        <span class="btn-icon">✗</span>
+                        <span class="btn-text">ОТМЕНА</span>
+                    </button>
                 </div>
             </form>
         </div>
