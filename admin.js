@@ -8,6 +8,11 @@ const OWNERS = ['milfa', 'milk123', 'Xchik_'];
 
 // Проверка доступа
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Админ панель загружена');
+    console.log('Текущий пользователь:', currentUser);
+    console.log('Жалобы из localStorage:', complaints);
+    console.log('Анкеты из localStorage:', applications);
+    
     if (!currentUser || !OWNERS.includes(currentUser.username)) {
         alert('У вас нет доступа к админ панели!');
         window.location.href = 'index.html';
@@ -47,6 +52,7 @@ function loadAdminComplaints() {
     if (!list) return;
     
     complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+    console.log('Загрузка жалоб в админку:', complaints);
     
     if (complaints.length === 0) {
         list.innerHTML = '<p style="color: #666; text-align: center;">Нет жалоб</p>';
@@ -86,6 +92,7 @@ function loadAdminApplications() {
     if (!list) return;
     
     applications = JSON.parse(localStorage.getItem('applications')) || [];
+    console.log('Загрузка анкет в админку:', applications);
     
     if (applications.length === 0) {
         list.innerHTML = '<p style="color: #666; text-align: center;">Нет анкет</p>';
