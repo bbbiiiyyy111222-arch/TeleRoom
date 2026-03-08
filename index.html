@@ -3,110 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌙 MOONGRIEF - ЛУННЫЙ СЕРВЕР</title>
+    <title>MoonGrief 🌙 Minecraft сервер</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- ШАПКА -->
+    <!-- Шапка -->
     <header class="header">
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <h1>🌙 MOONGRIEF</h1>
+                    <h1>🌙 MoonGrief</h1>
                     <div class="server-ip">
-                        <span>🌙 Moongrief.aurorix.pro 🌙</span>
-                        <button onclick="copyIP()" class="copy-btn">📋 КОПИРОВАТЬ IP</button>
+                        <span>Сервер: Moongrief.aurorix.pro</span>
+                        <button onclick="copyIP()" class="copy-btn">📋 Копировать IP</button>
                     </div>
                 </div>
                 
-                <!-- АВТОРИЗАЦИЯ -->
+                <!-- Авторизация -->
                 <div class="auth" id="auth">
                     <div id="userInfo" style="display: none;">
-                        <span id="currentUser" class="user-glow"></span>
-                        <button onclick="showChangePassword()" class="auth-btn password-btn">
-                            <span class="btn-icon">🔑</span>
-                            <span class="btn-text">СМЕНИТЬ ПАРОЛЬ</span>
-                        </button>
-                        <button onclick="logout()" class="auth-btn logout-btn">
-                            <span class="btn-icon">🌙</span>
-                            <span class="btn-text">ВЫЙТИ</span>
-                        </button>
+                        <span id="currentUser"></span>
+                        <button onclick="showChangePassword()" class="btn-small">🔑 Сменить пароль</button>
+                        <button onclick="logout()" class="btn-small">🌙 Выйти</button>
                     </div>
-                    <div id="loginForm" class="login-form">
-                        <input type="text" id="username" placeholder="НИК" class="auth-input">
-                        <input type="password" id="password" placeholder="ПАРОЛЬ" class="auth-input">
-                        <button onclick="login()" class="auth-btn login-btn">
-                            <span class="btn-icon">🔐</span>
-                            <span class="btn-text">ВОЙТИ</span>
-                        </button>
-                        <button onclick="showRegister()" class="auth-btn register-btn">
-                            <span class="btn-icon">📝</span>
-                            <span class="btn-text">РЕГИСТРАЦИЯ</span>
-                        </button>
+                    <div id="loginForm">
+                        <input type="text" id="username" placeholder="Ник" class="input-small">
+                        <input type="password" id="password" placeholder="Пароль" class="input-small">
+                        <button onclick="login()" class="btn-small">🔐 Войти</button>
+                        <button onclick="showRegister()" class="btn-small">📝 Регистрация</button>
                     </div>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- НАВИГАЦИЯ -->
+    <!-- Навигация -->
     <nav class="nav">
         <div class="container">
-            <a href="#rules" class="nav-link active" onclick="showSection('rules', event)">🌙 ПРАВИЛА</a>
-            <a href="#complaints" class="nav-link" onclick="showSection('complaints', event)">🌙 ЖАЛОБЫ</a>
-            <a href="#applications" class="nav-link" onclick="showSection('applications', event)">🌙 ЗАЯВКИ НА ХЕЛПЕРА</a>
-            <a href="admin.html" id="adminLink" class="nav-link" style="display: none;">🌙 АДМИН ПАНЕЛЬ</a>
+            <a href="#rules" class="nav-link active" onclick="showSection('rules', event)">📜 Правила</a>
+            <a href="#complaints" class="nav-link" onclick="showSection('complaints', event)">⚠️ Жалобы</a>
+            <a href="#applications" class="nav-link" onclick="showSection('applications', event)">👮 Заявки на хелпера</a>
+            <a href="admin.html" id="adminLink" class="nav-link" style="display: none;">⚡ Админ панель</a>
         </div>
     </nav>
 
-    <!-- ИНФОРМАЦИОННАЯ ПАНЕЛЬ -->
-    <div class="info-panel">
+    <!-- Информационная панель -->
+    <div class="info-bar">
         <div class="container">
-            <div class="panel-content">
-                <!-- КУРАТОР -->
-                <div class="panel-item">
-                    <span class="panel-icon">👑</span>
-                    <div class="panel-text">
-                        <span class="panel-label">НАШ КУРАТОР</span>
-                        <a href="https://t.me/milo4ika1" target="_blank" class="panel-link">@milo4ika1</a>
-                        <span class="panel-badge telegram">TELEGRAM</span>
+            <div class="info-content">
+                <!-- Куратор -->
+                <div class="info-item">
+                    <span class="info-icon">👑</span>
+                    <div class="info-text">
+                        <span class="info-label">Наш куратор</span>
+                        <a href="https://t.me/milo4ika1" target="_blank" class="info-link">@milo4ika1</a>
+                        <span class="info-badge telegram">Telegram</span>
                     </div>
                 </div>
                 
-                <!-- СРОКИ РАССМОТРЕНИЯ -->
-                <div class="panel-item">
-                    <span class="panel-icon">⏳</span>
-                    <div class="panel-text">
-                        <span class="panel-label">СРОК РАССМОТРЕНИЯ</span>
-                        <span class="panel-value">24 ЧАСА</span>
-                        <span class="panel-badge">ЗАЯВКИ И ЖАЛОБЫ</span>
+                <!-- Срок рассмотрения -->
+                <div class="info-item">
+                    <span class="info-icon">⏳</span>
+                    <div class="info-text">
+                        <span class="info-label">Срок рассмотрения</span>
+                        <span class="info-value">24 часа</span>
+                        <span class="info-badge">заявки и жалобы</span>
                     </div>
                 </div>
 
-                <!-- БЛОК ПРО БАГИ -->
-                <div class="panel-item bug-item">
-                    <span class="panel-icon">🐛</span>
-                    <div class="panel-text">
-                        <span class="panel-label">НАШЛИ БАГ?</span>
-                        <a href="https://t.me/milo4ika1" target="_blank" class="panel-link">@milo4ika1</a>
-                        <span class="panel-badge">НАПИШИТЕ СОЗДАТЕЛЮ ФОРУМА</span>
+                <!-- Срок ответа -->
+                <div class="info-item">
+                    <span class="info-icon">📝</span>
+                    <div class="info-text">
+                        <span class="info-label">Срок ответа</span>
+                        <span class="info-value">24 часа</span>
+                        <span class="info-badge">на обращения</span>
+                    </div>
+                </div>
+
+                <!-- Баги -->
+                <div class="info-item bug-report">
+                    <span class="info-icon">🐛</span>
+                    <div class="info-text">
+                        <span class="info-label">Нашли баг?</span>
+                        <a href="https://t.me/milo4ika1" target="_blank" class="info-link">@milo4ika1</a>
+                        <span class="info-badge">напишите создателю форума</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <!-- Основной контент -->
     <main class="main">
         <div class="container">
-            <!-- ПРАВИЛА -->
+            <!-- Правила -->
             <section id="rules" class="section active-section">
-                <h2 class="section-title">🌙 ПРАВИЛА СЕРВЕРА MOONGRIEF</h2>
+                <h2 class="section-title">📜 ПРАВИЛА СЕРВЕРА MOONGRIEF</h2>
                 
                 <!-- 1. Общие положения -->
                 <div class="rule-block">
-                    <h3>🌙 1. ОБЩИЕ ПОЛОЖЕНИЯ</h3>
+                    <h3>1. ОБЩИЕ ПОЛОЖЕНИЯ</h3>
                     
                     <div class="rule-item">
                         <span class="rule-num">1.1</span>
@@ -115,67 +113,77 @@
                     
                     <div class="rule-item">
                         <span class="rule-num">1.2</span>
-                        <p>Официальные сервера расположены по адресам: Moongrief.aurorix.pro. Другие домены не относятся к проекту.</p>
+                        <p>Официальные сервера расположены по адресам: Moongrief.aurorix.pro. Другие домены не относятся к проекту. Регистрируясь на проекте, вы автоматически соглашаетесь с этими правилами и правилами всех игровых режимов.</p>
                     </div>
                     
                     <div class="rule-item">
                         <span class="rule-num">1.3</span>
-                        <p>Решения администрации являются окончательными и не подлежат обсуждению.</p>
+                        <p>Решения администрации являются окончательными и не подлежат обсуждению. Главная администрация имеет право наказывать за нарушения, не предусмотренные в этих правилах. Все жалобы на администрацию в разделе "Форум" рассматриваться не будут.</p>
                     </div>
                     
                     <div class="rule-item">
                         <span class="rule-num">1.4</span>
-                        <p>Администрация не компенсирует потерю ресурсов, вызванную техническими сбоями.</p>
+                        <p>Администрация не компенсирует потерю ресурсов, вызванную техническими сбоями (лагами, багами), действиями читеров или других игроков, но за падения сервера Администрация может выдавать риллики.</p>
                     </div>
                     
                     <div class="rule-item">
                         <span class="rule-num">1.5</span>
                         <div class="rule-content">
-                            <p><strong>ЗАПРЕЩЁННЫЕ ДЕЙСТВИЯ:</strong></p>
+                            <p><strong>Запрещённые действия:</strong></p>
                             <ul>
-                                <li>▸ Продажа, взлом аккаунтов</li>
-                                <li>▸ Распространение личных данных</li>
-                                <li>▸ Намеренный вред серверу</li>
-                                <li>▸ Продажа игровых предметов за деньги</li>
+                                <li>▸ Продажа, взлом, попытки взлома, передача и покупка аккаунтов вне официального сайта.</li>
+                                <li>▸ Распространение личных данных других игроков.</li>
+                                <li>▸ Намеренный вред серверу.</li>
+                                <li>▸ Продажа игровых предметов или услуг за реальные деньги.</li>
                             </ul>
-                            <p><span class="punish">НАКАЗАНИЕ: БАН ПО IP + БАН АККАУНТА</span></p>
+                            <p><span class="punish">Наказание: Бан игрока по Айпи. Бан игрового аккаунта.</span></p>
                         </div>
                     </div>
                     
                     <div class="rule-item">
                         <span class="rule-num">1.6</span>
-                        <p>Уважение к администрации обязательно. <span class="mini-punish">БАН</span></p>
+                        <p>Игроки обязаны проявлять уважение к администрации сервера. Любые оскорбления, угрозы или неуважительное поведение в сторону администраторов будут наказываться.</p>
                     </div>
                     
                     <div class="rule-item">
                         <span class="rule-num">1.7</span>
-                        <p>Администрация может менять правила без предупреждения.</p>
+                        <p>Администрация проекта может вносить изменения в правила без предварительного уведомления игроков. Незнание правил не освобождает от ответственности за их нарушение.</p>
                     </div>
                 </div>
 
                 <!-- 2. Аккаунт -->
                 <div class="rule-block">
-                    <h3>🌙 2. АККАУНТ</h3>
+                    <h3>2. АККАУНТ</h3>
                     
                     <div class="rule-item">
                         <span class="rule-num">2.1</span>
-                        <p>Запрещены ники, похожие на администрацию. <span class="mini-punish">БАН НАВСЕГДА</span></p>
+                        <p>Игровой никнейм должен соответствовать установленным правилам. Любой ник, нарушающий эти правила, приведёт к блокировке аккаунта навсегда.</p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <span class="rule-num">2.1.1</span>
+                        <p>Запрещены ники, похожие на никнеймы администрации.</p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <span class="rule-num">2.1.2</span>
+                        <p>Запрещены ники, оскорбляющие других игроков.</p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <span class="rule-num">2.1.3</span>
+                        <p>Запрещены ники, содержащие названия запрещённого ПО, националистические или религиозные символы и экстремистские лозунги (например: "FLauncher", "Catlavan", "Ghitler1488").</p>
                     </div>
                     
                     <div class="rule-item">
                         <span class="rule-num">2.2</span>
-                        <p>Запрещены оскорбительные ники. <span class="mini-punish">БАН НАВСЕГДА</span></p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">2.3</span>
-                        <p>Запрещены ники с названиями читов. <span class="mini-punish">БАН НАВСЕГДА</span></p>
+                        <p>Сохраняйте чеки, выданные системой после покупки платных дополнений (групп, кейсов, донатной валюты). Они понадобятся для подтверждения покупки.</p>
                     </div>
                 </div>
 
                 <!-- 3. Донат -->
                 <div class="rule-block">
-                    <h3>🌙 3. ДОНАТ</h3>
+                    <h3>3. ДОНАТ</h3>
                     
                     <div class="rule-item">
                         <span class="rule-num">3.1</span>
@@ -184,159 +192,223 @@
                     
                     <div class="rule-item">
                         <span class="rule-num">3.2</span>
-                        <p>Пожертвования добровольны.</p>
+                        <p>Игроки могут добровольно поддерживать развитие проекта, делая пожертвования. В благодарность за пожертвования предоставляются внутриигровые услуги.</p>
                     </div>
                     
                     <div class="rule-item">
                         <span class="rule-num">3.3</span>
-                        <p>Платные группы не дают право нарушать правила.</p>
+                        <p>При возникновении проблем с платежом или неполучении услуги после оплаты следует обратиться в техническую поддержку.</p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <span class="rule-num">3.4</span>
+                        <p>Пожертвования на развитие сервера являются добровольными и не подлежат возврату; это не является коммерческой сделкой.</p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <span class="rule-num">3.5</span>
+                        <p>Покупка платных групп не даёт игрокам право нарушать правила сервера.</p>
                     </div>
                 </div>
 
                 <!-- 4. Чат -->
                 <div class="rule-block">
-                    <h3>🌙 4. ЧАТ</h3>
+                    <h3>4. ЧАТ</h3>
                     
                     <div class="rule-item">
                         <span class="rule-num">4.1</span>
-                        <p>Флуд запрещен. <span class="mini-punish">МУТ 2 ЧАСА</span></p>
+                        <p>Запрещено организовывать флуд и отправлять бессмысленные комбинации символов (например: "aaaaaaaaaaaaaa", "hahahahhahahahah"). Сообщение не должно превышать 10 символов. Также запрещены 3 сообщения с похожим смыслом, отправленные в одном окне чата. <span class="punish">Наказание: Мут на 2 часа.</span></p>
                     </div>
                     
                     <div class="rule-item">
                         <span class="rule-num">4.2</span>
-                        <p>Обход мута через /bc. <span class="mini-punish">БАН 1 ДЕНЬ</span></p>
+                        <p>Запрещено обходить мут с помощью команды /bc в целях уклонения от наказания. <span class="punish">Наказание: Бан на 1 день.</span></p>
                     </div>
                     
                     <div class="rule-item">
                         <span class="rule-num">4.3</span>
-                        <p>CAPS (>50%). <span class="mini-punish">МУТ 2 ЧАСА</span></p>
+                        <p>Запрещено использовать текст с верхним регистром (CAPS), превышающим 50% от всего текста, если сообщение содержит более 5 символов. <span class="punish">Наказание: Мут на 2 часа.</span></p>
                     </div>
                     
                     <div class="rule-item">
                         <span class="rule-num">4.4</span>
-                        <p>Оскорбления игроков. <span class="mini-punish">МУТ 2 ЧАСА</span></p>
+                        <p>Запрещены чрезмерные и грубые оскорбления, унижения и угрозы в адрес игроков. <span class="punish">Наказание: Мут на 2 часа.</span></p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <span class="rule-num">4.4.1</span>
+                        <p>Запрещены оскорбления и угрозы в адрес родителей (своих или чужих). <span class="punish">Наказание: Мут на 6 часов.</span></p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <span class="rule-num">4.4.2</span>
+                        <p>Запрещено упоминание родителей (своих или чужих). <span class="punish">Наказание: Мут на 3 часа.</span></p>
                     </div>
                     
                     <div class="rule-item">
                         <span class="rule-num">4.5</span>
-                        <p>Призыв к суициду. <span class="mini-punish">БАН 1 ДЕНЬ</span></p>
+                        <p>Призыв к суициду запрещён. <span class="punish">Наказание: Мут на 1 день.</span></p>
                     </div>
                     
                     <div class="rule-item">
                         <span class="rule-num">4.6</span>
-                        <p>Попрошайничество у админов (кроме Xchik_). <span class="mini-punish">МУТ 2 ЧАСА</span></p>
+                        <p>Оскорбление проекта и использование оскорбительных названий в любом виде чата запрещены. <span class="punish">Наказание: Мут на 1 день.</span></p>
                     </div>
                     
                     <div class="rule-item">
                         <span class="rule-num">4.7</span>
-                        <p>Реклама сторонних ресурсов. <span class="mini-punish">БАН 14 ДНЕЙ</span></p>
+                        <p>Попрошайничество ресурсов или повышения доната у администрации запрещено (исключение: Xchik_). <span class="punish">Наказание: Мут на 2 часа.</span></p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <span class="rule-num">4.7.1</span>
+                        <p>Попрошайничество ресурсов или валюты у игроков/команды проекта запрещено. <span class="punish">Наказание: Мут на 1 час.</span></p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <span class="rule-num">4.8</span>
+                        <p>Распространение дезинформации запрещено. <span class="punish">Наказание: Мут на 1 день.</span></p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <span class="rule-num">4.8.1</span>
+                        <p>Выдача себя за администрацию: <span class="punish">Наказание: Мут на 1 час.</span></p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <span class="rule-num">4.9</span>
+                        <p>Упоминание сторонних проектов запрещено. Исключение: короткие названия дуэль-серверов (пт, бромик, пвп, сатурн). <span class="punish">Наказание: Мут на 2 часа.</span></p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <span class="rule-num">4.9.1</span>
+                        <p>Запрещена реклама сторонних ресурсов в чате (Публикации связанные с MoonGrief рекламировать разрешено, не нарушая другие правила). Исключение: короткие названия дуэль-серверов (пт, бромик, пвп, сатурн). <span class="punish">Наказание: бан на 14 дней.</span></p>
                     </div>
                 </div>
 
                 <!-- 5. Запрещенный софт -->
                 <div class="rule-block">
-                    <h3>🌙 5. ЗАПРЕЩЕННЫЙ СОФТ</h3>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">5.1</span>
-                        <p>Использование читов. <span class="mini-punish">БАН 50 ДНЕЙ</span></p>
-                    </div>
+                    <h3>5. ЗАПРЕЩЕННЫЙ СОФТ</h3>
                     
                     <div class="rule-item">
                         <span class="rule-num">5.2</span>
-                        <p>Признание в читах при проверке. <span class="mini-punish">БАН 40 ДНЕЙ</span></p>
+                        <p>Запрещено использование стороннего ПО, дающего преимущество над другими игроками. Неадекватное поведение во время проверки также считается нарушением (задержка или ведение проверяющего в заблуждение). Также, игра с читами на ансофт-грифе запрещена. Если у игрока были установлены или использованы читы в течение последних 14 дней — это также считается нарушением. <span class="punish">Наказание: Бан на 50 дней.</span></p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <span class="rule-num">5.2.1</span>
+                        <p>Признание в использовании читов при проверке (в любом виде чата AnyDesk, Discord): <span class="punish">Наказание: Бан на 40 дней.</span></p>
                     </div>
                     
                     <div class="rule-item">
                         <span class="rule-num">5.3</span>
-                        <p>Игра с читерами. <span class="mini-punish">БАН 14 ДНЕЙ</span></p>
+                        <p>Запрещена совместная игра с игроками, нарушившими правило 5.2. <span class="punish">Наказание: Бан на 14 дней.</span></p>
                     </div>
                 </div>
 
                 <!-- 6. Игровой процесс -->
                 <div class="rule-block">
-                    <h3>🌙 6. ИГРОВОЙ ПРОЦЕСС</h3>
+                    <h3>6. ИГРОВОЙ ПРОЦЕСС</h3>
                     
                     <div class="rule-item">
                         <span class="rule-num">6.1</span>
-                        <p>Лаг-машины. <span class="mini-punish">БАН 7 ДНЕЙ</span></p>
+                        <p>Строительство лаг-машин и постройки, способные нанести вред работе сервера (лава-касты, заливы лавой) запрещены. <span class="punish">Наказание: Бан на 7 дней.</span></p>
                     </div>
                     
                     <div class="rule-item">
                         <span class="rule-num">6.2</span>
-                        <p>Варп до ловушки <10 блоков. <span class="mini-punish">БАН 1 ДЕНЬ + СНОС</span></p>
+                        <p>Расстояние от варпа до ловушки должно составлять не менее 10 блоков. <span class="punish">Наказание: Бан на 1 день, снос ловушки и удаление варпа.</span></p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <span class="rule-num">6.2.1</span>
+                        <p>Запрещен закрытый варп без открытого пространства размером 3х3 полных блока. <span class="punish">Наказание: Бан на 1 день, снос ловушки и удаление варпа.</span></p>
                     </div>
                     
                     <div class="rule-item">
                         <span class="rule-num">6.3</span>
-                        <p>Использование /spec в шуточных целях. <span class="mini-punish">БАН 1 ЧАС</span></p>
+                        <p>Использование команды /spec в шуточных целях или же спам командой. <span class="punish">Наказание: Бан на 1 час.</span></p>
                     </div>
                     
                     <div class="rule-item">
                         <span class="rule-num">6.4</span>
-                        <p>Блокировка по IP не обжалуется. Связь: @waixzelz</p>
+                        <p>Подача ложных жалоб (на собственных тиммейтов), жалобы с оскорблением/унижением второго лица или жалобы с оскорблением администрации/команды проекта.</p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <span class="rule-num">6.5</span>
+                        <p>Запрещено строительство ловушек без возможности выхода за счёт ограничений, выдвинутые сервером. Например, стойки для брони/рамки и т.д. <span class="punish">Наказание: снос варпа + бан на 1 день.</span></p>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <span class="rule-num">6.6</span>
+                        <p>Блокировку по Айпи, т.е. чёрный список проекта обжаловать никак нельзя, покупка "Разбана" не поможет, блокировка выдаётся только главной администрацией. Связь по поводу блокировки за "6.6" @waixzelz (TG)</p>
                     </div>
                 </div>
             </section>
 
-            <!-- ЖАЛОБЫ -->
+            <!-- Жалобы -->
             <section id="complaints" class="section">
-                <h2 class="section-title">🌙 ПОДАТЬ ЖАЛОБУ</h2>
+                <h2 class="section-title">⚠️ ПОДАТЬ ЖАЛОБУ</h2>
                 
+                <!-- Информация о сроках -->
                 <div class="info-message">
-                    <span class="info-icon">⏳</span>
-                    <div class="info-text">
-                        <strong>СРОК РАССМОТРЕНИЯ ЖАЛОБ: 24 ЧАСА</strong>
-                        <span>СРОК ОТВЕТА: 24 ЧАСА</span>
+                    <span class="info-message-icon">⏳</span>
+                    <div class="info-message-text">
+                        <strong>Срок рассмотрения: 24 часа</strong>
+                        <span>Срок ответа: 24 часа</span>
+                        <span>По вопросам: <a href="https://t.me/milo4ika1" target="_blank">@milo4ika1</a></span>
                     </div>
                 </div>
                 
-                <form id="complaintForm" onsubmit="submitComplaint(event)" class="form">
-                    <input type="text" id="complaintTitle" placeholder="ЗАГОЛОВОК ЖАЛОБЫ" required class="input">
-                    <input type="text" id="complaintAgainst" placeholder="НА КОГО ЖАЛОБА (НИК)" required class="input">
-                    <textarea id="complaintDesc" placeholder="ОПИСАНИЕ СИТУАЦИИ, ДОКАЗАТЕЛЬСТВА" required class="textarea" rows="4"></textarea>
-                    <button type="submit" class="submit-btn">🌙 ОТПРАВИТЬ ЖАЛОБУ</button>
+                <form id="complaintForm" onsubmit="submitComplaint(event)">
+                    <input type="text" id="complaintTitle" placeholder="Заголовок жалобы" required class="input">
+                    <input type="text" id="complaintAgainst" placeholder="На кого жалоба (ник)" required class="input">
+                    <textarea id="complaintDesc" placeholder="Описание ситуации, доказательства" required class="textarea" rows="4"></textarea>
+                    <button type="submit" class="btn">🌙 Отправить жалобу</button>
                 </form>
 
-                <h3 class="list-title">📋 ПОСЛЕДНИЕ ЖАЛОБЫ</h3>
-                <div id="complaintsList" class="list"></div>
+                <h3 style="margin-top: 30px; color: #ff6b6b;">Список жалоб</h3>
+                <div id="complaintsList"></div>
             </section>
 
-            <!-- ЗАЯВКИ НА ХЕЛПЕРА -->
+            <!-- Заявки на хелпера -->
             <section id="applications" class="section">
-                <h2 class="section-title">🌙 АНКЕТА НА ХЕЛПЕРА</h2>
+                <h2 class="section-title">👮 АНКЕТА НА ХЕЛПЕРА</h2>
                 
+                <!-- Информация о сроках -->
                 <div class="info-message">
-                    <span class="info-icon">⏳</span>
-                    <div class="info-text">
-                        <strong>СРОК РАССМОТРЕНИЯ ЗАЯВОК: 24 ЧАСА</strong>
-                        <span>СРОК ОТВЕТА: 24 ЧАСА</span>
+                    <span class="info-message-icon">⏳</span>
+                    <div class="info-message-text">
+                        <strong>Срок рассмотрения: 24 часа</strong>
+                        <span>Срок ответа: 24 часа</span>
+                        <span>По вопросам: <a href="https://t.me/milo4ika1" target="_blank">@milo4ika1</a></span>
                     </div>
                 </div>
                 
-                <form id="helperForm" onsubmit="submitApplication(event)" class="form">
+                <form id="helperForm" onsubmit="submitApplication(event)">
                     <div class="form-group">
-                        <label>ИГРОВОЙ НИКНЕЙМ</label>
-                        <input type="text" id="helperNickname" placeholder="ВАШ НИК В MINECRAFT" required class="input">
+                        <label>Игровой никнейм:</label>
+                        <input type="text" id="helperNickname" placeholder="Ваш ник в Minecraft" required class="input">
                     </div>
                     
                     <div class="form-group">
-                        <label>ИМЯ</label>
-                        <input type="text" id="helperName" placeholder="ВАШЕ НАСТОЯЩЕЕ ИМЯ" required class="input">
+                        <label>Имя:</label>
+                        <input type="text" id="helperName" placeholder="Ваше настоящее имя" required class="input">
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group half">
-                            <label>СКОЛЬКО ЛЕТ</label>
-                            <input type="number" id="helperAge" placeholder="ВАШ ВОЗРАСТ" required class="input">
+                            <label>Сколько лет:</label>
+                            <input type="number" id="helperAge" placeholder="Ваш возраст" required class="input">
                         </div>
                         
                         <div class="form-group half">
-                            <label>ЧАСОВОЙ ПОЯС</label>
+                            <label>Часовой пояс:</label>
                             <select id="helperTimezone" required class="select">
-                                <option value="">ВЫБЕРИТЕ</option>
-                                <option value="UTC+2">UTC+2 (КИЕВ)</option>
-                                <option value="UTC+3">UTC+3 (МОСКВА)</option>
+                                <option value="">Выберите</option>
+                                <option value="UTC+2">UTC+2 (Киев)</option>
+                                <option value="UTC+3">UTC+3 (Москва)</option>
                                 <option value="UTC+4">UTC+4</option>
                                 <option value="UTC+5">UTC+5</option>
                                 <option value="UTC+6">UTC+6</option>
@@ -347,57 +419,58 @@
                     </div>
                     
                     <div class="form-group">
-                        <label>ОПЫТ РАБОТЫ</label>
-                        <textarea id="helperExperience" placeholder="РАССКАЖИТЕ О ВАШЕМ ОПЫТЕ" required class="textarea" rows="3"></textarea>
+                        <label>Опыт работы / на должности:</label>
+                        <textarea id="helperExperience" placeholder="Расскажите о вашем опыте работы на подобных должностях (если был)" required class="textarea" rows="3"></textarea>
                     </div>
                     
                     <div class="form-group">
-                        <label>ПОЧЕМУ ХОТИТЕ СТАТЬ ХЕЛПЕРОМ?</label>
-                        <textarea id="helperReason" placeholder="ВАША МОТИВАЦИЯ" required class="textarea" rows="4"></textarea>
+                        <label>Почему вы хотите стать хелпером?:</label>
+                        <textarea id="helperReason" placeholder="Опишите вашу мотивацию" required class="textarea" rows="4"></textarea>
                     </div>
                     
                     <div class="form-group">
-                        <label>ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ</label>
-                        <textarea id="helperAdditional" placeholder="ЕСЛИ ХОТИТЕ ЧТО-ТО ДОБАВИТЬ" class="textarea" rows="3"></textarea>
+                        <label>Дополнительная информация:</label>
+                        <textarea id="helperAdditional" placeholder="Если хотите что-то добавить" class="textarea" rows="3"></textarea>
                     </div>
                     
-                    <button type="submit" class="submit-btn">🌙 ОТПРАВИТЬ АНКЕТУ</button>
+                    <button type="submit" class="btn">🌙 Отправить анкету</button>
                 </form>
 
-                <h3 class="list-title">📋 ПОСЛЕДНИЕ ЗАЯВКИ</h3>
-                <div id="applicationsList" class="list"></div>
+                <h3 style="margin-top: 30px; color: #ff6b6b;">Список заявок</h3>
+                <div id="applicationsList"></div>
             </section>
         </div>
     </main>
 
-    <!-- МОДАЛКА РЕГИСТРАЦИИ -->
+    <!-- Модалка регистрации -->
     <div id="registerModal" class="modal">
         <div class="modal-content">
-            <span class="modal-close" onclick="closeModal()">×</span>
-            <h2>🌙 РЕГИСТРАЦИЯ</h2>
-            <form onsubmit="register(event)" class="modal-form">
-                <input type="text" id="regUsername" placeholder="НИКНЕЙМ" required class="modal-input">
-                <input type="password" id="regPassword" placeholder="ПАРОЛЬ" required class="modal-input">
-                <input type="password" id="regConfirmPassword" placeholder="ПОВТОРИТЕ ПАРОЛЬ" required class="modal-input">
-                <button type="submit" class="modal-btn">🌙 ЗАРЕГИСТРИРОВАТЬСЯ</button>
+            <span class="close" onclick="closeModal()">×</span>
+            <h2>Регистрация</h2>
+            <form onsubmit="register(event)">
+                <input type="text" id="regUsername" placeholder="Никнейм" required class="input">
+                <input type="password" id="regPassword" placeholder="Пароль" required class="input">
+                <input type="password" id="regConfirmPassword" placeholder="Повторите пароль" required class="input">
+                <button type="submit" class="btn">🌙 Зарегистрироваться</button>
             </form>
         </div>
     </div>
 
-    <!-- МОДАЛКА СМЕНЫ ПАРОЛЯ -->
+    <!-- Модалка смены пароля -->
     <div id="changePasswordModal" class="modal">
         <div class="modal-content">
-            <span class="modal-close" onclick="closeChangePassword()">×</span>
-            <h2>🌙 СМЕНА ПАРОЛЯ</h2>
-            <form onsubmit="changePassword(event)" class="modal-form">
-                <input type="password" id="oldPassword" placeholder="СТАРЫЙ ПАРОЛЬ" required class="modal-input">
-                <input type="password" id="newPassword" placeholder="НОВЫЙ ПАРОЛЬ" required class="modal-input">
-                <input type="password" id="confirmPassword" placeholder="ПОВТОРИТЕ ПАРОЛЬ" required class="modal-input">
-                <button type="submit" class="modal-btn">🌙 ИЗМЕНИТЬ ПАРОЛЬ</button>
+            <span class="close" onclick="closeChangePassword()">×</span>
+            <h2>🔑 Смена пароля</h2>
+            <form onsubmit="changePassword(event)">
+                <input type="password" id="oldPassword" placeholder="Старый пароль" required class="input">
+                <input type="password" id="newPassword" placeholder="Новый пароль" required class="input">
+                <input type="password" id="confirmPassword" placeholder="Повторите пароль" required class="input">
+                <button type="submit" class="btn">🌙 Изменить пароль</button>
             </form>
         </div>
     </div>
 
+    <!-- Скрипты -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="db.js"></script>
     <script src="script.js"></script>
