@@ -596,13 +596,13 @@ async function loadApplications() {
 }
 
 // ==============================================
-// ФУНКЦИЯ ДЛЯ ФОРМАТИРОВАНИЯ ДАТЫ (ЛОКАЛЬНОЕ ВРЕМЯ)
+// ФУНКЦИЯ ДЛЯ ОТОБРАЖЕНИЯ ВРЕМЕНИ (GMT+3)
 // ==============================================
 
 function formatDateToMSK(dateString) {
     const date = new Date(dateString);
     
-    // Получаем локальные компоненты даты и времени
+    // Получаем компоненты даты и времени в локальном времени
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
