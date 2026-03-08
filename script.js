@@ -10,25 +10,38 @@ const OWNERS = ['milfa', 'milk123', 'Xchik_'];
 // Загрузка
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Страница загружена');
+    console.log('Supabase доступен:', typeof supabase !== 'undefined');
     
-    // Загружаем данные из базы
-    await loadDataFromDB();
-    
-    updateAuth();
-    await loadLists();
-    checkAdminLink();
-    
-    // Показываем правила по умолчанию
-    showSection('rules');
+    try {
+        // Загружаем данные из базы
+        await loadDataFromDB();
+        
+        updateAuth();
+        await loadLists();
+        checkAdminLink();
+        
+        // Показываем правила по умолчанию
+        showSection('rules');
+    } catch (error) {
+        console.error('Ошибка при загрузке:', error);
+        alert('Ошибка подключения к базе данных. Проверьте консоль.');
+    }
 });
 
 // Загрузка данных из базы
 async function loadDataFromDB() {
-    users = await getUsers();
-    complaints = await getComplaints();
-    applications = await getApplications();
-    
-    console.log('Загружено из базы:', { users, complaints, applications });
+    try {
+        users = await getUsers() || [];
+        complaints = await getComplaints() || [];
+        applications = await getApplications() || [];
+        
+        console.log('Загружено из базы:', { users, complaints, applications });
+    } catch (error) {
+        console.error('Ошибка загрузки из БД:', error);
+        users = [];
+        complaints = [];
+        applications = [];
+    }
 }
 
 // Копирование IP
@@ -61,19 +74,24 @@ async function login() {
         return;
     }
     
-    // Загружаем пользователей из базы
-    users = await getUsers();
-    
-    const user = users.find(u => u.username === username && u.password === password);
-    
-    if (user) {
-        currentUser = user;
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        updateAuth();
-        checkAdminLink();
-        alert('Добро пожаловать, ' + username + '!');
-    } else {
-        alert('Неверный ник или пароль!');
+    try {
+        // Загружаем пользователей из базы
+        users = await getUsers();
+        
+        const user = users.find(u => u.username === username && u.password === password);
+        
+        if (user) {
+            currentUser = user;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            updateAuth();
+            checkAdminLink();
+            alert('Добро пожаловать, ' + username + '!');
+        } else {
+            alert('Неверный ник или пароль!');
+        }
+    } catch (error) {
+        console.error('Ошибка авторизации:', error);
+        alert('Ошибка при авторизации');
     }
 }
 
@@ -123,6 +141,8 @@ async function register(event) {
     const password = document.getElementById('regPassword').value.trim();
     const confirm = document.getElementById('regConfirmPassword').value.trim();
     
+    console.log('Регистрация:', username);
+    
     if (!username || !password) {
         alert('Заполните все поля!');
         return;
@@ -133,44 +153,54 @@ async function register(event) {
         return;
     }
     
-    // Проверяем, есть ли уже такой пользователь
-    users = await getUsers();
-    const existingUser = users.find(u => u.username === username);
-    
-    if (existingUser) {
-        // Если пользователь уже есть (например, владелец), обновляем пароль
-        if (OWNERS.includes(username)) {
-            const updated = await updateUserPassword(username, password);
-            if (updated) {
-                currentUser = { username, password };
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                alert('Пароль установлен! Добро пожаловать, ' + username + '!');
-                closeModal();
-                updateAuth();
-                checkAdminLink();
-            } else {
-                alert('Ошибка при установке пароля!');
-            }
-        } else {
-            alert('Пользователь уже существует!');
-        }
-        return;
-    }
-    
-    // Сохраняем нового пользователя в базу
-    const saved = await saveUser(username, password);
-    
-    if (saved) {
-        // Сразу входим
-        currentUser = { username, password };
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    try {
+        // Проверяем, есть ли уже такой пользователь
+        users = await getUsers();
+        console.log('Существующие пользователи:', users);
         
-        alert('Регистрация успешна! Добро пожаловать, ' + username + '!');
-        closeModal();
-        updateAuth();
-        checkAdminLink();
-    } else {
-        alert('Ошибка при регистрации!');
+        const existingUser = users.find(u => u.username === username);
+        
+        if (existingUser) {
+            // Если пользователь уже есть (например, владелец), обновляем пароль
+            if (OWNERS.includes(username)) {
+                console.log('Обновление пароля для владельца:', username);
+                const updated = await updateUserPassword(username, password);
+                if (updated) {
+                    currentUser = { username, password };
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    alert('Пароль установлен! Добро пожаловать, ' + username + '!');
+                    closeModal();
+                    updateAuth();
+                    checkAdminLink();
+                } else {
+                    alert('Ошибка при установке пароля!');
+                }
+            } else {
+                alert('Пользователь уже существует!');
+            }
+            return;
+        }
+        
+        // Сохраняем нового пользователя в базу
+        console.log('Создание нового пользователя:', username);
+        const saved = await saveUser(username, password);
+        console.log('Результат сохранения:', saved);
+        
+        if (saved) {
+            // Сразу входим
+            currentUser = { username, password };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            alert('Регистрация успешна! Добро пожаловать, ' + username + '!');
+            closeModal();
+            updateAuth();
+            checkAdminLink();
+        } else {
+            alert('Ошибка при регистрации!');
+        }
+    } catch (error) {
+        console.error('Ошибка регистрации:', error);
+        alert('Ошибка при регистрации: ' + error.message);
     }
 }
 
@@ -195,26 +225,31 @@ async function submitComplaint(event) {
         return;
     }
     
-    const complaint = {
-        id: Date.now(),
-        title: document.getElementById('complaintTitle').value,
-        against: document.getElementById('complaintAgainst').value,
-        description: document.getElementById('complaintDesc').value,
-        author: currentUser.username,
-        date: new Date().toISOString(),
-        status: 'new',
-        response: null
-    };
-    
-    // Сохраняем в базу
-    const saved = await saveComplaint(complaint);
-    
-    if (saved) {
-        alert('Жалоба отправлена!');
-        document.getElementById('complaintForm').reset();
-        await loadLists();
-    } else {
-        alert('Ошибка при отправке жалобы!');
+    try {
+        const complaint = {
+            id: Date.now(),
+            title: document.getElementById('complaintTitle').value,
+            against: document.getElementById('complaintAgainst').value,
+            description: document.getElementById('complaintDesc').value,
+            author: currentUser.username,
+            date: new Date().toISOString(),
+            status: 'new',
+            response: null
+        };
+        
+        // Сохраняем в базу
+        const saved = await saveComplaint(complaint);
+        
+        if (saved) {
+            alert('Жалоба отправлена!');
+            document.getElementById('complaintForm').reset();
+            await loadLists();
+        } else {
+            alert('Ошибка при отправке жалобы!');
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Ошибка при отправке жалобы');
     }
 }
 
@@ -227,30 +262,35 @@ async function submitApplication(event) {
         return;
     }
     
-    const application = {
-        id: Date.now(),
-        nickname: document.getElementById('helperNickname').value,
-        name: document.getElementById('helperName').value,
-        age: document.getElementById('helperAge').value,
-        timezone: document.getElementById('helperTimezone').value,
-        experience: document.getElementById('helperExperience').value,
-        reason: document.getElementById('helperReason').value,
-        additional: document.getElementById('helperAdditional').value || 'Не указано',
-        author: currentUser.username,
-        date: new Date().toISOString(),
-        status: 'new',
-        response: null
-    };
-    
-    // Сохраняем в базу
-    const saved = await saveApplication(application);
-    
-    if (saved) {
-        alert('Анкета отправлена!');
-        document.getElementById('helperForm').reset();
-        await loadLists();
-    } else {
-        alert('Ошибка при отправке анкеты!');
+    try {
+        const application = {
+            id: Date.now(),
+            nickname: document.getElementById('helperNickname').value,
+            name: document.getElementById('helperName').value,
+            age: document.getElementById('helperAge').value,
+            timezone: document.getElementById('helperTimezone').value,
+            experience: document.getElementById('helperExperience').value,
+            reason: document.getElementById('helperReason').value,
+            additional: document.getElementById('helperAdditional').value || 'Не указано',
+            author: currentUser.username,
+            date: new Date().toISOString(),
+            status: 'new',
+            response: null
+        };
+        
+        // Сохраняем в базу
+        const saved = await saveApplication(application);
+        
+        if (saved) {
+            alert('Анкета отправлена!');
+            document.getElementById('helperForm').reset();
+            await loadLists();
+        } else {
+            alert('Ошибка при отправке анкеты!');
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Ошибка при отправке анкеты');
     }
 }
 
@@ -264,65 +304,75 @@ async function loadComplaints() {
     const list = document.getElementById('complaintsList');
     if (!list) return;
     
-    complaints = await getComplaints();
-    
-    if (complaints.length === 0) {
-        list.innerHTML = '<p style="color: #666; text-align: center;">Пока нет жалоб</p>';
-        return;
+    try {
+        complaints = await getComplaints();
+        
+        if (!complaints || complaints.length === 0) {
+            list.innerHTML = '<p style="color: #666; text-align: center;">Пока нет жалоб</p>';
+            return;
+        }
+        
+        list.innerHTML = '';
+        complaints.forEach(c => {
+            list.innerHTML += `
+                <div class="request-card">
+                    <div class="request-header">
+                        <span>${c.title}</span>
+                        <span class="request-status status-${c.status}">${getStatus(c.status)}</span>
+                    </div>
+                    <div class="request-details">
+                        <p><strong>От:</strong> ${c.author}</p>
+                        <p><strong>На:</strong> ${c.against}</p>
+                        <p><strong>Описание:</strong> ${c.description}</p>
+                        <p><small>${new Date(c.date).toLocaleString()}</small></p>
+                    </div>
+                    ${c.response ? `<p><strong>Ответ:</strong> ${c.response}</p>` : ''}
+                </div>
+            `;
+        });
+    } catch (error) {
+        console.error('Ошибка загрузки жалоб:', error);
+        list.innerHTML = '<p style="color: red; text-align: center;">Ошибка загрузки жалоб</p>';
     }
-    
-    list.innerHTML = '';
-    complaints.forEach(c => {
-        list.innerHTML += `
-            <div class="request-card">
-                <div class="request-header">
-                    <span>${c.title}</span>
-                    <span class="request-status status-${c.status}">${getStatus(c.status)}</span>
-                </div>
-                <div class="request-details">
-                    <p><strong>От:</strong> ${c.author}</p>
-                    <p><strong>На:</strong> ${c.against}</p>
-                    <p><strong>Описание:</strong> ${c.description}</p>
-                    <p><small>${new Date(c.date).toLocaleString()}</small></p>
-                </div>
-                ${c.response ? `<p><strong>Ответ:</strong> ${c.response}</p>` : ''}
-            </div>
-        `;
-    });
 }
 
 async function loadApplications() {
     const list = document.getElementById('applicationsList');
     if (!list) return;
     
-    applications = await getApplications();
-    
-    if (applications.length === 0) {
-        list.innerHTML = '<p style="color: #666; text-align: center;">Пока нет заявок</p>';
-        return;
+    try {
+        applications = await getApplications();
+        
+        if (!applications || applications.length === 0) {
+            list.innerHTML = '<p style="color: #666; text-align: center;">Пока нет заявок</p>';
+            return;
+        }
+        
+        list.innerHTML = '';
+        applications.forEach(a => {
+            list.innerHTML += `
+                <div class="request-card">
+                    <div class="request-header">
+                        <span>Анкета от ${a.author}</span>
+                        <span class="request-status status-${a.status}">${getStatus(a.status)}</span>
+                    </div>
+                    <div class="request-details">
+                        <p><strong>Ник:</strong> ${a.nickname}</p>
+                        <p><strong>Имя:</strong> ${a.name}</p>
+                        <p><strong>Возраст:</strong> ${a.age}</p>
+                        <p><strong>Часовой пояс:</strong> ${a.timezone}</p>
+                        <p><strong>Опыт:</strong> ${a.experience}</p>
+                        <p><strong>Мотивация:</strong> ${a.reason}</p>
+                        <p><small>${new Date(a.date).toLocaleString()}</small></p>
+                    </div>
+                    ${a.response ? `<p><strong>Ответ:</strong> ${a.response}</p>` : ''}
+                </div>
+            `;
+        });
+    } catch (error) {
+        console.error('Ошибка загрузки заявок:', error);
+        list.innerHTML = '<p style="color: red; text-align: center;">Ошибка загрузки заявок</p>';
     }
-    
-    list.innerHTML = '';
-    applications.forEach(a => {
-        list.innerHTML += `
-            <div class="request-card">
-                <div class="request-header">
-                    <span>Анкета от ${a.author}</span>
-                    <span class="request-status status-${a.status}">${getStatus(a.status)}</span>
-                </div>
-                <div class="request-details">
-                    <p><strong>Ник:</strong> ${a.nickname}</p>
-                    <p><strong>Имя:</strong> ${a.name}</p>
-                    <p><strong>Возраст:</strong> ${a.age}</p>
-                    <p><strong>Часовой пояс:</strong> ${a.timezone}</p>
-                    <p><strong>Опыт:</strong> ${a.experience}</p>
-                    <p><strong>Мотивация:</strong> ${a.reason}</p>
-                    <p><small>${new Date(a.date).toLocaleString()}</small></p>
-                </div>
-                ${a.response ? `<p><strong>Ответ:</strong> ${a.response}</p>` : ''}
-            </div>
-        `;
-    });
 }
 
 function getStatus(status) {
