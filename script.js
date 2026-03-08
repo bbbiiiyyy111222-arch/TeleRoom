@@ -1,3 +1,7 @@
+// ==============================================
+// ОСНОВНОЙ СКРИПТ MOONGRIEF
+// ==============================================
+
 // Данные
 let users = [];
 let complaints = [];
@@ -10,17 +14,12 @@ const OWNERS = ['milfa', 'milk123', 'Xchik_'];
 // Загрузка
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Страница загружена');
-    console.log('Supabase доступен:', typeof supabaseClient !== 'undefined');
     
     try {
-        // Загружаем данные из базы
         await loadDataFromDB();
-        
         updateAuth();
         await loadLists();
         checkAdminLink();
-        
-        // Показываем правила по умолчанию
         showDefaultSection();
     } catch (error) {
         console.error('Ошибка при загрузке:', error);
@@ -43,15 +42,12 @@ function showDefaultSection() {
 
 // Показать секцию
 function showSection(sectionId, event) {
-    // Скрываем все секции
     document.querySelectorAll('.section').forEach(section => {
         section.classList.remove('active-section');
     });
     
-    // Показываем нужную секцию
     document.getElementById(sectionId).classList.add('active-section');
     
-    // Обновляем навигацию
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
     });
@@ -86,7 +82,10 @@ function copyIP() {
     alert('IP скопирован в буфер обмена!');
 }
 
-// Авторизация
+// ==============================================
+// АВТОРИЗАЦИЯ
+// ==============================================
+
 async function login() {
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
@@ -98,7 +97,6 @@ async function login() {
     
     try {
         users = await window.getUsers();
-        
         const user = users.find(u => u.username === username && u.password === password);
         
         if (user) {
@@ -146,13 +144,19 @@ function updateAuth() {
     }
 }
 
-// Регистрация
+// ==============================================
+// РЕГИСТРАЦИЯ
+// ==============================================
+
 function showRegister() {
     document.getElementById('registerModal').style.display = 'block';
 }
 
 function closeModal() {
     document.getElementById('registerModal').style.display = 'none';
+    document.getElementById('regUsername').value = '';
+    document.getElementById('regPassword').value = '';
+    document.getElementById('regConfirmPassword').value = '';
 }
 
 async function register(event) {
@@ -169,6 +173,11 @@ async function register(event) {
     
     if (password !== confirm) {
         alert('Пароли не совпадают!');
+        return;
+    }
+    
+    if (password.length < 3) {
+        alert('Пароль должен быть минимум 3 символа');
         return;
     }
     
@@ -214,6 +223,71 @@ async function register(event) {
     }
 }
 
+// ==============================================
+// СМЕНА ПАРОЛЯ (НОВАЯ ФУНКЦИЯ)
+// ==============================================
+
+function showChangePassword() {
+    if (!currentUser) {
+        alert('Сначала войдите в систему!');
+        return;
+    }
+    document.getElementById('changePasswordModal').style.display = 'block';
+}
+
+function closeChangePassword() {
+    document.getElementById('changePasswordModal').style.display = 'none';
+    document.getElementById('oldPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+}
+
+async function changePassword(event) {
+    event.preventDefault();
+    
+    const oldPass = document.getElementById('oldPassword').value;
+    const newPass = document.getElementById('newPassword').value;
+    const confirm = document.getElementById('confirmPassword').value;
+    
+    if (!currentUser) {
+        alert('❌ Ошибка авторизации');
+        return;
+    }
+    
+    if (!oldPass || !newPass || !confirm) {
+        alert('❌ Заполните все поля!');
+        return;
+    }
+    
+    if (newPass !== confirm) {
+        alert('❌ Новые пароли не совпадают!');
+        return;
+    }
+    
+    if (newPass.length < 3) {
+        alert('❌ Пароль должен быть минимум 3 символа');
+        return;
+    }
+    
+    try {
+        const result = await window.changePassword(currentUser.username, oldPass, newPass);
+        
+        if (result && result.success) {
+            // Обновляем текущего пользователя с новым паролем
+            currentUser.password = newPass;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            alert('✅ Пароль успешно изменен!');
+            closeChangePassword();
+        } else {
+            alert('❌ ' + (result?.message || 'Ошибка при смене пароля'));
+        }
+    } catch (error) {
+        console.error('Ошибка смены пароля:', error);
+        alert('❌ Ошибка при смене пароля');
+    }
+}
+
 // Проверка доступа к админке
 function checkAdminLink() {
     const link = document.getElementById('adminLink');
@@ -226,7 +300,10 @@ function checkAdminLink() {
     }
 }
 
-// Отправка жалобы
+// ==============================================
+// ОТПРАВКА ЖАЛОБ
+// ==============================================
+
 async function submitComplaint(event) {
     event.preventDefault();
     
@@ -250,19 +327,22 @@ async function submitComplaint(event) {
         const saved = await window.saveComplaint(complaint);
         
         if (saved) {
-            alert('Жалоба отправлена!');
+            alert('✅ Жалоба отправлена!');
             document.getElementById('complaintForm').reset();
             await loadLists();
         } else {
-            alert('Ошибка при отправке жалобы!');
+            alert('❌ Ошибка при отправке жалобы!');
         }
     } catch (error) {
         console.error('Ошибка:', error);
-        alert('Ошибка при отправке жалобы');
+        alert('❌ Ошибка при отправке жалобы');
     }
 }
 
-// Отправка анкеты
+// ==============================================
+// ОТПРАВКА АНКЕТ
+// ==============================================
+
 async function submitApplication(event) {
     event.preventDefault();
     
@@ -290,19 +370,22 @@ async function submitApplication(event) {
         const saved = await window.saveApplication(application);
         
         if (saved) {
-            alert('Анкета отправлена!');
+            alert('✅ Анкета отправлена!');
             document.getElementById('helperForm').reset();
             await loadLists();
         } else {
-            alert('Ошибка при отправке анкеты!');
+            alert('❌ Ошибка при отправке анкеты!');
         }
     } catch (error) {
         console.error('Ошибка:', error);
-        alert('Ошибка при отправке анкеты');
+        alert('❌ Ошибка при отправке анкеты');
     }
 }
 
-// Загрузка списков
+// ==============================================
+// ЗАГРУЗКА СПИСКОВ
+// ==============================================
+
 async function loadLists() {
     await loadComplaints();
     await loadApplications();
@@ -316,17 +399,24 @@ async function loadComplaints() {
         complaints = await window.getComplaints() || [];
         
         if (complaints.length === 0) {
-            list.innerHTML = '<p style="color: #666; text-align: center;">Пока нет жалоб</p>';
+            list.innerHTML = '<p style="color: #666; text-align: center;">📭 Пока нет жалоб</p>';
             return;
         }
         
         list.innerHTML = '';
         complaints.forEach(c => {
+            let statusText = {
+                'new': '🆕 Новая',
+                'accepted': '✅ Принята',
+                'rejected': '❌ Отклонена',
+                'resolved': '📝 Отвечено'
+            }[c.status] || '🆕 Новая';
+            
             list.innerHTML += `
                 <div class="request-card">
                     <div class="request-header">
                         <span>${c.title}</span>
-                        <span class="request-status status-${c.status}">${getStatus(c.status)}</span>
+                        <span class="request-status status-${c.status}">${statusText}</span>
                     </div>
                     <div class="request-details">
                         <p><strong>От:</strong> ${c.author}</p>
@@ -340,7 +430,7 @@ async function loadComplaints() {
         });
     } catch (error) {
         console.error('Ошибка загрузки жалоб:', error);
-        list.innerHTML = '<p style="color: red; text-align: center;">Ошибка загрузки жалоб</p>';
+        list.innerHTML = '<p style="color: red; text-align: center;">❌ Ошибка загрузки жалоб</p>';
     }
 }
 
@@ -352,17 +442,24 @@ async function loadApplications() {
         applications = await window.getApplications() || [];
         
         if (applications.length === 0) {
-            list.innerHTML = '<p style="color: #666; text-align: center;">Пока нет заявок</p>';
+            list.innerHTML = '<p style="color: #666; text-align: center;">📭 Пока нет заявок</p>';
             return;
         }
         
         list.innerHTML = '';
         applications.forEach(a => {
+            let statusText = {
+                'new': '🆕 Новая',
+                'accepted': '✅ Принята',
+                'rejected': '❌ Отклонена',
+                'resolved': '📝 Отвечено'
+            }[a.status] || '🆕 Новая';
+            
             list.innerHTML += `
                 <div class="request-card">
                     <div class="request-header">
                         <span>Анкета от ${a.author}</span>
-                        <span class="request-status status-${a.status}">${getStatus(a.status)}</span>
+                        <span class="request-status status-${a.status}">${statusText}</span>
                     </div>
                     <div class="request-details">
                         <p><strong>Ник:</strong> ${a.nickname}</p>
@@ -379,15 +476,16 @@ async function loadApplications() {
         });
     } catch (error) {
         console.error('Ошибка загрузки заявок:', error);
-        list.innerHTML = '<p style="color: red; text-align: center;">Ошибка загрузки заявок</p>';
+        list.innerHTML = '<p style="color: red; text-align: center;">❌ Ошибка загрузки заявок</p>';
     }
 }
 
 function getStatus(status) {
     const statuses = {
         'new': '🆕 Новая',
-        'pending': '⏳ В обработке',
-        'resolved': '✅ Решена'
+        'accepted': '✅ Принята',
+        'rejected': '❌ Отклонена',
+        'resolved': '📝 Отвечено'
     };
     return statuses[status] || '🆕 Новая';
 }
