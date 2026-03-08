@@ -9,7 +9,6 @@ const OWNERS = ['milfa', 'milk123', 'Xchik_'];
 // Проверка доступа
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Админ панель загружена');
-    console.log('Текущий пользователь:', currentUser);
     
     if (!currentUser || !OWNERS.includes(currentUser.username)) {
         alert('У вас нет доступа к админ панели!');
@@ -19,8 +18,39 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     document.getElementById('adminName').textContent = '👑 ' + currentUser.username + ' (OWNER)';
     
-    // Загружаем данные
     await loadAdminData();
+    startAdminAutoUpdate(); // Запускаем автообновление
+});
+
+// ========== АВТОМАТИЧЕСКОЕ ОБНОВЛЕНИЕ ==========
+let adminUpdateInterval;
+
+function startAdminAutoUpdate() {
+    if (adminUpdateInterval) clearInterval(adminUpdateInterval);
+    
+    adminUpdateInterval = setInterval(async () => {
+        console.log('🔄 Автообновление админки...');
+        await loadAdminData();
+    }, 2000); // Каждые 2 секунды
+}
+
+window.addEventListener('beforeunload', function() {
+    if (adminUpdateInterval) {
+        clearInterval(adminUpdateInterval);
+    }
+});
+
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+        if (adminUpdateInterval) {
+            clearInterval(adminUpdateInterval);
+            adminUpdateInterval = null;
+        }
+    } else {
+        if (!adminUpdateInterval) {
+            startAdminAutoUpdate();
+        }
+    }
 });
 
 // Выход
@@ -39,8 +69,8 @@ async function loadAdminData() {
 // Обновление статистики
 async function updateStats() {
     try {
-        complaints = await getComplaints() || [];
-        applications = await getApplications() || [];
+        complaints = await window.getComplaints() || [];
+        applications = await window.getApplications() || [];
         
         document.getElementById('newComplaints').textContent = complaints.filter(c => c.status === 'new').length;
         document.getElementById('newApplications').textContent = applications.filter(a => a.status === 'new').length;
@@ -56,8 +86,7 @@ async function loadAdminComplaints() {
     if (!list) return;
     
     try {
-        complaints = await getComplaints() || [];
-        console.log('Загружено жалоб:', complaints);
+        complaints = await window.getComplaints() || [];
         
         if (complaints.length === 0) {
             list.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">Нет жалоб</p>';
@@ -66,11 +95,33 @@ async function loadAdminComplaints() {
         
         list.innerHTML = '';
         complaints.forEach(c => {
+            // Определяем текст статуса
+            let statusText = '';
+            let statusClass = c.status || 'new';
+            
+            switch(c.status) {
+                case 'new':
+                    statusText = '🆕 Новая';
+                    break;
+                case 'accepted':
+                    statusText = '✅ Принята';
+                    break;
+                case 'rejected':
+                    statusText = '❌ Отклонена';
+                    break;
+                case 'resolved':
+                    statusText = '📝 Отвечено';
+                    break;
+                default:
+                    statusText = '🆕 Новая';
+                    statusClass = 'new';
+            }
+            
             list.innerHTML += `
-                <div class="request-card">
+                <div class="request-card" id="complaint-${c.id}">
                     <div class="request-header">
                         <span>${c.title || 'Без названия'}</span>
-                        <span class="request-status status-${c.status || 'new'}">${getStatus(c.status)}</span>
+                        <span class="request-status status-${statusClass}">${statusText}</span>
                     </div>
                     <div class="request-details">
                         <p><strong>ID:</strong> ${c.id || 'Нет'}</p>
@@ -101,8 +152,7 @@ async function loadAdminApplications() {
     if (!list) return;
     
     try {
-        applications = await getApplications() || [];
-        console.log('Загружено анкет:', applications);
+        applications = await window.getApplications() || [];
         
         if (applications.length === 0) {
             list.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">Нет анкет</p>';
@@ -111,11 +161,33 @@ async function loadAdminApplications() {
         
         list.innerHTML = '';
         applications.forEach(a => {
+            // Определяем текст статуса
+            let statusText = '';
+            let statusClass = a.status || 'new';
+            
+            switch(a.status) {
+                case 'new':
+                    statusText = '🆕 Новая';
+                    break;
+                case 'accepted':
+                    statusText = '✅ Принята';
+                    break;
+                case 'rejected':
+                    statusText = '❌ Отклонена';
+                    break;
+                case 'resolved':
+                    statusText = '📝 Отвечено';
+                    break;
+                default:
+                    statusText = '🆕 Новая';
+                    statusClass = 'new';
+            }
+            
             list.innerHTML += `
-                <div class="request-card">
+                <div class="request-card" id="application-${a.id}">
                     <div class="request-header">
                         <span>Анкета от ${a.author || 'Неизвестно'}</span>
-                        <span class="request-status status-${a.status || 'new'}">${getStatus(a.status)}</span>
+                        <span class="request-status status-${statusClass}">${statusText}</span>
                     </div>
                     <div class="request-details">
                         <p><strong>ID:</strong> ${a.id || 'Нет'}</p>
@@ -147,10 +219,13 @@ async function loadAdminApplications() {
 // Функции для жалоб
 async function acceptComplaint(id) {
     try {
-        const updated = await updateComplaint(id, { status: 'resolved' });
+        console.log('Принимаем жалобу:', id);
+        const updated = await window.updateComplaint(id, { status: 'accepted' });
         if (updated) {
             await loadAdminData();
             alert('Жалоба принята!');
+        } else {
+            alert('Ошибка при принятии жалобы');
         }
     } catch (error) {
         console.error('Ошибка:', error);
@@ -160,10 +235,13 @@ async function acceptComplaint(id) {
 
 async function rejectComplaint(id) {
     try {
-        const updated = await updateComplaint(id, { status: 'pending' });
+        console.log('Отклоняем жалобу:', id);
+        const updated = await window.updateComplaint(id, { status: 'rejected' });
         if (updated) {
             await loadAdminData();
             alert('Жалоба отклонена!');
+        } else {
+            alert('Ошибка при отклонении жалобы');
         }
     } catch (error) {
         console.error('Ошибка:', error);
@@ -172,12 +250,15 @@ async function rejectComplaint(id) {
 }
 
 async function deleteComplaint(id) {
-    if (confirm('Удалить жалобу?')) {
+    if (confirm('Вы уверены, что хотите удалить эту жалобу?')) {
         try {
-            const deleted = await deleteComplaint(id);
+            console.log('Удаляем жалобу:', id);
+            const deleted = await window.deleteComplaint(id);
             if (deleted) {
                 await loadAdminData();
                 alert('Жалоба удалена!');
+            } else {
+                alert('Ошибка при удалении жалобы');
             }
         } catch (error) {
             console.error('Ошибка:', error);
@@ -189,10 +270,13 @@ async function deleteComplaint(id) {
 // Функции для анкет
 async function acceptApplication(id) {
     try {
-        const updated = await updateApplication(id, { status: 'resolved' });
+        console.log('Принимаем анкету:', id);
+        const updated = await window.updateApplication(id, { status: 'accepted' });
         if (updated) {
             await loadAdminData();
             alert('Анкета принята!');
+        } else {
+            alert('Ошибка при принятии анкеты');
         }
     } catch (error) {
         console.error('Ошибка:', error);
@@ -202,10 +286,13 @@ async function acceptApplication(id) {
 
 async function rejectApplication(id) {
     try {
-        const updated = await updateApplication(id, { status: 'pending' });
+        console.log('Отклоняем анкету:', id);
+        const updated = await window.updateApplication(id, { status: 'rejected' });
         if (updated) {
             await loadAdminData();
             alert('Анкета отклонена!');
+        } else {
+            alert('Ошибка при отклонении анкеты');
         }
     } catch (error) {
         console.error('Ошибка:', error);
@@ -214,12 +301,15 @@ async function rejectApplication(id) {
 }
 
 async function deleteApplication(id) {
-    if (confirm('Удалить анкету?')) {
+    if (confirm('Вы уверены, что хотите удалить эту анкету?')) {
         try {
-            const deleted = await deleteApplication(id);
+            console.log('Удаляем анкету:', id);
+            const deleted = await window.deleteApplication(id);
             if (deleted) {
                 await loadAdminData();
                 alert('Анкета удалена!');
+            } else {
+                alert('Ошибка при удалении анкеты');
             }
         } catch (error) {
             console.error('Ошибка:', error);
@@ -258,12 +348,12 @@ async function sendResponse(event) {
         let updated = false;
         
         if (type === 'complaint') {
-            updated = await updateComplaint(id, { 
+            updated = await window.updateComplaint(id, { 
                 response: response,
                 status: 'resolved' 
             });
         } else {
-            updated = await updateApplication(id, { 
+            updated = await window.updateApplication(id, { 
                 response: response,
                 status: 'resolved' 
             });
@@ -294,8 +384,9 @@ function showAdminTab(tabName) {
 function getStatus(status) {
     const statuses = {
         'new': '🆕 Новая',
-        'pending': '⏳ В обработке',
-        'resolved': '✅ Решена'
+        'accepted': '✅ Принята',
+        'rejected': '❌ Отклонена',
+        'resolved': '📝 Отвечено'
     };
     return statuses[status] || '🆕 Новая';
 }
