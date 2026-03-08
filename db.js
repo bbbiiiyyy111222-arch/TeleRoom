@@ -144,6 +144,8 @@ window.updateComplaint = async function(id, updates) {
 
 window.deleteComplaint = async function(id) {
     try {
+        console.log('Удаляем жалобу с ID:', id);
+        
         const { data, error } = await supabaseClient
             .from('complaints')
             .delete()
@@ -153,9 +155,10 @@ window.deleteComplaint = async function(id) {
             console.error('Ошибка удаления жалобы:', error);
             return false;
         }
+        console.log('Жалоба удалена:', data);
         return true;
     } catch (e) {
-        console.error('Исключение:', e);
+        console.error('Исключение при удалении:', e);
         return false;
     }
 }
@@ -219,6 +222,8 @@ window.updateApplication = async function(id, updates) {
 
 window.deleteApplication = async function(id) {
     try {
+        console.log('Удаляем заявку с ID:', id);
+        
         const { data, error } = await supabaseClient
             .from('applications')
             .delete()
@@ -228,9 +233,10 @@ window.deleteApplication = async function(id) {
             console.error('Ошибка удаления заявки:', error);
             return false;
         }
+        console.log('Заявка удалена:', data);
         return true;
     } catch (e) {
-        console.error('Исключение:', e);
+        console.error('Исключение при удалении:', e);
         return false;
     }
 }
