@@ -302,7 +302,7 @@
             <!-- Жалобы (скрыто по умолчанию) -->
             <section id="complaints" class="section">
                 <h2 class="section-title">⚠️ ПОДАТЬ ЖАЛОБУ</h2>
-                <form id="complaintForm">
+                <form id="complaintForm" onsubmit="submitComplaint(event)">
                     <input type="text" id="complaintTitle" placeholder="Заголовок жалобы" required class="input">
                     <input type="text" id="complaintAgainst" placeholder="На кого жалоба (ник)" required class="input">
                     <textarea id="complaintDesc" placeholder="Описание ситуации, доказательства" required class="textarea" rows="4"></textarea>
@@ -316,7 +316,7 @@
             <!-- Заявки на хелпера (скрыто по умолчанию) -->
             <section id="applications" class="section">
                 <h2 class="section-title">👮 АНКЕТА НА ХЕЛПЕРА</h2>
-                <form id="helperForm">
+                <form id="helperForm" onsubmit="submitApplication(event)">
                     <div class="form-group">
                         <label>Игровой никнейм:</label>
                         <input type="text" id="helperNickname" placeholder="Ваш ник в Minecraft" required class="input">
