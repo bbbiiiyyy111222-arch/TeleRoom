@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById('adminName').textContent = '👑 ' + currentUser.username + ' (OWNER)';
     
     await loadAdminData();
-    startAdminAutoUpdate(); // Запускаем автообновление
+    startAdminAutoUpdate();
 });
 
 // ========== АВТОМАТИЧЕСКОЕ ОБНОВЛЕНИЕ ==========
@@ -31,7 +31,7 @@ function startAdminAutoUpdate() {
     adminUpdateInterval = setInterval(async () => {
         console.log('🔄 Автообновление админки...');
         await loadAdminData();
-    }, 2000); // Каждые 2 секунды
+    }, 2000);
 }
 
 window.addEventListener('beforeunload', function() {
@@ -95,7 +95,6 @@ async function loadAdminComplaints() {
         
         list.innerHTML = '';
         complaints.forEach(c => {
-            // Определяем текст статуса
             let statusText = '';
             let statusClass = c.status || 'new';
             
@@ -161,7 +160,6 @@ async function loadAdminApplications() {
         
         list.innerHTML = '';
         applications.forEach(a => {
-            // Определяем текст статуса
             let statusText = '';
             let statusClass = a.status || 'new';
             
@@ -220,7 +218,8 @@ async function loadAdminApplications() {
 async function acceptComplaint(id) {
     try {
         console.log('Принимаем жалобу:', id);
-        const updated = await window.updateComplaint(id, { status: 'accepted' });
+        const numericId = typeof id === 'string' ? parseInt(id) : id;
+        const updated = await window.updateComplaint(numericId, { status: 'accepted' });
         if (updated) {
             await loadAdminData();
             alert('Жалоба принята!');
@@ -236,7 +235,8 @@ async function acceptComplaint(id) {
 async function rejectComplaint(id) {
     try {
         console.log('Отклоняем жалобу:', id);
-        const updated = await window.updateComplaint(id, { status: 'rejected' });
+        const numericId = typeof id === 'string' ? parseInt(id) : id;
+        const updated = await window.updateComplaint(numericId, { status: 'rejected' });
         if (updated) {
             await loadAdminData();
             alert('Жалоба отклонена!');
@@ -252,8 +252,12 @@ async function rejectComplaint(id) {
 async function deleteComplaint(id) {
     if (confirm('Вы уверены, что хотите удалить эту жалобу?')) {
         try {
-            console.log('Удаляем жалобу:', id);
-            const deleted = await window.deleteComplaint(id);
+            console.log('Удаляем жалобу с ID:', id, 'тип:', typeof id);
+            
+            const numericId = typeof id === 'string' ? parseInt(id) : id;
+            console.log('Преобразованный ID:', numericId);
+            
+            const deleted = await window.deleteComplaint(numericId);
             if (deleted) {
                 await loadAdminData();
                 alert('Жалоба удалена!');
@@ -271,7 +275,8 @@ async function deleteComplaint(id) {
 async function acceptApplication(id) {
     try {
         console.log('Принимаем анкету:', id);
-        const updated = await window.updateApplication(id, { status: 'accepted' });
+        const numericId = typeof id === 'string' ? parseInt(id) : id;
+        const updated = await window.updateApplication(numericId, { status: 'accepted' });
         if (updated) {
             await loadAdminData();
             alert('Анкета принята!');
@@ -287,7 +292,8 @@ async function acceptApplication(id) {
 async function rejectApplication(id) {
     try {
         console.log('Отклоняем анкету:', id);
-        const updated = await window.updateApplication(id, { status: 'rejected' });
+        const numericId = typeof id === 'string' ? parseInt(id) : id;
+        const updated = await window.updateApplication(numericId, { status: 'rejected' });
         if (updated) {
             await loadAdminData();
             alert('Анкета отклонена!');
@@ -303,8 +309,12 @@ async function rejectApplication(id) {
 async function deleteApplication(id) {
     if (confirm('Вы уверены, что хотите удалить эту анкету?')) {
         try {
-            console.log('Удаляем анкету:', id);
-            const deleted = await window.deleteApplication(id);
+            console.log('Удаляем анкету с ID:', id, 'тип:', typeof id);
+            
+            const numericId = typeof id === 'string' ? parseInt(id) : id;
+            console.log('Преобразованный ID:', numericId);
+            
+            const deleted = await window.deleteApplication(numericId);
             if (deleted) {
                 await loadAdminData();
                 alert('Анкета удалена!');
