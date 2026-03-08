@@ -40,10 +40,9 @@
     <!-- Навигация -->
     <nav class="nav">
         <div class="container">
-            <a href="index.html" class="nav-link active">Главная</a>
-            <a href="#rules" class="nav-link">Правила</a>
-            <a href="#complaints" class="nav-link">Жалобы</a>
-            <a href="#applications" class="nav-link">Заявки на хелпера</a>
+            <a href="#rules" class="nav-link active" onclick="showSection('rules')">Правила</a>
+            <a href="#complaints" class="nav-link" onclick="showSection('complaints')">Жалобы</a>
+            <a href="#applications" class="nav-link" onclick="showSection('applications')">Заявки на хелпера</a>
             <a href="admin.html" id="adminLink" class="nav-link" style="display: none;">Админ панель</a>
         </div>
     </nav>
@@ -51,8 +50,8 @@
     <!-- Основной контент -->
     <main class="main">
         <div class="container">
-            <!-- Правила -->
-            <section id="rules" class="section">
+            <!-- Правила (видно по умолчанию) -->
+            <section id="rules" class="section active-section">
                 <h2 class="section-title">📜 ПРАВИЛА СЕРВЕРА MOONGRIEF</h2>
                 
                 <!-- 1. Общие положения -->
@@ -300,7 +299,7 @@
                 </div>
             </section>
 
-            <!-- Жалобы -->
+            <!-- Жалобы (скрыто по умолчанию) -->
             <section id="complaints" class="section">
                 <h2 class="section-title">⚠️ ПОДАТЬ ЖАЛОБУ</h2>
                 <form id="complaintForm">
@@ -309,9 +308,12 @@
                     <textarea id="complaintDesc" placeholder="Описание ситуации, доказательства" required class="textarea" rows="4"></textarea>
                     <button type="submit" class="btn">Отправить жалобу</button>
                 </form>
+
+                <h3 style="margin-top: 30px; color: #ff6b6b;">Список жалоб</h3>
+                <div id="complaintsList"></div>
             </section>
 
-            <!-- Анкета на хелпера -->
+            <!-- Заявки на хелпера (скрыто по умолчанию) -->
             <section id="applications" class="section">
                 <h2 class="section-title">👮 АНКЕТА НА ХЕЛПЕРА</h2>
                 <form id="helperForm">
@@ -363,19 +365,9 @@
                     
                     <button type="submit" class="btn">Отправить анкету</button>
                 </form>
-            </section>
 
-            <!-- Список обращений -->
-            <section class="section">
-                <h2 class="section-title">📋 ПОСЛЕДНИЕ ОБРАЩЕНИЯ</h2>
-                
-                <div class="tabs">
-                    <button class="tab-btn active" onclick="showTab('complaintsList')">Жалобы</button>
-                    <button class="tab-btn" onclick="showTab('applicationsList')">Анкеты</button>
-                </div>
-                
-                <div id="complaintsList" class="tab-content active"></div>
-                <div id="applicationsList" class="tab-content"></div>
+                <h3 style="margin-top: 30px; color: #ff6b6b;">Список заявок</h3>
+                <div id="applicationsList"></div>
             </section>
         </div>
     </main>
@@ -385,7 +377,7 @@
         <div class="modal-content">
             <span class="close" onclick="closeModal()">×</span>
             <h2>Регистрация</h2>
-            <form id="registerForm">
+            <form id="registerForm" onsubmit="register(event)">
                 <input type="text" id="regUsername" placeholder="Никнейм" required class="input">
                 <input type="password" id="regPassword" placeholder="Пароль" required class="input">
                 <input type="password" id="regConfirmPassword" placeholder="Повторите пароль" required class="input">
