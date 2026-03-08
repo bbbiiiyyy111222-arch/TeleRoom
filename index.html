@@ -23,23 +23,27 @@
                 <!-- АВТОРИЗАЦИЯ -->
                 <div class="auth" id="auth">
                     <div id="userInfo" style="display: none;">
-                        <span id="currentUser" class="moon-glow"></span>
-                        <div class="auth-buttons">
-                            <button onclick="showChangePassword()" class="btn-moon">
-                                <span>🔑</span>
-                                <span>СМЕНИТЬ ПАРОЛЬ</span>
-                            </button>
-                            <button onclick="logout()" class="btn-moon logout-btn">
-                                <span>🌙</span>
-                                <span>ВЫЙТИ</span>
-                            </button>
-                        </div>
+                        <span id="currentUser" class="user-glow"></span>
+                        <button onclick="showChangePassword()" class="auth-btn password-btn">
+                            <span class="btn-icon">🔑</span>
+                            <span class="btn-text">СМЕНИТЬ ПАРОЛЬ</span>
+                        </button>
+                        <button onclick="logout()" class="auth-btn logout-btn">
+                            <span class="btn-icon">🌙</span>
+                            <span class="btn-text">ВЫЙТИ</span>
+                        </button>
                     </div>
                     <div id="loginForm" class="login-form">
-                        <input type="text" id="username" placeholder="НИК" class="moon-input">
-                        <input type="password" id="password" placeholder="ПАРОЛЬ" class="moon-input">
-                        <button onclick="login()" class="btn-moon">🔐 ВОЙТИ</button>
-                        <button onclick="showRegister()" class="btn-moon">📝 РЕГИСТРАЦИЯ</button>
+                        <input type="text" id="username" placeholder="НИК" class="auth-input">
+                        <input type="password" id="password" placeholder="ПАРОЛЬ" class="auth-input">
+                        <button onclick="login()" class="auth-btn login-btn">
+                            <span class="btn-icon">🔐</span>
+                            <span class="btn-text">ВОЙТИ</span>
+                        </button>
+                        <button onclick="showRegister()" class="auth-btn register-btn">
+                            <span class="btn-icon">📝</span>
+                            <span class="btn-text">РЕГИСТРАЦИЯ</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -56,34 +60,37 @@
         </div>
     </nav>
 
-    <!-- ИНФО ПАНЕЛЬ -->
-    <div class="moon-bar">
+    <!-- ИНФОРМАЦИОННАЯ ПАНЕЛЬ -->
+    <div class="info-panel">
         <div class="container">
-            <div class="moon-content">
-                <div class="moon-item">
-                    <span class="moon-icon">👑</span>
-                    <div class="moon-text">
-                        <span class="moon-label">КУРАТОР</span>
-                        <a href="https://t.me/milo4ika1" target="_blank" class="moon-link">@milo4ika1</a>
-                        <span class="moon-badge">TELEGRAM</span>
+            <div class="panel-content">
+                <!-- КУРАТОР -->
+                <div class="panel-item">
+                    <span class="panel-icon">👑</span>
+                    <div class="panel-text">
+                        <span class="panel-label">НАШ КУРАТОР</span>
+                        <a href="https://t.me/milo4ika1" target="_blank" class="panel-link">@milo4ika1</a>
+                        <span class="panel-badge telegram">TELEGRAM</span>
                     </div>
                 </div>
                 
-                <div class="moon-item">
-                    <span class="moon-icon">⏳</span>
-                    <div class="moon-text">
-                        <span class="moon-label">СРОК</span>
-                        <span class="moon-value">24 ЧАСА</span>
-                        <span class="moon-badge">ЗАЯВКИ/ЖАЛОБЫ</span>
+                <!-- СРОКИ РАССМОТРЕНИЯ -->
+                <div class="panel-item">
+                    <span class="panel-icon">⏳</span>
+                    <div class="panel-text">
+                        <span class="panel-label">СРОК РАССМОТРЕНИЯ</span>
+                        <span class="panel-value">24 ЧАСА</span>
+                        <span class="panel-badge">ЗАЯВКИ И ЖАЛОБЫ</span>
                     </div>
                 </div>
 
-                <div class="moon-item bug-moon">
-                    <span class="moon-icon">🌙</span>
-                    <div class="moon-text">
-                        <span class="moon-label">НАШЛИ БАГ?</span>
-                        <a href="https://t.me/milo4ika1" target="_blank" class="moon-link">@milo4ika1</a>
-                        <span class="moon-badge">СОЗДАТЕЛЮ</span>
+                <!-- БЛОК ПРО БАГИ -->
+                <div class="panel-item bug-item">
+                    <span class="panel-icon">🐛</span>
+                    <div class="panel-text">
+                        <span class="panel-label">НАШЛИ БАГ?</span>
+                        <a href="https://t.me/milo4ika1" target="_blank" class="panel-link">@milo4ika1</a>
+                        <span class="panel-badge">НАПИШИТЕ СОЗДАТЕЛЮ ФОРУМА</span>
                     </div>
                 </div>
             </div>
@@ -94,36 +101,36 @@
     <main class="main">
         <div class="container">
             <!-- ПРАВИЛА -->
-            <section id="rules" class="moon-section active-section">
-                <h2 class="moon-title">🌙 ПРАВИЛА СЕРВЕРА MOONGRIEF</h2>
+            <section id="rules" class="section active-section">
+                <h2 class="section-title">🌙 ПРАВИЛА СЕРВЕРА MOONGRIEF</h2>
                 
                 <!-- 1. Общие положения -->
-                <div class="moon-rule-block">
+                <div class="rule-block">
                     <h3>🌙 1. ОБЩИЕ ПОЛОЖЕНИЯ</h3>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">1.1</span>
+                    <div class="rule-item">
+                        <span class="rule-num">1.1</span>
                         <p>Настоящие правила разработаны администратором сервера MoonGrief и действуют на всех существующих игровых режимах.</p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">1.2</span>
+                    <div class="rule-item">
+                        <span class="rule-num">1.2</span>
                         <p>Официальные сервера расположены по адресам: Moongrief.aurorix.pro. Другие домены не относятся к проекту.</p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">1.3</span>
+                    <div class="rule-item">
+                        <span class="rule-num">1.3</span>
                         <p>Решения администрации являются окончательными и не подлежат обсуждению.</p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">1.4</span>
+                    <div class="rule-item">
+                        <span class="rule-num">1.4</span>
                         <p>Администрация не компенсирует потерю ресурсов, вызванную техническими сбоями.</p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">1.5</span>
-                        <div class="moon-rule-content">
+                    <div class="rule-item">
+                        <span class="rule-num">1.5</span>
+                        <div class="rule-content">
                             <p><strong>ЗАПРЕЩЁННЫЕ ДЕЙСТВИЯ:</strong></p>
                             <ul>
                                 <li>▸ Продажа, взлом аккаунтов</li>
@@ -131,270 +138,262 @@
                                 <li>▸ Намеренный вред серверу</li>
                                 <li>▸ Продажа игровых предметов за деньги</li>
                             </ul>
-                            <p><span class="moon-punish">НАКАЗАНИЕ: БАН ПО IP + БАН АККАУНТА</span></p>
+                            <p><span class="punish">НАКАЗАНИЕ: БАН ПО IP + БАН АККАУНТА</span></p>
                         </div>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">1.6</span>
-                        <p>Уважение к администрации обязательно. <span class="moon-mini-punish">БАН</span></p>
+                    <div class="rule-item">
+                        <span class="rule-num">1.6</span>
+                        <p>Уважение к администрации обязательно. <span class="mini-punish">БАН</span></p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">1.7</span>
+                    <div class="rule-item">
+                        <span class="rule-num">1.7</span>
                         <p>Администрация может менять правила без предупреждения.</p>
                     </div>
                 </div>
 
                 <!-- 2. Аккаунт -->
-                <div class="moon-rule-block">
+                <div class="rule-block">
                     <h3>🌙 2. АККАУНТ</h3>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">2.1</span>
-                        <p>Запрещены ники, похожие на администрацию. <span class="moon-mini-punish">БАН НАВСЕГДА</span></p>
+                    <div class="rule-item">
+                        <span class="rule-num">2.1</span>
+                        <p>Запрещены ники, похожие на администрацию. <span class="mini-punish">БАН НАВСЕГДА</span></p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">2.2</span>
-                        <p>Запрещены оскорбительные ники. <span class="moon-mini-punish">БАН НАВСЕГДА</span></p>
+                    <div class="rule-item">
+                        <span class="rule-num">2.2</span>
+                        <p>Запрещены оскорбительные ники. <span class="mini-punish">БАН НАВСЕГДА</span></p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">2.3</span>
-                        <p>Запрещены ники с названиями читов. <span class="moon-mini-punish">БАН НАВСЕГДА</span></p>
+                    <div class="rule-item">
+                        <span class="rule-num">2.3</span>
+                        <p>Запрещены ники с названиями читов. <span class="mini-punish">БАН НАВСЕГДА</span></p>
                     </div>
                 </div>
 
                 <!-- 3. Донат -->
-                <div class="moon-rule-block">
+                <div class="rule-block">
                     <h3>🌙 3. ДОНАТ</h3>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">3.1</span>
+                    <div class="rule-item">
+                        <span class="rule-num">3.1</span>
                         <p>Участие в проекте является бесплатным.</p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">3.2</span>
+                    <div class="rule-item">
+                        <span class="rule-num">3.2</span>
                         <p>Пожертвования добровольны.</p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">3.3</span>
+                    <div class="rule-item">
+                        <span class="rule-num">3.3</span>
                         <p>Платные группы не дают право нарушать правила.</p>
                     </div>
                 </div>
 
                 <!-- 4. Чат -->
-                <div class="moon-rule-block">
+                <div class="rule-block">
                     <h3>🌙 4. ЧАТ</h3>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">4.1</span>
-                        <p>Флуд запрещен. <span class="moon-mini-punish">МУТ 2 ЧАСА</span></p>
+                    <div class="rule-item">
+                        <span class="rule-num">4.1</span>
+                        <p>Флуд запрещен. <span class="mini-punish">МУТ 2 ЧАСА</span></p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">4.2</span>
-                        <p>Обход мута через /bc. <span class="moon-mini-punish">БАН 1 ДЕНЬ</span></p>
+                    <div class="rule-item">
+                        <span class="rule-num">4.2</span>
+                        <p>Обход мута через /bc. <span class="mini-punish">БАН 1 ДЕНЬ</span></p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">4.3</span>
-                        <p>CAPS (>50%). <span class="moon-mini-punish">МУТ 2 ЧАСА</span></p>
+                    <div class="rule-item">
+                        <span class="rule-num">4.3</span>
+                        <p>CAPS (>50%). <span class="mini-punish">МУТ 2 ЧАСА</span></p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">4.4</span>
-                        <p>Оскорбления игроков. <span class="moon-mini-punish">МУТ 2 ЧАСА</span></p>
+                    <div class="rule-item">
+                        <span class="rule-num">4.4</span>
+                        <p>Оскорбления игроков. <span class="mini-punish">МУТ 2 ЧАСА</span></p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">4.5</span>
-                        <p>Призыв к суициду. <span class="moon-mini-punish">БАН 1 ДЕНЬ</span></p>
+                    <div class="rule-item">
+                        <span class="rule-num">4.5</span>
+                        <p>Призыв к суициду. <span class="mini-punish">БАН 1 ДЕНЬ</span></p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">4.6</span>
-                        <p>Попрошайничество у админов (кроме Xchik_). <span class="moon-mini-punish">МУТ 2 ЧАСА</span></p>
+                    <div class="rule-item">
+                        <span class="rule-num">4.6</span>
+                        <p>Попрошайничество у админов (кроме Xchik_). <span class="mini-punish">МУТ 2 ЧАСА</span></p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">4.7</span>
-                        <p>Реклама сторонних ресурсов. <span class="moon-mini-punish">БАН 14 ДНЕЙ</span></p>
+                    <div class="rule-item">
+                        <span class="rule-num">4.7</span>
+                        <p>Реклама сторонних ресурсов. <span class="mini-punish">БАН 14 ДНЕЙ</span></p>
                     </div>
                 </div>
 
                 <!-- 5. Запрещенный софт -->
-                <div class="moon-rule-block">
+                <div class="rule-block">
                     <h3>🌙 5. ЗАПРЕЩЕННЫЙ СОФТ</h3>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">5.1</span>
-                        <p>Использование читов. <span class="moon-mini-punish">БАН 50 ДНЕЙ</span></p>
+                    <div class="rule-item">
+                        <span class="rule-num">5.1</span>
+                        <p>Использование читов. <span class="mini-punish">БАН 50 ДНЕЙ</span></p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">5.2</span>
-                        <p>Признание в читах при проверке. <span class="moon-mini-punish">БАН 40 ДНЕЙ</span></p>
+                    <div class="rule-item">
+                        <span class="rule-num">5.2</span>
+                        <p>Признание в читах при проверке. <span class="mini-punish">БАН 40 ДНЕЙ</span></p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">5.3</span>
-                        <p>Игра с читерами. <span class="moon-mini-punish">БАН 14 ДНЕЙ</span></p>
+                    <div class="rule-item">
+                        <span class="rule-num">5.3</span>
+                        <p>Игра с читерами. <span class="mini-punish">БАН 14 ДНЕЙ</span></p>
                     </div>
                 </div>
 
                 <!-- 6. Игровой процесс -->
-                <div class="moon-rule-block">
+                <div class="rule-block">
                     <h3>🌙 6. ИГРОВОЙ ПРОЦЕСС</h3>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">6.1</span>
-                        <p>Лаг-машины. <span class="moon-mini-punish">БАН 7 ДНЕЙ</span></p>
+                    <div class="rule-item">
+                        <span class="rule-num">6.1</span>
+                        <p>Лаг-машины. <span class="mini-punish">БАН 7 ДНЕЙ</span></p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">6.2</span>
-                        <p>Варп до ловушки <10 блоков. <span class="moon-mini-punish">БАН 1 ДЕНЬ + СНОС</span></p>
+                    <div class="rule-item">
+                        <span class="rule-num">6.2</span>
+                        <p>Варп до ловушки <10 блоков. <span class="mini-punish">БАН 1 ДЕНЬ + СНОС</span></p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">6.3</span>
-                        <p>Использование /spec в шуточных целях. <span class="moon-mini-punish">БАН 1 ЧАС</span></p>
+                    <div class="rule-item">
+                        <span class="rule-num">6.3</span>
+                        <p>Использование /spec в шуточных целях. <span class="mini-punish">БАН 1 ЧАС</span></p>
                     </div>
                     
-                    <div class="moon-rule-item">
-                        <span class="moon-num">6.4</span>
+                    <div class="rule-item">
+                        <span class="rule-num">6.4</span>
                         <p>Блокировка по IP не обжалуется. Связь: @waixzelz</p>
                     </div>
                 </div>
             </section>
 
             <!-- ЖАЛОБЫ -->
-            <section id="complaints" class="moon-section">
-                <h2 class="moon-title">🌙 ПОДАТЬ ЖАЛОБУ</h2>
+            <section id="complaints" class="section">
+                <h2 class="section-title">🌙 ПОДАТЬ ЖАЛОБУ</h2>
                 
-                <div class="moon-info">
-                    <span>⏳ СРОК РАССМОТРЕНИЯ: 24 ЧАСА</span>
-                    <span>📞 ВОПРОСЫ: @milo4ika1</span>
+                <div class="info-message">
+                    <span class="info-icon">⏳</span>
+                    <div class="info-text">
+                        <strong>СРОК РАССМОТРЕНИЯ ЖАЛОБ: 24 ЧАСА</strong>
+                        <span>СРОК ОТВЕТА: 24 ЧАСА</span>
+                    </div>
                 </div>
                 
-                <!-- ФОРМА ЖАЛОБЫ -->
-                <div class="moon-form-container">
-                    <h3 class="moon-form-title">📝 НОВАЯ ЖАЛОБА</h3>
-                    <form id="complaintForm" onsubmit="submitComplaint(event)" class="moon-form">
-                        <input type="text" id="complaintTitle" placeholder="ЗАГОЛОВОК ЖАЛОБЫ" required class="moon-input">
-                        <input type="text" id="complaintAgainst" placeholder="НА КОГО ЖАЛОБА (НИК)" required class="moon-input">
-                        <textarea id="complaintDesc" placeholder="ОПИСАНИЕ СИТУАЦИИ, ДОКАЗАТЕЛЬСТВА" required class="moon-textarea" rows="4"></textarea>
-                        <button type="submit" class="moon-submit-btn">🌙 ОТПРАВИТЬ ЖАЛОБУ</button>
-                    </form>
-                </div>
+                <form id="complaintForm" onsubmit="submitComplaint(event)" class="form">
+                    <input type="text" id="complaintTitle" placeholder="ЗАГОЛОВОК ЖАЛОБЫ" required class="input">
+                    <input type="text" id="complaintAgainst" placeholder="НА КОГО ЖАЛОБА (НИК)" required class="input">
+                    <textarea id="complaintDesc" placeholder="ОПИСАНИЕ СИТУАЦИИ, ДОКАЗАТЕЛЬСТВА" required class="textarea" rows="4"></textarea>
+                    <button type="submit" class="submit-btn">🌙 ОТПРАВИТЬ ЖАЛОБУ</button>
+                </form>
 
-                <!-- СПИСОК ЖАЛОБ -->
-                <div class="moon-list-container">
-                    <h3 class="moon-list-title">📋 ПОСЛЕДНИЕ ЖАЛОБЫ</h3>
-                    <div id="complaintsList" class="moon-list"></div>
-                </div>
+                <h3 class="list-title">📋 ПОСЛЕДНИЕ ЖАЛОБЫ</h3>
+                <div id="complaintsList" class="list"></div>
             </section>
 
             <!-- ЗАЯВКИ НА ХЕЛПЕРА -->
-            <section id="applications" class="moon-section">
-                <h2 class="moon-title">🌙 АНКЕТА НА ХЕЛПЕРА</h2>
+            <section id="applications" class="section">
+                <h2 class="section-title">🌙 АНКЕТА НА ХЕЛПЕРА</h2>
                 
-                <div class="moon-info">
-                    <span>⏳ СРОК РАССМОТРЕНИЯ: 24 ЧАСА</span>
-                    <span>📞 ВОПРОСЫ: @milo4ika1</span>
+                <div class="info-message">
+                    <span class="info-icon">⏳</span>
+                    <div class="info-text">
+                        <strong>СРОК РАССМОТРЕНИЯ ЗАЯВОК: 24 ЧАСА</strong>
+                        <span>СРОК ОТВЕТА: 24 ЧАСА</span>
+                    </div>
                 </div>
                 
-                <!-- ФОРМА ЗАЯВКИ -->
-                <div class="moon-form-container">
-                    <h3 class="moon-form-title">👮 НОВАЯ АНКЕТА</h3>
-                    <form id="helperForm" onsubmit="submitApplication(event)" class="moon-form">
-                        <div class="moon-form-group">
-                            <label>ИГРОВОЙ НИКНЕЙМ</label>
-                            <input type="text" id="helperNickname" placeholder="ВАШ НИК" required class="moon-input">
+                <form id="helperForm" onsubmit="submitApplication(event)" class="form">
+                    <div class="form-group">
+                        <label>ИГРОВОЙ НИКНЕЙМ</label>
+                        <input type="text" id="helperNickname" placeholder="ВАШ НИК В MINECRAFT" required class="input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>ИМЯ</label>
+                        <input type="text" id="helperName" placeholder="ВАШЕ НАСТОЯЩЕЕ ИМЯ" required class="input">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>СКОЛЬКО ЛЕТ</label>
+                            <input type="number" id="helperAge" placeholder="ВАШ ВОЗРАСТ" required class="input">
                         </div>
                         
-                        <div class="moon-form-group">
-                            <label>ИМЯ</label>
-                            <input type="text" id="helperName" placeholder="ВАШЕ ИМЯ" required class="moon-input">
+                        <div class="form-group half">
+                            <label>ЧАСОВОЙ ПОЯС</label>
+                            <select id="helperTimezone" required class="select">
+                                <option value="">ВЫБЕРИТЕ</option>
+                                <option value="UTC+2">UTC+2 (КИЕВ)</option>
+                                <option value="UTC+3">UTC+3 (МОСКВА)</option>
+                                <option value="UTC+4">UTC+4</option>
+                                <option value="UTC+5">UTC+5</option>
+                                <option value="UTC+6">UTC+6</option>
+                                <option value="UTC+7">UTC+7</option>
+                                <option value="UTC+8">UTC+8</option>
+                            </select>
                         </div>
-                        
-                        <div class="moon-form-row">
-                            <div class="moon-form-group half">
-                                <label>ВОЗРАСТ</label>
-                                <input type="number" id="helperAge" placeholder="ЛЕТ" required class="moon-input">
-                            </div>
-                            
-                            <div class="moon-form-group half">
-                                <label>ЧАСОВОЙ ПОЯС</label>
-                                <select id="helperTimezone" required class="moon-select">
-                                    <option value="">ВЫБЕРИТЕ</option>
-                                    <option value="UTC+2">UTC+2 (КИЕВ)</option>
-                                    <option value="UTC+3">UTC+3 (МОСКВА)</option>
-                                    <option value="UTC+4">UTC+4</option>
-                                    <option value="UTC+5">UTC+5</option>
-                                    <option value="UTC+6">UTC+6</option>
-                                    <option value="UTC+7">UTC+7</option>
-                                    <option value="UTC+8">UTC+8</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="moon-form-group">
-                            <label>ОПЫТ РАБОТЫ</label>
-                            <textarea id="helperExperience" placeholder="ВАШ ОПЫТ" required class="moon-textarea" rows="3"></textarea>
-                        </div>
-                        
-                        <div class="moon-form-group">
-                            <label>МОТИВАЦИЯ</label>
-                            <textarea id="helperReason" placeholder="ПОЧЕМУ ХОТИТЕ СТАТЬ ХЕЛПЕРОМ?" required class="moon-textarea" rows="4"></textarea>
-                        </div>
-                        
-                        <div class="moon-form-group">
-                            <label>ДОПОЛНИТЕЛЬНО</label>
-                            <textarea id="helperAdditional" placeholder="ЕСЛИ ХОТИТЕ ЧТО-ТО ДОБАВИТЬ" class="moon-textarea" rows="3"></textarea>
-                        </div>
-                        
-                        <button type="submit" class="moon-submit-btn">🌙 ОТПРАВИТЬ АНКЕТУ</button>
-                    </form>
-                </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>ОПЫТ РАБОТЫ</label>
+                        <textarea id="helperExperience" placeholder="РАССКАЖИТЕ О ВАШЕМ ОПЫТЕ" required class="textarea" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>ПОЧЕМУ ХОТИТЕ СТАТЬ ХЕЛПЕРОМ?</label>
+                        <textarea id="helperReason" placeholder="ВАША МОТИВАЦИЯ" required class="textarea" rows="4"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ</label>
+                        <textarea id="helperAdditional" placeholder="ЕСЛИ ХОТИТЕ ЧТО-ТО ДОБАВИТЬ" class="textarea" rows="3"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">🌙 ОТПРАВИТЬ АНКЕТУ</button>
+                </form>
 
-                <!-- СПИСОК ЗАЯВОК -->
-                <div class="moon-list-container">
-                    <h3 class="moon-list-title">📋 ПОСЛЕДНИЕ ЗАЯВКИ</h3>
-                    <div id="applicationsList" class="moon-list"></div>
-                </div>
+                <h3 class="list-title">📋 ПОСЛЕДНИЕ ЗАЯВКИ</h3>
+                <div id="applicationsList" class="list"></div>
             </section>
         </div>
     </main>
 
     <!-- МОДАЛКА РЕГИСТРАЦИИ -->
-    <div id="registerModal" class="moon-modal">
-        <div class="moon-modal-content">
-            <span class="moon-close" onclick="closeModal()">×</span>
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">×</span>
             <h2>🌙 РЕГИСТРАЦИЯ</h2>
-            <form onsubmit="register(event)" class="moon-modal-form">
-                <input type="text" id="regUsername" placeholder="НИКНЕЙМ" required class="moon-input">
-                <input type="password" id="regPassword" placeholder="ПАРОЛЬ" required class="moon-input">
-                <input type="password" id="regConfirmPassword" placeholder="ПОВТОРИТЕ ПАРОЛЬ" required class="moon-input">
-                <button type="submit" class="moon-submit-btn">🌙 ЗАРЕГИСТРИРОВАТЬСЯ</button>
+            <form onsubmit="register(event)" class="modal-form">
+                <input type="text" id="regUsername" placeholder="НИКНЕЙМ" required class="modal-input">
+                <input type="password" id="regPassword" placeholder="ПАРОЛЬ" required class="modal-input">
+                <input type="password" id="regConfirmPassword" placeholder="ПОВТОРИТЕ ПАРОЛЬ" required class="modal-input">
+                <button type="submit" class="modal-btn">🌙 ЗАРЕГИСТРИРОВАТЬСЯ</button>
             </form>
         </div>
     </div>
 
     <!-- МОДАЛКА СМЕНЫ ПАРОЛЯ -->
-    <div id="changePasswordModal" class="moon-modal">
-        <div class="moon-modal-content">
-            <span class="moon-close" onclick="closeChangePassword()">×</span>
+    <div id="changePasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeChangePassword()">×</span>
             <h2>🌙 СМЕНА ПАРОЛЯ</h2>
-            <form onsubmit="changePassword(event)" class="moon-modal-form">
-                <input type="password" id="oldPassword" placeholder="СТАРЫЙ ПАРОЛЬ" required class="moon-input">
-                <input type="password" id="newPassword" placeholder="НОВЫЙ ПАРОЛЬ" required class="moon-input">
-                <input type="password" id="confirmPassword" placeholder="ПОВТОРИТЕ ПАРОЛЬ" required class="moon-input">
-                <button type="submit" class="moon-submit-btn">🌙 ИЗМЕНИТЬ ПАРОЛЬ</button>
+            <form onsubmit="changePassword(event)" class="modal-form">
+                <input type="password" id="oldPassword" placeholder="СТАРЫЙ ПАРОЛЬ" required class="modal-input">
+                <input type="password" id="newPassword" placeholder="НОВЫЙ ПАРОЛЬ" required class="modal-input">
+                <input type="password" id="confirmPassword" placeholder="ПОВТОРИТЕ ПАРОЛЬ" required class="modal-input">
+                <button type="submit" class="modal-btn">🌙 ИЗМЕНИТЬ ПАРОЛЬ</button>
             </form>
         </div>
     </div>
