@@ -249,6 +249,7 @@ async function rejectComplaint(id) {
     }
 }
 
+// Функции для жалоб - УДАЛЕНИЕ (ИСПРАВЛЕНО)
 async function deleteComplaint(id) {
     if (confirm('❌ Вы уверены, что хотите удалить эту жалобу?')) {
         try {
@@ -258,17 +259,47 @@ async function deleteComplaint(id) {
             console.log('🔢 Числовой ID:', numericId);
             
             const deleted = await window.deleteComplaint(numericId);
+            console.log('📦 Результат удаления:', deleted);
             
-            if (deleted === true) {
+            // Если функция вернула true или undefined (если ошибки нет)
+            if (deleted !== false) {
                 console.log('✅ Жалоба удалена успешно');
                 await loadAdminData();
                 alert('✅ Жалоба удалена!');
             } else {
-                console.error('❌ Функция вернула false');
+                console.error('❌ Ошибка при удалении');
                 alert('❌ Ошибка при удалении жалобы');
             }
         } catch (error) {
             console.error('❌ Ошибка в deleteComplaint:', error);
+            alert('❌ Ошибка: ' + error.message);
+        }
+    }
+}
+
+// Функции для анкет - УДАЛЕНИЕ (ИСПРАВЛЕНО)
+async function deleteApplication(id) {
+    if (confirm('❌ Вы уверены, что хотите удалить эту анкету?')) {
+        try {
+            console.log('🗑️ Начинаем удаление анкеты ID:', id);
+            
+            const numericId = Number(id);
+            console.log('🔢 Числовой ID:', numericId);
+            
+            const deleted = await window.deleteApplication(numericId);
+            console.log('📦 Результат удаления:', deleted);
+            
+            // Если функция вернула true или undefined (если ошибки нет)
+            if (deleted !== false) {
+                console.log('✅ Анкета удалена успешно');
+                await loadAdminData();
+                alert('✅ Анкета удалена!');
+            } else {
+                console.error('❌ Ошибка при удалении');
+                alert('❌ Ошибка при удалении анкеты');
+            }
+        } catch (error) {
+            console.error('❌ Ошибка в deleteApplication:', error);
             alert('❌ Ошибка: ' + error.message);
         }
     }
