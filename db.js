@@ -45,6 +45,20 @@ async function updateUserPassword(username, password) {
     return true;
 }
 
+async function getUserByUsername(username) {
+    const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('username', username)
+        .single();
+    
+    if (error) {
+        console.error('Ошибка загрузки пользователя:', error);
+        return null;
+    }
+    return data;
+}
+
 // Функции для жалоб
 async function getComplaints() {
     const { data, error } = await supabase
