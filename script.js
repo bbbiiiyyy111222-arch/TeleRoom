@@ -43,13 +43,16 @@ function showSection(sectionId) {
 
 // Авторизация
 function login() {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
     
     if (!username || !password) {
         alert('Введите ник и пароль!');
         return;
     }
+    
+    // Обновляем users из localStorage
+    users = JSON.parse(localStorage.getItem('users')) || [];
     
     const user = users.find(u => u.username === username && u.password === password);
     
@@ -82,7 +85,13 @@ function updateAuth() {
     if (currentUser) {
         userInfo.style.display = 'flex';
         loginForm.style.display = 'none';
-        currentUserSpan.textContent = '👤 ' + currentUser.username;
+        
+        // Проверяем, является ли пользователь OWNER
+        if (OWNERS.includes(currentUser.username)) {
+            currentUserSpan.textContent = '👑 ' + currentUser.username + ' (OWNER)';
+        } else {
+            currentUserSpan.textContent = '👤 ' + currentUser.username;
+        }
     } else {
         userInfo.style.display = 'none';
         loginForm.style.display = 'flex';
@@ -101,9 +110,9 @@ function closeModal() {
 function register(event) {
     event.preventDefault();
     
-    const username = document.getElementById('regUsername').value;
-    const password = document.getElementById('regPassword').value;
-    const confirm = document.getElementById('regConfirmPassword').value;
+    const username = document.getElementById('regUsername').value.trim();
+    const password = document.getElementById('regPassword').value.trim();
+    const confirm = document.getElementById('regConfirmPassword').value.trim();
     
     if (!username || !password) {
         alert('Заполните все поля!');
@@ -115,19 +124,31 @@ function register(event) {
         return;
     }
     
+    // Обновляем users из localStorage
+    users = JSON.parse(localStorage.getItem('users')) || [];
+    
     if (users.find(u => u.username === username)) {
         alert('Пользователь уже существует!');
         return;
     }
     
-    users.push({
+    // Добавляем нового пользователя
+    const newUser = {
         username: username,
         password: password
-    });
+    };
     
+    users.push(newUser);
     localStorage.setItem('users', JSON.stringify(users));
-    alert('Регистрация успешна! Теперь можно войти.');
+    
+    // Сразу входим после регистрации
+    currentUser = newUser;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
+    alert('Регистрация успешна! Добро пожаловать, ' + username + '!');
     closeModal();
+    updateAuth();
+    checkAdminLink();
 }
 
 // Проверка доступа к админке (теперь все OWNER)
@@ -143,8 +164,8 @@ function checkAdminLink() {
 }
 
 // Отправка жалобы
-document.getElementById('complaintForm')?.addEventListener('submit', function(e) {
-    e.preventDefault();
+function submitComplaint(event) {
+    event.preventDefault();
     
     if (!currentUser) {
         alert('Сначала войдите в систему!');
@@ -162,17 +183,18 @@ document.getElementById('complaintForm')?.addEventListener('submit', function(e)
         response: null
     };
     
+    complaints = JSON.parse(localStorage.getItem('complaints')) || [];
     complaints.push(complaint);
     localStorage.setItem('complaints', JSON.stringify(complaints));
     
     alert('Жалоба отправлена!');
-    this.reset();
+    document.getElementById('complaintForm').reset();
     loadLists();
-});
+}
 
 // Отправка анкеты
-document.getElementById('helperForm')?.addEventListener('submit', function(e) {
-    e.preventDefault();
+function submitApplication(event) {
+    event.preventDefault();
     
     if (!currentUser) {
         alert('Сначала войдите в систему!');
@@ -194,13 +216,14 @@ document.getElementById('helperForm')?.addEventListener('submit', function(e) {
         response: null
     };
     
+    applications = JSON.parse(localStorage.getItem('applications')) || [];
     applications.push(application);
     localStorage.setItem('applications', JSON.stringify(applications));
     
     alert('Анкета отправлена!');
-    this.reset();
+    document.getElementById('helperForm').reset();
     loadLists();
-});
+}
 
 // Загрузка списков
 function loadLists() {
