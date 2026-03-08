@@ -1,17 +1,14 @@
 // Данные
-let complaints = JSON.parse(localStorage.getItem('complaints')) || [];
-let applications = JSON.parse(localStorage.getItem('applications')) || [];
+let complaints = [];
+let applications = [];
 let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 
 // ВСЕ OWNER
 const OWNERS = ['milfa', 'milk123', 'Xchik_'];
 
 // Проверка доступа
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     console.log('Админ панель загружена');
-    console.log('Текущий пользователь:', currentUser);
-    console.log('Жалобы из localStorage:', complaints);
-    console.log('Анкеты из localStorage:', applications);
     
     if (!currentUser || !OWNERS.includes(currentUser.username)) {
         alert('У вас нет доступа к админ панели!');
@@ -20,8 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     document.getElementById('adminName').textContent = '👑 ' + currentUser.username + ' (OWNER)';
-    loadAdminData();
-    updateStats();
+    
+    // Загружаем данные
+    await loadAdminData();
 });
 
 // Выход
@@ -31,15 +29,16 @@ function logout() {
 }
 
 // Загрузка данных
-function loadAdminData() {
-    loadAdminComplaints();
-    loadAdminApplications();
+async function loadAdminData() {
+    await loadAdminComplaints();
+    await loadAdminApplications();
+    await updateStats();
 }
 
 // Обновление статистики
-function updateStats() {
-    complaints = JSON.parse(localStorage.getItem('complaints')) || [];
-    applications = JSON.parse(localStorage.getItem('applications')) || [];
+async function updateStats() {
+    complaints = await getComplaints();
+    applications = await getApplications();
     
     document.getElementById('newComplaints').textContent = complaints.filter(c => c.status === 'new').length;
     document.getElementById('newApplications').textContent = applications.filter(a => a.status === 'new').length;
@@ -47,12 +46,11 @@ function updateStats() {
 }
 
 // Загрузка жалоб в админку
-function loadAdminComplaints() {
+async function loadAdminComplaints() {
     const list = document.getElementById('adminComplaints');
     if (!list) return;
     
-    complaints = JSON.parse(localStorage.getItem('complaints')) || [];
-    console.log('Загрузка жалоб в админку:', complaints);
+    complaints = await getComplaints();
     
     if (complaints.length === 0) {
         list.innerHTML = '<p style="color: #666; text-align: center;">Нет жалоб</p>';
@@ -60,7 +58,7 @@ function loadAdminComplaints() {
     }
     
     list.innerHTML = '';
-    complaints.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(c => {
+    complaints.forEach(c => {
         list.innerHTML += `
             <div class="request-card">
                 <div class="request-header">
@@ -87,12 +85,11 @@ function loadAdminComplaints() {
 }
 
 // Загрузка анкет в админку
-function loadAdminApplications() {
+async function loadAdminApplications() {
     const list = document.getElementById('adminApplications');
     if (!list) return;
     
-    applications = JSON.parse(localStorage.getItem('applications')) || [];
-    console.log('Загрузка анкет в админку:', applications);
+    applications = await getApplications();
     
     if (applications.length === 0) {
         list.innerHTML = '<p style="color: #666; text-align: center;">Нет анкет</p>';
@@ -100,7 +97,7 @@ function loadAdminApplications() {
     }
     
     list.innerHTML = '';
-    applications.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(a => {
+    applications.forEach(a => {
         list.innerHTML += `
             <div class="request-card">
                 <div class="request-header">
@@ -131,72 +128,50 @@ function loadAdminApplications() {
 }
 
 // Функции для жалоб
-function acceptComplaint(id) {
-    complaints = JSON.parse(localStorage.getItem('complaints')) || [];
-    const index = complaints.findIndex(c => c.id === id);
-    
-    if (index !== -1) {
-        complaints[index].status = 'resolved';
-        localStorage.setItem('complaints', JSON.stringify(complaints));
-        loadAdminData();
-        updateStats();
+async function acceptComplaint(id) {
+    const updated = await updateComplaint(id, { status: 'resolved' });
+    if (updated) {
+        await loadAdminData();
     }
 }
 
-function rejectComplaint(id) {
-    complaints = JSON.parse(localStorage.getItem('complaints')) || [];
-    const index = complaints.findIndex(c => c.id === id);
-    
-    if (index !== -1) {
-        complaints[index].status = 'pending';
-        localStorage.setItem('complaints', JSON.stringify(complaints));
-        loadAdminData();
-        updateStats();
+async function rejectComplaint(id) {
+    const updated = await updateComplaint(id, { status: 'pending' });
+    if (updated) {
+        await loadAdminData();
     }
 }
 
-function deleteComplaint(id) {
+async function deleteComplaint(id) {
     if (confirm('Удалить жалобу?')) {
-        complaints = JSON.parse(localStorage.getItem('complaints')) || [];
-        complaints = complaints.filter(c => c.id !== id);
-        localStorage.setItem('complaints', JSON.stringify(complaints));
-        loadAdminData();
-        updateStats();
+        const deleted = await deleteComplaint(id);
+        if (deleted) {
+            await loadAdminData();
+        }
     }
 }
 
 // Функции для анкет
-function acceptApplication(id) {
-    applications = JSON.parse(localStorage.getItem('applications')) || [];
-    const index = applications.findIndex(a => a.id === id);
-    
-    if (index !== -1) {
-        applications[index].status = 'resolved';
-        localStorage.setItem('applications', JSON.stringify(applications));
-        loadAdminData();
-        updateStats();
+async function acceptApplication(id) {
+    const updated = await updateApplication(id, { status: 'resolved' });
+    if (updated) {
+        await loadAdminData();
     }
 }
 
-function rejectApplication(id) {
-    applications = JSON.parse(localStorage.getItem('applications')) || [];
-    const index = applications.findIndex(a => a.id === id);
-    
-    if (index !== -1) {
-        applications[index].status = 'pending';
-        localStorage.setItem('applications', JSON.stringify(applications));
-        loadAdminData();
-        updateStats();
+async function rejectApplication(id) {
+    const updated = await updateApplication(id, { status: 'pending' });
+    if (updated) {
+        await loadAdminData();
     }
 }
 
-function deleteApplication(id) {
+async function deleteApplication(id) {
     if (confirm('Удалить анкету?')) {
-        applications = JSON.parse(localStorage.getItem('applications')) || [];
-        applications = applications.filter(a => a.id !== id);
-        localStorage.setItem('applications', JSON.stringify(applications));
-        loadAdminData();
-        updateStats();
+        const deleted = await deleteApplication(id);
+        if (deleted) {
+            await loadAdminData();
+        }
     }
 }
 
@@ -214,7 +189,7 @@ function closeResponseModal() {
 }
 
 // Отправка ответа
-function sendResponse(event) {
+async function sendResponse(event) {
     event.preventDefault();
     
     const id = parseInt(document.getElementById('responseId').value);
@@ -226,30 +201,27 @@ function sendResponse(event) {
         return;
     }
     
+    let updated = false;
+    
     if (type === 'complaint') {
-        complaints = JSON.parse(localStorage.getItem('complaints')) || [];
-        const index = complaints.findIndex(c => c.id === id);
-        
-        if (index !== -1) {
-            complaints[index].response = response;
-            complaints[index].status = 'resolved';
-            localStorage.setItem('complaints', JSON.stringify(complaints));
-        }
+        updated = await updateComplaint(id, { 
+            response: response,
+            status: 'resolved' 
+        });
     } else {
-        applications = JSON.parse(localStorage.getItem('applications')) || [];
-        const index = applications.findIndex(a => a.id === id);
-        
-        if (index !== -1) {
-            applications[index].response = response;
-            applications[index].status = 'resolved';
-            localStorage.setItem('applications', JSON.stringify(applications));
-        }
+        updated = await updateApplication(id, { 
+            response: response,
+            status: 'resolved' 
+        });
     }
     
-    closeResponseModal();
-    loadAdminData();
-    updateStats();
-    alert('Ответ отправлен!');
+    if (updated) {
+        closeResponseModal();
+        await loadAdminData();
+        alert('Ответ отправлен!');
+    } else {
+        alert('Ошибка при отправке ответа!');
+    }
 }
 
 // Переключение табов
