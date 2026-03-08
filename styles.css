@@ -77,6 +77,7 @@ body {
     margin-right: 20px;
     padding: 5px 10px;
     transition: all 0.3s;
+    font-size: 12px;
 }
 
 .nav-link:hover,
@@ -107,16 +108,11 @@ body {
 }
 
 /* Правила */
-.rules {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-}
-
 .rule-block {
     background: rgba(0,0,0,0.3);
     border-radius: 8px;
     padding: 20px;
+    margin-bottom: 20px;
 }
 
 .rule-block h3 {
@@ -167,11 +163,6 @@ body {
 }
 
 /* Формы */
-.form {
-    max-width: 600px;
-    margin: 0 auto;
-}
-
 .form-group {
     margin-bottom: 20px;
 }
@@ -203,6 +194,7 @@ body {
     font-family: 'Press Start 2P', cursive;
     font-size: 10px;
     border-radius: 5px;
+    margin-bottom: 15px;
 }
 
 .input-small {
@@ -213,6 +205,7 @@ body {
     font-family: 'Press Start 2P', cursive;
     font-size: 8px;
     border-radius: 3px;
+    margin-right: 5px;
 }
 
 .textarea {
@@ -358,89 +351,4 @@ body {
 }
 
 .stat-card {
-    background: #1a1a1a;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-    border: 1px solid #ff6b6b;
-}
-
-.stat-card h3 {
-    color: #ff6b6b;
-    font-size: 10px;
-    margin-bottom: 10px;
-}
-
-.stat-card span {
-    font-size: 24px;
-    font-weight: bold;
-    color: #fff;
-}
-
-/* Модальное окно */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
-}
-
-.modal-content {
-    background: #1a1a1a;
-    margin: 10% auto;
-    padding: 30px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 500px;
-    border: 2px solid #ff6b6b;
-}
-
-.close {
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    color: #ff6b6b;
-}
-
-.close:hover {
-    color: #fff;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    body {
-        font-size: 10px;
-    }
-    
-    .header-content {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .form-row {
-        flex-direction: column;
-    }
-    
-    .rule-item {
-        flex-direction: column;
-        gap: 5px;
-    }
-    
-    .request-details strong {
-        display: block;
-        margin-bottom: 5px;
-    }
-    
-    .admin-actions {
-        flex-direction: column;
-    }
-    
-    .admin-btn {
-        width: 100%;
-    }
-}
+    background: #1a
