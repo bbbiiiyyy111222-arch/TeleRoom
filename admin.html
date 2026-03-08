@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MoonGrief - Админ панель</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -65,17 +65,19 @@
     <div id="responseModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeResponseModal()">×</span>
-            <h2 id="responseTitle">Ответ</h2>
+            <h2 id="responseTitle">Ответ на обращение</h2>
             <form id="responseForm">
                 <input type="hidden" id="responseId">
                 <input type="hidden" id="responseType">
                 <textarea id="responseText" placeholder="Введите ответ..." required class="textarea" rows="5"></textarea>
-                <button type="submit" class="btn">Отправить</button>
-                <button type="button" onclick="closeResponseModal()" class="btn btn-gray">Отмена</button>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn">Отправить</button>
+                    <button type="button" onclick="closeResponseModal()" class="btn btn-gray">Отмена</button>
+                </div>
             </form>
         </div>
     </div>
 
-    <script src="js/admin.js"></script>
+    <script src="admin.js"></script>
 </body>
 </html>
