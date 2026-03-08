@@ -1,5 +1,5 @@
 /* ==============================================
-   МЕГА ДИЗАЙН MOONGRIEF - ИМБА ВЕРСИЯ
+   МЕГА ИМБА ДИЗАЙН MOONGRIEF
    ============================================== */
 
 * {
@@ -15,15 +15,15 @@ body {
     line-height: 1.6;
     font-size: 12px;
     background-image: 
-        radial-gradient(circle at 10% 20%, rgba(255,107,107,0.1) 0%, transparent 30%),
-        radial-gradient(circle at 90% 80%, rgba(255,107,107,0.1) 0%, transparent 30%),
-        url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48cmVjdCB3aWR0aD0iODAiIGhlaWdodD0iODAiIGZpbGw9IiMwYTBhMGEiLz48cGF0aCBkPSJNMCAwaDEwdjEwSDB6TTEwIDIwaDEwdjEwSDEwek0yMCAwaDEwdjEwSDIwek0zMCAyMGgxMHYxMEgzMHpNNDAgMGgxMHYxMEg0MHpNNTAgMjBoMTB2MTBINTB6TTYwIDBoMTB2MTBINjB6TTcwIDIwaDEwdjEwSDcweiIgZmlsbD0iIzFhMWExYSIvPjwvc3ZnPg==');
-    animation: bgPulse 10s infinite;
+        radial-gradient(circle at 10% 20%, rgba(255,107,107,0.15) 0%, transparent 30%),
+        radial-gradient(circle at 90% 80%, rgba(255,107,107,0.15) 0%, transparent 30%),
+        repeating-linear-gradient(45deg, rgba(255,107,107,0.02) 0px, rgba(255,107,107,0.02) 2px, transparent 2px, transparent 8px);
+    animation: bgMove 20s linear infinite;
 }
 
-@keyframes bgPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.9; }
+@keyframes bgMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 100px 100px; }
 }
 
 .container {
@@ -33,14 +33,14 @@ body {
 }
 
 /* ==============================================
-   МЕГА ШАПКА С АНИМАЦИЕЙ
+   МЕГА ШАПКА
    ============================================== */
 
 .header {
-    background: linear-gradient(135deg, #1a1a1a, #2c3e50);
+    background: linear-gradient(135deg, #1a0f0f, #2c1a1a);
     padding: 25px 0;
-    border-bottom: 4px solid #ff6b6b;
-    box-shadow: 0 0 30px rgba(255,107,107,0.5);
+    border-bottom: 4px solid #ff4444;
+    box-shadow: 0 0 50px rgba(255,68,68,0.5);
     position: relative;
     overflow: hidden;
 }
@@ -52,11 +52,11 @@ body {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255,107,107,0.2) 0%, transparent 70%);
-    animation: rotate 20s linear infinite;
+    background: radial-gradient(circle, rgba(255,68,68,0.2) 0%, transparent 60%);
+    animation: headerRotate 15s linear infinite;
 }
 
-@keyframes rotate {
+@keyframes headerRotate {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
@@ -68,46 +68,46 @@ body {
     flex-wrap: wrap;
     gap: 20px;
     position: relative;
-    z-index: 1;
+    z-index: 2;
 }
 
 .logo h1 {
-    color: #ff6b6b;
-    font-size: 28px;
+    color: #ff4444;
+    font-size: 32px;
     margin-bottom: 10px;
-    text-shadow: 3px 3px 0 #000, 0 0 20px #ff6b6b;
-    animation: logoGlow 3s infinite;
+    text-shadow: 4px 4px 0 #000, 0 0 30px #ff4444;
+    animation: logoGlow 2s infinite;
 }
 
 @keyframes logoGlow {
-    0%, 100% { text-shadow: 3px 3px 0 #000, 0 0 20px #ff6b6b; }
-    50% { text-shadow: 3px 3px 0 #000, 0 0 40px #ff6b6b, 0 0 60px #ff6b6b; }
+    0%, 100% { text-shadow: 4px 4px 0 #000, 0 0 30px #ff4444; }
+    50% { text-shadow: 4px 4px 0 #000, 0 0 60px #ff4444, 0 0 90px #ff4444; }
 }
 
 .server-ip {
     display: flex;
     align-items: center;
     gap: 15px;
-    background: rgba(0,0,0,0.7);
-    padding: 12px 20px;
-    border-radius: 40px;
-    border: 2px solid #ff6b6b;
+    background: rgba(0,0,0,0.8);
+    padding: 15px 25px;
+    border-radius: 50px;
+    border: 2px solid #ff4444;
     backdrop-filter: blur(10px);
-    box-shadow: 0 0 20px rgba(255,107,107,0.3);
-    animation: borderPulse 2s infinite;
+    box-shadow: 0 0 30px rgba(255,68,68,0.5);
+    animation: ipPulse 2s infinite;
 }
 
-@keyframes borderPulse {
-    0%, 100% { border-color: #ff6b6b; box-shadow: 0 0 20px rgba(255,107,107,0.3); }
-    50% { border-color: #ff5252; box-shadow: 0 0 40px rgba(255,107,107,0.6); }
+@keyframes ipPulse {
+    0%, 100% { border-color: #ff4444; box-shadow: 0 0 30px rgba(255,68,68,0.5); }
+    50% { border-color: #ff6666; box-shadow: 0 0 60px rgba(255,68,68,0.8); }
 }
 
 .copy-btn {
-    background: linear-gradient(135deg, #ff6b6b, #ff5252);
+    background: linear-gradient(135deg, #ff4444, #ff6666);
     color: white;
     border: none;
-    padding: 8px 15px;
-    border-radius: 30px;
+    padding: 10px 20px;
+    border-radius: 40px;
     cursor: pointer;
     font-family: 'Press Start 2P', cursive;
     font-size: 10px;
@@ -130,91 +130,13 @@ body {
 }
 
 .copy-btn:hover::before {
-    width: 200px;
-    height: 200px;
+    width: 300px;
+    height: 300px;
 }
 
 .copy-btn:hover {
     transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 10px 30px rgba(255,107,107,0.7);
-}
-
-/* ==============================================
-   МЕГА АВТОРИЗАЦИЯ
-   ============================================== */
-
-.auth {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-#userInfo {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    background: rgba(0,0,0,0.7);
-    padding: 8px 20px;
-    border-radius: 40px;
-    border: 2px solid #ff6b6b;
-    backdrop-filter: blur(10px);
-    animation: glowPulse 2s infinite;
-}
-
-@keyframes glowPulse {
-    0%, 100% { box-shadow: 0 0 10px #ff6b6b; }
-    50% { box-shadow: 0 0 30px #ff6b6b; }
-}
-
-#currentUser {
-    color: #ff6b6b;
-    font-size: 11px;
-    font-weight: bold;
-    text-shadow: 0 0 10px #ff6b6b;
-}
-
-#loginForm {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.input-small {
-    padding: 10px;
-    background: rgba(0,0,0,0.7);
-    border: 2px solid #ff6b6b;
-    color: white;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 9px;
-    border-radius: 30px;
-    width: 110px;
-    transition: all 0.3s;
-}
-
-.input-small:focus {
-    outline: none;
-    border-color: #ff5252;
-    box-shadow: 0 0 20px #ff6b6b;
-    transform: scale(1.05);
-}
-
-.btn-small {
-    background: linear-gradient(135deg, #ff6b6b, #ff5252);
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 9px;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: all 0.3s;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-small:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(255,107,107,0.6);
+    box-shadow: 0 15px 40px rgba(255,68,68,0.8);
 }
 
 /* ==============================================
@@ -222,9 +144,9 @@ body {
    ============================================== */
 
 .nav {
-    background: rgba(26,26,26,0.95);
+    background: rgba(26,10,10,0.95);
     padding: 15px 0;
-    border-bottom: 2px solid #ff6b6b;
+    border-bottom: 2px solid #ff4444;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -235,13 +157,14 @@ body {
     color: #fff;
     text-decoration: none;
     margin-right: 25px;
-    padding: 8px 20px;
+    padding: 10px 25px;
     transition: all 0.3s;
     font-size: 12px;
     cursor: pointer;
-    border-radius: 30px;
+    border-radius: 40px;
     position: relative;
     overflow: hidden;
+    display: inline-block;
 }
 
 .nav-link::before {
@@ -252,36 +175,36 @@ body {
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(255,107,107,0.3);
+    background: rgba(255,68,68,0.3);
     transform: translate(-50%, -50%);
     transition: width 0.5s, height 0.5s;
 }
 
 .nav-link:hover::before {
-    width: 200px;
-    height: 200px;
+    width: 250px;
+    height: 250px;
 }
 
 .nav-link:hover {
-    color: #ff6b6b;
-    text-shadow: 0 0 10px #ff6b6b;
+    color: #ff4444;
+    text-shadow: 0 0 15px #ff4444;
 }
 
 .nav-link.active {
-    color: #ff6b6b;
-    background: rgba(255,107,107,0.2);
-    border: 2px solid #ff6b6b;
-    box-shadow: 0 0 20px #ff6b6b;
+    color: #ff4444;
+    background: rgba(255,68,68,0.2);
+    border: 2px solid #ff4444;
+    box-shadow: 0 0 30px #ff4444;
 }
 
 /* ==============================================
-   МЕГА ИНФОРМАЦИОННАЯ ПАНЕЛЬ (КУРАТОР, БАГИ)
+   МЕГА ИНФОРМАЦИОННАЯ ПАНЕЛЬ
    ============================================== */
 
 .info-bar {
-    background: linear-gradient(135deg, #2c3e50, #1a1a1a);
+    background: linear-gradient(135deg, #2c1a1a, #1a0f0f);
     padding: 20px 0;
-    border-bottom: 2px solid #ff6b6b;
+    border-bottom: 2px solid #ff4444;
     position: relative;
     overflow: hidden;
 }
@@ -289,15 +212,15 @@ body {
 .info-bar::before {
     content: '';
     position: absolute;
-    top: -100%;
-    left: -100%;
-    width: 300%;
-    height: 300%;
-    background: radial-gradient(circle, rgba(255,107,107,0.1) 0%, transparent 50%);
-    animation: rotateSlow 30s linear infinite;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,68,68,0.15) 0%, transparent 60%);
+    animation: infoRotate 20s linear infinite;
 }
 
-@keyframes rotateSlow {
+@keyframes infoRotate {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
@@ -309,17 +232,17 @@ body {
     flex-wrap: wrap;
     gap: 40px;
     position: relative;
-    z-index: 1;
+    z-index: 2;
 }
 
 .info-item {
     display: flex;
     align-items: center;
     gap: 20px;
-    background: rgba(0,0,0,0.6);
-    padding: 15px 30px;
-    border-radius: 60px;
-    border: 2px solid #ff6b6b;
+    background: rgba(0,0,0,0.7);
+    padding: 15px 35px;
+    border-radius: 70px;
+    border: 2px solid #ff4444;
     backdrop-filter: blur(10px);
     transition: all 0.4s;
     cursor: pointer;
@@ -335,25 +258,31 @@ body {
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(255,107,107,0.2);
+    background: rgba(255,68,68,0.2);
     transform: translate(-50%, -50%);
-    transition: width 0.5s, height 0.5s;
+    transition: width 0.6s, height 0.6s;
 }
 
 .info-item:hover::before {
-    width: 300px;
-    height: 300px;
+    width: 400px;
+    height: 400px;
 }
 
 .info-item:hover {
-    transform: translateY(-8px) scale(1.05);
-    box-shadow: 0 20px 40px rgba(255,107,107,0.5);
-    border-color: #ff5252;
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 25px 50px rgba(255,68,68,0.6);
+    border-color: #ff6666;
 }
 
 .info-icon {
-    font-size: 32px;
-    filter: drop-shadow(0 0 15px #ff6b6b);
+    font-size: 36px;
+    filter: drop-shadow(0 0 20px #ff4444);
+    animation: iconFloat 3s infinite;
+}
+
+@keyframes iconFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
 }
 
 .info-text {
@@ -363,42 +292,43 @@ body {
 }
 
 .info-label {
-    color: #ff6b6b;
-    font-size: 9px;
+    color: #ff4444;
+    font-size: 10px;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px #ff4444;
 }
 
 .info-link {
     color: #fff;
     text-decoration: none;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
     transition: all 0.3s;
 }
 
 .info-link:hover {
-    color: #ff6b6b;
-    text-shadow: 0 0 20px #ff6b6b;
+    color: #ff4444;
+    text-shadow: 0 0 25px #ff4444;
     transform: scale(1.1);
 }
 
 .info-badge {
     background: linear-gradient(135deg, #00b894, #00cec9);
     color: white;
-    padding: 4px 12px;
-    border-radius: 30px;
-    font-size: 8px;
+    padding: 5px 15px;
+    border-radius: 40px;
+    font-size: 9px;
     display: inline-block;
     width: fit-content;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
     animation: badgePulse 2s infinite;
 }
 
 @keyframes badgePulse {
-    0%, 100% { box-shadow: 0 0 5px #00b894; }
-    50% { box-shadow: 0 0 20px #00b894; }
+    0%, 100% { box-shadow: 0 0 10px #00b894; }
+    50% { box-shadow: 0 0 30px #00b894; }
 }
 
 .info-badge.telegram {
@@ -407,14 +337,15 @@ body {
 }
 
 @keyframes telegramPulse {
-    0%, 100% { box-shadow: 0 0 5px #0088cc; }
-    50% { box-shadow: 0 0 20px #0088cc; }
+    0%, 100% { box-shadow: 0 0 10px #0088cc; }
+    50% { box-shadow: 0 0 30px #0088cc; }
 }
 
 .info-value {
     color: #fff;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
+    text-shadow: 0 0 15px #ff4444;
 }
 
 /* ==============================================
@@ -422,58 +353,57 @@ body {
    ============================================== */
 
 .bug-report {
-    background: linear-gradient(135deg, rgba(255,107,107,0.3), rgba(255,82,82,0.3));
-    border: 2px solid #ff6b6b;
-    animation: megaBugPulse 1.5s infinite;
+    background: linear-gradient(135deg, rgba(255,68,68,0.3), rgba(255,102,102,0.3));
+    border: 2px solid #ff4444;
+    animation: megaBugPulse 1s infinite;
     position: relative;
 }
 
 .bug-report::after {
     content: '⚠️';
     position: absolute;
-    top: -10px;
-    right: -10px;
-    font-size: 20px;
-    animation: bugAlert 1s infinite;
+    top: -15px;
+    right: -15px;
+    font-size: 28px;
+    animation: bugAlert 0.5s infinite;
 }
 
 @keyframes megaBugPulse {
     0%, 100% {
-        box-shadow: 0 0 20px #ff6b6b, 0 0 40px #ff6b6b;
+        box-shadow: 0 0 30px #ff4444, 0 0 60px #ff4444;
         transform: scale(1);
     }
     50% {
-        box-shadow: 0 0 40px #ff6b6b, 0 0 80px #ff6b6b, 0 0 120px #ff6b6b;
-        transform: scale(1.02);
+        box-shadow: 0 0 60px #ff4444, 0 0 90px #ff4444, 0 0 120px #ff4444;
+        transform: scale(1.03);
     }
 }
 
 @keyframes bugAlert {
     0%, 100% { transform: rotate(0deg) scale(1); }
-    25% { transform: rotate(20deg) scale(1.2); }
-    75% { transform: rotate(-20deg) scale(1.2); }
+    25% { transform: rotate(25deg) scale(1.3); }
+    75% { transform: rotate(-25deg) scale(1.3); }
 }
 
 .bug-report .info-icon {
-    animation: bugShake 0.3s infinite;
+    animation: bugShake 0.2s infinite;
 }
 
 @keyframes bugShake {
     0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
 }
 
-.bug-report .info-link {
-    color: #fff;
-    font-size: 18px;
-    text-shadow: 0 0 15px #ff6b6b;
-    animation: linkGlow 1.5s infinite;
+.bug-link {
+    font-size: 20px !important;
+    text-shadow: 0 0 20px #ff4444 !important;
+    animation: linkMegaGlow 1s infinite;
 }
 
-@keyframes linkGlow {
-    0%, 100% { text-shadow: 0 0 10px #ff6b6b; }
-    50% { text-shadow: 0 0 30px #ff6b6b, 0 0 50px #ff6b6b; }
+@keyframes linkMegaGlow {
+    0%, 100% { text-shadow: 0 0 15px #ff4444; }
+    50% { text-shadow: 0 0 40px #ff4444, 0 0 70px #ff4444; }
 }
 
 /* ==============================================
@@ -486,14 +416,14 @@ body {
 }
 
 .section {
-    background: rgba(26, 26, 26, 0.95);
-    border-radius: 30px;
-    padding: 40px;
-    margin-bottom: 40px;
-    border: 2px solid #ff6b6b;
+    background: rgba(26,10,10,0.95);
+    border-radius: 40px;
+    padding: 50px;
+    margin-bottom: 50px;
+    border: 2px solid #ff4444;
     display: none;
     backdrop-filter: blur(10px);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(255,107,107,0.3);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 50px rgba(255,68,68,0.4);
     position: relative;
     overflow: hidden;
 }
@@ -505,8 +435,8 @@ body {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255,107,107,0.1) 0%, transparent 70%);
-    animation: sectionRotate 30s linear infinite;
+    background: radial-gradient(circle, rgba(255,68,68,0.1) 0%, transparent 70%);
+    animation: sectionRotate 25s linear infinite;
 }
 
 @keyframes sectionRotate {
@@ -522,7 +452,7 @@ body {
 @keyframes megaFadeIn {
     0% {
         opacity: 0;
-        transform: translateY(40px) scale(0.95);
+        transform: translateY(50px) scale(0.95);
     }
     100% {
         opacity: 1;
@@ -531,15 +461,16 @@ body {
 }
 
 .section-title {
-    color: #ff6b6b;
-    font-size: 24px;
-    margin-bottom: 40px;
+    color: #ff4444;
+    font-size: 28px;
+    margin-bottom: 50px;
     text-align: center;
     text-transform: uppercase;
-    text-shadow: 4px 4px 0 #000, 0 0 30px #ff6b6b;
+    text-shadow: 5px 5px 0 #000, 0 0 50px #ff4444;
     position: relative;
-    padding-bottom: 20px;
-    letter-spacing: 4px;
+    padding-bottom: 25px;
+    letter-spacing: 5px;
+    font-weight: bold;
 }
 
 .section-title::after {
@@ -548,16 +479,189 @@ body {
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 200px;
-    height: 4px;
-    background: linear-gradient(90deg, transparent, #ff6b6b, #ff5252, #ff6b6b, transparent);
-    border-radius: 2px;
+    width: 300px;
+    height: 5px;
+    background: linear-gradient(90deg, transparent, #ff4444, #ff6666, #ff4444, transparent);
+    border-radius: 3px;
     animation: titleLine 3s infinite;
 }
 
 @keyframes titleLine {
-    0%, 100% { width: 200px; opacity: 1; }
-    50% { width: 300px; opacity: 0.8; }
+    0%, 100% { width: 300px; opacity: 1; }
+    50% { width: 500px; opacity: 0.9; }
+}
+
+/* ==============================================
+   МЕГА ПРАВИЛА
+   ============================================== */
+
+.rule-block {
+    background: rgba(0,0,0,0.5);
+    border-radius: 25px;
+    padding: 30px;
+    margin-bottom: 35px;
+    border-left: 8px solid #ff4444;
+    border-right: 2px solid rgba(255,68,68,0.3);
+    transition: all 0.4s;
+    position: relative;
+    overflow: hidden;
+}
+
+.rule-block:hover {
+    transform: translateX(10px) scale(1.02);
+    box-shadow: -15px 15px 40px rgba(255,68,68,0.4);
+    border-left-color: #ff6666;
+}
+
+.rule-block-title {
+    color: #ff4444;
+    font-size: 22px;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    text-shadow: 0 0 20px #ff4444;
+    position: relative;
+    display: inline-block;
+    padding: 0 20px;
+}
+
+.rule-block-title::before,
+.rule-block-title::after {
+    content: '⚡';
+    color: #ff4444;
+    font-size: 24px;
+    margin: 0 15px;
+    animation: titleSpark 1.5s infinite;
+}
+
+@keyframes titleSpark {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+.rule-item {
+    display: flex;
+    gap: 25px;
+    padding: 18px;
+    border-bottom: 1px solid rgba(255,68,68,0.2);
+    transition: all 0.3s;
+    border-radius: 15px;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.rule-item:hover {
+    background: rgba(255,68,68,0.15);
+    transform: scale(1.01);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.rule-item:last-child {
+    border-bottom: none;
+}
+
+.rule-num {
+    color: #ff4444;
+    font-weight: bold;
+    min-width: 100px;
+    font-size: 15px;
+    text-shadow: 0 0 15px #ff4444;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rule-content {
+    flex: 1;
+}
+
+.rule-content ul {
+    list-style: none;
+    margin: 15px 0;
+}
+
+.rule-content li {
+    margin: 10px 0;
+    color: #fff;
+    font-size: 12px;
+    padding-left: 25px;
+    position: relative;
+    text-shadow: 0 0 5px rgba(255,255,255,0.5);
+}
+
+.rule-content li::before {
+    content: '🔥';
+    color: #ff4444;
+    position: absolute;
+    left: 0;
+    animation: fireFlicker 1s infinite;
+}
+
+@keyframes fireFlicker {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.2); }
+}
+
+.danger-text {
+    color: #ff4444;
+    font-size: 16px;
+    text-shadow: 0 0 20px #ff4444;
+    animation: dangerGlow 1s infinite;
+}
+
+@keyframes dangerGlow {
+    0%, 100% { text-shadow: 0 0 15px #ff4444; }
+    50% { text-shadow: 0 0 40px #ff4444, 0 0 60px #ff4444; }
+}
+
+.danger-list li {
+    color: #ffaaaa !important;
+    font-weight: bold;
+}
+
+.punish {
+    color: #ff4444;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 12px;
+    padding: 8px 20px;
+    background: rgba(255,68,68,0.2);
+    border-radius: 50px;
+    font-size: 12px;
+    border: 2px solid #ff4444;
+    animation: punishPulse 1.5s infinite;
+}
+
+@keyframes punishPulse {
+    0%, 100% { box-shadow: 0 0 10px #ff4444; }
+    50% { box-shadow: 0 0 30px #ff4444; }
+}
+
+.mini-punish {
+    background: rgba(255,68,68,0.3);
+    padding: 5px 15px;
+    border-radius: 30px;
+    font-size: 11px;
+    margin-left: 10px;
+    border: 1px solid #ff4444;
+}
+
+.admin-glow {
+    color: #ff4444;
+    text-shadow: 0 0 10px #ff4444;
+    font-weight: bold;
+}
+
+.ip-glow {
+    color: #ff6666;
+    text-shadow: 0 0 15px #ff6666;
+    font-weight: bold;
+}
+
+.telegram-link {
+    color: #0088cc;
+    text-shadow: 0 0 10px #0088cc;
+    font-weight: bold;
 }
 
 /* ==============================================
@@ -565,22 +669,22 @@ body {
    ============================================== */
 
 .form-group {
-    margin-bottom: 30px;
+    margin-bottom: 35px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 12px;
-    color: #ff6b6b;
-    font-size: 12px;
+    margin-bottom: 15px;
+    color: #ff4444;
+    font-size: 14px;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px #ff6b6b;
+    letter-spacing: 3px;
+    text-shadow: 0 0 15px #ff4444;
 }
 
 .form-row {
     display: flex;
-    gap: 30px;
+    gap: 35px;
 }
 
 .form-group.half {
@@ -591,43 +695,44 @@ body {
 .textarea,
 .select {
     width: 100%;
-    padding: 15px 20px;
-    background: rgba(0,0,0,0.7);
-    border: 2px solid #ff6b6b;
+    padding: 18px 25px;
+    background: rgba(0,0,0,0.8);
+    border: 2px solid #ff4444;
     color: white;
     font-family: 'Press Start 2P', cursive;
-    font-size: 11px;
-    border-radius: 15px;
+    font-size: 12px;
+    border-radius: 20px;
     margin-bottom: 15px;
     transition: all 0.3s;
-    box-shadow: 0 0 10px rgba(255,107,107,0.2);
+    box-shadow: 0 0 15px rgba(255,68,68,0.3);
 }
 
 .input:focus,
 .textarea:focus,
 .select:focus {
     outline: none;
-    border-color: #ff5252;
-    box-shadow: 0 0 40px rgba(255,107,107,0.6);
+    border-color: #ff6666;
+    box-shadow: 0 0 50px rgba(255,68,68,0.8);
     transform: scale(1.02);
-    background: rgba(0,0,0,0.9);
+    background: rgba(0,0,0,0.95);
 }
 
 .btn {
-    background: linear-gradient(135deg, #ff6b6b, #ff5252);
+    background: linear-gradient(135deg, #ff4444, #ff6666);
     color: white;
     border: none;
-    padding: 15px 40px;
+    padding: 18px 50px;
     font-family: 'Press Start 2P', cursive;
-    font-size: 12px;
-    border-radius: 50px;
+    font-size: 14px;
+    border-radius: 60px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.4s;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 5px 20px rgba(255,107,107,0.4);
+    box-shadow: 0 8px 30px rgba(255,68,68,0.5);
+    width: 100%;
 }
 
 .btn::before {
@@ -640,419 +745,17 @@ body {
     border-radius: 50%;
     background: rgba(255,255,255,0.3);
     transform: translate(-50%, -50%);
-    transition: width 0.5s, height 0.5s;
-}
-
-.btn:hover::before {
-    width: 400px;
-    height: 400px;
-}
-
-.btn:hover {
-    transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 15px 40px rgba(255,107,107,0.8);
-}
-
-/* ==============================================
-   МЕГА КАРТОЧКИ ДЛЯ АДМИНКИ
-   ============================================== */
-
-.card {
-    background: linear-gradient(135deg, rgba(26,26,26,0.98), rgba(44,62,80,0.98));
-    border: 2px solid #ff6b6b;
-    border-radius: 30px;
-    padding: 30px;
-    margin-bottom: 30px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(255,107,107,0.3);
-    transition: all 0.4s;
-    position: relative;
-    overflow: hidden;
-}
-
-.card::before {
-    content: '';
-    position: absolute;
-    top: -100%;
-    left: -100%;
-    width: 300%;
-    height: 300%;
-    background: radial-gradient(circle, rgba(255,107,107,0.1) 0%, transparent 70%);
-    animation: cardRotate 20s linear infinite;
-}
-
-@keyframes cardRotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.card:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 30px 70px rgba(255,107,107,0.5), 0 0 50px #ff6b6b;
-    border-color: #ff5252;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid rgba(255,107,107,0.4);
-    position: relative;
-    z-index: 1;
-}
-
-.card-title {
-    color: #ff6b6b;
-    font-size: 16px;
-    font-weight: bold;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    text-shadow: 0 0 15px #ff6b6b;
-}
-
-.card-icon {
-    font-size: 24px;
-    filter: drop-shadow(0 0 10px #ff6b6b);
-    animation: iconFloat 3s infinite;
-}
-
-@keyframes iconFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
-
-.status-badge {
-    padding: 8px 25px;
-    border-radius: 50px;
-    font-size: 10px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    animation: badgeGlow 2s infinite;
-    position: relative;
-    overflow: hidden;
-}
-
-@keyframes badgeGlow {
-    0%, 100% { filter: brightness(1); }
-    50% { filter: brightness(1.3); }
-}
-
-.status-new {
-    background: linear-gradient(135deg, #ff6b6b, #ff5252);
-    box-shadow: 0 0 30px #ff6b6b;
-}
-
-.status-accepted {
-    background: linear-gradient(135deg, #00b894, #00cec9);
-    box-shadow: 0 0 30px #00b894;
-}
-
-.status-rejected {
-    background: linear-gradient(135deg, #e74c3c, #d63031);
-    box-shadow: 0 0 30px #e74c3c;
-}
-
-.status-resolved {
-    background: linear-gradient(135deg, #0984e3, #00b0ff);
-    box-shadow: 0 0 30px #0984e3;
-}
-
-/* ==============================================
-   МЕГА КНОПКИ ДЛЯ АДМИНКИ
-   ============================================== */
-
-.button-group {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    position: relative;
-    z-index: 1;
-}
-
-.btn-glow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 15px 25px;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 10px;
-    color: white;
-    transition: all 0.4s;
-    flex: 1;
-    min-width: 140px;
-    text-transform: uppercase;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.4);
-}
-
-.btn-glow::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.4);
-    transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
 }
 
-.btn-glow:hover::before {
-    width: 400px;
-    height: 400px;
+.btn:hover::before {
+    width: 500px;
+    height: 500px;
 }
 
-.btn-glow:hover {
-    transform: translateY(-5px) scale(1.05);
-    filter: brightness(1.2);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-}
-
-.btn-icon {
-    font-size: 16px;
-    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
-    animation: iconPulse 2s infinite;
-}
-
-@keyframes iconPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-}
-
-.btn-text {
-    font-size: 10px;
-    font-weight: bold;
-    letter-spacing: 1px;
-}
-
-.btn-accept {
-    background: linear-gradient(135deg, #00b894, #00cec9);
-    border: 1px solid #00b894;
-    box-shadow: 0 0 20px #00b894;
-}
-
-.btn-accept:hover {
-    box-shadow: 0 0 40px #00b894;
-}
-
-.btn-reject {
-    background: linear-gradient(135deg, #e74c3c, #d63031);
-    border: 1px solid #e74c3c;
-    box-shadow: 0 0 20px #e74c3c;
-}
-
-.btn-reject:hover {
-    box-shadow: 0 0 40px #e74c3c;
-}
-
-.btn-respond {
-    background: linear-gradient(135deg, #0984e3, #00b0ff);
-    border: 1px solid #0984e3;
-    box-shadow: 0 0 20px #0984e3;
-}
-
-.btn-respond:hover {
-    box-shadow: 0 0 40px #0984e3;
-}
-
-/* ==============================================
-   МЕГА УВЕДОМЛЕНИЯ
-   ============================================== */
-
-.notification {
-    position: fixed;
-    top: 30px;
-    right: 30px;
-    padding: 20px 35px;
-    border-radius: 15px;
-    color: white;
-    font-size: 12px;
-    z-index: 9999;
-    opacity: 0;
-    transform: translateX(50px);
-    transition: all 0.4s;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.2);
-    animation: notificationGlow 2s infinite;
-}
-
-@keyframes notificationGlow {
-    0%, 100% { box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-    50% { box-shadow: 0 10px 60px rgba(255,107,107,0.5); }
-}
-
-.notification.show {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-.notification.success {
-    background: linear-gradient(135deg, #00b894, #00cec9);
-}
-
-.notification.error {
-    background: linear-gradient(135deg, #e74c3c, #d63031);
-}
-
-/* ==============================================
-   МЕГА СТАТИСТИКА
-   ============================================== */
-
-.stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 25px;
-    margin-bottom: 40px;
-}
-
-.stat-card {
-    background: linear-gradient(135deg, #1a1a1a, #2c3e50);
-    padding: 30px;
-    border-radius: 25px;
-    text-align: center;
-    border: 2px solid #ff6b6b;
-    transition: all 0.4s;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: -100%;
-    left: -100%;
-    width: 300%;
-    height: 300%;
-    background: radial-gradient(circle, rgba(255,107,107,0.2) 0%, transparent 70%);
-    animation: statRotate 15s linear infinite;
-}
-
-@keyframes statRotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.stat-card:hover {
-    transform: translateY(-10px) scale(1.05);
-    box-shadow: 0 20px 50px rgba(255,107,107,0.5);
-}
-
-.stat-card h3 {
-    color: #ff6b6b;
-    font-size: 12px;
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    position: relative;
-    z-index: 1;
-}
-
-.stat-card span {
-    font-size: 48px;
-    font-weight: bold;
-    color: #fff;
-    text-shadow: 0 0 40px #ff6b6b;
-    position: relative;
-    z-index: 1;
-    animation: numberPulse 2s infinite;
-}
-
-@keyframes numberPulse {
-    0%, 100% { text-shadow: 0 0 20px #ff6b6b; }
-    50% { text-shadow: 0 0 50px #ff6b6b; }
-}
-
-/* ==============================================
-   МЕГА МОДАЛЬНЫЕ ОКНА
-   ============================================== */
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 2000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.95);
-    backdrop-filter: blur(15px);
-    animation: megaModalFade 0.3s;
-}
-
-@keyframes megaModalFade {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.modal-content {
-    background: linear-gradient(135deg, #1a1a1a, #2c3e50);
-    margin: 5% auto;
-    padding: 50px;
-    border-radius: 40px;
-    width: 90%;
-    max-width: 600px;
-    border: 3px solid #ff6b6b;
-    position: relative;
-    animation: megaModalSlide 0.5s;
-    box-shadow: 0 30px 80px rgba(255,107,107,0.5);
-}
-
-@keyframes megaModalSlide {
-    from {
-        transform: translateY(-80px) scale(0.9);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-    }
-}
-
-.modal-content h2 {
-    color: #ff6b6b;
-    margin-bottom: 30px;
-    text-align: center;
-    font-size: 22px;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    text-shadow: 0 0 20px #ff6b6b;
-}
-
-.close {
-    position: absolute;
-    right: 25px;
-    top: 20px;
-    font-size: 40px;
-    font-weight: bold;
-    cursor: pointer;
-    color: #ff6b6b;
-    transition: all 0.4s;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-}
-
-.close:hover {
-    color: #fff;
-    transform: rotate(180deg) scale(1.2);
-    background: rgba(255,107,107,0.3);
-    box-shadow: 0 0 30px #ff6b6b;
+.btn:hover {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 20px 60px rgba(255,68,68,0.9);
 }
 
 /* ==============================================
@@ -1069,55 +772,29 @@ body {
         text-align: center;
     }
     
-    .auth {
-        flex-direction: column;
-        width: 100%;
-    }
-    
-    #loginForm {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
-    .form-row {
-        flex-direction: column;
-        gap: 0;
-    }
-    
-    .rule-item {
-        flex-direction: column;
-        gap: 5px;
-    }
-    
     .info-content {
         flex-direction: column;
-        gap: 15px;
+        gap: 20px;
     }
     
     .info-item {
         width: 100%;
     }
     
-    .button-group {
+    .nav-link {
+        display: block;
+        margin: 10px 0;
+    }
+    
+    .form-row {
         flex-direction: column;
     }
     
-    .btn-glow {
-        width: 100%;
+    .rule-item {
+        flex-direction: column;
     }
     
-    .nav-link {
-        display: inline-block;
-        margin: 5px;
-        font-size: 10px;
-    }
-    
-    .stats {
-        grid-template-columns: 1fr;
-    }
-    
-    .modal-content {
-        margin: 10% auto;
-        padding: 30px;
+    .section {
+        padding: 25px;
     }
 }
