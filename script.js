@@ -489,3 +489,108 @@ function getStatus(status) {
     };
     return statuses[status] || '🆕 Новая';
 }
+// ==============================================
+// КРАСИВОЕ ОТОБРАЖЕНИЕ ЖАЛОБ И ЗАЯВОК
+// ==============================================
+
+function getStatusText(status) {
+    const statuses = {
+        'new': '🆕 Новая',
+        'accepted': '✅ Принята',
+        'rejected': '❌ Отклонена',
+        'resolved': '📝 Отвечено'
+    };
+    return statuses[status] || '🆕 Новая';
+}
+
+function getStatusClass(status) {
+    const classes = {
+        'new': 'status-new',
+        'accepted': 'status-accepted',
+        'rejected': 'status-rejected',
+        'resolved': 'status-resolved'
+    };
+    return classes[status] || 'status-new';
+}
+
+// Переопределяем функцию загрузки жалоб
+async function loadComplaints() {
+    const list = document.getElementById('complaintsList');
+    if (!list) return;
+    
+    try {
+        complaints = await window.getComplaints() || [];
+        
+        if (complaints.length === 0) {
+            list.innerHTML = '<div class="empty-state">🌙 <h3>Нет жалоб</h3></div>';
+            return;
+        }
+        
+        let html = '';
+        complaints.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(c => {
+            html += `
+                <div class="complaint-card">
+                    <div class="complaint-header">
+                        <span class="complaint-title">${c.title || 'Жалоба'}</span>
+                        <span class="complaint-status ${getStatusClass(c.status)}">${getStatusText(c.status)}</span>
+                    </div>
+                    <div class="complaint-body">
+                        <p><strong>👤 От:</strong> ${c.author}</p>
+                        <p><strong>🎯 На:</strong> ${c.against}</p>
+                        <p><strong>📝 Описание:</strong> ${c.description}</p>
+                        <p><strong>📅 Дата:</strong> ${new Date(c.date).toLocaleString()}</p>
+                        ${c.response ? `<p><strong>💬 Ответ:</strong> ${c.response}</p>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+        
+        list.innerHTML = html;
+    } catch (error) {
+        console.error('Ошибка загрузки жалоб:', error);
+        list.innerHTML = '<div class="error-state">❌ Ошибка загрузки</div>';
+    }
+}
+
+// Переопределяем функцию загрузки заявок
+async function loadApplications() {
+    const list = document.getElementById('applicationsList');
+    if (!list) return;
+    
+    try {
+        applications = await window.getApplications() || [];
+        
+        if (applications.length === 0) {
+            list.innerHTML = '<div class="empty-state">🌙 <h3>Нет заявок</h3></div>';
+            return;
+        }
+        
+        let html = '';
+        applications.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(a => {
+            html += `
+                <div class="application-card">
+                    <div class="application-header">
+                        <span class="application-title">👮 Анкета от ${a.author}</span>
+                        <span class="application-status ${getStatusClass(a.status)}">${getStatusText(a.status)}</span>
+                    </div>
+                    <div class="application-body">
+                        <p><strong>🎮 Ник:</strong> ${a.nickname}</p>
+                        <p><strong>👤 Имя:</strong> ${a.name}</p>
+                        <p><strong>📅 Возраст:</strong> ${a.age}</p>
+                        <p><strong>🌍 Часовой пояс:</strong> ${a.timezone}</p>
+                        <p><strong>💼 Опыт:</strong> ${a.experience}</p>
+                        <p><strong>❓ Мотивация:</strong> ${a.reason}</p>
+                        ${a.additional ? `<p><strong>📝 Дополнительно:</strong> ${a.additional}</p>` : ''}
+                        <p><strong>📅 Дата:</strong> ${new Date(a.date).toLocaleString()}</p>
+                        ${a.response ? `<p><strong>💬 Ответ:</strong> ${a.response}</p>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+        
+        list.innerHTML = html;
+    } catch (error) {
+        console.error('Ошибка загрузки заявок:', error);
+        list.innerHTML = '<div class="error-state">❌ Ошибка загрузки</div>';
+    }
+}
