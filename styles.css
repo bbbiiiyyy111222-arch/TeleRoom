@@ -1427,3 +1427,131 @@ body::before {
         padding: 25px;
     }
 }
+
+/* ==============================================
+   КАРТОЧКИ ДЛЯ ЖАЛОБ И ЗАЯВОК НА ГЛАВНОЙ
+   ============================================== */
+
+.complaint-card,
+.application-card {
+    background: rgba(26, 26, 46, 0.8);
+    border: 1px solid #4a6fa5;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 0 20px rgba(74, 111, 165, 0.2);
+}
+
+.complaint-card:hover,
+.application-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 30px rgba(74, 111, 165, 0.4);
+    border-color: #6c9bd2;
+}
+
+.complaint-header,
+.application-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(74, 111, 165, 0.3);
+}
+
+.complaint-title {
+    color: #6c9bd2;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.application-title {
+    color: #6c9bd2;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.complaint-status,
+.application-status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.complaint-status.status-new,
+.application-status.status-new {
+    background: #4a6fa5;
+    color: white;
+    box-shadow: 0 0 10px #4a6fa5;
+}
+
+.complaint-status.status-accepted,
+.application-status.status-accepted {
+    background: #2a5a4a;
+    color: white;
+    box-shadow: 0 0 10px #4acf9e;
+}
+
+.complaint-status.status-rejected,
+.application-status.status-rejected {
+    background: #5a2a2a;
+    color: white;
+    box-shadow: 0 0 10px #cf4a4a;
+}
+
+.complaint-status.status-resolved,
+.application-status.status-resolved {
+    background: #2a3a5a;
+    color: white;
+    box-shadow: 0 0 10px #4a8acf;
+}
+
+.complaint-body,
+.application-body {
+    color: #e0e0ff;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.complaint-body p,
+.application-body p {
+    margin: 8px 0;
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.complaint-body strong,
+.application-body strong {
+    color: #6c9bd2;
+    min-width: 80px;
+    display: inline-block;
+}
+
+/* Пустое состояние */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    background: rgba(26, 26, 46, 0.5);
+    border-radius: 15px;
+    border: 2px dashed #4a6fa5;
+}
+
+.empty-state h3 {
+    color: #6c9bd2;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.error-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #cf4a4a;
+    background: rgba(207, 74, 74, 0.1);
+    border-radius: 15px;
+    border: 2px solid #cf4a4a;
+}
