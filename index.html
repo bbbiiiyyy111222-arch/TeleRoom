@@ -23,15 +23,23 @@
                 <!-- Авторизация -->
                 <div class="auth" id="auth">
                     <div id="userInfo" style="display: none;">
-                        <span id="currentUser"></span>
-                        <button onclick="showChangePassword()" class="btn-small">🔑 Сменить пароль</button>
-                        <button onclick="logout()" class="btn-small">🌙 Выйти</button>
+                        <span id="currentUser" class="moon-glow"></span>
+                        <div class="auth-buttons">
+                            <button onclick="showChangePassword()" class="btn-moon">
+                                <span>🔑</span>
+                                <span>Сменить пароль</span>
+                            </button>
+                            <button onclick="logout()" class="btn-moon logout-btn">
+                                <span>🌙</span>
+                                <span>Выйти</span>
+                            </button>
+                        </div>
                     </div>
-                    <div id="loginForm">
-                        <input type="text" id="username" placeholder="Ник" class="input-small">
-                        <input type="password" id="password" placeholder="Пароль" class="input-small">
-                        <button onclick="login()" class="btn-small">🔐 Войти</button>
-                        <button onclick="showRegister()" class="btn-small">📝 Регистрация</button>
+                    <div id="loginForm" class="login-form">
+                        <input type="text" id="username" placeholder="Ник" class="moon-input">
+                        <input type="password" id="password" placeholder="Пароль" class="moon-input">
+                        <button onclick="login()" class="btn-moon">🔐 Войти</button>
+                        <button onclick="showRegister()" class="btn-moon">📝 Регистрация</button>
                     </div>
                 </div>
             </div>
