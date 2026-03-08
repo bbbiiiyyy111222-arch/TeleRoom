@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
-    document.getElementById('adminName').textContent = '👑 ' + currentUser.username + ' (Owner)';
+    document.getElementById('adminName').textContent = '👑 ' + currentUser.username + ' (OWNER)';
     loadAdminData();
     updateStats();
 });
