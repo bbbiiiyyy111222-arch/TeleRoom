@@ -2,283 +2,224 @@
 // БАЗА ДАННЫХ MOONGRIEF - ПОЛНАЯ ВЕРСИЯ
 // ==============================================
 
-// Подключение к Supabase
 const SUPABASE_URL = 'https://opeypwayctnnyrfkhajf.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wZXlwd2F5Y3RubnlyZmtoYWpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MzU4ODQsImV4cCI6MjA4ODUxMTg4NH0._Y1R1NNCVMyVgyeN7O7a24n4BGwc44c6vO1Q6MAf74A';
 
-console.log('🔄 Подключение к Supabase:', SUPABASE_URL);
-console.log('🔑 Ключ загружен');
+console.log('🔄 Подключение к Supabase');
 
-// Создаем клиент
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ==============================================
-// ФУНКЦИЯ ПРОВЕРКИ ПОДКЛЮЧЕНИЯ
+// ПОЛЬЗОВАТЕЛИ
 // ==============================================
-window.testConnection = async function() {
-    try {
-        console.log('🔍 Проверяем подключение...');
-        const { data, error } = await supabaseClient
-            .from('users')
-            .select('*')
-            .limit(1);
-        
-        if (error) {
-            console.error('❌ Ошибка подключения:', error);
-            return false;
-        } else {
-            console.log('✅ Подключение работает! Данные:', data);
-            return true;
-        }
-    } catch (e) {
-        console.error('❌ Исключение при подключении:', e);
-        return false;
-    }
-}
 
-// ==============================================
-// ФУНКЦИИ ДЛЯ ПОЛЬЗОВАТЕЛЕЙ
-// ==============================================
 window.getUsers = async function() {
     try {
         const { data, error } = await supabaseClient
             .from('users')
             .select('*');
-        
-        if (error) {
-            console.error('❌ Ошибка загрузки пользователей:', error);
-            return [];
-        }
+        if (error) throw error;
         return data || [];
     } catch (e) {
-        console.error('❌ Исключение:', e);
+        console.error('Ошибка загрузки пользователей:', e);
         return [];
     }
 }
 
 window.saveUser = async function(username, password) {
     try {
-        const { data, error } = await supabaseClient
+        const { error } = await supabaseClient
             .from('users')
-            .insert([
-                { username: username, password: password }
-            ]);
-        
-        if (error) {
-            console.error('❌ Ошибка сохранения пользователя:', error);
-            return false;
-        }
-        console.log('✅ Пользователь сохранен');
+            .insert([{ username, password }]);
+        if (error) throw error;
         return true;
     } catch (e) {
-        console.error('❌ Исключение:', e);
+        console.error('Ошибка сохранения пользователя:', e);
         return false;
     }
 }
 
 window.updateUserPassword = async function(username, password) {
     try {
-        const { data, error } = await supabaseClient
+        const { error } = await supabaseClient
             .from('users')
-            .update({ password: password })
+            .update({ password })
             .eq('username', username);
-        
-        if (error) {
-            console.error('❌ Ошибка обновления пароля:', error);
-            return false;
-        }
-        console.log('✅ Пароль обновлен');
+        if (error) throw error;
         return true;
     } catch (e) {
-        console.error('❌ Исключение:', e);
+        console.error('Ошибка обновления пароля:', e);
         return false;
     }
 }
 
+window.changePassword = async function(username, oldPassword, newPassword) {
+    try {
+        const { data: user, error: findError } = await supabaseClient
+            .from('users')
+            .select('*')
+            .eq('username', username)
+            .eq('password', oldPassword)
+            .single();
+        
+        if (findError || !user) {
+            return { success: false, message: 'Неверный старый пароль' };
+        }
+        
+        const { error: updateError } = await supabaseClient
+            .from('users')
+            .update({ password: newPassword })
+            .eq('username', username);
+        
+        if (updateError) throw updateError;
+        
+        return { success: true, message: 'Пароль изменен' };
+    } catch (e) {
+        console.error('Ошибка смены пароля:', e);
+        return { success: false, message: 'Ошибка при смене пароля' };
+    }
+}
+
 // ==============================================
-// ФУНКЦИИ ДЛЯ ЖАЛОБ
+// ЖАЛОБЫ
 // ==============================================
+
 window.getComplaints = async function() {
     try {
-        console.log('📋 Загружаем жалобы...');
         const { data, error } = await supabaseClient
             .from('complaints')
             .select('*')
             .order('date', { ascending: false });
-        
-        if (error) {
-            console.error('❌ Ошибка загрузки жалоб:', error);
-            return [];
-        }
-        console.log(`✅ Загружено жалоб: ${data ? data.length : 0}`);
+        if (error) throw error;
         return data || [];
     } catch (e) {
-        console.error('❌ Исключение:', e);
+        console.error('Ошибка загрузки жалоб:', e);
         return [];
     }
 }
 
 window.saveComplaint = async function(complaint) {
     try {
-        console.log('💾 Сохраняем жалобу:', complaint);
-        
-        const { data, error } = await supabaseClient
+        const { error } = await supabaseClient
             .from('complaints')
             .insert([complaint]);
-        
-        if (error) {
-            console.error('❌ Ошибка сохранения жалобы:', error);
-            return false;
-        }
-        console.log('✅ Жалоба сохранена');
+        if (error) throw error;
         return true;
     } catch (e) {
-        console.error('❌ Исключение:', e);
+        console.error('Ошибка сохранения жалобы:', e);
         return false;
     }
 }
 
 window.updateComplaint = async function(id, updates) {
     try {
-        console.log('🔄 Обновляем жалобу:', id, updates);
-        
-        const { data, error } = await supabaseClient
+        const { error } = await supabaseClient
             .from('complaints')
             .update(updates)
             .eq('id', id);
-        
-        if (error) {
-            console.error('❌ Ошибка обновления жалобы:', error);
-            return false;
-        }
-        console.log('✅ Жалоба обновлена');
+        if (error) throw error;
         return true;
     } catch (e) {
-        console.error('❌ Исключение:', e);
+        console.error('Ошибка обновления жалобы:', e);
         return false;
     }
 }
 
+// ==============================================
+// УДАЛЕНИЕ ЖАЛОБ - РАБОЧАЯ ВЕРСИЯ
+// ==============================================
+
 window.deleteComplaint = async function(id) {
+    console.log('🗑️ db.js: Удаление жалобы ID:', id);
+    
     try {
-        console.log('🗑️ Удаляем жалобу с ID:', id);
-        
-        const { data, error } = await supabaseClient
+        const { error } = await supabaseClient
             .from('complaints')
             .delete()
             .eq('id', id);
         
         if (error) {
-            console.error('❌ Ошибка удаления жалобы:', error);
+            console.error('❌ db.js: Ошибка:', error);
             return false;
         }
         
-        console.log('✅ Жалоба удалена');
+        console.log('✅ db.js: Жалоба удалена');
         return true;
     } catch (e) {
-        console.error('❌ Исключение при удалении:', e);
+        console.error('❌ db.js: Исключение:', e);
         return false;
     }
 }
 
 // ==============================================
-// ФУНКЦИИ ДЛЯ ЗАЯВОК
+// ЗАЯВКИ
 // ==============================================
+
 window.getApplications = async function() {
     try {
-        console.log('📋 Загружаем заявки...');
         const { data, error } = await supabaseClient
             .from('applications')
             .select('*')
             .order('date', { ascending: false });
-        
-        if (error) {
-            console.error('❌ Ошибка загрузки заявок:', error);
-            return [];
-        }
-        console.log(`✅ Загружено заявок: ${data ? data.length : 0}`);
+        if (error) throw error;
         return data || [];
     } catch (e) {
-        console.error('❌ Исключение:', e);
+        console.error('Ошибка загрузки заявок:', e);
         return [];
     }
 }
 
 window.saveApplication = async function(application) {
     try {
-        console.log('💾 Сохраняем заявку:', application);
-        
-        const { data, error } = await supabaseClient
+        const { error } = await supabaseClient
             .from('applications')
             .insert([application]);
-        
-        if (error) {
-            console.error('❌ Ошибка сохранения заявки:', error);
-            return false;
-        }
-        console.log('✅ Заявка сохранена');
+        if (error) throw error;
         return true;
     } catch (e) {
-        console.error('❌ Исключение:', e);
+        console.error('Ошибка сохранения заявки:', e);
         return false;
     }
 }
 
 window.updateApplication = async function(id, updates) {
     try {
-        console.log('🔄 Обновляем заявку:', id, updates);
-        
-        const { data, error } = await supabaseClient
+        const { error } = await supabaseClient
             .from('applications')
             .update(updates)
             .eq('id', id);
-        
-        if (error) {
-            console.error('❌ Ошибка обновления заявки:', error);
-            return false;
-        }
-        console.log('✅ Заявка обновлена');
+        if (error) throw error;
         return true;
     } catch (e) {
-        console.error('❌ Исключение:', e);
+        console.error('Ошибка обновления заявки:', e);
         return false;
     }
 }
 
+// ==============================================
+// УДАЛЕНИЕ ЗАЯВОК - РАБОЧАЯ ВЕРСИЯ
+// ==============================================
+
 window.deleteApplication = async function(id) {
+    console.log('🗑️ db.js: Удаление заявки ID:', id);
+    
     try {
-        console.log('🗑️ Удаляем заявку с ID:', id);
-        
-        const { data, error } = await supabaseClient
+        const { error } = await supabaseClient
             .from('applications')
             .delete()
             .eq('id', id);
         
         if (error) {
-            console.error('❌ Ошибка удаления заявки:', error);
+            console.error('❌ db.js: Ошибка:', error);
             return false;
         }
         
-        console.log('✅ Заявка удалена');
+        console.log('✅ db.js: Заявка удалена');
         return true;
     } catch (e) {
-        console.error('❌ Исключение при удалении:', e);
+        console.error('❌ db.js: Исключение:', e);
         return false;
     }
 }
 
-// ==============================================
-// ОБЪЯВЛЯЕМ ФУНКЦИИ ГЛОБАЛЬНО (на всякий случай)
-// ==============================================
-console.log('📦 Функции db.js зарегистрированы:');
-console.log('  - getUsers:', typeof window.getUsers);
-console.log('  - getComplaints:', typeof window.getComplaints);
-console.log('  - getApplications:', typeof window.getApplications);
-console.log('  - saveComplaint:', typeof window.saveComplaint);
-console.log('  - updateComplaint:', typeof window.updateComplaint);
-console.log('  - deleteComplaint:', typeof window.deleteComplaint);
-
-// Проверяем подключение
-setTimeout(() => {
-    window.testConnection();
-}, 1000);
+console.log('✅ db.js загружен');
