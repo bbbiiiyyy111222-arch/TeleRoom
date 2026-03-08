@@ -10,7 +10,7 @@ const OWNERS = ['milfa', 'milk123', 'Xchik_'];
 // Загрузка
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Страница загружена');
-    console.log('Supabase доступен:', typeof supabase !== 'undefined');
+    console.log('Supabase доступен:', typeof supabaseClient !== 'undefined');
     
     try {
         // Загружаем данные из базы
@@ -20,20 +20,54 @@ document.addEventListener('DOMContentLoaded', async function() {
         await loadLists();
         checkAdminLink();
         
-        // Показываем правила по умолчанию
-        showSection('rules');
+        // Показываем правила по умолчанию (без event)
+        showDefaultSection();
     } catch (error) {
         console.error('Ошибка при загрузке:', error);
-        alert('Ошибка подключения к базе данных. Проверьте консоль.');
     }
 });
+
+// Показать правила по умолчанию (без event)
+function showDefaultSection() {
+    document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active-section');
+    });
+    document.getElementById('rules').classList.add('active-section');
+    
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    // Активируем первую ссылку (Правила)
+    const firstLink = document.querySelector('.nav-link');
+    if (firstLink) firstLink.classList.add('active');
+}
+
+// Показать секцию (с event)
+function showSection(sectionId, event) {
+    if (!event) {
+        // Если event нет, используем showDefaultSection
+        showDefaultSection();
+        return;
+    }
+    
+    document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active-section');
+    });
+    
+    document.getElementById(sectionId).classList.add('active-section');
+    
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    event.target.classList.add('active');
+}
 
 // Загрузка данных из базы
 async function loadDataFromDB() {
     try {
-        users = await getUsers() || [];
-        complaints = await getComplaints() || [];
-        applications = await getApplications() || [];
+        users = await window.getUsers() || [];
+        complaints = await window.getComplaints() || [];
+        applications = await window.getApplications() || [];
         
         console.log('Загружено из базы:', { users, complaints, applications });
     } catch (error) {
@@ -50,20 +84,6 @@ function copyIP() {
     alert('IP скопирован в буфер обмена!');
 }
 
-// Показать секцию
-function showSection(sectionId) {
-    document.querySelectorAll('.section').forEach(section => {
-        section.classList.remove('active-section');
-    });
-    
-    document.getElementById(sectionId).classList.add('active-section');
-    
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.classList.remove('active');
-    });
-    event.target.classList.add('active');
-}
-
 // Авторизация
 async function login() {
     const username = document.getElementById('username').value.trim();
@@ -75,8 +95,7 @@ async function login() {
     }
     
     try {
-        // Загружаем пользователей из базы
-        users = await getUsers();
+        users = await window.getUsers();
         
         const user = users.find(u => u.username === username && u.password === password);
         
@@ -141,8 +160,6 @@ async function register(event) {
     const password = document.getElementById('regPassword').value.trim();
     const confirm = document.getElementById('regConfirmPassword').value.trim();
     
-    console.log('Регистрация:', username);
-    
     if (!username || !password) {
         alert('Заполните все поля!');
         return;
@@ -154,17 +171,12 @@ async function register(event) {
     }
     
     try {
-        // Проверяем, есть ли уже такой пользователь
-        users = await getUsers();
-        console.log('Существующие пользователи:', users);
-        
+        users = await window.getUsers();
         const existingUser = users.find(u => u.username === username);
         
         if (existingUser) {
-            // Если пользователь уже есть (например, владелец), обновляем пароль
             if (OWNERS.includes(username)) {
-                console.log('Обновление пароля для владельца:', username);
-                const updated = await updateUserPassword(username, password);
+                const updated = await window.updateUserPassword(username, password);
                 if (updated) {
                     currentUser = { username, password };
                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
@@ -181,13 +193,9 @@ async function register(event) {
             return;
         }
         
-        // Сохраняем нового пользователя в базу
-        console.log('Создание нового пользователя:', username);
-        const saved = await saveUser(username, password);
-        console.log('Результат сохранения:', saved);
+        const saved = await window.saveUser(username, password);
         
         if (saved) {
-            // Сразу входим
             currentUser = { username, password };
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             
@@ -200,7 +208,7 @@ async function register(event) {
         }
     } catch (error) {
         console.error('Ошибка регистрации:', error);
-        alert('Ошибка при регистрации: ' + error.message);
+        alert('Ошибка при регистрации');
     }
 }
 
@@ -237,8 +245,7 @@ async function submitComplaint(event) {
             response: null
         };
         
-        // Сохраняем в базу
-        const saved = await saveComplaint(complaint);
+        const saved = await window.saveComplaint(complaint);
         
         if (saved) {
             alert('Жалоба отправлена!');
@@ -278,8 +285,7 @@ async function submitApplication(event) {
             response: null
         };
         
-        // Сохраняем в базу
-        const saved = await saveApplication(application);
+        const saved = await window.saveApplication(application);
         
         if (saved) {
             alert('Анкета отправлена!');
@@ -305,9 +311,9 @@ async function loadComplaints() {
     if (!list) return;
     
     try {
-        complaints = await getComplaints();
+        complaints = await window.getComplaints() || [];
         
-        if (!complaints || complaints.length === 0) {
+        if (complaints.length === 0) {
             list.innerHTML = '<p style="color: #666; text-align: center;">Пока нет жалоб</p>';
             return;
         }
@@ -341,9 +347,9 @@ async function loadApplications() {
     if (!list) return;
     
     try {
-        applications = await getApplications();
+        applications = await window.getApplications() || [];
         
-        if (!applications || applications.length === 0) {
+        if (applications.length === 0) {
             list.innerHTML = '<p style="color: #666; text-align: center;">Пока нет заявок</p>';
             return;
         }
@@ -381,5 +387,5 @@ function getStatus(status) {
         'pending': '⏳ В обработке',
         'resolved': '✅ Решена'
     };
-    return statuses[status] || status;
+    return statuses[status] || '🆕 Новая';
 }
