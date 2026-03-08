@@ -20,14 +20,14 @@ document.addEventListener('DOMContentLoaded', async function() {
         await loadLists();
         checkAdminLink();
         
-        // Показываем правила по умолчанию (без event)
+        // Показываем правила по умолчанию
         showDefaultSection();
     } catch (error) {
         console.error('Ошибка при загрузке:', error);
     }
 });
 
-// Показать правила по умолчанию (без event)
+// Показать правила по умолчанию
 function showDefaultSection() {
     document.querySelectorAll('.section').forEach(section => {
         section.classList.remove('active-section');
@@ -37,29 +37,31 @@ function showDefaultSection() {
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
     });
-    // Активируем первую ссылку (Правила)
-    const firstLink = document.querySelector('.nav-link');
-    if (firstLink) firstLink.classList.add('active');
+    const rulesLink = document.querySelector('[href="#rules"]');
+    if (rulesLink) rulesLink.classList.add('active');
 }
 
-// Показать секцию (с event)
+// Показать секцию
 function showSection(sectionId, event) {
-    if (!event) {
-        // Если event нет, используем showDefaultSection
-        showDefaultSection();
-        return;
-    }
-    
+    // Скрываем все секции
     document.querySelectorAll('.section').forEach(section => {
         section.classList.remove('active-section');
     });
     
+    // Показываем нужную секцию
     document.getElementById(sectionId).classList.add('active-section');
     
+    // Обновляем навигацию
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
     });
-    event.target.classList.add('active');
+    
+    if (event && event.target) {
+        event.target.classList.add('active');
+    } else {
+        const link = document.querySelector(`[href="#${sectionId}"]`);
+        if (link) link.classList.add('active');
+    }
 }
 
 // Загрузка данных из базы
