@@ -1081,3 +1081,747 @@ body::before {
 #complaintsList, #applicationsList {
     margin-top: 20px;
 }
+/* ==============================================
+   ЛУННАЯ АДМИН ПАНЕЛЬ - ПОЛНЫЙ СТИЛЬ
+   ============================================== */
+
+/* СТАТИСТИКА */
+.moon-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.moon-stat-card {
+    background: linear-gradient(135deg, #1e2a3a, #16213e);
+    border: 2px solid #4a6fa5;
+    border-radius: 30px;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    transition: all 0.4s;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(74, 111, 165, 0.3);
+}
+
+.moon-stat-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(74, 111, 165, 0.2) 0%, transparent 70%);
+    animation: statRotate 15s linear infinite;
+}
+
+@keyframes statRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.moon-stat-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 0 70px rgba(74, 111, 165, 0.7);
+    border-color: #6c9bd2;
+}
+
+.moon-stat-icon {
+    font-size: 54px;
+    color: #6c9bd2;
+    filter: drop-shadow(0 0 25px #6c9bd2);
+    animation: statIconFloat 3s infinite;
+}
+
+@keyframes statIconFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.moon-stat-info {
+    flex: 1;
+}
+
+.moon-stat-info h3 {
+    color: #6c9bd2;
+    font-size: 12px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px #6c9bd2;
+}
+
+.moon-stat-number {
+    color: #e0e0ff;
+    font-size: 48px;
+    font-weight: bold;
+    text-shadow: 0 0 35px #6c9bd2;
+    animation: numberPulse 2s infinite;
+}
+
+@keyframes numberPulse {
+    0%, 100% { text-shadow: 0 0 25px #6c9bd2; }
+    50% { text-shadow: 0 0 60px #6c9bd2; }
+}
+
+/* ЛУННЫЕ ТАБЫ */
+.moon-admin-tabs {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.moon-tab-btn {
+    background: rgba(22, 33, 62, 0.9);
+    color: #6c9bd2;
+    border: 2px solid #4a6fa5;
+    padding: 18px 45px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px;
+    border-radius: 60px;
+    cursor: pointer;
+    transition: all 0.4s;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(74, 111, 165, 0.3);
+}
+
+.moon-tab-btn::before {
+    content: '🌙';
+    position: absolute;
+    left: -35px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: all 0.4s;
+    font-size: 16px;
+}
+
+.moon-tab-btn::after {
+    content: '🌙';
+    position: absolute;
+    right: -35px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: all 0.4s;
+    font-size: 16px;
+}
+
+.moon-tab-btn:hover::before {
+    left: 15px;
+    opacity: 1;
+}
+
+.moon-tab-btn:hover::after {
+    right: 15px;
+    opacity: 1;
+}
+
+.moon-tab-btn:hover {
+    background: #1e2a3a;
+    color: #8ab3ff;
+    transform: translateY(-5px);
+    box-shadow: 0 0 50px #6c9bd2;
+    border-color: #6c9bd2;
+    padding-left: 60px;
+    padding-right: 60px;
+}
+
+.moon-tab-btn.active {
+    background: #4a6fa5;
+    color: white;
+    border-color: #6c9bd2;
+    box-shadow: 0 0 40px #6c9bd2;
+}
+
+.moon-tab-btn.active::before,
+.moon-tab-btn.active::after {
+    opacity: 1;
+    color: white;
+}
+
+.moon-tab-btn.active::before {
+    left: 15px;
+}
+
+.moon-tab-btn.active::after {
+    right: 15px;
+}
+
+/* ЛУННЫЙ КОНТЕНТ */
+.moon-admin-content {
+    display: none;
+    animation: moonContentFade 0.5s ease;
+}
+
+@keyframes moonContentFade {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.moon-admin-content.active {
+    display: block;
+}
+
+.moon-admin-title {
+    color: #6c9bd2;
+    font-size: 20px;
+    margin-bottom: 30px;
+    text-align: center;
+    text-shadow: 0 0 25px #6c9bd2;
+    letter-spacing: 2px;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.moon-admin-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #4a6fa5, #6c9bd2, #4a6fa5, transparent);
+    border-radius: 2px;
+}
+
+.moon-admin-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* ЛУННЫЕ КАРТОЧКИ ДЛЯ АДМИНКИ */
+.moon-admin-card {
+    background: rgba(22, 33, 62, 0.8);
+    border: 2px solid #4a6fa5;
+    border-radius: 25px;
+    padding: 25px;
+    transition: all 0.4s;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(5px);
+}
+
+.moon-admin-card::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: -100%;
+    width: 300%;
+    height: 300%;
+    background: radial-gradient(circle, rgba(74, 111, 165, 0.1) 0%, transparent 70%);
+    animation: cardRotate 20s linear infinite;
+}
+
+@keyframes cardRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.moon-admin-card:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 0 50px rgba(74, 111, 165, 0.5);
+    border-color: #6c9bd2;
+}
+
+.moon-admin-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(74, 111, 165, 0.3);
+    position: relative;
+    z-index: 2;
+}
+
+.moon-admin-card-title {
+    color: #6c9bd2;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 0 15px #6c9bd2;
+}
+
+.moon-admin-card-status {
+    padding: 6px 18px;
+    border-radius: 30px;
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: #4a6fa5;
+    color: white;
+    box-shadow: 0 0 15px #4a6fa5;
+}
+
+.moon-admin-card-content {
+    position: relative;
+    z-index: 2;
+}
+
+.moon-admin-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.moon-admin-info-item {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 12px;
+    border-radius: 15px;
+    border-left: 4px solid #4a6fa5;
+}
+
+.moon-admin-info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.moon-admin-info-label {
+    color: #6c9bd2;
+    font-size: 9px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+}
+
+.moon-admin-info-value {
+    color: #e0e0ff;
+    font-size: 11px;
+    word-break: break-word;
+    line-height: 1.5;
+}
+
+.moon-admin-response {
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(74, 111, 165, 0.15);
+    border-radius: 15px;
+    border-left: 4px solid #6c9bd2;
+}
+
+.moon-admin-response-label {
+    color: #6c9bd2;
+    font-size: 10px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.moon-admin-response-text {
+    color: #e0e0ff;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* ЛУННЫЕ КНОПКИ ДЕЙСТВИЙ */
+.moon-admin-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.moon-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 9px;
+    color: white;
+    transition: all 0.4s;
+    flex: 1;
+    min-width: 120px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.moon-action-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.moon-action-btn:hover::before {
+    width: 400px;
+    height: 400px;
+}
+
+.moon-action-btn:hover {
+    transform: translateY(-5px) scale(1.05);
+    filter: brightness(1.2);
+    box-shadow: 0 0 40px currentColor;
+}
+
+.moon-action-accept {
+    background: linear-gradient(135deg, #2a5a4a, #1e4a3a);
+    border: 1px solid #4acf9e;
+    color: #8ae0c0;
+}
+
+.moon-action-accept:hover {
+    background: #4acf9e;
+    color: white;
+    box-shadow: 0 0 40px #4acf9e;
+}
+
+.moon-action-reject {
+    background: linear-gradient(135deg, #5a2a2a, #4a1e1e);
+    border: 1px solid #cf4a4a;
+    color: #e08a8a;
+}
+
+.moon-action-reject:hover {
+    background: #cf4a4a;
+    color: white;
+    box-shadow: 0 0 40px #cf4a4a;
+}
+
+.moon-action-respond {
+    background: linear-gradient(135deg, #2a3a5a, #1e2a4a);
+    border: 1px solid #4a8acf;
+    color: #8ab0e0;
+}
+
+.moon-action-respond:hover {
+    background: #4a8acf;
+    color: white;
+    box-shadow: 0 0 40px #4a8acf;
+}
+
+.moon-action-delete {
+    background: linear-gradient(135deg, #3a2a2a, #2a1e1e);
+    border: 1px solid #8a4a4a;
+    color: #b08a8a;
+}
+
+.moon-action-delete:hover {
+    background: #8a4a4a;
+    color: white;
+    box-shadow: 0 0 40px #8a4a4a;
+}
+
+/* ЛУННЫЙ СТАТУС МЕССЕДЖ */
+.moon-status-message {
+    color: #6c9bd2;
+    font-size: 9px;
+    padding: 12px;
+    background: rgba(74, 111, 165, 0.2);
+    border-radius: 40px;
+    text-align: center;
+    flex: 1;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 1px solid #4a6fa5;
+}
+
+/* ЛУННАЯ МОДАЛКА */
+.moon-modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(15px);
+    animation: moonModalFade 0.4s;
+}
+
+@keyframes moonModalFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.moon-modal-content {
+    background: linear-gradient(135deg, #1e2a3a, #16213e);
+    margin: 5% auto;
+    padding: 50px;
+    border-radius: 50px;
+    width: 90%;
+    max-width: 600px;
+    border: 3px solid #4a6fa5;
+    position: relative;
+    animation: moonModalSlide 0.6s;
+    box-shadow: 0 0 100px rgba(74, 111, 165, 0.6);
+}
+
+@keyframes moonModalSlide {
+    from {
+        transform: translateY(-80px) scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.moon-modal-title {
+    color: #6c9bd2;
+    font-size: 22px;
+    margin-bottom: 35px;
+    text-align: center;
+    text-shadow: 0 0 30px #6c9bd2;
+    letter-spacing: 2px;
+}
+
+.moon-close {
+    position: absolute;
+    right: 25px;
+    top: 20px;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #4a6fa5;
+    transition: all 0.4s;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.moon-close:hover {
+    color: #fff;
+    transform: rotate(180deg) scale(1.2);
+    background: rgba(74, 111, 165, 0.3);
+    box-shadow: 0 0 40px #4a6fa5;
+}
+
+.moon-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.moon-form-group {
+    margin-bottom: 20px;
+}
+
+.moon-label {
+    color: #6c9bd2;
+    font-size: 12px;
+    margin-bottom: 12px;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.moon-textarea {
+    width: 100%;
+    padding: 18px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid #4a6fa5;
+    color: #e0e0ff;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 11px;
+    border-radius: 25px;
+    resize: vertical;
+    min-height: 150px;
+    transition: all 0.3s;
+}
+
+.moon-textarea:focus {
+    outline: none;
+    border-color: #6c9bd2;
+    box-shadow: 0 0 40px #6c9bd2;
+    background: rgba(0, 0, 0, 0.8);
+    transform: scale(1.02);
+}
+
+.moon-modal-buttons {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.moon-submit-btn {
+    background: linear-gradient(135deg, #2a3a5a, #1a2a4a);
+    color: #6c9bd2;
+    border: 2px solid #4a6fa5;
+    padding: 18px 30px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.4s;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+    box-shadow: 0 0 25px rgba(74, 111, 165, 0.3);
+}
+
+.moon-submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(108, 155, 210, 0.4);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.moon-submit-btn:hover::before {
+    width: 600px;
+    height: 600px;
+}
+
+.moon-submit-btn:hover {
+    background: #4a6fa5;
+    color: white;
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 0 60px #6c9bd2;
+    border-color: #6c9bd2;
+}
+
+.moon-cancel-btn {
+    background: linear-gradient(135deg, #3a2a2a, #2a1e1e);
+    color: #d26c6c;
+    border-color: #a54a4a;
+}
+
+.moon-cancel-btn:hover {
+    background: #a54a4a;
+    color: white;
+    border-color: #d26c6c;
+}
+
+/* АДАПТИВНОСТЬ ДЛЯ АДМИНКИ */
+@media (max-width: 768px) {
+    .moon-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .moon-stat-card {
+        padding: 20px;
+    }
+    
+    .moon-stat-icon {
+        font-size: 42px;
+    }
+    
+    .moon-stat-number {
+        font-size: 36px;
+    }
+    
+    .moon-admin-tabs {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .moon-tab-btn {
+        width: 100%;
+        padding: 15px;
+    }
+    
+    .moon-tab-btn:hover::before,
+    .moon-tab-btn:hover::after,
+    .moon-tab-btn.active::before,
+    .moon-tab-btn.active::after {
+        display: none;
+    }
+    
+    .moon-admin-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .moon-admin-actions {
+        flex-direction: column;
+    }
+    
+    .moon-action-btn {
+        width: 100%;
+    }
+    
+    .moon-modal-content {
+        padding: 25px;
+        margin: 10% auto;
+    }
+    
+    .moon-modal-buttons {
+        flex-direction: column;
+    }
+}
+
+/* СТАТУСЫ ДЛЯ КАРТОЧЕК */
+.status-new {
+    background: #4a6fa5;
+    box-shadow: 0 0 20px #4a6fa5;
+}
+
+.status-accepted {
+    background: #2a5a4a;
+    box-shadow: 0 0 20px #4acf9e;
+}
+
+.status-rejected {
+    background: #5a2a2a;
+    box-shadow: 0 0 20px #cf4a4a;
+}
+
+.status-resolved {
+    background: #2a3a5a;
+    box-shadow: 0 0 20px #4a8acf;
+}
+
+/* ПУСТЫЕ СОСТОЯНИЯ */
+.moon-empty {
+    text-align: center;
+    padding: 60px 20px;
+    background: rgba(22, 33, 62, 0.5);
+    border-radius: 30px;
+    border: 2px dashed #4a6fa5;
+}
+
+.moon-empty h3 {
+    color: #6c9bd2;
+    font-size: 16px;
+    margin: 20px 0 10px;
+}
+
+.moon-empty p {
+    color: #8a8ac0;
+    font-size: 11px;
+}
