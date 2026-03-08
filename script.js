@@ -1,98 +1,34 @@
 // Данные
-let users = JSON.parse(localStorage.getItem('users')) || [];
-let complaints = JSON.parse(localStorage.getItem('complaints')) || [];
-let applications = JSON.parse(localStorage.getItem('applications')) || [];
+let users = [];
+let complaints = [];
+let applications = [];
 let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 
-// ВСЕ OWNER (вшиты в код)
+// ВСЕ OWNER
 const OWNERS = ['milfa', 'milk123', 'Xchik_'];
 
-// Загрузка - сразу добавляем владельцев в систему
-document.addEventListener('DOMContentLoaded', function() {
+// Загрузка
+document.addEventListener('DOMContentLoaded', async function() {
     console.log('Страница загружена');
     
-    // Добавляем владельцев в систему, если их нет
-    addOwnersToSystem();
-    
-    // Добавляем тестовые данные для демонстрации
-    addTestData();
+    // Загружаем данные из базы
+    await loadDataFromDB();
     
     updateAuth();
-    loadLists();
+    await loadLists();
     checkAdminLink();
     
     // Показываем правила по умолчанию
     showSection('rules');
 });
 
-// Функция добавления владельцев в систему
-function addOwnersToSystem() {
-    // Загружаем пользователей
-    users = JSON.parse(localStorage.getItem('users')) || [];
-    let added = false;
+// Загрузка данных из базы
+async function loadDataFromDB() {
+    users = await getUsers();
+    complaints = await getComplaints();
+    applications = await getApplications();
     
-    // Для каждого владельца проверяем, есть ли он в системе
-    OWNERS.forEach(owner => {
-        const exists = users.find(u => u.username === owner);
-        if (!exists) {
-            // Если владельца нет, добавляем его с паролем по умолчанию
-            users.push({
-                username: owner,
-                password: owner + '123' // пароль: ник + 123 (например milfa123)
-            });
-            added = true;
-        }
-    });
-    
-    if (added) {
-        localStorage.setItem('users', JSON.stringify(users));
-        console.log('Владельцы добавлены в систему');
-    }
-}
-
-// Функция добавления тестовых данных
-function addTestData() {
-    // Загружаем текущие данные
-    complaints = JSON.parse(localStorage.getItem('complaints')) || [];
-    applications = JSON.parse(localStorage.getItem('applications')) || [];
-    
-    // Если нет ни одной жалобы, добавляем тестовую
-    if (complaints.length === 0) {
-        const testComplaint = {
-            id: Date.now() - 1000000,
-            title: "Тестовая жалоба",
-            against: "TestPlayer",
-            description: "Это тестовая жалоба для проверки работы админ панели",
-            author: "milfa",
-            date: new Date().toISOString(),
-            status: 'new',
-            response: null
-        };
-        complaints.push(testComplaint);
-        localStorage.setItem('complaints', JSON.stringify(complaints));
-        console.log('Добавлена тестовая жалоба');
-    }
-    
-    // Если нет ни одной заявки, добавляем тестовую
-    if (applications.length === 0) {
-        const testApplication = {
-            id: Date.now() - 500000,
-            nickname: "TestPlayer",
-            name: "Тест Тестович",
-            age: "16",
-            timezone: "UTC+3",
-            experience: "Был хелпером на другом сервере",
-            reason: "Хочу помогать игрокам",
-            additional: "Есть микрофон, могу играть каждый день",
-            author: "milk123",
-            date: new Date().toISOString(),
-            status: 'new',
-            response: null
-        };
-        applications.push(testApplication);
-        localStorage.setItem('applications', JSON.stringify(applications));
-        console.log('Добавлена тестовая заявка');
-    }
+    console.log('Загружено из базы:', { users, complaints, applications });
 }
 
 // Копирование IP
@@ -101,17 +37,14 @@ function copyIP() {
     alert('IP скопирован в буфер обмена!');
 }
 
-// Показать секцию (правила/жалобы/заявки)
+// Показать секцию
 function showSection(sectionId) {
-    // Скрываем все секции
     document.querySelectorAll('.section').forEach(section => {
         section.classList.remove('active-section');
     });
     
-    // Показываем нужную секцию
     document.getElementById(sectionId).classList.add('active-section');
     
-    // Обновляем активный класс в навигации
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
     });
@@ -119,7 +52,7 @@ function showSection(sectionId) {
 }
 
 // Авторизация
-function login() {
+async function login() {
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
     
@@ -128,8 +61,8 @@ function login() {
         return;
     }
     
-    // Обновляем users из localStorage
-    users = JSON.parse(localStorage.getItem('users')) || [];
+    // Загружаем пользователей из базы
+    users = await getUsers();
     
     const user = users.find(u => u.username === username && u.password === password);
     
@@ -163,7 +96,6 @@ function updateAuth() {
         userInfo.style.display = 'flex';
         loginForm.style.display = 'none';
         
-        // Проверяем, является ли пользователь OWNER
         if (OWNERS.includes(currentUser.username)) {
             currentUserSpan.textContent = '👑 ' + currentUser.username + ' (OWNER)';
         } else {
@@ -184,7 +116,7 @@ function closeModal() {
     document.getElementById('registerModal').style.display = 'none';
 }
 
-function register(event) {
+async function register(event) {
     event.preventDefault();
     
     const username = document.getElementById('regUsername').value.trim();
@@ -201,34 +133,48 @@ function register(event) {
         return;
     }
     
-    // Обновляем users из localStorage
-    users = JSON.parse(localStorage.getItem('users')) || [];
+    // Проверяем, есть ли уже такой пользователь
+    users = await getUsers();
+    const existingUser = users.find(u => u.username === username);
     
-    if (users.find(u => u.username === username)) {
-        alert('Пользователь уже существует!');
+    if (existingUser) {
+        // Если пользователь уже есть (например, владелец), обновляем пароль
+        if (OWNERS.includes(username)) {
+            const updated = await updateUserPassword(username, password);
+            if (updated) {
+                currentUser = { username, password };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                alert('Пароль установлен! Добро пожаловать, ' + username + '!');
+                closeModal();
+                updateAuth();
+                checkAdminLink();
+            } else {
+                alert('Ошибка при установке пароля!');
+            }
+        } else {
+            alert('Пользователь уже существует!');
+        }
         return;
     }
     
-    // Добавляем нового пользователя
-    const newUser = {
-        username: username,
-        password: password
-    };
+    // Сохраняем нового пользователя в базу
+    const saved = await saveUser(username, password);
     
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    
-    // Сразу входим после регистрации
-    currentUser = newUser;
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    
-    alert('Регистрация успешна! Добро пожаловать, ' + username + '!');
-    closeModal();
-    updateAuth();
-    checkAdminLink();
+    if (saved) {
+        // Сразу входим
+        currentUser = { username, password };
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        
+        alert('Регистрация успешна! Добро пожаловать, ' + username + '!');
+        closeModal();
+        updateAuth();
+        checkAdminLink();
+    } else {
+        alert('Ошибка при регистрации!');
+    }
 }
 
-// Проверка доступа к админке (теперь все OWNER)
+// Проверка доступа к админке
 function checkAdminLink() {
     const link = document.getElementById('adminLink');
     if (link) {
@@ -241,7 +187,7 @@ function checkAdminLink() {
 }
 
 // Отправка жалобы
-function submitComplaint(event) {
+async function submitComplaint(event) {
     event.preventDefault();
     
     if (!currentUser) {
@@ -260,25 +206,20 @@ function submitComplaint(event) {
         response: null
     };
     
-    // Загружаем текущие жалобы
-    complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+    // Сохраняем в базу
+    const saved = await saveComplaint(complaint);
     
-    // Добавляем новую жалобу
-    complaints.push(complaint);
-    
-    // Сохраняем
-    localStorage.setItem('complaints', JSON.stringify(complaints));
-    
-    console.log('Жалоба отправлена:', complaint);
-    console.log('Все жалобы:', complaints);
-    
-    alert('Жалоба отправлена!');
-    document.getElementById('complaintForm').reset();
-    loadLists();
+    if (saved) {
+        alert('Жалоба отправлена!');
+        document.getElementById('complaintForm').reset();
+        await loadLists();
+    } else {
+        alert('Ошибка при отправке жалобы!');
+    }
 }
 
 // Отправка анкеты
-function submitApplication(event) {
+async function submitApplication(event) {
     event.preventDefault();
     
     if (!currentUser) {
@@ -301,35 +242,29 @@ function submitApplication(event) {
         response: null
     };
     
-    // Загружаем текущие заявки
-    applications = JSON.parse(localStorage.getItem('applications')) || [];
+    // Сохраняем в базу
+    const saved = await saveApplication(application);
     
-    // Добавляем новую заявку
-    applications.push(application);
-    
-    // Сохраняем
-    localStorage.setItem('applications', JSON.stringify(applications));
-    
-    console.log('Анкета отправлена:', application);
-    console.log('Все анкеты:', applications);
-    
-    alert('Анкета отправлена!');
-    document.getElementById('helperForm').reset();
-    loadLists();
+    if (saved) {
+        alert('Анкета отправлена!');
+        document.getElementById('helperForm').reset();
+        await loadLists();
+    } else {
+        alert('Ошибка при отправке анкеты!');
+    }
 }
 
 // Загрузка списков
-function loadLists() {
-    loadComplaints();
-    loadApplications();
+async function loadLists() {
+    await loadComplaints();
+    await loadApplications();
 }
 
-function loadComplaints() {
+async function loadComplaints() {
     const list = document.getElementById('complaintsList');
     if (!list) return;
     
-    complaints = JSON.parse(localStorage.getItem('complaints')) || [];
-    console.log('Загрузка жалоб:', complaints);
+    complaints = await getComplaints();
     
     if (complaints.length === 0) {
         list.innerHTML = '<p style="color: #666; text-align: center;">Пока нет жалоб</p>';
@@ -337,7 +272,7 @@ function loadComplaints() {
     }
     
     list.innerHTML = '';
-    complaints.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(c => {
+    complaints.forEach(c => {
         list.innerHTML += `
             <div class="request-card">
                 <div class="request-header">
@@ -356,12 +291,11 @@ function loadComplaints() {
     });
 }
 
-function loadApplications() {
+async function loadApplications() {
     const list = document.getElementById('applicationsList');
     if (!list) return;
     
-    applications = JSON.parse(localStorage.getItem('applications')) || [];
-    console.log('Загрузка анкет:', applications);
+    applications = await getApplications();
     
     if (applications.length === 0) {
         list.innerHTML = '<p style="color: #666; text-align: center;">Пока нет заявок</p>';
@@ -369,7 +303,7 @@ function loadApplications() {
     }
     
     list.innerHTML = '';
-    applications.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(a => {
+    applications.forEach(a => {
         list.innerHTML += `
             <div class="request-card">
                 <div class="request-header">
