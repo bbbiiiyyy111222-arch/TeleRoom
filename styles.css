@@ -1604,3 +1604,60 @@ body::before {
 .moon-rise {
     animation: moonRise 0.8s ease;
 }
+
+/* ==============================================
+   ЛУННЫЕ УВЕДОМЛЕНИЯ
+   ============================================== */
+
+.moon-notification {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    padding: 15px 25px;
+    background: linear-gradient(135deg, #1e2a3a, #16213e);
+    border: 2px solid #4a6fa5;
+    border-radius: 50px;
+    color: #e0e0ff;
+    font-size: 11px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateX(50px);
+    transition: all 0.4s;
+    box-shadow: 0 0 40px rgba(74, 111, 165, 0.5);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 250px;
+}
+
+.moon-notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.moon-notification.success {
+    border-color: #4acf9e;
+    box-shadow: 0 0 40px rgba(74, 207, 158, 0.3);
+}
+
+.moon-notification.success .notification-icon {
+    color: #4acf9e;
+}
+
+.moon-notification.error {
+    border-color: #cf4a4a;
+    box-shadow: 0 0 40px rgba(207, 74, 74, 0.3);
+}
+
+.moon-notification.error .notification-icon {
+    color: #cf4a4a;
+}
+
+.notification-icon {
+    font-size: 18px;
+}
+
+.notification-text {
+    flex: 1;
+}
