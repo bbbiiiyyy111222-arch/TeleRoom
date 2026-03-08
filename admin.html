@@ -1,108 +1,567 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌙 MOONGRIEF - ЛУННАЯ АДМИН ПАНЕЛЬ</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-</head>
-<body>
-    <!-- ЛУННАЯ ШАПКА -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <h1>🌙 MOONGRIEF ADMIN</h1>
-                </div>
-                <div class="auth">
-                    <span id="adminName" class="moon-glow"></span>
-                    <button onclick="logout()" class="btn-moon logout-btn">
-                        <span>🌙</span>
-                        <span>ВЫЙТИ</span>
+// ==============================================
+// АДМИН ПАНЕЛЬ MOONGRIEF - ИСПРАВЛЕННАЯ ВЕРСИЯ
+// ==============================================
+
+// Данные
+let complaints = [];
+let applications = [];
+let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+
+// ВСЕ OWNER
+const OWNERS = ['milfa', 'milk123', 'Xchik_'];
+
+// Загрузка
+document.addEventListener('DOMContentLoaded', async function() {
+    if (!currentUser || !OWNERS.includes(currentUser.username)) {
+        alert('У вас нет доступа!');
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    document.getElementById('adminName').innerHTML = `🌙 ${currentUser.username} (OWNER)`;
+    await loadAdminData();
+    startAutoUpdate();
+});
+
+// Автообновление
+let updateInterval;
+function startAutoUpdate() {
+    if (updateInterval) clearInterval(updateInterval);
+    updateInterval = setInterval(async () => {
+        await loadAdminData();
+    }, 20000);
+}
+
+// Выход
+function logout() {
+    localStorage.removeItem('currentUser');
+    window.location.href = 'index.html';
+}
+
+// Загрузка данных
+async function loadAdminData() {
+    await loadComplaints();
+    await loadApplications();
+    updateStats();
+}
+
+// Обновление статистики
+async function updateStats() {
+    complaints = await window.getComplaints() || [];
+    applications = await window.getApplications() || [];
+    
+    document.getElementById('newComplaints').innerHTML = complaints.filter(c => c.status === 'new').length;
+    document.getElementById('newApplications').innerHTML = applications.filter(a => a.status === 'new').length;
+    document.getElementById('total').innerHTML = complaints.length + applications.length;
+}
+
+// ==============================================
+// ЗАГРУЗКА ЖАЛОБ
+// ==============================================
+
+async function loadComplaints() {
+    const container = document.getElementById('adminComplaints');
+    if (!container) return;
+    
+    complaints = await window.getComplaints() || [];
+    
+    if (complaints.length === 0) {
+        container.innerHTML = `
+            <div class="moon-empty">
+                <div class="moon-empty-icon">🌙</div>
+                <h3>НЕТ ЖАЛОБ</h3>
+                <p>Пока никто не подавал жалоб</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    complaints.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(c => {
+        html += createComplaintCard(c);
+    });
+    
+    container.innerHTML = html;
+}
+
+// ==============================================
+// ЗАГРУЗКА АНКЕТ
+// ==============================================
+
+async function loadApplications() {
+    const container = document.getElementById('adminApplications');
+    if (!container) return;
+    
+    applications = await window.getApplications() || [];
+    
+    if (applications.length === 0) {
+        container.innerHTML = `
+            <div class="moon-empty">
+                <div class="moon-empty-icon">🌙</div>
+                <h3>НЕТ АНКЕТ</h3>
+                <p>Пока никто не подавал заявки</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    applications.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(a => {
+        html += createApplicationCard(a);
+    });
+    
+    container.innerHTML = html;
+}
+
+// ==============================================
+// КАРТОЧКА ЖАЛОБЫ
+// ==============================================
+
+function createComplaintCard(c) {
+    // Определяем статус
+    let statusClass = '';
+    let statusText = '';
+    let statusIcon = '';
+    let actionButtons = '';
+    
+    switch(c.status) {
+        case 'new':
+            statusClass = 'status-new';
+            statusText = 'НОВАЯ';
+            statusIcon = '🆕';
+            actionButtons = `
+                <div class="action-group">
+                    <button onclick="acceptComplaint(${c.id})" class="action-btn accept-btn">
+                        <span class="action-icon">✅</span>
+                        <span class="action-text">ПРИНЯТЬ</span>
+                    </button>
+                    <button onclick="rejectComplaint(${c.id})" class="action-btn reject-btn">
+                        <span class="action-icon">❌</span>
+                        <span class="action-text">ОТКЛОНИТЬ</span>
+                    </button>
+                    <button onclick="openResponseModal('complaint', ${c.id})" class="action-btn respond-btn">
+                        <span class="action-icon">📝</span>
+                        <span class="action-text">ОТВЕТИТЬ</span>
                     </button>
                 </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- ЛУННАЯ НАВИГАЦИЯ -->
-    <nav class="nav">
-        <div class="container">
-            <a href="index.html" class="nav-link">🌙 ГЛАВНАЯ</a>
-            <a href="admin.html" class="nav-link active">🌙 АДМИН ПАНЕЛЬ</a>
-        </div>
-    </nav>
-
-    <!-- ЛУННАЯ АДМИН ПАНЕЛЬ -->
-    <main class="main">
-        <div class="container">
-            <!-- ЛУННАЯ СТАТИСТИКА -->
-            <div class="moon-stats">
-                <div class="moon-stat-card">
-                    <div class="moon-stat-icon">📊</div>
-                    <div class="moon-stat-info">
-                        <h3>НОВЫЕ ЖАЛОБЫ</h3>
-                        <span id="newComplaints" class="moon-stat-number">0</span>
-                    </div>
+            `;
+            break;
+        case 'accepted':
+            statusClass = 'status-accepted';
+            statusText = 'ПРИНЯТА';
+            statusIcon = '✅';
+            actionButtons = `
+                <div class="action-group">
+                    <span class="status-message">✓ Жалоба принята</span>
+                    <button onclick="openResponseModal('complaint', ${c.id})" class="action-btn respond-btn small">
+                        <span class="action-icon">📝</span>
+                        <span class="action-text">ОТВЕТИТЬ</span>
+                    </button>
                 </div>
-                <div class="moon-stat-card">
-                    <div class="moon-stat-icon">📝</div>
-                    <div class="moon-stat-info">
-                        <h3>НОВЫЕ АНКЕТЫ</h3>
-                        <span id="newApplications" class="moon-stat-number">0</span>
-                    </div>
+            `;
+            break;
+        case 'rejected':
+            statusClass = 'status-rejected';
+            statusText = 'ОТКЛОНЕНА';
+            statusIcon = '❌';
+            actionButtons = `
+                <div class="action-group">
+                    <span class="status-message">✗ Жалоба отклонена</span>
+                    <button onclick="openResponseModal('complaint', ${c.id})" class="action-btn respond-btn small">
+                        <span class="action-icon">📝</span>
+                        <span class="action-text">ОТВЕТИТЬ</span>
+                    </button>
                 </div>
-                <div class="moon-stat-card">
-                    <div class="moon-stat-icon">⚡</div>
-                    <div class="moon-stat-info">
-                        <h3>ВСЕГО</h3>
-                        <span id="total" class="moon-stat-number">0</span>
-                    </div>
+            `;
+            break;
+        case 'resolved':
+            statusClass = 'status-resolved';
+            statusText = 'ОТВЕЧЕНО';
+            statusIcon = '📝';
+            actionButtons = `
+                <div class="action-group">
+                    <span class="status-message">✓ Ответ отправлен</span>
+                    <button onclick="openResponseModal('complaint', ${c.id})" class="action-btn respond-btn small">
+                        <span class="action-icon">📝</span>
+                        <span class="action-text">ОТВЕТИТЬ СНОВА</span>
+                    </button>
                 </div>
-            </div>
-
-            <!-- ЛУННЫЕ ТАБЫ -->
-            <div class="moon-admin-tabs">
-                <button class="moon-tab-btn active" onclick="showAdminTab('complaints')">🌙 ЖАЛОБЫ</button>
-                <button class="moon-tab-btn" onclick="showAdminTab('applications')">🌙 АНКЕТЫ</button>
-            </div>
-
-            <!-- ЛУННЫЙ КОНТЕНТ -->
-            <div id="adminComplaints" class="moon-admin-content active">
-                <h2 class="moon-admin-title">🌙 УПРАВЛЕНИЕ ЖАЛОБАМИ</h2>
-                <div id="adminComplaintsList" class="moon-admin-list"></div>
+            `;
+            break;
+    }
+    
+    return `
+        <div class="moon-card" data-id="${c.id}">
+            <div class="moon-card-header">
+                <div class="card-title">
+                    <span class="card-icon">⚠️</span>
+                    <span>${c.title || 'Жалоба'}</span>
+                </div>
+                <div class="card-status ${statusClass}">
+                    <span class="status-icon">${statusIcon}</span>
+                    <span class="status-text">${statusText}</span>
+                </div>
             </div>
             
-            <div id="adminApplications" class="moon-admin-content">
-                <h2 class="moon-admin-title">🌙 УПРАВЛЕНИЕ АНКЕТАМИ</h2>
-                <div id="adminApplicationsList" class="moon-admin-list"></div>
+            <div class="moon-card-body">
+                <div class="info-row">
+                    <div class="info-label">👤 От:</div>
+                    <div class="info-value">${c.author}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">🎯 На:</div>
+                    <div class="info-value">${c.against}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">📝 Описание:</div>
+                    <div class="info-value">${c.description}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">📅 Дата:</div>
+                    <div class="info-value">${new Date(c.date).toLocaleString()}</div>
+                </div>
+                
+                ${c.response ? `
+                <div class="response-block">
+                    <div class="response-label">💬 Ответ:</div>
+                    <div class="response-text">${c.response}</div>
+                </div>
+                ` : ''}
+            </div>
+            
+            <div class="moon-card-footer">
+                ${actionButtons}
             </div>
         </div>
-    </main>
+    `;
+}
 
-    <!-- ЛУННАЯ МОДАЛКА ОТВЕТА -->
-    <div id="responseModal" class="moon-modal">
-        <div class="moon-modal-content">
-            <span class="moon-close" onclick="closeResponseModal()">×</span>
-            <h2 class="moon-modal-title">🌙 ОТВЕТ НА ОБРАЩЕНИЕ</h2>
-            <form id="responseForm" onsubmit="sendResponse(event)" class="moon-modal-form">
-                <input type="hidden" id="responseId">
-                <input type="hidden" id="responseType">
-                <div class="moon-form-group">
-                    <label class="moon-label">💬 ВАШ ОТВЕТ</label>
-                    <textarea id="responseText" placeholder="ВВЕДИТЕ ОТВЕТ..." required class="moon-textarea" rows="6"></textarea>
+// ==============================================
+// КАРТОЧКА АНКЕТЫ
+// ==============================================
+
+function createApplicationCard(a) {
+    // Определяем статус
+    let statusClass = '';
+    let statusText = '';
+    let statusIcon = '';
+    let actionButtons = '';
+    
+    switch(a.status) {
+        case 'new':
+            statusClass = 'status-new';
+            statusText = 'НОВАЯ';
+            statusIcon = '🆕';
+            actionButtons = `
+                <div class="action-group">
+                    <button onclick="acceptApplication(${a.id})" class="action-btn accept-btn">
+                        <span class="action-icon">✅</span>
+                        <span class="action-text">ПРИНЯТЬ</span>
+                    </button>
+                    <button onclick="rejectApplication(${a.id})" class="action-btn reject-btn">
+                        <span class="action-icon">❌</span>
+                        <span class="action-text">ОТКЛОНИТЬ</span>
+                    </button>
+                    <button onclick="openResponseModal('application', ${a.id})" class="action-btn respond-btn">
+                        <span class="action-icon">📝</span>
+                        <span class="action-text">ОТВЕТИТЬ</span>
+                    </button>
                 </div>
-                <div class="moon-modal-buttons">
-                    <button type="submit" class="moon-submit-btn">🌙 ОТПРАВИТЬ</button>
-                    <button type="button" onclick="closeResponseModal()" class="moon-submit-btn moon-cancel-btn">🌙 ОТМЕНА</button>
+            `;
+            break;
+        case 'accepted':
+            statusClass = 'status-accepted';
+            statusText = 'ПРИНЯТА';
+            statusIcon = '✅';
+            actionButtons = `
+                <div class="action-group">
+                    <span class="status-message">✓ Анкета принята</span>
+                    <button onclick="openResponseModal('application', ${a.id})" class="action-btn respond-btn small">
+                        <span class="action-icon">📝</span>
+                        <span class="action-text">ОТВЕТИТЬ</span>
+                    </button>
                 </div>
-            </form>
+            `;
+            break;
+        case 'rejected':
+            statusClass = 'status-rejected';
+            statusText = 'ОТКЛОНЕНА';
+            statusIcon = '❌';
+            actionButtons = `
+                <div class="action-group">
+                    <span class="status-message">✗ Анкета отклонена</span>
+                    <button onclick="openResponseModal('application', ${a.id})" class="action-btn respond-btn small">
+                        <span class="action-icon">📝</span>
+                        <span class="action-text">ОТВЕТИТЬ</span>
+                    </button>
+                </div>
+            `;
+            break;
+        case 'resolved':
+            statusClass = 'status-resolved';
+            statusText = 'ОТВЕЧЕНО';
+            statusIcon = '📝';
+            actionButtons = `
+                <div class="action-group">
+                    <span class="status-message">✓ Ответ отправлен</span>
+                    <button onclick="openResponseModal('application', ${a.id})" class="action-btn respond-btn small">
+                        <span class="action-icon">📝</span>
+                        <span class="action-text">ОТВЕТИТЬ СНОВА</span>
+                    </button>
+                </div>
+            `;
+            break;
+    }
+    
+    return `
+        <div class="moon-card" data-id="${a.id}">
+            <div class="moon-card-header">
+                <div class="card-title">
+                    <span class="card-icon">👮</span>
+                    <span>АНКЕТА НА ХЕЛПЕРА</span>
+                </div>
+                <div class="card-status ${statusClass}">
+                    <span class="status-icon">${statusIcon}</span>
+                    <span class="status-text">${statusText}</span>
+                </div>
+            </div>
+            
+            <div class="moon-card-body">
+                <div class="info-row">
+                    <div class="info-label">🎮 Ник:</div>
+                    <div class="info-value">${a.nickname || 'Нет'}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">👤 Имя:</div>
+                    <div class="info-value">${a.name || 'Нет'}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">📅 Возраст:</div>
+                    <div class="info-value">${a.age || 'Нет'}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">🌍 Часовой пояс:</div>
+                    <div class="info-value">${a.timezone || 'Нет'}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">💼 Опыт:</div>
+                    <div class="info-value">${a.experience || 'Нет'}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">❓ Мотивация:</div>
+                    <div class="info-value">${a.reason || 'Нет'}</div>
+                </div>
+                ${a.additional ? `
+                <div class="info-row">
+                    <div class="info-label">📝 Дополнительно:</div>
+                    <div class="info-value">${a.additional}</div>
+                </div>
+                ` : ''}
+                <div class="info-row">
+                    <div class="info-label">👤 От:</div>
+                    <div class="info-value">${a.author || 'Нет'}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">📅 Дата:</div>
+                    <div class="info-value">${new Date(a.date).toLocaleString()}</div>
+                </div>
+                
+                ${a.response ? `
+                <div class="response-block">
+                    <div class="response-label">💬 Ответ:</div>
+                    <div class="response-text">${a.response}</div>
+                </div>
+                ` : ''}
+            </div>
+            
+            <div class="moon-card-footer">
+                ${actionButtons}
+            </div>
         </div>
-    </div>
+    `;
+}
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="db.js"></script>
-    <script src="admin.js"></script>
-</body>
-</html>
+// ==============================================
+// ДЕЙСТВИЯ С ЖАЛОБАМИ
+// ==============================================
+
+async function acceptComplaint(id) {
+    try {
+        const complaint = complaints.find(c => c.id === id);
+        if (!complaint) return;
+        
+        if (complaint.status !== 'new') {
+            alert('❌ Эту жалобу уже обработали!');
+            return;
+        }
+        
+        const result = await window.updateComplaint(id, { status: 'accepted' });
+        if (result) {
+            await loadAdminData();
+            showNotification('✅ Жалоба принята', 'success');
+        }
+    } catch (error) {
+        showNotification('❌ Ошибка: ' + error.message, 'error');
+    }
+}
+
+async function rejectComplaint(id) {
+    try {
+        const complaint = complaints.find(c => c.id === id);
+        if (!complaint) return;
+        
+        if (complaint.status !== 'new') {
+            alert('❌ Эту жалобу уже обработали!');
+            return;
+        }
+        
+        const result = await window.updateComplaint(id, { status: 'rejected' });
+        if (result) {
+            await loadAdminData();
+            showNotification('❌ Жалоба отклонена', 'error');
+        }
+    } catch (error) {
+        showNotification('❌ Ошибка: ' + error.message, 'error');
+    }
+}
+
+// ==============================================
+// ДЕЙСТВИЯ С АНКЕТАМИ
+// ==============================================
+
+async function acceptApplication(id) {
+    try {
+        const application = applications.find(a => a.id === id);
+        if (!application) return;
+        
+        if (application.status !== 'new') {
+            alert('❌ Эту анкету уже обработали!');
+            return;
+        }
+        
+        const result = await window.updateApplication(id, { status: 'accepted' });
+        if (result) {
+            await loadAdminData();
+            showNotification('✅ Анкета принята', 'success');
+        }
+    } catch (error) {
+        showNotification('❌ Ошибка: ' + error.message, 'error');
+    }
+}
+
+async function rejectApplication(id) {
+    try {
+        const application = applications.find(a => a.id === id);
+        if (!application) return;
+        
+        if (application.status !== 'new') {
+            alert('❌ Эту анкету уже обработали!');
+            return;
+        }
+        
+        const result = await window.updateApplication(id, { status: 'rejected' });
+        if (result) {
+            await loadAdminData();
+            showNotification('❌ Анкета отклонена', 'error');
+        }
+    } catch (error) {
+        showNotification('❌ Ошибка: ' + error.message, 'error');
+    }
+}
+
+// ==============================================
+// МОДАЛКА ОТВЕТА
+// ==============================================
+
+function openResponseModal(type, id) {
+    document.getElementById('responseModal').style.display = 'block';
+    document.getElementById('responseId').value = id;
+    document.getElementById('responseType').value = type;
+    
+    const title = type === 'complaint' ? 'ОТВЕТ НА ЖАЛОБУ' : 'ОТВЕТ НА АНКЕТУ';
+    document.querySelector('#responseModal .moon-modal-title').innerHTML = `🌙 ${title}`;
+}
+
+function closeResponseModal() {
+    document.getElementById('responseModal').style.display = 'none';
+    document.getElementById('responseForm').reset();
+}
+
+async function sendResponse(event) {
+    event.preventDefault();
+    
+    const id = Number(document.getElementById('responseId').value);
+    const type = document.getElementById('responseType').value;
+    const response = document.getElementById('responseText').value;
+    
+    if (!response) {
+        showNotification('Введите ответ!', 'error');
+        return;
+    }
+    
+    try {
+        let result;
+        if (type === 'complaint') {
+            result = await window.updateComplaint(id, { 
+                response: response,
+                status: 'resolved' 
+            });
+        } else {
+            result = await window.updateApplication(id, { 
+                response: response,
+                status: 'resolved' 
+            });
+        }
+        
+        if (result) {
+            closeResponseModal();
+            await loadAdminData();
+            showNotification('✅ Ответ отправлен', 'success');
+        }
+    } catch (error) {
+        showNotification('❌ Ошибка: ' + error.message, 'error');
+    }
+}
+
+// ==============================================
+// УВЕДОМЛЕНИЯ
+// ==============================================
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `moon-notification ${type}`;
+    notification.innerHTML = `
+        <span class="notification-icon">${type === 'success' ? '✅' : '❌'}</span>
+        <span class="notification-text">${message}</span>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 3000);
+}
+
+// ==============================================
+// ПЕРЕКЛЮЧЕНИЕ ТАБОВ
+// ==============================================
+
+function showAdminTab(tabName) {
+    document.querySelectorAll('.moon-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    document.querySelectorAll('.moon-admin-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    event.target.classList.add('active');
+    document.getElementById('admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
+}
