@@ -4,15 +4,18 @@ let complaints = JSON.parse(localStorage.getItem('complaints')) || [];
 let applications = JSON.parse(localStorage.getItem('applications')) || [];
 let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 
-// Владелец и админы
-const OWNER = 'milfa';
-const ADMINS = ['milk123', 'Xchik_'];
+// ВСЕ OWNER
+const OWNERS = ['milfa', 'milk123', 'Xchik_'];
 
 // Загрузка
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Страница загружена');
     updateAuth();
     loadLists();
     checkAdminLink();
+    
+    // Показываем правила по умолчанию
+    showSection('rules');
 });
 
 // Копирование IP
@@ -21,10 +24,32 @@ function copyIP() {
     alert('IP скопирован в буфер обмена!');
 }
 
+// Показать секцию (правила/жалобы/заявки)
+function showSection(sectionId) {
+    // Скрываем все секции
+    document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active-section');
+    });
+    
+    // Показываем нужную секцию
+    document.getElementById(sectionId).classList.add('active-section');
+    
+    // Обновляем активный класс в навигации
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    event.target.classList.add('active');
+}
+
 // Авторизация
 function login() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
+    
+    if (!username || !password) {
+        alert('Введите ник и пароль!');
+        return;
+    }
     
     const user = users.find(u => u.username === username && u.password === password);
     
@@ -73,12 +98,17 @@ function closeModal() {
     document.getElementById('registerModal').style.display = 'none';
 }
 
-document.getElementById('registerForm')?.addEventListener('submit', function(e) {
-    e.preventDefault();
+function register(event) {
+    event.preventDefault();
     
     const username = document.getElementById('regUsername').value;
     const password = document.getElementById('regPassword').value;
     const confirm = document.getElementById('regConfirmPassword').value;
+    
+    if (!username || !password) {
+        alert('Заполните все поля!');
+        return;
+    }
     
     if (password !== confirm) {
         alert('Пароли не совпадают!');
@@ -96,15 +126,15 @@ document.getElementById('registerForm')?.addEventListener('submit', function(e) 
     });
     
     localStorage.setItem('users', JSON.stringify(users));
-    alert('Регистрация успешна!');
+    alert('Регистрация успешна! Теперь можно войти.');
     closeModal();
-});
+}
 
-// Проверка доступа к админке
+// Проверка доступа к админке (теперь все OWNER)
 function checkAdminLink() {
     const link = document.getElementById('adminLink');
     if (link) {
-        if (currentUser && (currentUser.username === OWNER || ADMINS.includes(currentUser.username))) {
+        if (currentUser && OWNERS.includes(currentUser.username)) {
             link.style.display = 'inline-block';
         } else {
             link.style.display = 'none';
@@ -182,6 +212,13 @@ function loadComplaints() {
     const list = document.getElementById('complaintsList');
     if (!list) return;
     
+    complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+    
+    if (complaints.length === 0) {
+        list.innerHTML = '<p style="color: #666; text-align: center;">Пока нет жалоб</p>';
+        return;
+    }
+    
     list.innerHTML = '';
     complaints.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(c => {
         list.innerHTML += `
@@ -205,6 +242,13 @@ function loadComplaints() {
 function loadApplications() {
     const list = document.getElementById('applicationsList');
     if (!list) return;
+    
+    applications = JSON.parse(localStorage.getItem('applications')) || [];
+    
+    if (applications.length === 0) {
+        list.innerHTML = '<p style="color: #666; text-align: center;">Пока нет заявок</p>';
+        return;
+    }
     
     list.innerHTML = '';
     applications.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(a => {
@@ -231,18 +275,9 @@ function loadApplications() {
 
 function getStatus(status) {
     const statuses = {
-        'new': 'Новая',
-        'pending': 'В обработке',
-        'resolved': 'Решена'
+        'new': '🆕 Новая',
+        'pending': '⏳ В обработке',
+        'resolved': '✅ Решена'
     };
     return statuses[status] || status;
-}
-
-// Переключение табов
-function showTab(tabName) {
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-    
-    event.target.classList.add('active');
-    document.getElementById(tabName).classList.add('active');
 }
