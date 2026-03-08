@@ -10,29 +10,12 @@ let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 // ВСЕ OWNER
 const OWNERS = ['milfa', 'milk123', 'Xchik_'];
 
-// Проверка загрузки db.js
-console.log('🔍 Проверка функций db.js:', {
-    getUsers: typeof window.getUsers,
-    getComplaints: typeof window.getComplaints,
-    getApplications: typeof window.getApplications
-});
-
-// Ждем загрузки db.js
-(async function waitForDB() {
-    for(let i = 0; i < 10; i++) {
-        if (typeof window.getComplaints === 'function') {
-            console.log('✅ db.js загружен');
-            return;
-        }
-        console.log('⏳ Ждем db.js...', i + 1);
-        await new Promise(r => setTimeout(r, 500));
-    }
-    console.error('❌ db.js не загрузился! Проверьте порядок скриптов в admin.html');
-})();
+console.log('📱 Админ панель загружается...');
+console.log('👤 Текущий пользователь:', currentUser);
 
 // Проверка доступа
 document.addEventListener('DOMContentLoaded', async function() {
-    console.log('📱 Админ панель загружена');
+    console.log('📱 DOM загружен');
     
     if (!currentUser || !OWNERS.includes(currentUser.username)) {
         alert('🚫 У вас нет доступа к админ панели!');
@@ -42,12 +25,27 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     document.getElementById('adminName').textContent = '👑 ' + currentUser.username + ' (OWNER)';
     
-    // Даем время на загрузку db.js
-    setTimeout(async () => {
-        await loadAdminData();
-        startAdminAutoUpdate();
-    }, 1000);
+    // Проверяем наличие функций из db.js
+    checkDBFunctions();
+    
+    // Загружаем данные
+    await loadAdminData();
+    startAdminAutoUpdate();
 });
+
+// Проверка функций из db.js
+function checkDBFunctions() {
+    console.log('🔍 Проверка функций db.js:');
+    console.log('  - getComplaints:', typeof window.getComplaints);
+    console.log('  - getApplications:', typeof window.getApplications);
+    console.log('  - updateComplaint:', typeof window.updateComplaint);
+    console.log('  - deleteComplaint:', typeof window.deleteComplaint);
+    
+    if (typeof window.getComplaints !== 'function') {
+        console.error('❌ Функции db.js не загружены!');
+        alert('❌ Ошибка загрузки базы данных. Обновите страницу.');
+    }
+}
 
 // ========== АВТОМАТИЧЕСКОЕ ОБНОВЛЕНИЕ ==========
 let adminUpdateInterval;
@@ -123,7 +121,7 @@ async function loadAdminComplaints() {
     
     try {
         if (typeof window.getComplaints !== 'function') {
-            list.innerHTML = '<p style="color: red; text-align: center;">❌ Ошибка: db.js не загружен</p>';
+            list.innerHTML = '<p style="color: red; text-align: center;">❌ Ошибка: функции базы данных не загружены</p>';
             return;
         }
         
@@ -193,7 +191,7 @@ async function loadAdminApplications() {
     
     try {
         if (typeof window.getApplications !== 'function') {
-            list.innerHTML = '<p style="color: red; text-align: center;">❌ Ошибка: db.js не загружен</p>';
+            list.innerHTML = '<p style="color: red; text-align: center;">❌ Ошибка: функции базы данных не загружены</p>';
             return;
         }
         
