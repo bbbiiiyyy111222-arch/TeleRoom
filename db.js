@@ -1,9 +1,32 @@
-// Подключение к Supabase
-const SUPABASE_URL = 'https://opeypwavctnnryrfkhajf.supabase.co';
+// Подключение к Supabase - ИСПРАВЛЕННЫЙ URL
+const SUPABASE_URL = 'https://opeypwayctnnyrfkhajf.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_AzXYR-uQE2Ua9S0v6LAQBQ_Noq1h..';
 
-// Создаем клиент с другим именем
+console.log('Подключение к Supabase:', SUPABASE_URL);
+
+// Создаем клиент
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Проверка подключения
+async function testConnection() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('users')
+            .select('*')
+            .limit(1);
+        
+        if (error) {
+            console.error('Ошибка подключения:', error);
+        } else {
+            console.log('Подключение работает! Данные:', data);
+        }
+    } catch (e) {
+        console.error('Исключение при подключении:', e);
+    }
+}
+
+// Вызвать при загрузке
+testConnection();
 
 // Функции для работы с пользователями
 async function getUsers() {
