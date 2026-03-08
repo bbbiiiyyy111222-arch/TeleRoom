@@ -218,55 +218,58 @@ async function loadAdminApplications() {
 async function acceptComplaint(id) {
     try {
         console.log('Принимаем жалобу:', id);
-        const numericId = typeof id === 'string' ? parseInt(id) : id;
+        const numericId = Number(id);
         const updated = await window.updateComplaint(numericId, { status: 'accepted' });
         if (updated) {
             await loadAdminData();
-            alert('Жалоба принята!');
+            alert('✅ Жалоба принята!');
         } else {
-            alert('Ошибка при принятии жалобы');
+            alert('❌ Ошибка при принятии жалобы');
         }
     } catch (error) {
         console.error('Ошибка:', error);
-        alert('Ошибка при принятии жалобы');
+        alert('❌ Ошибка: ' + error.message);
     }
 }
 
 async function rejectComplaint(id) {
     try {
         console.log('Отклоняем жалобу:', id);
-        const numericId = typeof id === 'string' ? parseInt(id) : id;
+        const numericId = Number(id);
         const updated = await window.updateComplaint(numericId, { status: 'rejected' });
         if (updated) {
             await loadAdminData();
-            alert('Жалоба отклонена!');
+            alert('❌ Жалоба отклонена!');
         } else {
-            alert('Ошибка при отклонении жалобы');
+            alert('❌ Ошибка при отклонении жалобы');
         }
     } catch (error) {
         console.error('Ошибка:', error);
-        alert('Ошибка при отклонении жалобы');
+        alert('❌ Ошибка: ' + error.message);
     }
 }
 
 async function deleteComplaint(id) {
-    if (confirm('Вы уверены, что хотите удалить эту жалобу?')) {
+    if (confirm('❌ Вы уверены, что хотите удалить эту жалобу?')) {
         try {
-            console.log('Удаляем жалобу с ID:', id, 'тип:', typeof id);
+            console.log('🗑️ Начинаем удаление жалобы ID:', id);
             
-            const numericId = typeof id === 'string' ? parseInt(id) : id;
-            console.log('Преобразованный ID:', numericId);
+            const numericId = Number(id);
+            console.log('🔢 Числовой ID:', numericId);
             
             const deleted = await window.deleteComplaint(numericId);
-            if (deleted) {
+            
+            if (deleted === true) {
+                console.log('✅ Жалоба удалена успешно');
                 await loadAdminData();
-                alert('Жалоба удалена!');
+                alert('✅ Жалоба удалена!');
             } else {
-                alert('Ошибка при удалении жалобы');
+                console.error('❌ Функция вернула false');
+                alert('❌ Ошибка при удалении жалобы');
             }
         } catch (error) {
-            console.error('Ошибка:', error);
-            alert('Ошибка при удалении жалобы');
+            console.error('❌ Ошибка в deleteComplaint:', error);
+            alert('❌ Ошибка: ' + error.message);
         }
     }
 }
@@ -275,55 +278,58 @@ async function deleteComplaint(id) {
 async function acceptApplication(id) {
     try {
         console.log('Принимаем анкету:', id);
-        const numericId = typeof id === 'string' ? parseInt(id) : id;
+        const numericId = Number(id);
         const updated = await window.updateApplication(numericId, { status: 'accepted' });
         if (updated) {
             await loadAdminData();
-            alert('Анкета принята!');
+            alert('✅ Анкета принята!');
         } else {
-            alert('Ошибка при принятии анкеты');
+            alert('❌ Ошибка при принятии анкеты');
         }
     } catch (error) {
         console.error('Ошибка:', error);
-        alert('Ошибка при принятии анкеты');
+        alert('❌ Ошибка: ' + error.message);
     }
 }
 
 async function rejectApplication(id) {
     try {
         console.log('Отклоняем анкету:', id);
-        const numericId = typeof id === 'string' ? parseInt(id) : id;
+        const numericId = Number(id);
         const updated = await window.updateApplication(numericId, { status: 'rejected' });
         if (updated) {
             await loadAdminData();
-            alert('Анкета отклонена!');
+            alert('❌ Анкета отклонена!');
         } else {
-            alert('Ошибка при отклонении анкеты');
+            alert('❌ Ошибка при отклонении анкеты');
         }
     } catch (error) {
         console.error('Ошибка:', error);
-        alert('Ошибка при отклонении анкеты');
+        alert('❌ Ошибка: ' + error.message);
     }
 }
 
 async function deleteApplication(id) {
-    if (confirm('Вы уверены, что хотите удалить эту анкету?')) {
+    if (confirm('❌ Вы уверены, что хотите удалить эту анкету?')) {
         try {
-            console.log('Удаляем анкету с ID:', id, 'тип:', typeof id);
+            console.log('🗑️ Начинаем удаление анкеты ID:', id);
             
-            const numericId = typeof id === 'string' ? parseInt(id) : id;
-            console.log('Преобразованный ID:', numericId);
+            const numericId = Number(id);
+            console.log('🔢 Числовой ID:', numericId);
             
             const deleted = await window.deleteApplication(numericId);
-            if (deleted) {
+            
+            if (deleted === true) {
+                console.log('✅ Анкета удалена успешно');
                 await loadAdminData();
-                alert('Анкета удалена!');
+                alert('✅ Анкета удалена!');
             } else {
-                alert('Ошибка при удалении анкеты');
+                console.error('❌ Функция вернула false');
+                alert('❌ Ошибка при удалении анкеты');
             }
         } catch (error) {
-            console.error('Ошибка:', error);
-            alert('Ошибка при удалении анкеты');
+            console.error('❌ Ошибка в deleteApplication:', error);
+            alert('❌ Ошибка: ' + error.message);
         }
     }
 }
@@ -345,7 +351,7 @@ function closeResponseModal() {
 async function sendResponse(event) {
     event.preventDefault();
     
-    const id = parseInt(document.getElementById('responseId').value);
+    const id = Number(document.getElementById('responseId').value);
     const type = document.getElementById('responseType').value;
     const response = document.getElementById('responseText').value;
     
@@ -372,13 +378,13 @@ async function sendResponse(event) {
         if (updated) {
             closeResponseModal();
             await loadAdminData();
-            alert('Ответ отправлен!');
+            alert('✅ Ответ отправлен!');
         } else {
-            alert('Ошибка при отправке ответа!');
+            alert('❌ Ошибка при отправке ответа!');
         }
     } catch (error) {
         console.error('Ошибка:', error);
-        alert('Ошибка при отправке ответа');
+        alert('❌ Ошибка: ' + error.message);
     }
 }
 
