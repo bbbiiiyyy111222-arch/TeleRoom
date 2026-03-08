@@ -1,1 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoonGrief - Админ панель</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🌙 MoonGrief ADMIN</h1>
+                </div>
+                <div class="auth">
+                    <span id="adminName"></span>
+                    <button onclick="logout()" class="btn-small">Выйти</button>
+                </div>
+            </div>
+        </div>
+    </header>
 
+    <nav class="nav">
+        <div class="container">
+            <a href="index.html" class="nav-link">Главная</a>
+            <a href="admin.html" class="nav-link active">Админ панель</a>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="container">
+            <!-- Статистика -->
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>Новые жалобы</h3>
+                    <span id="newComplaints">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Новые анкеты</h3>
+                    <span id="newApplications">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Всего</h3>
+                    <span id="total">0</span>
+                </div>
+            </div>
+
+            <!-- Табы -->
+            <div class="admin-tabs">
+                <button class="admin-tab active" onclick="showAdminTab('complaints')">Жалобы</button>
+                <button class="admin-tab" onclick="showAdminTab('applications')">Анкеты</button>
+            </div>
+
+            <!-- Жалобы -->
+            <div id="adminComplaints" class="admin-tab-content active"></div>
+            
+            <!-- Анкеты -->
+            <div id="adminApplications" class="admin-tab-content"></div>
+        </div>
+    </main>
+
+    <!-- Модалка ответа -->
+    <div id="responseModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeResponseModal()">×</span>
+            <h2 id="responseTitle">Ответ</h2>
+            <form id="responseForm">
+                <input type="hidden" id="responseId">
+                <input type="hidden" id="responseType">
+                <textarea id="responseText" placeholder="Введите ответ..." required class="textarea" rows="5"></textarea>
+                <button type="submit" class="btn">Отправить</button>
+                <button type="button" onclick="closeResponseModal()" class="btn btn-gray">Отмена</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>
