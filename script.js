@@ -1,5 +1,5 @@
 // ==============================================
-// ОСНОВНОЙ СКРИПТ MOONGRIEF
+// ОСНОВНОЙ СКРИПТ MOONGRIEF - ИСПРАВЛЕННАЯ ВЕРСИЯ
 // ==============================================
 
 // Данные
@@ -11,7 +11,51 @@ let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 // ВСЕ OWNER
 const OWNERS = ['milfa', 'milk123', 'Xchik_'];
 
-// Загрузка
+// ==============================================
+// ФУНКЦИЯ ДЛЯ ОТОБРАЖЕНИЯ ВРЕМЕНИ (GMT+3)
+// ==============================================
+
+function formatDateToMSK(dateString) {
+    const date = new Date(dateString);
+    
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+    return `${day}.${month}.${year}, ${hours}:${minutes}:${seconds}`;
+}
+
+// ==============================================
+// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ СТАТУСОВ
+// ==============================================
+
+function getStatusText(status) {
+    const statuses = {
+        'new': '🆕 Новая',
+        'accepted': '✅ Принята',
+        'rejected': '❌ Отклонена',
+        'resolved': '📝 Отвечено'
+    };
+    return statuses[status] || '🆕 Новая';
+}
+
+function getStatusClass(status) {
+    const classes = {
+        'new': 'status-new',
+        'accepted': 'status-accepted',
+        'rejected': 'status-rejected',
+        'resolved': 'status-resolved'
+    };
+    return classes[status] || 'status-new';
+}
+
+// ==============================================
+// ЗАГРУЗКА ПРИ СТАРТЕ
+// ==============================================
+
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Страница загружена');
     
@@ -224,7 +268,7 @@ async function register(event) {
 }
 
 // ==============================================
-// СМЕНА ПАРОЛЯ (НОВАЯ ФУНКЦИЯ)
+// СМЕНА ПАРОЛЯ
 // ==============================================
 
 function showChangePassword() {
@@ -273,7 +317,6 @@ async function changePassword(event) {
         const result = await window.changePassword(currentUser.username, oldPass, newPass);
         
         if (result && result.success) {
-            // Обновляем текущего пользователя с новым паролем
             currentUser.password = newPass;
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             
@@ -383,13 +426,8 @@ async function submitApplication(event) {
 }
 
 // ==============================================
-// ЗАГРУЗКА СПИСКОВ
+// ЗАГРУЗКА ЖАЛОБ (КЛИКАБЕЛЬНЫЕ КАРТОЧКИ)
 // ==============================================
-
-async function loadLists() {
-    await loadComplaints();
-    await loadApplications();
-}
 
 async function loadComplaints() {
     const list = document.getElementById('complaintsList');
@@ -399,137 +437,16 @@ async function loadComplaints() {
         complaints = await window.getComplaints() || [];
         
         if (complaints.length === 0) {
-            list.innerHTML = '<p style="color: #666; text-align: center;">📭 Пока нет жалоб</p>';
-            return;
-        }
-        
-        list.innerHTML = '';
-        complaints.forEach(c => {
-            let statusText = {
-                'new': '🆕 Новая',
-                'accepted': '✅ Принята',
-                'rejected': '❌ Отклонена',
-                'resolved': '📝 Отвечено'
-            }[c.status] || '🆕 Новая';
-            
-            list.innerHTML += `
-                <div class="request-card">
-                    <div class="request-header">
-                        <span>${c.title}</span>
-                        <span class="request-status status-${c.status}">${statusText}</span>
-                    </div>
-                    <div class="request-details">
-                        <p><strong>От:</strong> ${c.author}</p>
-                        <p><strong>На:</strong> ${c.against}</p>
-                        <p><strong>Описание:</strong> ${c.description}</p>
-                        <p><small>${new Date(c.date).toLocaleString()}</small></p>
-                    </div>
-                    ${c.response ? `<p><strong>Ответ:</strong> ${c.response}</p>` : ''}
-                </div>
-            `;
-        });
-    } catch (error) {
-        console.error('Ошибка загрузки жалоб:', error);
-        list.innerHTML = '<p style="color: red; text-align: center;">❌ Ошибка загрузки жалоб</p>';
-    }
-}
-
-async function loadApplications() {
-    const list = document.getElementById('applicationsList');
-    if (!list) return;
-    
-    try {
-        applications = await window.getApplications() || [];
-        
-        if (applications.length === 0) {
-            list.innerHTML = '<p style="color: #666; text-align: center;">📭 Пока нет заявок</p>';
-            return;
-        }
-        
-        list.innerHTML = '';
-        applications.forEach(a => {
-            let statusText = {
-                'new': '🆕 Новая',
-                'accepted': '✅ Принята',
-                'rejected': '❌ Отклонена',
-                'resolved': '📝 Отвечено'
-            }[a.status] || '🆕 Новая';
-            
-            list.innerHTML += `
-                <div class="request-card">
-                    <div class="request-header">
-                        <span>Анкета от ${a.author}</span>
-                        <span class="request-status status-${a.status}">${statusText}</span>
-                    </div>
-                    <div class="request-details">
-                        <p><strong>Ник:</strong> ${a.nickname}</p>
-                        <p><strong>Имя:</strong> ${a.name}</p>
-                        <p><strong>Возраст:</strong> ${a.age}</p>
-                        <p><strong>Часовой пояс:</strong> ${a.timezone}</p>
-                        <p><strong>Опыт:</strong> ${a.experience}</p>
-                        <p><strong>Мотивация:</strong> ${a.reason}</p>
-                        <p><small>${new Date(a.date).toLocaleString()}</small></p>
-                    </div>
-                    ${a.response ? `<p><strong>Ответ:</strong> ${a.response}</p>` : ''}
-                </div>
-            `;
-        });
-    } catch (error) {
-        console.error('Ошибка загрузки заявок:', error);
-        list.innerHTML = '<p style="color: red; text-align: center;">❌ Ошибка загрузки заявок</p>';
-    }
-}
-
-function getStatus(status) {
-    const statuses = {
-        'new': '🆕 Новая',
-        'accepted': '✅ Принята',
-        'rejected': '❌ Отклонена',
-        'resolved': '📝 Отвечено'
-    };
-    return statuses[status] || '🆕 Новая';
-}
-// ==============================================
-// КРАСИВОЕ ОТОБРАЖЕНИЕ ЖАЛОБ И ЗАЯВОК
-// ==============================================
-
-function getStatusText(status) {
-    const statuses = {
-        'new': '🆕 Новая',
-        'accepted': '✅ Принята',
-        'rejected': '❌ Отклонена',
-        'resolved': '📝 Отвечено'
-    };
-    return statuses[status] || '🆕 Новая';
-}
-
-function getStatusClass(status) {
-    const classes = {
-        'new': 'status-new',
-        'accepted': 'status-accepted',
-        'rejected': 'status-rejected',
-        'resolved': 'status-resolved'
-    };
-    return classes[status] || 'status-new';
-}
-
-// Переопределяем функцию загрузки жалоб
-async function loadComplaints() {
-    const list = document.getElementById('complaintsList');
-    if (!list) return;
-    
-    try {
-        complaints = await window.getComplaints() || [];
-        
-        if (complaints.length === 0) {
-            list.innerHTML = '<div class="empty-state">🌙 <h3>Нет жалоб</h3></div>';
+            list.innerHTML = '<div class="empty-state">🌙 <h3>Нет жалоб</h3><p>Пока никто не подавал жалоб</p></div>';
             return;
         }
         
         let html = '';
         complaints.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(c => {
+            const formattedDate = formatDateToMSK(c.date);
+            
             html += `
-                <div class="complaint-card">
+                <div class="complaint-card" onclick="openComplaintDetails(${c.id})">
                     <div class="complaint-header">
                         <span class="complaint-title">${c.title || 'Жалоба'}</span>
                         <span class="complaint-status ${getStatusClass(c.status)}">${getStatusText(c.status)}</span>
@@ -537,9 +454,9 @@ async function loadComplaints() {
                     <div class="complaint-body">
                         <p><strong>👤 От:</strong> ${c.author}</p>
                         <p><strong>🎯 На:</strong> ${c.against}</p>
-                        <p><strong>📝 Описание:</strong> ${c.description}</p>
-                        <p><strong>📅 Дата:</strong> ${new Date(c.date).toLocaleString()}</p>
-                        ${c.response ? `<p><strong>💬 Ответ:</strong> ${c.response}</p>` : ''}
+                        <p><strong>📝 Описание:</strong> ${c.description.substring(0, 50)}${c.description.length > 50 ? '...' : ''}</p>
+                        <p><strong>📅 Дата:</strong> ${formattedDate}</p>
+                        ${c.response ? `<p><strong>💬 Ответ:</strong> ${c.response.substring(0, 30)}${c.response.length > 30 ? '...' : ''}</p>` : ''}
                     </div>
                 </div>
             `;
@@ -552,7 +469,10 @@ async function loadComplaints() {
     }
 }
 
-// Переопределяем функцию загрузки заявок
+// ==============================================
+// ЗАГРУЗКА АНКЕТ (КЛИКАБЕЛЬНЫЕ КАРТОЧКИ)
+// ==============================================
+
 async function loadApplications() {
     const list = document.getElementById('applicationsList');
     if (!list) return;
@@ -561,14 +481,16 @@ async function loadApplications() {
         applications = await window.getApplications() || [];
         
         if (applications.length === 0) {
-            list.innerHTML = '<div class="empty-state">🌙 <h3>Нет заявок</h3></div>';
+            list.innerHTML = '<div class="empty-state">🌙 <h3>Нет анкет</h3><p>Пока никто не подавал заявки</p></div>';
             return;
         }
         
         let html = '';
         applications.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(a => {
+            const formattedDate = formatDateToMSK(a.date);
+            
             html += `
-                <div class="application-card">
+                <div class="application-card" onclick="openApplicationDetails(${a.id})">
                     <div class="application-header">
                         <span class="application-title">👮 Анкета от ${a.author}</span>
                         <span class="application-status ${getStatusClass(a.status)}">${getStatusText(a.status)}</span>
@@ -576,13 +498,8 @@ async function loadApplications() {
                     <div class="application-body">
                         <p><strong>🎮 Ник:</strong> ${a.nickname}</p>
                         <p><strong>👤 Имя:</strong> ${a.name}</p>
-                        <p><strong>📅 Возраст:</strong> ${a.age}</p>
-                        <p><strong>🌍 Часовой пояс:</strong> ${a.timezone}</p>
-                        <p><strong>💼 Опыт:</strong> ${a.experience}</p>
-                        <p><strong>❓ Мотивация:</strong> ${a.reason}</p>
-                        ${a.additional ? `<p><strong>📝 Дополнительно:</strong> ${a.additional}</p>` : ''}
-                        <p><strong>📅 Дата:</strong> ${new Date(a.date).toLocaleString()}</p>
-                        ${a.response ? `<p><strong>💬 Ответ:</strong> ${a.response}</p>` : ''}
+                        <p><strong>📅 Дата:</strong> ${formattedDate}</p>
+                        ${a.response ? `<p><strong>💬 Ответ:</strong> ${a.response.substring(0, 30)}${a.response.length > 30 ? '...' : ''}</p>` : ''}
                     </div>
                 </div>
             `;
@@ -590,25 +507,69 @@ async function loadApplications() {
         
         list.innerHTML = html;
     } catch (error) {
-        console.error('Ошибка загрузки заявок:', error);
+        console.error('Ошибка загрузки анкет:', error);
         list.innerHTML = '<div class="error-state">❌ Ошибка загрузки</div>';
     }
 }
 
 // ==============================================
-// ФУНКЦИЯ ДЛЯ ОТОБРАЖЕНИЯ ВРЕМЕНИ (GMT+3)
+// ЗАГРУЗКА ОБОИХ СПИСКОВ
 // ==============================================
 
-function formatDateToMSK(dateString) {
-    const date = new Date(dateString);
+async function loadLists() {
+    await loadComplaints();
+    await loadApplications();
+}
+
+// ==============================================
+// ДЕТАЛЬНЫЙ ПРОСМОТР
+// ==============================================
+
+function openComplaintDetails(id) {
+    const complaint = complaints.find(c => c.id === id);
+    if (!complaint) return;
     
-    // Получаем компоненты даты и времени в локальном времени
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const formattedDate = formatDateToMSK(complaint.date);
     
-    return `${day}.${month}.${year}, ${hours}:${minutes}:${seconds}`;
+    let message = `📋 ЖАЛОБА\n\n`;
+    message += `👤 От: ${complaint.author}\n`;
+    message += `🎯 На: ${complaint.against}\n`;
+    message += `📝 Описание: ${complaint.description}\n`;
+    message += `📅 Дата: ${formattedDate}\n`;
+    message += `📊 Статус: ${getStatusText(complaint.status)}\n`;
+    
+    if (complaint.response) {
+        message += `\n💬 Ответ: ${complaint.response}`;
+    }
+    
+    alert(message);
+}
+
+function openApplicationDetails(id) {
+    const application = applications.find(a => a.id === id);
+    if (!application) return;
+    
+    const formattedDate = formatDateToMSK(application.date);
+    
+    let message = `📋 АНКЕТА НА ХЕЛПЕРА\n\n`;
+    message += `🎮 Ник: ${application.nickname}\n`;
+    message += `👤 Имя: ${application.name}\n`;
+    message += `📅 Возраст: ${application.age}\n`;
+    message += `🌍 Часовой пояс: ${application.timezone}\n`;
+    message += `💼 Опыт: ${application.experience}\n`;
+    message += `❓ Мотивация: ${application.reason}\n`;
+    
+    if (application.additional) {
+        message += `📝 Дополнительно: ${application.additional}\n`;
+    }
+    
+    message += `👤 От: ${application.author}\n`;
+    message += `📅 Дата: ${formattedDate}\n`;
+    message += `📊 Статус: ${getStatusText(application.status)}\n`;
+    
+    if (application.response) {
+        message += `\n💬 Ответ: ${application.response}`;
+    }
+    
+    alert(message);
 }
