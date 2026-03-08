@@ -1197,4 +1197,233 @@ body::before {
     transition: all 0.3s;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 0 15px rgba(0, 
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+.mini-btn:hover {
+    transform: translateY(-3px) scale(1.1);
+}
+
+.accept-btn {
+    background: #2a5a4a;
+    color: #8ae0c0;
+    border: 1px solid #4acf9e;
+}
+
+.accept-btn:hover {
+    background: #4acf9e;
+    color: white;
+    box-shadow: 0 0 20px #4acf9e;
+}
+
+.reject-btn {
+    background: #5a2a2a;
+    color: #e08a8a;
+    border: 1px solid #cf4a4a;
+}
+
+.reject-btn:hover {
+    background: #cf4a4a;
+    color: white;
+    box-shadow: 0 0 20px #cf4a4a;
+}
+
+.respond-btn {
+    background: #2a3a5a;
+    color: #8ab0e0;
+    border: 1px solid #4a8acf;
+}
+
+.respond-btn:hover {
+    background: #4a8acf;
+    color: white;
+    box-shadow: 0 0 20px #4a8acf;
+}
+
+.status-badge {
+    padding: 8px 15px;
+    border-radius: 25px;
+    font-size: 9px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(74, 111, 165, 0.2);
+    border: 1px solid #4a6fa5;
+    color: #6c9bd2;
+}
+
+.status-badge.accepted {
+    background: rgba(74, 207, 158, 0.2);
+    border-color: #4acf9e;
+    color: #8ae0c0;
+}
+
+.status-badge.rejected {
+    background: rgba(207, 74, 74, 0.2);
+    border-color: #cf4a4a;
+    color: #e08a8a;
+}
+
+.status-badge.resolved {
+    background: rgba(74, 138, 207, 0.2);
+    border-color: #4a8acf;
+    color: #8ab0e0;
+}
+
+/* ==============================================
+   ЛУННЫЕ УВЕДОМЛЕНИЯ
+   ============================================== */
+
+.notification {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    padding: 15px 25px;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 2px solid #4a6fa5;
+    border-radius: 50px;
+    color: #e0e0ff;
+    font-size: 11px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateX(50px);
+    transition: all 0.4s;
+    box-shadow: 0 0 40px rgba(74, 111, 165, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 250px;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification.success {
+    border-color: #4acf9e;
+    box-shadow: 0 0 40px rgba(74, 207, 158, 0.3);
+}
+
+.notification.error {
+    border-color: #cf4a4a;
+    box-shadow: 0 0 40px rgba(207, 74, 74, 0.3);
+}
+
+.notif-icon {
+    font-size: 18px;
+}
+
+.notif-text {
+    flex: 1;
+}
+
+/* ==============================================
+   ПУСТЫЕ СОСТОЯНИЯ
+   ============================================== */
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: rgba(22, 33, 62, 0.5);
+    border-radius: 30px;
+    border: 2px dashed #4a6fa5;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    animation: moonFloat 3s infinite;
+}
+
+.empty-state h3 {
+    color: #6c9bd2;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: #8a8ac0;
+    font-size: 11px;
+}
+
+/* ==============================================
+   АДАПТИВНОСТЬ
+   ============================================== */
+
+@media (max-width: 768px) {
+    body {
+        font-size: 10px;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .auth {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .login-form {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .info-content {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .info-item {
+        width: 100%;
+    }
+    
+    .nav-link {
+        display: block;
+        margin: 10px 0;
+        text-align: center;
+    }
+    
+    .nav-link:hover::before,
+    .nav-link:hover::after,
+    .nav-link.active::before,
+    .nav-link.active::after {
+        display: none;
+    }
+    
+    .form-row {
+        flex-direction: column;
+    }
+    
+    .rule-item {
+        flex-direction: column;
+    }
+    
+    .stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .tabs {
+        flex-direction: column;
+    }
+    
+    .tab-btn {
+        width: 100%;
+    }
+    
+    .action-group {
+        flex-direction: column;
+    }
+    
+    .mini-btn {
+        width: 42px;
+        height: 42px;
+    }
+    
+    .modal-content {
+        margin: 10% auto;
+        padding: 25px;
+    }
+}
