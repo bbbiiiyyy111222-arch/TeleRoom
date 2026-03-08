@@ -1,3 +1,7 @@
+// ==============================================
+// АДМИН ПАНЕЛЬ MOONGRIEF - ПОЛНАЯ ВЕРСИЯ
+// ==============================================
+
 // Данные
 let complaints = [];
 let applications = [];
@@ -6,20 +10,43 @@ let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 // ВСЕ OWNER
 const OWNERS = ['milfa', 'milk123', 'Xchik_'];
 
+// Проверка загрузки db.js
+console.log('🔍 Проверка функций db.js:', {
+    getUsers: typeof window.getUsers,
+    getComplaints: typeof window.getComplaints,
+    getApplications: typeof window.getApplications
+});
+
+// Ждем загрузки db.js
+(async function waitForDB() {
+    for(let i = 0; i < 10; i++) {
+        if (typeof window.getComplaints === 'function') {
+            console.log('✅ db.js загружен');
+            return;
+        }
+        console.log('⏳ Ждем db.js...', i + 1);
+        await new Promise(r => setTimeout(r, 500));
+    }
+    console.error('❌ db.js не загрузился! Проверьте порядок скриптов в admin.html');
+})();
+
 // Проверка доступа
 document.addEventListener('DOMContentLoaded', async function() {
-    console.log('Админ панель загружена');
+    console.log('📱 Админ панель загружена');
     
     if (!currentUser || !OWNERS.includes(currentUser.username)) {
-        alert('У вас нет доступа к админ панели!');
+        alert('🚫 У вас нет доступа к админ панели!');
         window.location.href = 'index.html';
         return;
     }
     
     document.getElementById('adminName').textContent = '👑 ' + currentUser.username + ' (OWNER)';
     
-    await loadAdminData();
-    startAdminAutoUpdate();
+    // Даем время на загрузку db.js
+    setTimeout(async () => {
+        await loadAdminData();
+        startAdminAutoUpdate();
+    }, 1000);
 });
 
 // ========== АВТОМАТИЧЕСКОЕ ОБНОВЛЕНИЕ ==========
@@ -61,14 +88,23 @@ function logout() {
 
 // Загрузка данных
 async function loadAdminData() {
-    await loadAdminComplaints();
-    await loadAdminApplications();
-    await updateStats();
+    try {
+        await loadAdminComplaints();
+        await loadAdminApplications();
+        await updateStats();
+    } catch (error) {
+        console.error('❌ Ошибка загрузки данных:', error);
+    }
 }
 
 // Обновление статистики
 async function updateStats() {
     try {
+        if (typeof window.getComplaints !== 'function') {
+            console.error('❌ getComplaints не функция');
+            return;
+        }
+        
         complaints = await window.getComplaints() || [];
         applications = await window.getApplications() || [];
         
@@ -76,7 +112,7 @@ async function updateStats() {
         document.getElementById('newApplications').textContent = applications.filter(a => a.status === 'new').length;
         document.getElementById('total').textContent = complaints.length + applications.length;
     } catch (error) {
-        console.error('Ошибка обновления статистики:', error);
+        console.error('❌ Ошибка обновления статистики:', error);
     }
 }
 
@@ -86,10 +122,15 @@ async function loadAdminComplaints() {
     if (!list) return;
     
     try {
+        if (typeof window.getComplaints !== 'function') {
+            list.innerHTML = '<p style="color: red; text-align: center;">❌ Ошибка: db.js не загружен</p>';
+            return;
+        }
+        
         complaints = await window.getComplaints() || [];
         
         if (complaints.length === 0) {
-            list.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">Нет жалоб</p>';
+            list.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">📭 Нет жалоб</p>';
             return;
         }
         
@@ -123,13 +164,13 @@ async function loadAdminComplaints() {
                         <span class="request-status status-${statusClass}">${statusText}</span>
                     </div>
                     <div class="request-details">
-                        <p><strong>ID:</strong> ${c.id || 'Нет'}</p>
-                        <p><strong>От:</strong> ${c.author || 'Неизвестно'}</p>
-                        <p><strong>На:</strong> ${c.against || 'Неизвестно'}</p>
-                        <p><strong>Описание:</strong> ${c.description || 'Нет описания'}</p>
-                        <p><small>${c.date ? new Date(c.date).toLocaleString() : 'Нет даты'}</small></p>
+                        <p><strong>🆔 ID:</strong> ${c.id || 'Нет'}</p>
+                        <p><strong>👤 От:</strong> ${c.author || 'Неизвестно'}</p>
+                        <p><strong>🎯 На:</strong> ${c.against || 'Неизвестно'}</p>
+                        <p><strong>📝 Описание:</strong> ${c.description || 'Нет описания'}</p>
+                        <p><small>📅 ${c.date ? new Date(c.date).toLocaleString() : 'Нет даты'}</small></p>
                     </div>
-                    ${c.response ? `<p><strong>Ответ:</strong> ${c.response}</p>` : ''}
+                    ${c.response ? `<p><strong>💬 Ответ:</strong> ${c.response}</p>` : ''}
                     <div class="admin-actions">
                         <button onclick="acceptComplaint(${c.id})" class="admin-btn accept-btn">✅ Принять</button>
                         <button onclick="rejectComplaint(${c.id})" class="admin-btn reject-btn">❌ Отклонить</button>
@@ -140,8 +181,8 @@ async function loadAdminComplaints() {
             `;
         });
     } catch (error) {
-        console.error('Ошибка загрузки жалоб:', error);
-        list.innerHTML = '<p style="color: red; text-align: center;">Ошибка загрузки жалоб</p>';
+        console.error('❌ Ошибка загрузки жалоб:', error);
+        list.innerHTML = '<p style="color: red; text-align: center;">❌ Ошибка загрузки жалоб</p>';
     }
 }
 
@@ -151,10 +192,15 @@ async function loadAdminApplications() {
     if (!list) return;
     
     try {
+        if (typeof window.getApplications !== 'function') {
+            list.innerHTML = '<p style="color: red; text-align: center;">❌ Ошибка: db.js не загружен</p>';
+            return;
+        }
+        
         applications = await window.getApplications() || [];
         
         if (applications.length === 0) {
-            list.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">Нет анкет</p>';
+            list.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">📭 Нет анкет</p>';
             return;
         }
         
@@ -188,17 +234,17 @@ async function loadAdminApplications() {
                         <span class="request-status status-${statusClass}">${statusText}</span>
                     </div>
                     <div class="request-details">
-                        <p><strong>ID:</strong> ${a.id || 'Нет'}</p>
-                        <p><strong>Ник:</strong> ${a.nickname || 'Нет'}</p>
-                        <p><strong>Имя:</strong> ${a.name || 'Нет'}</p>
-                        <p><strong>Возраст:</strong> ${a.age || 'Нет'}</p>
-                        <p><strong>Часовой пояс:</strong> ${a.timezone || 'Нет'}</p>
-                        <p><strong>Опыт:</strong> ${a.experience || 'Нет'}</p>
-                        <p><strong>Мотивация:</strong> ${a.reason || 'Нет'}</p>
-                        <p><strong>Дополнительно:</strong> ${a.additional || 'Нет'}</p>
-                        <p><small>${a.date ? new Date(a.date).toLocaleString() : 'Нет даты'}</small></p>
+                        <p><strong>🆔 ID:</strong> ${a.id || 'Нет'}</p>
+                        <p><strong>🎮 Ник:</strong> ${a.nickname || 'Нет'}</p>
+                        <p><strong>👤 Имя:</strong> ${a.name || 'Нет'}</p>
+                        <p><strong>📅 Возраст:</strong> ${a.age || 'Нет'}</p>
+                        <p><strong>🌍 Часовой пояс:</strong> ${a.timezone || 'Нет'}</p>
+                        <p><strong>💼 Опыт:</strong> ${a.experience || 'Нет'}</p>
+                        <p><strong>❓ Мотивация:</strong> ${a.reason || 'Нет'}</p>
+                        <p><strong>📝 Дополнительно:</strong> ${a.additional || 'Нет'}</p>
+                        <p><small>📅 ${a.date ? new Date(a.date).toLocaleString() : 'Нет даты'}</small></p>
                     </div>
-                    ${a.response ? `<p><strong>Ответ:</strong> ${a.response}</p>` : ''}
+                    ${a.response ? `<p><strong>💬 Ответ:</strong> ${a.response}</p>` : ''}
                     <div class="admin-actions">
                         <button onclick="acceptApplication(${a.id})" class="admin-btn accept-btn">✅ Принять</button>
                         <button onclick="rejectApplication(${a.id})" class="admin-btn reject-btn">❌ Отклонить</button>
@@ -209,15 +255,15 @@ async function loadAdminApplications() {
             `;
         });
     } catch (error) {
-        console.error('Ошибка загрузки анкет:', error);
-        list.innerHTML = '<p style="color: red; text-align: center;">Ошибка загрузки анкет</p>';
+        console.error('❌ Ошибка загрузки анкет:', error);
+        list.innerHTML = '<p style="color: red; text-align: center;">❌ Ошибка загрузки анкет</p>';
     }
 }
 
 // Функции для жалоб
 async function acceptComplaint(id) {
     try {
-        console.log('Принимаем жалобу:', id);
+        console.log('✅ Принимаем жалобу:', id);
         const numericId = Number(id);
         const updated = await window.updateComplaint(numericId, { status: 'accepted' });
         if (updated) {
@@ -227,14 +273,14 @@ async function acceptComplaint(id) {
             alert('❌ Ошибка при принятии жалобы');
         }
     } catch (error) {
-        console.error('Ошибка:', error);
+        console.error('❌ Ошибка:', error);
         alert('❌ Ошибка: ' + error.message);
     }
 }
 
 async function rejectComplaint(id) {
     try {
-        console.log('Отклоняем жалобу:', id);
+        console.log('❌ Отклоняем жалобу:', id);
         const numericId = Number(id);
         const updated = await window.updateComplaint(numericId, { status: 'rejected' });
         if (updated) {
@@ -244,12 +290,11 @@ async function rejectComplaint(id) {
             alert('❌ Ошибка при отклонении жалобы');
         }
     } catch (error) {
-        console.error('Ошибка:', error);
+        console.error('❌ Ошибка:', error);
         alert('❌ Ошибка: ' + error.message);
     }
 }
 
-// Функции для жалоб - УДАЛЕНИЕ (ИСПРАВЛЕНО)
 async function deleteComplaint(id) {
     if (confirm('❌ Вы уверены, что хотите удалить эту жалобу?')) {
         try {
@@ -261,7 +306,6 @@ async function deleteComplaint(id) {
             const deleted = await window.deleteComplaint(numericId);
             console.log('📦 Результат удаления:', deleted);
             
-            // Если функция вернула true или undefined (если ошибки нет)
             if (deleted !== false) {
                 console.log('✅ Жалоба удалена успешно');
                 await loadAdminData();
@@ -277,7 +321,41 @@ async function deleteComplaint(id) {
     }
 }
 
-// Функции для анкет - УДАЛЕНИЕ (ИСПРАВЛЕНО)
+// Функции для анкет
+async function acceptApplication(id) {
+    try {
+        console.log('✅ Принимаем анкету:', id);
+        const numericId = Number(id);
+        const updated = await window.updateApplication(numericId, { status: 'accepted' });
+        if (updated) {
+            await loadAdminData();
+            alert('✅ Анкета принята!');
+        } else {
+            alert('❌ Ошибка при принятии анкеты');
+        }
+    } catch (error) {
+        console.error('❌ Ошибка:', error);
+        alert('❌ Ошибка: ' + error.message);
+    }
+}
+
+async function rejectApplication(id) {
+    try {
+        console.log('❌ Отклоняем анкету:', id);
+        const numericId = Number(id);
+        const updated = await window.updateApplication(numericId, { status: 'rejected' });
+        if (updated) {
+            await loadAdminData();
+            alert('❌ Анкета отклонена!');
+        } else {
+            alert('❌ Ошибка при отклонении анкеты');
+        }
+    } catch (error) {
+        console.error('❌ Ошибка:', error);
+        alert('❌ Ошибка: ' + error.message);
+    }
+}
+
 async function deleteApplication(id) {
     if (confirm('❌ Вы уверены, что хотите удалить эту анкету?')) {
         try {
@@ -289,73 +367,12 @@ async function deleteApplication(id) {
             const deleted = await window.deleteApplication(numericId);
             console.log('📦 Результат удаления:', deleted);
             
-            // Если функция вернула true или undefined (если ошибки нет)
             if (deleted !== false) {
                 console.log('✅ Анкета удалена успешно');
                 await loadAdminData();
                 alert('✅ Анкета удалена!');
             } else {
                 console.error('❌ Ошибка при удалении');
-                alert('❌ Ошибка при удалении анкеты');
-            }
-        } catch (error) {
-            console.error('❌ Ошибка в deleteApplication:', error);
-            alert('❌ Ошибка: ' + error.message);
-        }
-    }
-}
-
-// Функции для анкет
-async function acceptApplication(id) {
-    try {
-        console.log('Принимаем анкету:', id);
-        const numericId = Number(id);
-        const updated = await window.updateApplication(numericId, { status: 'accepted' });
-        if (updated) {
-            await loadAdminData();
-            alert('✅ Анкета принята!');
-        } else {
-            alert('❌ Ошибка при принятии анкеты');
-        }
-    } catch (error) {
-        console.error('Ошибка:', error);
-        alert('❌ Ошибка: ' + error.message);
-    }
-}
-
-async function rejectApplication(id) {
-    try {
-        console.log('Отклоняем анкету:', id);
-        const numericId = Number(id);
-        const updated = await window.updateApplication(numericId, { status: 'rejected' });
-        if (updated) {
-            await loadAdminData();
-            alert('❌ Анкета отклонена!');
-        } else {
-            alert('❌ Ошибка при отклонении анкеты');
-        }
-    } catch (error) {
-        console.error('Ошибка:', error);
-        alert('❌ Ошибка: ' + error.message);
-    }
-}
-
-async function deleteApplication(id) {
-    if (confirm('❌ Вы уверены, что хотите удалить эту анкету?')) {
-        try {
-            console.log('🗑️ Начинаем удаление анкеты ID:', id);
-            
-            const numericId = Number(id);
-            console.log('🔢 Числовой ID:', numericId);
-            
-            const deleted = await window.deleteApplication(numericId);
-            
-            if (deleted === true) {
-                console.log('✅ Анкета удалена успешно');
-                await loadAdminData();
-                alert('✅ Анкета удалена!');
-            } else {
-                console.error('❌ Функция вернула false');
                 alert('❌ Ошибка при удалении анкеты');
             }
         } catch (error) {
@@ -414,7 +431,7 @@ async function sendResponse(event) {
             alert('❌ Ошибка при отправке ответа!');
         }
     } catch (error) {
-        console.error('Ошибка:', error);
+        console.error('❌ Ошибка:', error);
         alert('❌ Ошибка: ' + error.message);
     }
 }
