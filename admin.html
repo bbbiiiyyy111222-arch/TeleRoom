@@ -3,120 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌙 MOONGRIEF - ЛУННАЯ АДМИН ПАНЕЛЬ</title>
+    <title>🌙 MoonGrief - Лунная админ панель</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- ШАПКА -->
+    <!-- Шапка -->
     <header class="header">
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <h1>🌙 MOONGRIEF ADMIN</h1>
+                    <h1>🌙 MoonGrief ADMIN</h1>
                 </div>
                 <div class="auth">
                     <span id="adminName" class="moon-glow"></span>
                     <button onclick="logout()" class="btn-moon logout-btn">
-                        <span class="btn-icon">🌙</span>
-                        <span class="btn-text">ВЫЙТИ</span>
+                        <span>🌙</span>
+                        <span>Выйти</span>
                     </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- НАВИГАЦИЯ -->
+    <!-- Навигация -->
     <nav class="nav">
         <div class="container">
-            <a href="index.html" class="nav-link">🌙 ГЛАВНАЯ</a>
-            <a href="admin.html" class="nav-link active">🌙 АДМИН ПАНЕЛЬ</a>
+            <a href="index.html" class="nav-link">🌙 Главная</a>
+            <a href="admin.html" class="nav-link active">🌙 Админ панель</a>
         </div>
     </nav>
 
-    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <!-- Основной контент -->
     <main class="main">
         <div class="container">
-            <!-- СТАТИСТИКА -->
-            <div class="moon-stats">
-                <div class="moon-stat-card">
-                    <div class="moon-stat-icon">⚠️</div>
-                    <div class="moon-stat-info">
-                        <h3>НОВЫЕ ЖАЛОБЫ</h3>
-                        <span id="newComplaints" class="moon-stat-number">0</span>
+            <!-- Статистика -->
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-info">
+                        <h3>Новые жалобы</h3>
+                        <span id="newComplaints" class="stat-number">0</span>
                     </div>
                 </div>
-                <div class="moon-stat-card">
-                    <div class="moon-stat-icon">👮</div>
-                    <div class="moon-stat-info">
-                        <h3>НОВЫЕ АНКЕТЫ</h3>
-                        <span id="newApplications" class="moon-stat-number">0</span>
+                <div class="stat-card">
+                    <div class="stat-icon">👮</div>
+                    <div class="stat-info">
+                        <h3>Новые анкеты</h3>
+                        <span id="newApplications" class="stat-number">0</span>
                     </div>
                 </div>
-                <div class="moon-stat-card">
-                    <div class="moon-stat-icon">🌙</div>
-                    <div class="moon-stat-info">
-                        <h3>ВСЕГО</h3>
-                        <span id="total" class="moon-stat-number">0</span>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-info">
+                        <h3>Всего</h3>
+                        <span id="total" class="stat-number">0</span>
                     </div>
                 </div>
             </div>
 
-            <!-- КРАСИВЫЕ ТАБЫ -->
-            <div class="moon-tabs">
-                <button class="moon-tab-btn active" onclick="showAdminTab('complaints')">
-                    <span class="tab-icon">⚠️</span>
-                    <span class="tab-text">ЖАЛОБЫ</span>
-                    <span class="tab-count" id="complaintsCount">0</span>
-                </button>
-                <button class="moon-tab-btn" onclick="showAdminTab('applications')">
-                    <span class="tab-icon">👮</span>
-                    <span class="tab-text">АНКЕТЫ</span>
-                    <span class="tab-count" id="applicationsCount">0</span>
-                </button>
+            <!-- Табы -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showAdminTab('complaints')">🌙 Жалобы</button>
+                <button class="tab-btn" onclick="showAdminTab('applications')">🌙 Анкеты</button>
             </div>
 
-            <!-- ЖАЛОБЫ -->
-            <div id="adminComplaints" class="moon-tab-content active">
-                <h2 class="moon-section-title">🌙 УПРАВЛЕНИЕ ЖАЛОБАМИ</h2>
-                <div id="complaintsList" class="moon-cards"></div>
-            </div>
+            <!-- Жалобы -->
+            <div id="adminComplaints" class="tab-content active"></div>
             
-            <!-- АНКЕТЫ -->
-            <div id="adminApplications" class="moon-tab-content">
-                <h2 class="moon-section-title">🌙 УПРАВЛЕНИЕ АНКЕТАМИ</h2>
-                <div id="applicationsList" class="moon-cards"></div>
-            </div>
+            <!-- Анкеты -->
+            <div id="adminApplications" class="tab-content"></div>
         </div>
     </main>
 
-    <!-- КРАСИВАЯ МОДАЛКА ОТВЕТА -->
-    <div id="responseModal" class="moon-modal">
-        <div class="moon-modal-content">
-            <span class="moon-close" onclick="closeResponseModal()">×</span>
-            <h2 class="moon-modal-title">🌙 ОТВЕТ НА ОБРАЩЕНИЕ</h2>
-            <form id="responseForm" onsubmit="sendResponse(event)" class="moon-modal-form">
+    <!-- Модалка ответа -->
+    <div id="responseModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeResponseModal()">×</span>
+            <h2>🌙 Ответ на обращение</h2>
+            <form id="responseForm" onsubmit="sendResponse(event)" class="modal-form">
                 <input type="hidden" id="responseId">
                 <input type="hidden" id="responseType">
-                <div class="moon-form-group">
-                    <label class="moon-label">💬 ВАШ ОТВЕТ</label>
-                    <textarea id="responseText" placeholder="ВВЕДИТЕ ТЕКСТ ОТВЕТА..." required class="moon-textarea" rows="6"></textarea>
+                <div class="form-group">
+                    <label>💬 Ваш ответ</label>
+                    <textarea id="responseText" placeholder="Введите текст ответа..." required class="textarea" rows="6"></textarea>
                 </div>
-                <div class="moon-modal-buttons">
-                    <button type="submit" class="moon-btn moon-btn-primary">
+                <div class="action-group" style="justify-content: center; margin-top: 20px;">
+                    <button type="submit" class="submit-btn" style="width: auto; min-width: 200px;">
                         <span class="btn-icon">🌙</span>
-                        <span class="btn-text">ОТПРАВИТЬ</span>
+                        <span class="btn-text">Отправить</span>
                     </button>
-                    <button type="button" onclick="closeResponseModal()" class="moon-btn moon-btn-secondary">
+                    <button type="button" onclick="closeResponseModal()" class="submit-btn" style="width: auto; min-width: 200px; background: #3a2a2a; border-color: #a54a4a;">
                         <span class="btn-icon">✗</span>
-                        <span class="btn-text">ОТМЕНА</span>
+                        <span class="btn-text">Отмена</span>
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- СКРИПТЫ -->
+    <!-- Скрипты -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="db.js"></script>
     <script src="admin.js"></script>
