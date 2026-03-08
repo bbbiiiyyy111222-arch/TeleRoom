@@ -1,1 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoonGrief Minecraft Forum</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Minecraft&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="minecraft-header">
+        <div class="server-info">
+            <h1>🌙 MoonGrief Minecraft</h1>
+            <div class="server-ip">
+                <span>Сервер: Moongrief.aurorix.pro</span>
+                <button onclick="copyIP()" class="copy-btn">📋 Копировать IP</button>
+            </div>
+        </div>
+        <div class="auth-section" id="authSection">
+            <div id="userInfo" style="display: none;">
+                <span id="currentUser"></span>
+                <button onclick="logout()" class="logout-btn">Выйти</button>
+            </div>
+            <div id="loginForm">
+                <input type="text" id="username" placeholder="Никнейм" class="minecraft-input">
+                <input type="password" id="password" placeholder="Пароль" class="minecraft-input">
+                <button onclick="login()" class="minecraft-btn">Войти</button>
+                <button onclick="showRegister()" class="minecraft-btn">Регистрация</button>
+            </div>
+        </div>
+    </div>
 
+    <nav class="minecraft-nav">
+        <a href="index.html" class="active">Главная</a>
+        <a href="#rules">Правила</a>
+        <a href="#complaints">Жалобы</a>
+        <a href="#applications">Заявки на хелпера</a>
+        <a href="admin.html" id="adminLink" style="display: none;">Админ панель</a>
+    </nav>
+
+    <div class="container">
+        <!-- Правила -->
+        <section id="rules" class="section">
+            <h2 class="section-title">📜 Правила сервера MoonGrief</h2>
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <h3>🤝 Общие правила</h3>
+                    <ul>
+                        <li>1.1 Уважайте других игроков</li>
+                        <li>1.2 Запрещен читерство и использование багов</li>
+                        <li>1.3 Запрещены оскорбления и токсичное поведение</li>
+                        <li>1.4 Запрещен спам и реклама</li>
+                    </ul>
+                </div>
+                <div class="rule-card">
+                    <h3>🏗️ Гриферство и постройки</h3>
+                    <ul>
+                        <li>2.1 Запрещено гриферство чужих построек</li>
+                        <li>2.2 Не разрушайте спавн и общественные фермы</li>
+                        <li>2.3 Соблюдайте расстояние между постройками</li>
+                        <li>2.4 Не стройте на чужих территориях</li>
+                    </ul>
+                </div>
+                <div class="rule-card">
+                    <h3>⚔️ PvP правила</h3>
+                    <ul>
+                        <li>3.1 PvP только по взаимному согласию</li>
+                        <li>3.2 Запрещен килл-аура и другие чита</li>
+                        <li>3.3 Не убивайте игроков на спавне</li>
+                        <li>3.4 Запрещено использование багов PvP</li>
+                    </ul>
+                </div>
+                <div class="rule-card">
+                    <h3>🎤 Правила общения</h3>
+                    <ul>
+                        <li>4.1 Не флудите в чате</li>
+                        <li>4.2 Запрещен капс и нецензурная лексика</li>
+                        <li>4.3 Не провоцируйте конфликты</li>
+                        <li>4.4 Уважайте мнение других</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Форма жалобы -->
+        <section id="complaints" class="section">
+            <h2 class="section-title">⚠️ Подать жалобу</h2>
+            <form id="complaintForm" class="minecraft-form">
+                <input type="text" id="complaintTitle" placeholder="Заголовок жалобы" required class="minecraft-input">
+                <input type="text" id="complaintAgainst" placeholder="На кого жалоба (ник)" required class="minecraft-input">
+                <textarea id="complaintDesc" placeholder="Описание ситуации, доказательства" required class="minecraft-textarea"></textarea>
+                <button type="submit" class="minecraft-btn">Отправить жалобу</button>
+            </form>
+        </section>
+
+        <!-- Форма заявки на хелпера -->
+        <section id="applications" class="section">
+            <h2 class="section-title">👮 Заявка на хелпера</h2>
+            <form id="helperForm" class="minecraft-form">
+                <input type="text" id="helperName" placeholder="Ваш ник в Minecraft" required class="minecraft-input">
+                <input type="number" id="helperAge" placeholder="Ваш возраст" required class="minecraft-input">
+                <input type="text" id="helperExperience" placeholder="Опыт игры на сервере (дней/месяцев)" required class="minecraft-input">
+                <textarea id="helperReason" placeholder="Почему вы хотите стать хелпером?" required class="minecraft-textarea"></textarea>
+                <textarea id="helperTime" placeholder="Сколько времени можете уделять серверу?" required class="minecraft-textarea"></textarea>
+                <button type="submit" class="minecraft-btn">Отправить заявку</button>
+            </form>
+        </section>
+
+        <!-- Список жалоб и заявок -->
+        <section class="section">
+            <h2 class="section-title">📋 Последние обращения</h2>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('complaintsList')">Жалобы</button>
+                <button class="tab-btn" onclick="showTab('applicationsList')">Заявки в хелперы</button>
+            </div>
+            <div id="complaintsList" class="tab-content active">
+                <!-- Жалобы будут загружаться сюда -->
+            </div>
+            <div id="applicationsList" class="tab-content">
+                <!-- Заявки будут загружаться сюда -->
+            </div>
+        </section>
+    </div>
+
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Регистрация</h2>
+            <form id="registerForm">
+                <input type="text" id="regUsername" placeholder="Никнейм" required class="minecraft-input">
+                <input type="password" id="regPassword" placeholder="Пароль" required class="minecraft-input">
+                <input type="password" id="regConfirmPassword" placeholder="Подтвердите пароль" required class="minecraft-input">
+                <button type="submit" class="minecraft-btn">Зарегистрироваться</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
