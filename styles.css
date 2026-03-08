@@ -1,5 +1,5 @@
 /* ==============================================
-   ОСНОВНЫЕ СТИЛИ
+   ПОЛНЫЙ СТИЛЬ MOONGRIEF - ВСЕ СТРАНИЦЫ
    ============================================== */
 
 * {
@@ -47,6 +47,12 @@ body {
     font-size: 24px;
     margin-bottom: 10px;
     text-shadow: 3px 3px 0 #000;
+    animation: glow 2s infinite;
+}
+
+@keyframes glow {
+    0%, 100% { text-shadow: 3px 3px 0 #000; }
+    50% { text-shadow: 3px 3px 10px #ff6b6b; }
 }
 
 .server-ip {
@@ -78,7 +84,7 @@ body {
 }
 
 /* ==============================================
-   АВТОРИЗАЦИЯ (ВЕРНУЛ НА МЕСТО)
+   АВТОРИЗАЦИЯ
    ============================================== */
 
 .auth {
@@ -102,7 +108,7 @@ body {
     font-size: 10px;
 }
 
-.login-form {
+#loginForm {
     display: flex;
     gap: 5px;
     align-items: center;
@@ -173,7 +179,7 @@ body {
 }
 
 /* ==============================================
-   ИНФОРМАЦИОННАЯ ПАНЕЛЬ (КУРАТОР)
+   ИНФОРМАЦИОННАЯ ПАНЕЛЬ (КУРАТОР И БАГИ)
    ============================================== */
 
 .info-bar {
@@ -198,6 +204,12 @@ body {
     padding: 10px 20px;
     border-radius: 40px;
     border: 1px solid #ff6b6b;
+    transition: all 0.3s;
+}
+
+.info-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255,107,107,0.3);
 }
 
 .info-icon {
@@ -248,6 +260,40 @@ body {
 }
 
 /* ==============================================
+   БЛОК ПРО БАГИ (С АНИМАЦИЕЙ)
+   ============================================== */
+
+.bug-report {
+    background: rgba(255, 107, 107, 0.2);
+    border: 1px solid #ff6b6b;
+    animation: pulse-bug 2s infinite;
+}
+
+.bug-report:hover {
+    background: rgba(255, 107, 107, 0.3);
+    transform: scale(1.05);
+}
+
+@keyframes pulse-bug {
+    0%, 100% {
+        box-shadow: 0 0 5px #ff6b6b;
+    }
+    50% {
+        box-shadow: 0 0 20px #ff6b6b;
+    }
+}
+
+.bug-report .info-icon {
+    animation: shake 0.5s ease infinite;
+}
+
+@keyframes shake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+}
+
+/* ==============================================
    ОСНОВНОЙ КОНТЕНТ
    ============================================== */
 
@@ -284,6 +330,51 @@ body {
     text-shadow: 2px 2px 0 #000;
     padding-bottom: 10px;
     border-bottom: 2px solid #ff6b6b;
+}
+
+/* ==============================================
+   ИНФОРМАЦИОННОЕ СООБЩЕНИЕ В ФОРМАХ
+   ============================================== */
+
+.info-message {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255,107,107,0.1);
+    border-left: 4px solid #ff6b6b;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+.info-message-icon {
+    font-size: 24px;
+}
+
+.info-message-text {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-message-text strong {
+    color: #ff6b6b;
+    font-size: 11px;
+}
+
+.info-message-text span {
+    color: #ddd;
+    font-size: 10px;
+}
+
+.info-message-text a {
+    color: #ff6b6b;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.info-message-text a:hover {
+    text-decoration: underline;
 }
 
 /* ==============================================
@@ -453,6 +544,13 @@ body {
     font-size: 14px;
     font-weight: bold;
     text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-icon {
+    font-size: 18px;
 }
 
 .status-badge {
@@ -525,6 +623,19 @@ body {
     border-left: 3px solid #0984e3;
 }
 
+.response-header {
+    color: #0984e3;
+    font-size: 9px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.response-content {
+    color: #fff;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
 .card-footer {
     margin-top: 15px;
     padding-top: 15px;
@@ -537,8 +648,12 @@ body {
     flex-wrap: wrap;
 }
 
-.action-btn {
-    padding: 8px 15px;
+.btn-glow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 15px;
     border: none;
     border-radius: 30px;
     cursor: pointer;
@@ -549,33 +664,52 @@ body {
     flex: 1;
     min-width: 100px;
     text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
 }
 
-.action-btn:hover {
+.btn-glow::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+}
+
+.btn-glow:hover::before {
+    width: 200px;
+    height: 200px;
+}
+
+.btn-glow:hover {
     transform: translateY(-2px);
     filter: brightness(1.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
-.accept-btn {
-    background: #00b894;
+.btn-icon {
+    font-size: 12px;
 }
 
-.reject-btn {
-    background: #e74c3c;
-}
-
-.respond-btn {
-    background: #0984e3;
-}
-
-.status-message {
-    color: #888;
+.btn-text {
     font-size: 8px;
-    padding: 8px;
-    background: rgba(0,0,0,0.3);
-    border-radius: 30px;
-    text-align: center;
-    flex: 1;
+}
+
+.btn-accept {
+    background: linear-gradient(135deg, #00b894, #00cec9);
+}
+
+.btn-reject {
+    background: linear-gradient(135deg, #e74c3c, #d63031);
+}
+
+.btn-respond {
+    background: linear-gradient(135deg, #0984e3, #00b0ff);
 }
 
 /* ==============================================
@@ -626,6 +760,7 @@ body {
     gap: 10px;
     margin-bottom: 20px;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .tab-btn,
@@ -644,6 +779,7 @@ body {
 .tab-btn:hover,
 .admin-tab:hover {
     background: #444;
+    transform: translateY(-2px);
 }
 
 .tab-btn.active,
@@ -660,6 +796,7 @@ body {
 .tab-content.active,
 .admin-tab-content.active {
     display: block;
+    animation: fadeIn 0.3s ease;
 }
 
 /* ==============================================
@@ -686,6 +823,18 @@ body {
     max-width: 500px;
     border: 2px solid #ff6b6b;
     position: relative;
+    animation: modalSlide 0.3s;
+}
+
+@keyframes modalSlide {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .close {
@@ -696,10 +845,12 @@ body {
     font-weight: bold;
     cursor: pointer;
     color: #ff6b6b;
+    transition: all 0.3s;
 }
 
 .close:hover {
     color: #fff;
+    transform: rotate(90deg);
 }
 
 .modal-content h2 {
@@ -707,6 +858,7 @@ body {
     margin-bottom: 20px;
     text-align: center;
     font-size: 16px;
+    text-transform: uppercase;
 }
 
 /* ==============================================
@@ -761,6 +913,27 @@ body {
 }
 
 /* ==============================================
+   СКРОЛЛБАР
+   ============================================== */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #ff6b6b;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #ff5252;
+}
+
+/* ==============================================
    АДАПТИВНОСТЬ
    ============================================== */
 
@@ -779,7 +952,7 @@ body {
         width: 100%;
     }
     
-    .login-form {
+    #loginForm {
         flex-wrap: wrap;
         justify-content: center;
     }
@@ -799,16 +972,30 @@ body {
         gap: 15px;
     }
     
+    .info-item {
+        width: 100%;
+    }
+    
     .button-group {
         flex-direction: column;
     }
     
-    .action-btn {
+    .btn-glow {
         width: 100%;
     }
     
     .nav-link {
         display: inline-block;
         margin: 5px;
+        font-size: 10px;
+    }
+    
+    .stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-content {
+        margin: 20% auto;
+        padding: 20px;
     }
 }
