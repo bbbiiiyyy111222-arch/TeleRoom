@@ -1,5 +1,5 @@
 // ==============================================
-// АДМИН ПАНЕЛЬ MOONGRIEF - ПОЛНАЯ РАБОЧАЯ ВЕРСИЯ
+// АДМИН ПАНЕЛЬ MOONGRIEF - ПОЛНАЯ ВЕРСИЯ
 // ==============================================
 
 // Данные
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 // ==============================================
-// АВТООБНОВЛЕНИЕ КАЖДЫЕ 15 СЕКУНД
+// АВТООБНОВЛЕНИЕ КАЖДЫЕ 20 СЕКУНД
 // ==============================================
 
 let updateInterval;
@@ -37,9 +37,9 @@ function startAutoUpdate() {
     if (updateInterval) clearInterval(updateInterval);
     
     updateInterval = setInterval(async () => {
-        console.log('🔄 Автообновление...');
+        console.log('🔄 Автообновление каждые 20 сек...');
         await loadAdminData();
-    }, 15000);
+    }, 20000);
 }
 
 window.addEventListener('beforeunload', function() {
@@ -76,7 +76,7 @@ async function loadComplaints() {
         console.log('📋 Загружено жалоб:', complaints.length);
         
         if (complaints.length === 0) {
-            list.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">📭 Нет жалоб</p>';
+            list.innerHTML = '<div class="empty-state">📭 <h3>Нет жалоб</h3><p>Пока никто не подавал жалоб</p></div>';
             return;
         }
         
@@ -86,7 +86,7 @@ async function loadComplaints() {
         });
     } catch (error) {
         console.error('❌ Ошибка загрузки жалоб:', error);
-        list.innerHTML = '<p style="color: red; text-align: center;">❌ Ошибка загрузки</p>';
+        list.innerHTML = '<div class="error-state">❌ Ошибка загрузки данных</div>';
     }
 }
 
@@ -99,7 +99,7 @@ async function loadApplications() {
         console.log('📋 Загружено анкет:', applications.length);
         
         if (applications.length === 0) {
-            list.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">📭 Нет анкет</p>';
+            list.innerHTML = '<div class="empty-state">📭 <h3>Нет анкет</h3><p>Пока никто не подавал заявки</p></div>';
             return;
         }
         
@@ -109,7 +109,7 @@ async function loadApplications() {
         });
     } catch (error) {
         console.error('❌ Ошибка загрузки анкет:', error);
-        list.innerHTML = '<p style="color: red; text-align: center;">❌ Ошибка загрузки</p>';
+        list.innerHTML = '<div class="error-state">❌ Ошибка загрузки данных</div>';
     }
 }
 
@@ -127,38 +127,97 @@ async function updateStats() {
 }
 
 // ==============================================
-// СОЗДАНИЕ КАРТОЧЕК (С АНКЕТАМИ!)
+// КРАСИВЫЕ КАРТОЧКИ
 // ==============================================
 
 function createComplaintCard(c) {
     let statusText = '';
+    let statusClass = '';
+    let actionButtons = '';
+    
     switch(c.status) {
-        case 'new': statusText = '🆕 Новая'; break;
-        case 'accepted': statusText = '✅ Принята'; break;
-        case 'rejected': statusText = '❌ Отклонена'; break;
-        case 'resolved': statusText = '📝 Отвечено'; break;
-        default: statusText = '🆕 Новая';
+        case 'new':
+            statusText = '🆕 НОВАЯ';
+            statusClass = 'status-new';
+            actionButtons = `
+                <div class="button-group">
+                    <button onclick="acceptComplaint(${c.id})" class="btn-glow accept-btn">✅ ПРИНЯТЬ</button>
+                    <button onclick="rejectComplaint(${c.id})" class="btn-glow reject-btn">❌ ОТКЛОНИТЬ</button>
+                    <button onclick="openResponseModal('complaint', ${c.id})" class="btn-glow respond-btn">📝 ОТВЕТИТЬ</button>
+                </div>
+            `;
+            break;
+        case 'accepted':
+            statusText = '✅ ПРИНЯТА';
+            statusClass = 'status-accepted';
+            actionButtons = `
+                <div class="button-group">
+                    <div class="status-message">✓ Жалоба принята</div>
+                    <button onclick="openResponseModal('complaint', ${c.id})" class="btn-glow respond-btn">📝 ОТВЕТИТЬ</button>
+                </div>
+            `;
+            break;
+        case 'rejected':
+            statusText = '❌ ОТКЛОНЕНА';
+            statusClass = 'status-rejected';
+            actionButtons = `
+                <div class="button-group">
+                    <div class="status-message">✗ Жалоба отклонена</div>
+                    <button onclick="openResponseModal('complaint', ${c.id})" class="btn-glow respond-btn">📝 ОТВЕТИТЬ</button>
+                </div>
+            `;
+            break;
+        case 'resolved':
+            statusText = '📝 ОТВЕЧЕНО';
+            statusClass = 'status-resolved';
+            actionButtons = `
+                <div class="button-group">
+                    <div class="status-message">✓ Ответ отправлен</div>
+                    <button onclick="openResponseModal('complaint', ${c.id})" class="btn-glow respond-btn">📝 ОТВЕТИТЬ СНОВА</button>
+                </div>
+            `;
+            break;
     }
     
     return `
-        <div class="request-card">
-            <div class="request-header">
-                <span>${c.title || 'Жалоба'}</span>
-                <span class="request-status status-${c.status || 'new'}">${statusText}</span>
+        <div class="card animate-in">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">⚠️</span>
+                    ${c.title || 'Жалоба'}
+                </div>
+                <div class="status-badge ${statusClass}">${statusText}</div>
             </div>
-            <div class="request-details">
-                <p><strong>ID:</strong> ${c.id}</p>
-                <p><strong>От:</strong> ${c.author}</p>
-                <p><strong>На:</strong> ${c.against}</p>
-                <p><strong>Описание:</strong> ${c.description}</p>
-                <p><small>${new Date(c.date).toLocaleString()}</small></p>
+            
+            <div class="card-content">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">👤 Отправитель</div>
+                        <div class="info-value">${c.author}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">🎯 Нарушитель</div>
+                        <div class="info-value">${c.against}</div>
+                    </div>
+                    <div class="info-item full-width">
+                        <div class="info-label">📝 Описание</div>
+                        <div class="info-value description">${c.description}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">📅 Дата</div>
+                        <div class="info-value">${new Date(c.date).toLocaleString()}</div>
+                    </div>
+                </div>
+                
+                ${c.response ? `
+                <div class="response-section">
+                    <div class="response-header">💬 Ответ администрации</div>
+                    <div class="response-content">${c.response}</div>
+                </div>` : ''}
             </div>
-            ${c.response ? `<p><strong>Ответ:</strong> ${c.response}</p>` : ''}
-            <div class="admin-actions">
-                <button onclick="acceptComplaint(${c.id})" class="admin-btn accept-btn">✅ Принять</button>
-                <button onclick="rejectComplaint(${c.id})" class="admin-btn reject-btn">❌ Отклонить</button>
-                <button onclick="deleteComplaint(${c.id})" class="admin-btn delete-btn">🗑️ Удалить</button>
-                <button onclick="openResponseModal('complaint', ${c.id})" class="admin-btn respond-btn">📝 Ответить</button>
+            
+            <div class="card-footer">
+                ${actionButtons}
             </div>
         </div>
     `;
@@ -166,140 +225,214 @@ function createComplaintCard(c) {
 
 function createApplicationCard(a) {
     let statusText = '';
+    let statusClass = '';
+    let actionButtons = '';
+    
     switch(a.status) {
-        case 'new': statusText = '🆕 Новая'; break;
-        case 'accepted': statusText = '✅ Принята'; break;
-        case 'rejected': statusText = '❌ Отклонена'; break;
-        case 'resolved': statusText = '📝 Отвечено'; break;
-        default: statusText = '🆕 Новая';
+        case 'new':
+            statusText = '🆕 НОВАЯ';
+            statusClass = 'status-new';
+            actionButtons = `
+                <div class="button-group">
+                    <button onclick="acceptApplication(${a.id})" class="btn-glow accept-btn">✅ ПРИНЯТЬ</button>
+                    <button onclick="rejectApplication(${a.id})" class="btn-glow reject-btn">❌ ОТКЛОНИТЬ</button>
+                    <button onclick="openResponseModal('application', ${a.id})" class="btn-glow respond-btn">📝 ОТВЕТИТЬ</button>
+                </div>
+            `;
+            break;
+        case 'accepted':
+            statusText = '✅ ПРИНЯТА';
+            statusClass = 'status-accepted';
+            actionButtons = `
+                <div class="button-group">
+                    <div class="status-message">✓ Анкета принята</div>
+                    <button onclick="openResponseModal('application', ${a.id})" class="btn-glow respond-btn">📝 ОТВЕТИТЬ</button>
+                </div>
+            `;
+            break;
+        case 'rejected':
+            statusText = '❌ ОТКЛОНЕНА';
+            statusClass = 'status-rejected';
+            actionButtons = `
+                <div class="button-group">
+                    <div class="status-message">✗ Анкета отклонена</div>
+                    <button onclick="openResponseModal('application', ${a.id})" class="btn-glow respond-btn">📝 ОТВЕТИТЬ</button>
+                </div>
+            `;
+            break;
+        case 'resolved':
+            statusText = '📝 ОТВЕЧЕНО';
+            statusClass = 'status-resolved';
+            actionButtons = `
+                <div class="button-group">
+                    <div class="status-message">✓ Ответ отправлен</div>
+                    <button onclick="openResponseModal('application', ${a.id})" class="btn-glow respond-btn">📝 ОТВЕТИТЬ СНОВА</button>
+                </div>
+            `;
+            break;
     }
     
     return `
-        <div class="request-card">
-            <div class="request-header">
-                <span>Анкета от ${a.author}</span>
-                <span class="request-status status-${a.status || 'new'}">${statusText}</span>
+        <div class="card animate-in">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">👮</span>
+                    АНКЕТА НА ХЕЛПЕРА
+                </div>
+                <div class="status-badge ${statusClass}">${statusText}</div>
             </div>
-            <div class="request-details">
-                <p><strong>ID:</strong> ${a.id}</p>
-                <p><strong>Ник:</strong> ${a.nickname}</p>
-                <p><strong>Имя:</strong> ${a.name}</p>
-                <p><strong>Возраст:</strong> ${a.age}</p>
-                <p><strong>Часовой пояс:</strong> ${a.timezone}</p>
-                <p><strong>Опыт:</strong> ${a.experience}</p>
-                <p><strong>Мотивация:</strong> ${a.reason}</p>
-                <p><strong>Дополнительно:</strong> ${a.additional || 'Нет'}</p>
-                <p><small>${new Date(a.date).toLocaleString()}</small></p>
+            
+            <div class="card-content">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">🎮 Игровой ник</div>
+                        <div class="info-value">${a.nickname}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">👤 Настоящее имя</div>
+                        <div class="info-value">${a.name}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">📅 Возраст</div>
+                        <div class="info-value">${a.age} лет</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">🌍 Часовой пояс</div>
+                        <div class="info-value">${a.timezone}</div>
+                    </div>
+                    <div class="info-item full-width">
+                        <div class="info-label">💼 Опыт работы</div>
+                        <div class="info-value description">${a.experience}</div>
+                    </div>
+                    <div class="info-item full-width">
+                        <div class="info-label">❓ Мотивация</div>
+                        <div class="info-value description">${a.reason}</div>
+                    </div>
+                    ${a.additional ? `
+                    <div class="info-item full-width">
+                        <div class="info-label">📝 Дополнительно</div>
+                        <div class="info-value description">${a.additional}</div>
+                    </div>` : ''}
+                    <div class="info-item">
+                        <div class="info-label">👤 Отправитель</div>
+                        <div class="info-value">${a.author}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">📅 Дата</div>
+                        <div class="info-value">${new Date(a.date).toLocaleString()}</div>
+                    </div>
+                </div>
+                
+                ${a.response ? `
+                <div class="response-section">
+                    <div class="response-header">💬 Ответ администрации</div>
+                    <div class="response-content">${a.response}</div>
+                </div>` : ''}
             </div>
-            ${a.response ? `<p><strong>Ответ:</strong> ${a.response}</p>` : ''}
-            <div class="admin-actions">
-                <button onclick="acceptApplication(${a.id})" class="admin-btn accept-btn">✅ Принять</button>
-                <button onclick="rejectApplication(${a.id})" class="admin-btn reject-btn">❌ Отклонить</button>
-                <button onclick="deleteApplication(${a.id})" class="admin-btn delete-btn">🗑️ Удалить</button>
-                <button onclick="openResponseModal('application', ${a.id})" class="admin-btn respond-btn">📝 Ответить</button>
+            
+            <div class="card-footer">
+                ${actionButtons}
             </div>
         </div>
     `;
 }
 
 // ==============================================
-// ДЕЙСТВИЯ С ЖАЛОБАМИ
+// ДЕЙСТВИЯ (ТОЛЬКО 1 РАЗ)
 // ==============================================
 
 async function acceptComplaint(id) {
     try {
+        const complaint = complaints.find(c => c.id === id);
+        if (complaint.status !== 'new') {
+            alert('❌ Эту жалобу уже обработали!');
+            return;
+        }
+        
         const result = await window.updateComplaint(id, { status: 'accepted' });
         if (result) {
             await loadAdminData();
-            alert('✅ Жалоба принята');
+            showNotification('✅ Жалоба принята', 'success');
         }
     } catch (error) {
-        alert('❌ Ошибка: ' + error.message);
+        showNotification('❌ Ошибка: ' + error.message, 'error');
     }
 }
 
 async function rejectComplaint(id) {
     try {
+        const complaint = complaints.find(c => c.id === id);
+        if (complaint.status !== 'new') {
+            alert('❌ Эту жалобу уже обработали!');
+            return;
+        }
+        
         const result = await window.updateComplaint(id, { status: 'rejected' });
         if (result) {
             await loadAdminData();
-            alert('❌ Жалоба отклонена');
+            showNotification('❌ Жалоба отклонена', 'error');
         }
     } catch (error) {
-        alert('❌ Ошибка: ' + error.message);
+        showNotification('❌ Ошибка: ' + error.message, 'error');
     }
 }
-
-// ==============================================
-// УДАЛЕНИЕ ЖАЛОБ - ИСПРАВЛЕНО!
-// ==============================================
-
-async function deleteComplaint(id) {
-    if (!confirm('❌ Удалить жалобу?')) return;
-    
-    try {
-        console.log('🗑️ Удаляем жалобу ID:', id);
-        const result = await window.deleteComplaint(id);
-        
-        if (result) {
-            alert('✅ Жалоба удалена');
-            await loadAdminData();
-        } else {
-            alert('❌ Ошибка при удалении');
-        }
-    } catch (error) {
-        alert('❌ Ошибка: ' + error.message);
-    }
-}
-
-// ==============================================
-// ДЕЙСТВИЯ С ЗАЯВКАМИ
-// ==============================================
 
 async function acceptApplication(id) {
     try {
+        const application = applications.find(a => a.id === id);
+        if (application.status !== 'new') {
+            alert('❌ Эту анкету уже обработали!');
+            return;
+        }
+        
         const result = await window.updateApplication(id, { status: 'accepted' });
         if (result) {
             await loadAdminData();
-            alert('✅ Анкета принята');
+            showNotification('✅ Анкета принята', 'success');
         }
     } catch (error) {
-        alert('❌ Ошибка: ' + error.message);
+        showNotification('❌ Ошибка: ' + error.message, 'error');
     }
 }
 
 async function rejectApplication(id) {
     try {
+        const application = applications.find(a => a.id === id);
+        if (application.status !== 'new') {
+            alert('❌ Эту анкету уже обработали!');
+            return;
+        }
+        
         const result = await window.updateApplication(id, { status: 'rejected' });
         if (result) {
             await loadAdminData();
-            alert('❌ Анкета отклонена');
+            showNotification('❌ Анкета отклонена', 'error');
         }
     } catch (error) {
-        alert('❌ Ошибка: ' + error.message);
+        showNotification('❌ Ошибка: ' + error.message, 'error');
     }
 }
 
 // ==============================================
-// УДАЛЕНИЕ ЗАЯВОК - ИСПРАВЛЕНО!
+// УВЕДОМЛЕНИЯ
 // ==============================================
 
-async function deleteApplication(id) {
-    if (!confirm('❌ Удалить анкету?')) return;
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
     
-    try {
-        console.log('🗑️ Удаляем анкету ID:', id);
-        const result = await window.deleteApplication(id);
-        
-        if (result) {
-            alert('✅ Анкета удалена');
-            await loadAdminData();
-        } else {
-            alert('❌ Ошибка при удалении');
-        }
-    } catch (error) {
-        alert('❌ Ошибка: ' + error.message);
-    }
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 3000);
 }
 
 // ==============================================
@@ -324,7 +457,10 @@ async function sendResponse(event) {
     const type = document.getElementById('responseType').value;
     const response = document.getElementById('responseText').value;
     
-    if (!response) return alert('Введите ответ!');
+    if (!response) {
+        showNotification('Введите ответ!', 'error');
+        return;
+    }
     
     try {
         let result;
@@ -337,10 +473,10 @@ async function sendResponse(event) {
         if (result) {
             closeResponseModal();
             await loadAdminData();
-            alert('✅ Ответ отправлен');
+            showNotification('✅ Ответ отправлен', 'success');
         }
     } catch (error) {
-        alert('❌ Ошибка: ' + error.message);
+        showNotification('❌ Ошибка: ' + error.message, 'error');
     }
 }
 
