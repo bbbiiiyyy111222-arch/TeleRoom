@@ -1,6 +1,6 @@
-// Подключение к Supabase - ПРАВИЛЬНЫЕ КЛЮЧИ
+// Подключение к Supabase - ПРАВИЛЬНЫЙ КЛЮЧ!
 const SUPABASE_URL = 'https://opeypwayctnnyrfkhajf.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_AzXYR-uQE2Ua9S0v6LAQBQ_Noq1h..';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wZXlwd2F5Y3RubnlyZmtoYWpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MzU4ODQsImV4cCI6MjA4ODUxMTg4NH0._Y1R1NNCVMyVgyeN7O7a24n4BGwc44c6vO1Q6MAf74A';
 
 console.log('🔄 Подключение к Supabase:', SUPABASE_URL);
 console.log('🔑 Ключ загружен');
@@ -235,7 +235,7 @@ window.deleteApplication = async function(id) {
     }
 }
 
-// Автоматически проверим подключение
+// Проверяем подключение
 setTimeout(() => {
     window.testConnection();
 }, 1000);
