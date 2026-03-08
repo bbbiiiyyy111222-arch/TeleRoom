@@ -1,35 +1,37 @@
-// Подключение к Supabase - ИСПРАВЛЕННЫЙ URL
+// Подключение к Supabase - ПРАВИЛЬНЫЕ КЛЮЧИ
 const SUPABASE_URL = 'https://opeypwayctnnyrfkhajf.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_AzXYR-uQE2Ua9S0v6LAQBQ_Noq1h..';
 
-console.log('Подключение к Supabase:', SUPABASE_URL);
+console.log('🔄 Подключение к Supabase:', SUPABASE_URL);
+console.log('🔑 Ключ загружен');
 
 // Создаем клиент
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Проверка подключения
-async function testConnection() {
+// Функция проверки подключения
+window.testConnection = async function() {
     try {
+        console.log('🔍 Проверяем подключение...');
         const { data, error } = await supabaseClient
             .from('users')
             .select('*')
             .limit(1);
         
         if (error) {
-            console.error('Ошибка подключения:', error);
+            console.error('❌ Ошибка подключения:', error);
+            return false;
         } else {
-            console.log('Подключение работает! Данные:', data);
+            console.log('✅ Подключение работает! Данные:', data);
+            return true;
         }
     } catch (e) {
-        console.error('Исключение при подключении:', e);
+        console.error('❌ Исключение при подключении:', e);
+        return false;
     }
 }
 
-// Вызвать при загрузке
-testConnection();
-
 // Функции для работы с пользователями
-async function getUsers() {
+window.getUsers = async function() {
     try {
         const { data, error } = await supabaseClient
             .from('users')
@@ -46,7 +48,7 @@ async function getUsers() {
     }
 }
 
-async function saveUser(username, password) {
+window.saveUser = async function(username, password) {
     try {
         const { data, error } = await supabaseClient
             .from('users')
@@ -65,7 +67,7 @@ async function saveUser(username, password) {
     }
 }
 
-async function updateUserPassword(username, password) {
+window.updateUserPassword = async function(username, password) {
     try {
         const { data, error } = await supabaseClient
             .from('users')
@@ -84,7 +86,7 @@ async function updateUserPassword(username, password) {
 }
 
 // Функции для жалоб
-async function getComplaints() {
+window.getComplaints = async function() {
     try {
         const { data, error } = await supabaseClient
             .from('complaints')
@@ -102,7 +104,7 @@ async function getComplaints() {
     }
 }
 
-async function saveComplaint(complaint) {
+window.saveComplaint = async function(complaint) {
     try {
         console.log('Сохраняем жалобу:', complaint);
         
@@ -122,7 +124,7 @@ async function saveComplaint(complaint) {
     }
 }
 
-async function updateComplaint(id, updates) {
+window.updateComplaint = async function(id, updates) {
     try {
         const { data, error } = await supabaseClient
             .from('complaints')
@@ -140,7 +142,7 @@ async function updateComplaint(id, updates) {
     }
 }
 
-async function deleteComplaint(id) {
+window.deleteComplaint = async function(id) {
     try {
         const { data, error } = await supabaseClient
             .from('complaints')
@@ -159,7 +161,7 @@ async function deleteComplaint(id) {
 }
 
 // Функции для заявок
-async function getApplications() {
+window.getApplications = async function() {
     try {
         const { data, error } = await supabaseClient
             .from('applications')
@@ -177,7 +179,7 @@ async function getApplications() {
     }
 }
 
-async function saveApplication(application) {
+window.saveApplication = async function(application) {
     try {
         console.log('Сохраняем заявку:', application);
         
@@ -197,7 +199,7 @@ async function saveApplication(application) {
     }
 }
 
-async function updateApplication(id, updates) {
+window.updateApplication = async function(id, updates) {
     try {
         const { data, error } = await supabaseClient
             .from('applications')
@@ -215,7 +217,7 @@ async function updateApplication(id, updates) {
     }
 }
 
-async function deleteApplication(id) {
+window.deleteApplication = async function(id) {
     try {
         const { data, error } = await supabaseClient
             .from('applications')
@@ -232,3 +234,8 @@ async function deleteApplication(id) {
         return false;
     }
 }
+
+// Автоматически проверим подключение
+setTimeout(() => {
+    window.testConnection();
+}, 1000);
