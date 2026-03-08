@@ -147,21 +147,27 @@ window.updateComplaint = async function(id, updates) {
 
 window.deleteComplaint = async function(id) {
     try {
-        console.log('Удаляем жалобу с ID:', id, 'тип:', typeof id);
+        console.log('🗑️ Удаляем жалобу с ID:', id, 'тип:', typeof id);
+        
+        // Преобразуем ID в число
+        const numericId = Number(id);
+        console.log('🔢 Числовой ID:', numericId);
         
         const { data, error } = await supabaseClient
             .from('complaints')
             .delete()
-            .eq('id', id);
+            .eq('id', numericId);
         
         if (error) {
-            console.error('Ошибка удаления жалобы:', error);
+            console.error('❌ Ошибка удаления жалобы:', error);
+            alert('Ошибка: ' + error.message);
             return false;
         }
-        console.log('Жалоба удалена, ответ:', data);
+        console.log('✅ Жалоба удалена, ответ:', data);
         return true;
     } catch (e) {
-        console.error('Исключение при удалении:', e);
+        console.error('❌ Исключение при удалении:', e);
+        alert('Исключение: ' + e.message);
         return false;
     }
 }
@@ -228,21 +234,27 @@ window.updateApplication = async function(id, updates) {
 
 window.deleteApplication = async function(id) {
     try {
-        console.log('Удаляем заявку с ID:', id, 'тип:', typeof id);
+        console.log('🗑️ Удаляем заявку с ID:', id, 'тип:', typeof id);
+        
+        // Преобразуем ID в число
+        const numericId = Number(id);
+        console.log('🔢 Числовой ID:', numericId);
         
         const { data, error } = await supabaseClient
             .from('applications')
             .delete()
-            .eq('id', id);
+            .eq('id', numericId);
         
         if (error) {
-            console.error('Ошибка удаления заявки:', error);
+            console.error('❌ Ошибка удаления заявки:', error);
+            alert('Ошибка: ' + error.message);
             return false;
         }
-        console.log('Заявка удалена, ответ:', data);
+        console.log('✅ Заявка удалена, ответ:', data);
         return true;
     } catch (e) {
-        console.error('Исключение при удалении:', e);
+        console.error('❌ Исключение при удалении:', e);
+        alert('Исключение: ' + e.message);
         return false;
     }
 }
