@@ -1,4 +1,4 @@
-// Подключение к Supabase - ПРАВИЛЬНЫЙ КЛЮЧ!
+// Подключение к Supabase
 const SUPABASE_URL = 'https://opeypwayctnnyrfkhajf.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wZXlwd2F5Y3RubnlyZmtoYWpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MzU4ODQsImV4cCI6MjA4ODUxMTg4NH0._Y1R1NNCVMyVgyeN7O7a24n4BGwc44c6vO1Q6MAf74A';
 
@@ -126,6 +126,8 @@ window.saveComplaint = async function(complaint) {
 
 window.updateComplaint = async function(id, updates) {
     try {
+        console.log('Обновляем жалобу:', id, updates);
+        
         const { data, error } = await supabaseClient
             .from('complaints')
             .update(updates)
@@ -135,6 +137,7 @@ window.updateComplaint = async function(id, updates) {
             console.error('Ошибка обновления жалобы:', error);
             return false;
         }
+        console.log('Жалоба обновлена:', data);
         return true;
     } catch (e) {
         console.error('Исключение:', e);
@@ -144,7 +147,7 @@ window.updateComplaint = async function(id, updates) {
 
 window.deleteComplaint = async function(id) {
     try {
-        console.log('Удаляем жалобу с ID:', id);
+        console.log('Удаляем жалобу с ID:', id, 'тип:', typeof id);
         
         const { data, error } = await supabaseClient
             .from('complaints')
@@ -155,7 +158,7 @@ window.deleteComplaint = async function(id) {
             console.error('Ошибка удаления жалобы:', error);
             return false;
         }
-        console.log('Жалоба удалена:', data);
+        console.log('Жалоба удалена, ответ:', data);
         return true;
     } catch (e) {
         console.error('Исключение при удалении:', e);
@@ -204,6 +207,8 @@ window.saveApplication = async function(application) {
 
 window.updateApplication = async function(id, updates) {
     try {
+        console.log('Обновляем заявку:', id, updates);
+        
         const { data, error } = await supabaseClient
             .from('applications')
             .update(updates)
@@ -213,6 +218,7 @@ window.updateApplication = async function(id, updates) {
             console.error('Ошибка обновления заявки:', error);
             return false;
         }
+        console.log('Заявка обновлена:', data);
         return true;
     } catch (e) {
         console.error('Исключение:', e);
@@ -222,7 +228,7 @@ window.updateApplication = async function(id, updates) {
 
 window.deleteApplication = async function(id) {
     try {
-        console.log('Удаляем заявку с ID:', id);
+        console.log('Удаляем заявку с ID:', id, 'тип:', typeof id);
         
         const { data, error } = await supabaseClient
             .from('applications')
@@ -233,7 +239,7 @@ window.deleteApplication = async function(id) {
             console.error('Ошибка удаления заявки:', error);
             return false;
         }
-        console.log('Заявка удалена:', data);
+        console.log('Заявка удалена, ответ:', data);
         return true;
     } catch (e) {
         console.error('Исключение при удалении:', e);
