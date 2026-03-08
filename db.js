@@ -1,5 +1,5 @@
 // ==============================================
-// БАЗА ДАННЫХ MOONGRIEF - ПОЛНАЯ ВЕРСИЯ
+// БАЗА ДАННЫХ MOONGRIEF
 // ==============================================
 
 const SUPABASE_URL = 'https://opeypwayctnnyrfkhajf.supabase.co';
@@ -125,28 +125,16 @@ window.updateComplaint = async function(id, updates) {
     }
 }
 
-// ==============================================
-// УДАЛЕНИЕ ЖАЛОБ - РАБОЧАЯ ВЕРСИЯ
-// ==============================================
-
 window.deleteComplaint = async function(id) {
-    console.log('🗑️ db.js: Удаление жалобы ID:', id);
-    
     try {
         const { error } = await supabaseClient
             .from('complaints')
             .delete()
             .eq('id', id);
-        
-        if (error) {
-            console.error('❌ db.js: Ошибка:', error);
-            return false;
-        }
-        
-        console.log('✅ db.js: Жалоба удалена');
+        if (error) throw error;
         return true;
     } catch (e) {
-        console.error('❌ db.js: Исключение:', e);
+        console.error('Ошибка удаления жалобы:', e);
         return false;
     }
 }
@@ -196,28 +184,16 @@ window.updateApplication = async function(id, updates) {
     }
 }
 
-// ==============================================
-// УДАЛЕНИЕ ЗАЯВОК - РАБОЧАЯ ВЕРСИЯ
-// ==============================================
-
 window.deleteApplication = async function(id) {
-    console.log('🗑️ db.js: Удаление заявки ID:', id);
-    
     try {
         const { error } = await supabaseClient
             .from('applications')
             .delete()
             .eq('id', id);
-        
-        if (error) {
-            console.error('❌ db.js: Ошибка:', error);
-            return false;
-        }
-        
-        console.log('✅ db.js: Заявка удалена');
+        if (error) throw error;
         return true;
     } catch (e) {
-        console.error('❌ db.js: Исключение:', e);
+        console.error('Ошибка удаления заявки:', e);
         return false;
     }
 }
