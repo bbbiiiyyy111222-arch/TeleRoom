@@ -1,5 +1,5 @@
 // ==============================================
-// АДМИН ПАНЕЛЬ MOONGRIEF - КРАСИВЫЕ МАЛЕНЬКИЕ КНОПКИ
+// АДМИН ПАНЕЛЬ MOONGRIEF - ЛУННЫЙ ДИЗАЙН
 // ==============================================
 
 let complaints = [];
@@ -54,7 +54,13 @@ async function loadComplaints() {
     complaints = await window.getComplaints() || [];
     
     if (complaints.length === 0) {
-        container.innerHTML = `<div class="empty-state">🌙 <h3>Нет жалоб</h3></div>`;
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">🌙</div>
+                <h3>НЕТ ЖАЛОБ</h3>
+                <p>Пока никто не подавал жалоб</p>
+            </div>
+        `;
         return;
     }
     
@@ -73,7 +79,13 @@ async function loadApplications() {
     applications = await window.getApplications() || [];
     
     if (applications.length === 0) {
-        container.innerHTML = `<div class="empty-state">🌙 <h3>Нет анкет</h3></div>`;
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">🌙</div>
+                <h3>НЕТ АНКЕТ</h3>
+                <p>Пока никто не подавал заявки</p>
+            </div>
+        `;
         return;
     }
     
@@ -86,20 +98,22 @@ async function loadApplications() {
 }
 
 // ==============================================
-// КАРТОЧКА ЖАЛОБЫ
+// КАРТОЧКА ЖАЛОБЫ С МАЛЕНЬКИМИ КНОПКАМИ
 // ==============================================
 
 function createComplaintCard(c) {
     let statusClass = '';
     let statusText = '';
+    let statusIcon = '';
     let buttons = '';
     
     switch(c.status) {
         case 'new':
             statusClass = 'status-new';
-            statusText = '🆕 НОВАЯ';
+            statusText = 'НОВАЯ';
+            statusIcon = '🆕';
             buttons = `
-                <div class="action-buttons">
+                <div class="action-group">
                     <button onclick="acceptComplaint(${c.id})" class="mini-btn accept-btn" title="Принять">
                         <span>✅</span>
                     </button>
@@ -114,10 +128,14 @@ function createComplaintCard(c) {
             break;
         case 'accepted':
             statusClass = 'status-accepted';
-            statusText = '✅ ПРИНЯТО';
+            statusText = 'ПРИНЯТО';
+            statusIcon = '✅';
             buttons = `
-                <div class="action-buttons">
-                    <span class="status-badge accepted">✅ ПРИНЯТО</span>
+                <div class="action-group">
+                    <span class="status-badge accepted">
+                        <span>✅</span>
+                        <span>ПРИНЯТО</span>
+                    </span>
                     <button onclick="openResponseModal('complaint', ${c.id})" class="mini-btn respond-btn" title="Ответить">
                         <span>📝</span>
                     </button>
@@ -126,10 +144,14 @@ function createComplaintCard(c) {
             break;
         case 'rejected':
             statusClass = 'status-rejected';
-            statusText = '❌ ОТКЛОНЕНО';
+            statusText = 'ОТКЛОНЕНО';
+            statusIcon = '❌';
             buttons = `
-                <div class="action-buttons">
-                    <span class="status-badge rejected">❌ ОТКЛОНЕНО</span>
+                <div class="action-group">
+                    <span class="status-badge rejected">
+                        <span>❌</span>
+                        <span>ОТКЛОНЕНО</span>
+                    </span>
                     <button onclick="openResponseModal('complaint', ${c.id})" class="mini-btn respond-btn" title="Ответить">
                         <span>📝</span>
                     </button>
@@ -138,10 +160,14 @@ function createComplaintCard(c) {
             break;
         case 'resolved':
             statusClass = 'status-resolved';
-            statusText = '📝 ОТВЕЧЕНО';
+            statusText = 'ОТВЕЧЕНО';
+            statusIcon = '📝';
             buttons = `
-                <div class="action-buttons">
-                    <span class="status-badge resolved">📝 ОТВЕЧЕНО</span>
+                <div class="action-group">
+                    <span class="status-badge resolved">
+                        <span>📝</span>
+                        <span>ОТВЕЧЕНО</span>
+                    </span>
                     <button onclick="openResponseModal('complaint', ${c.id})" class="mini-btn respond-btn" title="Ответить">
                         <span>📝</span>
                     </button>
@@ -151,32 +177,32 @@ function createComplaintCard(c) {
     }
     
     return `
-        <div class="admin-card">
+        <div class="card">
             <div class="card-header">
                 <div class="card-title">
-                    <span class="title-icon">⚠️</span>
-                    <span class="title-text">${c.title || 'Жалоба'}</span>
+                    <span class="card-icon">⚠️</span>
+                    <span class="card-text">${c.title || 'Жалоба'}</span>
                 </div>
                 <div class="card-status ${statusClass}">
-                    <span class="status-icon">${statusText.split(' ')[0]}</span>
-                    <span class="status-text">${statusText.split(' ')[1] || statusText}</span>
+                    <span class="status-icon">${statusIcon}</span>
+                    <span class="status-text">${statusText}</span>
                 </div>
             </div>
             
             <div class="card-body">
-                <div class="info-line">
+                <div class="info-row">
                     <span class="info-label">👤 От:</span>
                     <span class="info-value">${c.author}</span>
                 </div>
-                <div class="info-line">
+                <div class="info-row">
                     <span class="info-label">🎯 На:</span>
                     <span class="info-value">${c.against}</span>
                 </div>
-                <div class="info-line full">
+                <div class="info-row full">
                     <span class="info-label">📝 Описание:</span>
                     <span class="info-value">${c.description}</span>
                 </div>
-                <div class="info-line">
+                <div class="info-row">
                     <span class="info-label">📅 Дата:</span>
                     <span class="info-value">${new Date(c.date).toLocaleString()}</span>
                 </div>
@@ -197,20 +223,22 @@ function createComplaintCard(c) {
 }
 
 // ==============================================
-// КАРТОЧКА АНКЕТЫ
+// КАРТОЧКА АНКЕТЫ С МАЛЕНЬКИМИ КНОПКАМИ
 // ==============================================
 
 function createApplicationCard(a) {
     let statusClass = '';
     let statusText = '';
+    let statusIcon = '';
     let buttons = '';
     
     switch(a.status) {
         case 'new':
             statusClass = 'status-new';
-            statusText = '🆕 НОВАЯ';
+            statusText = 'НОВАЯ';
+            statusIcon = '🆕';
             buttons = `
-                <div class="action-buttons">
+                <div class="action-group">
                     <button onclick="acceptApplication(${a.id})" class="mini-btn accept-btn" title="Принять">
                         <span>✅</span>
                     </button>
@@ -225,10 +253,14 @@ function createApplicationCard(a) {
             break;
         case 'accepted':
             statusClass = 'status-accepted';
-            statusText = '✅ ПРИНЯТО';
+            statusText = 'ПРИНЯТО';
+            statusIcon = '✅';
             buttons = `
-                <div class="action-buttons">
-                    <span class="status-badge accepted">✅ ПРИНЯТО</span>
+                <div class="action-group">
+                    <span class="status-badge accepted">
+                        <span>✅</span>
+                        <span>ПРИНЯТО</span>
+                    </span>
                     <button onclick="openResponseModal('application', ${a.id})" class="mini-btn respond-btn" title="Ответить">
                         <span>📝</span>
                     </button>
@@ -237,10 +269,14 @@ function createApplicationCard(a) {
             break;
         case 'rejected':
             statusClass = 'status-rejected';
-            statusText = '❌ ОТКЛОНЕНО';
+            statusText = 'ОТКЛОНЕНО';
+            statusIcon = '❌';
             buttons = `
-                <div class="action-buttons">
-                    <span class="status-badge rejected">❌ ОТКЛОНЕНО</span>
+                <div class="action-group">
+                    <span class="status-badge rejected">
+                        <span>❌</span>
+                        <span>ОТКЛОНЕНО</span>
+                    </span>
                     <button onclick="openResponseModal('application', ${a.id})" class="mini-btn respond-btn" title="Ответить">
                         <span>📝</span>
                     </button>
@@ -249,10 +285,14 @@ function createApplicationCard(a) {
             break;
         case 'resolved':
             statusClass = 'status-resolved';
-            statusText = '📝 ОТВЕЧЕНО';
+            statusText = 'ОТВЕЧЕНО';
+            statusIcon = '📝';
             buttons = `
-                <div class="action-buttons">
-                    <span class="status-badge resolved">📝 ОТВЕЧЕНО</span>
+                <div class="action-group">
+                    <span class="status-badge resolved">
+                        <span>📝</span>
+                        <span>ОТВЕЧЕНО</span>
+                    </span>
                     <button onclick="openResponseModal('application', ${a.id})" class="mini-btn respond-btn" title="Ответить">
                         <span>📝</span>
                     </button>
@@ -262,54 +302,54 @@ function createApplicationCard(a) {
     }
     
     return `
-        <div class="admin-card">
+        <div class="card">
             <div class="card-header">
                 <div class="card-title">
-                    <span class="title-icon">👮</span>
-                    <span class="title-text">АНКЕТА НА ХЕЛПЕРА</span>
+                    <span class="card-icon">👮</span>
+                    <span class="card-text">АНКЕТА НА ХЕЛПЕРА</span>
                 </div>
                 <div class="card-status ${statusClass}">
-                    <span class="status-icon">${statusText.split(' ')[0]}</span>
-                    <span class="status-text">${statusText.split(' ')[1] || statusText}</span>
+                    <span class="status-icon">${statusIcon}</span>
+                    <span class="status-text">${statusText}</span>
                 </div>
             </div>
             
             <div class="card-body">
-                <div class="info-line">
+                <div class="info-row">
                     <span class="info-label">🎮 Ник:</span>
-                    <span class="info-value">${a.nickname}</span>
+                    <span class="info-value">${a.nickname || 'Нет'}</span>
                 </div>
-                <div class="info-line">
+                <div class="info-row">
                     <span class="info-label">👤 Имя:</span>
-                    <span class="info-value">${a.name}</span>
+                    <span class="info-value">${a.name || 'Нет'}</span>
                 </div>
-                <div class="info-line">
+                <div class="info-row">
                     <span class="info-label">📅 Возраст:</span>
-                    <span class="info-value">${a.age}</span>
+                    <span class="info-value">${a.age || 'Нет'}</span>
                 </div>
-                <div class="info-line">
+                <div class="info-row">
                     <span class="info-label">🌍 Часовой пояс:</span>
-                    <span class="info-value">${a.timezone}</span>
+                    <span class="info-value">${a.timezone || 'Нет'}</span>
                 </div>
-                <div class="info-line full">
+                <div class="info-row full">
                     <span class="info-label">💼 Опыт:</span>
-                    <span class="info-value">${a.experience}</span>
+                    <span class="info-value">${a.experience || 'Нет'}</span>
                 </div>
-                <div class="info-line full">
+                <div class="info-row full">
                     <span class="info-label">❓ Мотивация:</span>
-                    <span class="info-value">${a.reason}</span>
+                    <span class="info-value">${a.reason || 'Нет'}</span>
                 </div>
                 ${a.additional ? `
-                <div class="info-line full">
+                <div class="info-row full">
                     <span class="info-label">📝 Дополнительно:</span>
                     <span class="info-value">${a.additional}</span>
                 </div>
                 ` : ''}
-                <div class="info-line">
+                <div class="info-row">
                     <span class="info-label">👤 От:</span>
-                    <span class="info-value">${a.author}</span>
+                    <span class="info-value">${a.author || 'Нет'}</span>
                 </div>
-                <div class="info-line">
+                <div class="info-row">
                     <span class="info-label">📅 Дата:</span>
                     <span class="info-value">${new Date(a.date).toLocaleString()}</span>
                 </div>
