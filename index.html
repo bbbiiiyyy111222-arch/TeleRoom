@@ -3,565 +3,597 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BLADEBOX ⚔️ Minecraft сервер</title>
+    <title>MoonGrief-Forum 🌙 Minecraft сервер</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Шапка -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <h1>⚔️ BLADEBOX</h1>
-                    <div class="server-ip">
-                        <span>Сервер: Moongrief.aurorix.pro</span>
-                        <button onclick="copyIP()" class="copy-btn">📋 Копировать IP</button>
-                    </div>
-                </div>
+    <!-- Экран выбора устройства -->
+    <div id="deviceChoice" class="device-choice">
+        <div class="device-choice-content">
+            <h1 class="device-title">🌙 MOONGRIEF-FORUM</h1>
+            <p class="device-subtitle">ВЫБЕРИТЕ ВАШЕ УСТРОЙСТВО</p>
+            
+            <div class="device-buttons">
+                <button onclick="selectDevice('pc')" class="device-btn pc-btn">
+                    <span class="device-icon">🖥️</span>
+                    <span class="device-name">ПК / НОУТБУК</span>
+                </button>
                 
-                <!-- Авторизация -->
-                <div class="auth" id="auth">
-                    <div id="userInfo" style="display: none;">
-                        <span id="currentUser" class="moon-glow"></span>
-                        <div class="auth-buttons">
-                            <button onclick="showChangePassword()" class="btn-moon">
-                                <span>🔑</span>
-                                <span>Сменить пароль</span>
-                            </button>
-                            <button onclick="logout()" class="btn-moon logout-btn">
-                                <span>⚔️</span>
-                                <span>Выйти</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div id="loginForm" class="login-form">
-                        <input type="text" id="username" placeholder="Ник" class="moon-input">
-                        <input type="password" id="password" placeholder="Пароль" class="moon-input">
-                        <button onclick="login()" class="btn-moon">🔐 Войти</button>
-                        <button onclick="showRegister()" class="btn-moon">📝 Регистрация</button>
-                    </div>
-                </div>
+                <button onclick="selectDevice('mobile')" class="device-btn mobile-btn">
+                    <span class="device-icon">📱</span>
+                    <span class="device-name">ТЕЛЕФОН</span>
+                </button>
             </div>
-        </div>
-    </header>
-
-    <!-- Навигация -->
-    <nav class="nav">
-        <div class="container">
-            <a href="#rules" class="nav-link active" onclick="showSection('rules', event)">⚔️ ПРАВИЛА</a>
-            <a href="#complaints" class="nav-link" onclick="showSection('complaints', event)">⚠️ ЖАЛОБЫ</a>
-            <a href="#media" class="nav-link" onclick="showSection('media', event)">📱 ЗАЯВКИ НА МЕДИЮ</a>
-            <a href="#applications" class="nav-link" onclick="showSection('applications', event)">👮 ЗАЯВКИ НА ХЕЛПЕРА</a>
-            <a href="admin.html" id="adminLink" class="nav-link" style="display: none;">⚡ АДМИН ПАНЕЛЬ</a>
-        </div>
-    </nav>
-
-    <!-- Информационная панель -->
-    <div class="info-bar">
-        <div class="container">
-            <div class="info-content">
-                <!-- Куратор -->
-                <div class="info-item">
-                    <span class="info-icon">👑</span>
-                    <div class="info-text">
-                        <span class="info-label">Наш куратор</span>
-                        <a href="https://t.me/milo4ika1" target="_blank" class="info-link">@milo4ika1</a>
-                        <span class="info-badge telegram">Telegram</span>
-                    </div>
-                </div>
-                
-                <!-- Срок рассмотрения -->
-                <div class="info-item">
-                    <span class="info-icon">⏳</span>
-                    <div class="info-text">
-                        <span class="info-label">Срок рассмотрения</span>
-                        <span class="info-value">24 часа</span>
-                        <span class="info-badge">заявки и жалобы</span>
-                    </div>
-                </div>
-
-                <!-- Баги -->
-                <div class="info-item bug-report">
-                    <span class="info-icon">🐛</span>
-                    <div class="info-text">
-                        <span class="info-label">Нашли баг?</span>
-                        <a href="https://t.me/milo4ika1" target="_blank" class="info-link">@milo4ika1</a>
-                        <span class="info-badge">напишите создателю форума</span>
-                    </div>
-                </div>
-            </div>
+            
+            <p class="device-note">Выбор нужен для лучшего отображения сайта</p>
         </div>
     </div>
 
-    <!-- Основной контент -->
-    <main class="main">
-        <div class="container">
-            <!-- Правила -->
-            <section id="rules" class="section active-section">
-                <h2 class="section-title">⚔️ ПРАВИЛА СЕРВЕРА BLADEBOX</h2>
-                
-                <!-- 1. Общие положения -->
-                <div class="rule-block">
-                    <h3>⚔️ 1. ОБЩИЕ ПОЛОЖЕНИЯ</h3>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">1.1 🔥</span>
-                        <p>Настоящие правила разработаны администратором сервера BLADEBOX и действуют на всех существующих игровых режимах.</p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">1.2 ⚡</span>
-                        <p>Официальные сервера расположены по адресам: bladebox.aurorix.pro. Другие домены не относятся к проекту.</p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">1.3 👑</span>
-                        <p>Решения администрации являются окончательными и не подлежат обсуждению.</p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">1.4 💔</span>
-                        <p>Администрация не компенсирует потерю ресурсов, вызванную техническими сбоями.</p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">1.5 💀</span>
-                        <div class="rule-content">
-                            <p><strong>⚠️ ЗАПРЕЩЁННЫЕ ДЕЙСТВИЯ ⚠️</strong></p>
-                            <ul>
-                                <li>▸ Продажа, взлом аккаунтов 💀</li>
-                                <li>▸ Распространение личных данных 📵</li>
-                                <li>▸ Намеренный вред серверу 💢</li>
-                                <li>▸ Продажа игровых предметов за деньги 💰</li>
-                            </ul>
-                            <p><span class="punish">⚡ НАКАЗАНИЕ: БАН ПО IP + БАН АККАУНТА ⚡</span></p>
+    <!-- Основной сайт (изначально скрыт) -->
+    <div id="mainSite" style="display: none;">
+        <!-- Шапка -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <h1>🌙 MOONGRIEF-FORUM</h1>
+                        <div class="server-ip">
+                            <span>Сервер: Moongrief.aurorix.pro</span>
+                            <button onclick="copyIP()" class="copy-btn">📋 Копировать IP</button>
                         </div>
                     </div>
                     
-                    <div class="rule-item">
-                        <span class="rule-num">1.6 🤝</span>
-                        <p>Уважение к администрации обязательно. <span class="mini-punish">🚫 БАН</span></p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">1.7 📢</span>
-                        <p>Администрация может менять правила без предупреждения.</p>
+                    <!-- Авторизация -->
+                    <div class="auth" id="auth">
+                        <div id="userInfo" style="display: none;">
+                            <span id="currentUser" class="moon-glow"></span>
+                            <div class="auth-buttons">
+                                <button onclick="showChangePassword()" class="btn-moon">
+                                    <span>🔑</span>
+                                    <span>Сменить пароль</span>
+                                </button>
+                                <button onclick="logout()" class="btn-moon logout-btn">
+                                    <span>🌙</span>
+                                    <span>Выйти</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="loginForm" class="login-form">
+                            <input type="text" id="username" placeholder="Ник" class="moon-input">
+                            <input type="password" id="password" placeholder="Пароль" class="moon-input">
+                            <button onclick="login()" class="btn-moon">🌙 Войти</button>
+                            <button onclick="showRegister()" class="btn-moon">📝 Регистрация</button>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </header>
 
-                <!-- 2. Аккаунт -->
-                <div class="rule-block">
-                    <h3>⚔️ 2. АККАУНТ</h3>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">2.1 🎮</span>
-                        <p>Запрещены ники, похожие на администрацию. <span class="mini-punish">🚫 БАН НАВСЕГДА</span></p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">2.2 ⚔️</span>
-                        <p>Запрещены оскорбительные ники. <span class="mini-punish">🚫 БАН НАВСЕГДА</span></p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">2.3 🚫</span>
-                        <p>Запрещены ники с названиями читов. <span class="mini-punish">🚫 БАН НАВСЕГДА</span></p>
-                    </div>
-                </div>
+        <!-- Кнопка смены устройства (для мобильной версии) -->
+        <div class="device-switch" id="deviceSwitch">
+            <button onclick="showDeviceChoice()" class="device-switch-btn">
+                <span>📱</span> СМЕНИТЬ УСТРОЙСТВО <span>🖥️</span>
+            </button>
+        </div>
 
-                <!-- 3. Донат -->
-                <div class="rule-block">
-                    <h3>⚔️ 3. ДОНАТ</h3>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">3.1 💎</span>
-                        <p>Участие в проекте является бесплатным.</p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">3.2 💰</span>
-                        <p>Пожертвования добровольны.</p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">3.3 💳</span>
-                        <p>Платные группы не дают право нарушать правила.</p>
-                    </div>
-                </div>
+        <!-- Навигация -->
+        <nav class="nav">
+            <div class="container">
+                <a href="#rules" class="nav-link active" onclick="showSection('rules', event)">🌙 ПРАВИЛА</a>
+                <a href="#complaints" class="nav-link" onclick="showSection('complaints', event)">⚠️ ЖАЛОБЫ</a>
+                <a href="#media" class="nav-link" onclick="showSection('media', event)">📱 ЗАЯВКИ НА МЕДИЮ</a>
+                <a href="#applications" class="nav-link" onclick="showSection('applications', event)">👮 ЗАЯВКИ НА ХЕЛПЕРА</a>
+                <a href="admin.html" id="adminLink" class="nav-link" style="display: none;">🌙 АДМИН ПАНЕЛЬ</a>
+            </div>
+        </nav>
 
-                <!-- 4. Чат -->
-                <div class="rule-block">
-                    <h3>⚔️ 4. ЧАТ</h3>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">4.1 💬</span>
-                        <p>Флуд запрещен. <span class="mini-punish">🔇 МУТ 2 ЧАСА</span></p>
+        <!-- Информационная панель -->
+        <div class="info-bar">
+            <div class="container">
+                <div class="info-content">
+                    <!-- Куратор -->
+                    <div class="info-item">
+                        <span class="info-icon">🌙</span>
+                        <div class="info-text">
+                            <span class="info-label">Наш куратор</span>
+                            <a href="https://t.me/milo4ika1" target="_blank" class="info-link">@milo4ika1</a>
+                            <span class="info-badge telegram">Telegram</span>
+                        </div>
                     </div>
                     
-                    <div class="rule-item">
-                        <span class="rule-num">4.2 📢</span>
-                        <p>Обход мута через /bc. <span class="mini-punish">🔨 БАН 1 ДЕНЬ</span></p>
+                    <!-- Срок рассмотрения -->
+                    <div class="info-item">
+                        <span class="info-icon">⏳</span>
+                        <div class="info-text">
+                            <span class="info-label">Срок рассмотрения</span>
+                            <span class="info-value">24 часа</span>
+                            <span class="info-badge">заявки и жалобы</span>
+                        </div>
                     </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">4.3 🔠</span>
-                        <p>CAPS (>50%). <span class="mini-punish">🔇 МУТ 2 ЧАСА</span></p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">4.4 🤬</span>
-                        <p>Оскорбления игроков. <span class="mini-punish">🔇 МУТ 2 ЧАСА</span></p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">4.5 💀</span>
-                        <p>Призыв к суициду. <span class="mini-punish">🔨 БАН 1 ДЕНЬ</span></p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">4.6 🚫</span>
-                        <p>Попрошайничество у админов (исключение: Xchik_). <span class="mini-punish">🔇 МУТ 2 ЧАСА</span></p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">4.7 📛</span>
-                        <p>Реклама сторонних ресурсов. <span class="mini-punish">🔨 БАН 14 ДНЕЙ</span></p>
-                    </div>
-                </div>
 
-                <!-- 5. Запрещенный софт -->
-                <div class="rule-block">
-                    <h3>⚔️ 5. ЗАПРЕЩЕННЫЙ СОФТ</h3>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">5.1 🤖</span>
-                        <p>Использование читов. <span class="mini-punish">🔨 БАН 50 ДНЕЙ</span></p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">5.2 📝</span>
-                        <p>Признание в читах при проверке. <span class="mini-punish">🔨 БАН 40 ДНЕЙ</span></p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">5.3 👥</span>
-                        <p>Игра с читерами. <span class="mini-punish">🔨 БАН 14 ДНЕЙ</span></p>
+                    <!-- Баги -->
+                    <div class="info-item bug-report">
+                        <span class="info-icon">🐛</span>
+                        <div class="info-text">
+                            <span class="info-label">Нашли баг?</span>
+                            <a href="https://t.me/milo4ika1" target="_blank" class="info-link">@milo4ika1</a>
+                            <span class="info-badge">напишите создателю форума</span>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- 6. Игровой процесс -->
-                <div class="rule-block">
-                    <h3>⚔️ 6. ИГРОВОЙ ПРОЦЕСС</h3>
+        <!-- Основной контент -->
+        <main class="main">
+            <div class="container">
+                <!-- Правила (без смайлов) -->
+                <section id="rules" class="section active-section">
+                    <h2 class="section-title">🌙 ПРАВИЛА СЕРВЕРА MOONGRIEF</h2>
                     
-                    <div class="rule-item">
-                        <span class="rule-num">6.1 🏗️</span>
-                        <p>Лаг-машины. <span class="mini-punish">🔨 БАН 7 ДНЕЙ</span></p>
+                    <!-- 1. Общие положения -->
+                    <div class="rule-block">
+                        <h3>РАЗДЕЛ 1. ОБЩИЕ ПОЛОЖЕНИЯ</h3>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">1.1</span>
+                            <p>Настоящие правила разработаны администратором сервера MoonGrief и действуют на всех существующих игровых режимах.</p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">1.2</span>
+                            <p>Официальные сервера расположены по адресам: Moongrief.aurorix.pro. Другие домены не относятся к проекту.</p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">1.3</span>
+                            <p>Решения администрации являются окончательными и не подлежат обсуждению.</p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">1.4</span>
+                            <p>Администрация не компенсирует потерю ресурсов, вызванную техническими сбоями.</p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">1.5</span>
+                            <div class="rule-content">
+                                <p><strong>ЗАПРЕЩЁННЫЕ ДЕЙСТВИЯ</strong></p>
+                                <ul>
+                                    <li>▸ Продажа, взлом аккаунтов</li>
+                                    <li>▸ Распространение личных данных</li>
+                                    <li>▸ Намеренный вред серверу</li>
+                                    <li>▸ Продажа игровых предметов за деньги</li>
+                                </ul>
+                                <p><span class="punish">НАКАЗАНИЕ: БАН ПО IP + БАН АККАУНТА</span></p>
+                            </div>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">1.6</span>
+                            <p>Уважение к администрации обязательно. <span class="mini-punish">НАКАЗАНИЕ: БАН</span></p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">1.7</span>
+                            <p>Администрация может менять правила без предупреждения.</p>
+                        </div>
+                    </div>
+
+                    <!-- 2. Аккаунт -->
+                    <div class="rule-block">
+                        <h3>РАЗДЕЛ 2. АККАУНТ</h3>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">2.1</span>
+                            <p>Запрещены ники, похожие на администрацию. <span class="mini-punish">НАКАЗАНИЕ: БАН НАВСЕГДА</span></p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">2.2</span>
+                            <p>Запрещены оскорбительные ники. <span class="mini-punish">НАКАЗАНИЕ: БАН НАВСЕГДА</span></p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">2.3</span>
+                            <p>Запрещены ники с названиями читов. <span class="mini-punish">НАКАЗАНИЕ: БАН НАВСЕГДА</span></p>
+                        </div>
+                    </div>
+
+                    <!-- 3. Донат -->
+                    <div class="rule-block">
+                        <h3>РАЗДЕЛ 3. ДОНАТ</h3>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">3.1</span>
+                            <p>Участие в проекте является бесплатным.</p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">3.2</span>
+                            <p>Пожертвования добровольны.</p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">3.3</span>
+                            <p>Платные группы не дают право нарушать правила.</p>
+                        </div>
+                    </div>
+
+                    <!-- 4. Чат -->
+                    <div class="rule-block">
+                        <h3>РАЗДЕЛ 4. ЧАТ</h3>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">4.1</span>
+                            <p>Флуд запрещен. <span class="mini-punish">НАКАЗАНИЕ: МУТ 2 ЧАСА</span></p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">4.2</span>
+                            <p>Обход мута через /bc. <span class="mini-punish">НАКАЗАНИЕ: БАН 1 ДЕНЬ</span></p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">4.3</span>
+                            <p>CAPS (более 50% сообщения). <span class="mini-punish">НАКАЗАНИЕ: МУТ 2 ЧАСА</span></p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">4.4</span>
+                            <p>Оскорбления игроков. <span class="mini-punish">НАКАЗАНИЕ: МУТ 2 ЧАСА</span></p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">4.5</span>
+                            <p>Призыв к суициду. <span class="mini-punish">НАКАЗАНИЕ: БАН 1 ДЕНЬ</span></p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">4.6</span>
+                            <p>Попрошайничество у админов (исключение: Xchik_). <span class="mini-punish">НАКАЗАНИЕ: МУТ 2 ЧАСА</span></p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">4.7</span>
+                            <p>Реклама сторонних ресурсов. <span class="mini-punish">НАКАЗАНИЕ: БАН 14 ДНЕЙ</span></p>
+                        </div>
+                    </div>
+
+                    <!-- 5. Запрещенный софт -->
+                    <div class="rule-block">
+                        <h3>РАЗДЕЛ 5. ЗАПРЕЩЕННЫЙ СОФТ</h3>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">5.1</span>
+                            <p>Использование читов. <span class="mini-punish">НАКАЗАНИЕ: БАН 50 ДНЕЙ</span></p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">5.2</span>
+                            <p>Признание в читах при проверке. <span class="mini-punish">НАКАЗАНИЕ: БАН 40 ДНЕЙ</span></p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">5.3</span>
+                            <p>Игра с читерами. <span class="mini-punish">НАКАЗАНИЕ: БАН 14 ДНЕЙ</span></p>
+                        </div>
+                    </div>
+
+                    <!-- 6. Игровой процесс -->
+                    <div class="rule-block">
+                        <h3>РАЗДЕЛ 6. ИГРОВОЙ ПРОЦЕСС</h3>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">6.1</span>
+                            <p>Лаг-машины. <span class="mini-punish">НАКАЗАНИЕ: БАН 7 ДНЕЙ</span></p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">6.2</span>
+                            <p>Варп до ловушки менее 10 блоков. <span class="mini-punish">НАКАЗАНИЕ: БАН 1 ДЕНЬ + СНОС</span></p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">6.3</span>
+                            <p>Использование /spec в шуточных целях. <span class="mini-punish">НАКАЗАНИЕ: БАН 1 ЧАС</span></p>
+                        </div>
+                        
+                        <div class="rule-item">
+                            <span class="rule-num">6.4</span>
+                            <p>Блокировка по IP не обжалуется. Связь: @waixzelz</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Жалобы -->
+                <section id="complaints" class="section">
+                    <h2 class="section-title">⚠️ ПОДАТЬ ЖАЛОБУ</h2>
+                    
+                    <div class="info-message">
+                        <span class="info-message-icon">⏳</span>
+                        <div class="info-message-text">
+                            <strong>СРОК РАССМОТРЕНИЯ: 24 ЧАСА</strong>
+                            <span>ПО ВОПРОСАМ: <a href="https://t.me/milo4ika1" target="_blank">@milo4ika1</a></span>
+                        </div>
                     </div>
                     
-                    <div class="rule-item">
-                        <span class="rule-num">6.2 🪤</span>
-                        <p>Варп до ловушки <10 блоков. <span class="mini-punish">🔨 БАН 1 ДЕНЬ + СНОС</span></p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">6.3 👁️</span>
-                        <p>Использование /spec в шуточных целях. <span class="mini-punish">🔨 БАН 1 ЧАС</span></p>
-                    </div>
-                    
-                    <div class="rule-item">
-                        <span class="rule-num">6.4 📞</span>
-                        <p>Блокировка по IP не обжалуется. Связь: @waixzelz</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Жалобы -->
-            <section id="complaints" class="section">
-                <h2 class="section-title">⚠️ ПОДАТЬ ЖАЛОБУ</h2>
-                
-                <div class="info-message">
-                    <span class="info-message-icon">⏳</span>
-                    <div class="info-message-text">
-                        <strong>СРОК РАССМОТРЕНИЯ: 24 ЧАСА</strong>
-                        <span>ПО ВОПРОСАМ: <a href="https://t.me/milo4ika1" target="_blank">@milo4ika1</a></span>
-                    </div>
-                </div>
-                
-                <div class="form-container">
-                    <h3 class="form-title">📝 НОВАЯ ЖАЛОБА</h3>
-                    <form id="complaintForm" onsubmit="submitComplaint(event)" class="form">
-                        <div class="form-group">
-                            <label>ЗАГОЛОВОК ЖАЛОБЫ</label>
-                            <input type="text" id="complaintTitle" placeholder="ВВЕДИТЕ ЗАГОЛОВОК" required class="input">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>НА КОГО ЖАЛОБА (НИК)</label>
-                            <input type="text" id="complaintAgainst" placeholder="НИК НАРУШИТЕЛЯ" required class="input">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>ОПИСАНИЕ СИТУАЦИИ</label>
-                            <textarea id="complaintDesc" placeholder="ПОДРОБНО ОПИШИТЕ СИТУАЦИЮ" required class="textarea" rows="4"></textarea>
-                        </div>
-                        
-                        <button type="submit" class="submit-btn">
-                            <span class="btn-icon">⚔️</span>
-                            <span class="btn-text">ОТПРАВИТЬ ЖАЛОБУ</span>
-                            <span class="btn-icon">⚔️</span>
-                        </button>
-                    </form>
-                </div>
-
-                <div class="list-container">
-                    <h3 class="list-title">📋 ПОСЛЕДНИЕ ЖАЛОБЫ</h3>
-                    <div id="complaintsList" class="items-list"></div>
-                </div>
-            </section>
-
-            <!-- ЗАЯВКИ НА МЕДИЮ (TT и YT) -->
-            <section id="media" class="section">
-                <h2 class="section-title">📱 ЗАЯВКИ НА МЕДИЮ</h2>
-                
-                <div class="info-message">
-                    <span class="info-message-icon">⏳</span>
-                    <div class="info-message-text">
-                        <strong>СРОК РАССМОТРЕНИЯ: 24 ЧАСА</strong>
-                        <span>ПО ВОПРОСАМ: <a href="https://t.me/milo4ika1" target="_blank">@milo4ika1</a></span>
-                    </div>
-                </div>
-                
-                <!-- Переключатель платформ -->
-                <div class="platform-switch">
-                    <button type="button" id="switchTT" class="platform-btn active" onclick="switchPlatform('tt')">📱 TIKTOK</button>
-                    <button type="button" id="switchYT" class="platform-btn" onclick="switchPlatform('yt')">▶️ YOUTUBE</button>
-                </div>
-                
-                <!-- Форма для TikTok -->
-                <div id="ttForm" class="form-container active">
-                    <h3 class="form-title">📱 ЗАЯВКА НА TIKTOK</h3>
-                    <form id="ttMediaForm" onsubmit="submitTTMedia(event)" class="form">
-                        <div class="form-group">
-                            <label>1) СКОЛЬКО ЛЕТ?</label>
-                            <input type="number" id="ttAge" placeholder="ВАШ ВОЗРАСТ" required class="input">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>2) КАК ЗОВУТ?</label>
-                            <input type="text" id="ttName" placeholder="ВАШЕ ИМЯ" required class="input">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>3) ИГРОВОЙ НИКНЕЙМ?</label>
-                            <input type="text" id="ttNickname" placeholder="ВАШ НИК В ИГРЕ" required class="input">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>4) СКОЛЬКО ПОДПИСЧИКОВ?</label>
-                            <input type="text" id="ttSubs" placeholder="КОЛИЧЕСТВО ПОДПИСЧИКОВ" required class="input">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>5) СТАБИЛЬНЫЕ ПРОСМОТРЫ?</label>
-                            <input type="text" id="ttViews" placeholder="СРЕДНИЕ ПРОСМОТРЫ" required class="input">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>6) ССЫЛКА НА TIKTOK?</label>
-                            <input type="url" id="ttLink" placeholder="https://tiktok.com/..." required class="input">
-                        </div>
-                        
-                        <button type="submit" class="submit-btn">
-                            <span class="btn-icon">📱</span>
-                            <span class="btn-text">ОТПРАВИТЬ ЗАЯВКУ</span>
-                            <span class="btn-icon">⚔️</span>
-                        </button>
-                    </form>
-                </div>
-                
-                <!-- Форма для YouTube -->
-                <div id="ytForm" class="form-container">
-                    <h3 class="form-title">▶️ ЗАЯВКА НА YOUTUBE</h3>
-                    <form id="ytMediaForm" onsubmit="submitYTMedia(event)" class="form">
-                        <div class="form-group">
-                            <label>1) СКОЛЬКО ЛЕТ?</label>
-                            <input type="number" id="ytAge" placeholder="ВАШ ВОЗРАСТ" required class="input">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>2) КАК ЗОВУТ?</label>
-                            <input type="text" id="ytName" placeholder="ВАШЕ ИМЯ" required class="input">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>3) ИГРОВОЙ НИКНЕЙМ?</label>
-                            <input type="text" id="ytNickname" placeholder="ВАШ НИК В ИГРЕ" required class="input">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>4) СКОЛЬКО ПОДПИСЧИКОВ?</label>
-                            <input type="text" id="ytSubs" placeholder="КОЛИЧЕСТВО ПОДПИСЧИКОВ" required class="input">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>5) СТАБИЛЬНЫЕ ПРОСМОТРЫ?</label>
-                            <input type="text" id="ytViews" placeholder="СРЕДНИЕ ПРОСМОТРЫ" required class="input">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>6) ССЫЛКА НА КАНАЛ?</label>
-                            <input type="url" id="ytLink" placeholder="https://youtube.com/..." required class="input">
-                        </div>
-                        
-                        <button type="submit" class="submit-btn">
-                            <span class="btn-icon">▶️</span>
-                            <span class="btn-text">ОТПРАВИТЬ ЗАЯВКУ</span>
-                            <span class="btn-icon">⚔️</span>
-                        </button>
-                    </form>
-                </div>
-
-                <div class="list-container">
-                    <h3 class="list-title">📋 ПОСЛЕДНИЕ ЗАЯВКИ НА МЕДИЮ</h3>
-                    <div id="mediaList" class="items-list"></div>
-                </div>
-            </section>
-
-            <!-- Заявки на хелпера -->
-            <section id="applications" class="section">
-                <h2 class="section-title">👮 АНКЕТА НА ХЕЛПЕРА</h2>
-                
-                <div class="info-message">
-                    <span class="info-message-icon">⏳</span>
-                    <div class="info-message-text">
-                        <strong>СРОК РАССМОТРЕНИЯ: 24 ЧАСА</strong>
-                        <span>ПО ВОПРОСАМ: <a href="https://t.me/milo4ika1" target="_blank">@milo4ika1</a></span>
-                    </div>
-                </div>
-                
-                <div class="form-container">
-                    <h3 class="form-title">👮 НОВАЯ АНКЕТА</h3>
-                    <form id="helperForm" onsubmit="submitApplication(event)" class="form">
-                        <div class="form-group">
-                            <label>🎮 ИГРОВОЙ НИКНЕЙМ</label>
-                            <input type="text" id="helperNickname" placeholder="ВАШ НИК В MINECRAFT" required class="input">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>👤 ИМЯ</label>
-                            <input type="text" id="helperName" placeholder="ВАШЕ НАСТОЯЩЕЕ ИМЯ" required class="input">
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group half">
-                                <label>📅 СКОЛЬКО ЛЕТ</label>
-                                <input type="number" id="helperAge" placeholder="ВАШ ВОЗРАСТ" required class="input">
+                    <div class="form-container">
+                        <h3 class="form-title">📝 НОВАЯ ЖАЛОБА</h3>
+                        <form id="complaintForm" onsubmit="submitComplaint(event)" class="form">
+                            <div class="form-group">
+                                <label>ЗАГОЛОВОК ЖАЛОБЫ</label>
+                                <input type="text" id="complaintTitle" placeholder="ВВЕДИТЕ ЗАГОЛОВОК" required class="input">
                             </div>
                             
-                            <div class="form-group half">
-                                <label>🌍 ЧАСОВОЙ ПОЯС</label>
-                                <select id="helperTimezone" required class="select">
-                                    <option value="">ВЫБЕРИТЕ</option>
-                                    <option value="UTC+2">UTC+2 (КИЕВ)</option>
-                                    <option value="UTC+3">UTC+3 (МОСКВА)</option>
-                                    <option value="UTC+4">UTC+4</option>
-                                    <option value="UTC+5">UTC+5</option>
-                                    <option value="UTC+6">UTC+6</option>
-                                    <option value="UTC+7">UTC+7</option>
-                                    <option value="UTC+8">UTC+8</option>
-                                </select>
+                            <div class="form-group">
+                                <label>НА КОГО ЖАЛОБА (НИК)</label>
+                                <input type="text" id="complaintAgainst" placeholder="НИК НАРУШИТЕЛЯ" required class="input">
                             </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>💼 ОПЫТ РАБОТЫ</label>
-                            <textarea id="helperExperience" placeholder="РАССКАЖИТЕ О ВАШЕМ ОПЫТЕ" required class="textarea" rows="3"></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>❓ ПОЧЕМУ ХОТИТЕ СТАТЬ ХЕЛПЕРОМ?</label>
-                            <textarea id="helperReason" placeholder="ВАША МОТИВАЦИЯ" required class="textarea" rows="4"></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>📝 ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ</label>
-                            <textarea id="helperAdditional" placeholder="ЕСЛИ ХОТИТЕ ЧТО-ТО ДОБАВИТЬ" class="textarea" rows="3"></textarea>
-                        </div>
-                        
-                        <button type="submit" class="submit-btn">
-                            <span class="btn-icon">⚔️</span>
-                            <span class="btn-text">ОТПРАВИТЬ АНКЕТУ</span>
-                            <span class="btn-icon">⚔️</span>
-                        </button>
-                    </form>
-                </div>
+                            
+                            <div class="form-group">
+                                <label>ОПИСАНИЕ СИТУАЦИИ</label>
+                                <textarea id="complaintDesc" placeholder="ПОДРОБНО ОПИШИТЕ СИТУАЦИЮ" required class="textarea" rows="4"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="submit-btn">
+                                <span class="btn-icon">🌙</span>
+                                <span class="btn-text">ОТПРАВИТЬ ЖАЛОБУ</span>
+                                <span class="btn-icon">🌙</span>
+                            </button>
+                        </form>
+                    </div>
 
-                <div class="list-container">
-                    <h3 class="list-title">📋 ПОСЛЕДНИЕ ЗАЯВКИ</h3>
-                    <div id="applicationsList" class="items-list"></div>
-                </div>
-            </section>
+                    <div class="list-container">
+                        <h3 class="list-title">📋 ПОСЛЕДНИЕ ЖАЛОБЫ</h3>
+                        <div id="complaintsList" class="items-list"></div>
+                    </div>
+                </section>
+
+                <!-- ЗАЯВКИ НА МЕДИЮ (TT и YT) -->
+                <section id="media" class="section">
+                    <h2 class="section-title">📱 ЗАЯВКИ НА МЕДИЮ</h2>
+                    
+                    <div class="info-message">
+                        <span class="info-message-icon">⏳</span>
+                        <div class="info-message-text">
+                            <strong>СРОК РАССМОТРЕНИЯ: 24 ЧАСА</strong>
+                            <span>ПО ВОПРОСАМ: <a href="https://t.me/milo4ika1" target="_blank">@milo4ika1</a></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Переключатель платформ -->
+                    <div class="platform-switch">
+                        <button type="button" id="switchTT" class="platform-btn active" onclick="switchPlatform('tt')">📱 TIKTOK</button>
+                        <button type="button" id="switchYT" class="platform-btn" onclick="switchPlatform('yt')">▶️ YOUTUBE</button>
+                    </div>
+                    
+                    <!-- Форма для TikTok -->
+                    <div id="ttForm" class="form-container active">
+                        <h3 class="form-title">📱 ЗАЯВКА НА TIKTOK</h3>
+                        <form id="ttMediaForm" onsubmit="submitTTMedia(event)" class="form">
+                            <div class="form-group">
+                                <label>1) СКОЛЬКО ЛЕТ?</label>
+                                <input type="number" id="ttAge" placeholder="ВАШ ВОЗРАСТ" required class="input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>2) КАК ЗОВУТ?</label>
+                                <input type="text" id="ttName" placeholder="ВАШЕ ИМЯ" required class="input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>3) ИГРОВОЙ НИКНЕЙМ?</label>
+                                <input type="text" id="ttNickname" placeholder="ВАШ НИК В ИГРЕ" required class="input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>4) СКОЛЬКО ПОДПИСЧИКОВ?</label>
+                                <input type="text" id="ttSubs" placeholder="КОЛИЧЕСТВО ПОДПИСЧИКОВ" required class="input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>5) СТАБИЛЬНЫЕ ПРОСМОТРЫ?</label>
+                                <input type="text" id="ttViews" placeholder="СРЕДНИЕ ПРОСМОТРЫ" required class="input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>6) ССЫЛКА НА TIKTOK?</label>
+                                <input type="url" id="ttLink" placeholder="https://tiktok.com/..." required class="input">
+                            </div>
+                            
+                            <button type="submit" class="submit-btn">
+                                <span class="btn-icon">📱</span>
+                                <span class="btn-text">ОТПРАВИТЬ ЗАЯВКУ</span>
+                                <span class="btn-icon">🌙</span>
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Форма для YouTube -->
+                    <div id="ytForm" class="form-container">
+                        <h3 class="form-title">▶️ ЗАЯВКА НА YOUTUBE</h3>
+                        <form id="ytMediaForm" onsubmit="submitYTMedia(event)" class="form">
+                            <div class="form-group">
+                                <label>1) СКОЛЬКО ЛЕТ?</label>
+                                <input type="number" id="ytAge" placeholder="ВАШ ВОЗРАСТ" required class="input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>2) КАК ЗОВУТ?</label>
+                                <input type="text" id="ytName" placeholder="ВАШЕ ИМЯ" required class="input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>3) ИГРОВОЙ НИКНЕЙМ?</label>
+                                <input type="text" id="ytNickname" placeholder="ВАШ НИК В ИГРЕ" required class="input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>4) СКОЛЬКО ПОДПИСЧИКОВ?</label>
+                                <input type="text" id="ytSubs" placeholder="КОЛИЧЕСТВО ПОДПИСЧИКОВ" required class="input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>5) СТАБИЛЬНЫЕ ПРОСМОТРЫ?</label>
+                                <input type="text" id="ytViews" placeholder="СРЕДНИЕ ПРОСМОТРЫ" required class="input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>6) ССЫЛКА НА КАНАЛ?</label>
+                                <input type="url" id="ytLink" placeholder="https://youtube.com/..." required class="input">
+                            </div>
+                            
+                            <button type="submit" class="submit-btn">
+                                <span class="btn-icon">▶️</span>
+                                <span class="btn-text">ОТПРАВИТЬ ЗАЯВКУ</span>
+                                <span class="btn-icon">🌙</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="list-container">
+                        <h3 class="list-title">📋 ПОСЛЕДНИЕ ЗАЯВКИ НА МЕДИЮ</h3>
+                        <div id="mediaList" class="items-list"></div>
+                    </div>
+                </section>
+
+                <!-- Заявки на хелпера -->
+                <section id="applications" class="section">
+                    <h2 class="section-title">👮 АНКЕТА НА ХЕЛПЕРА</h2>
+                    
+                    <div class="info-message">
+                        <span class="info-message-icon">⏳</span>
+                        <div class="info-message-text">
+                            <strong>СРОК РАССМОТРЕНИЯ: 24 ЧАСА</strong>
+                            <span>ПО ВОПРОСАМ: <a href="https://t.me/milo4ika1" target="_blank">@milo4ika1</a></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-container">
+                        <h3 class="form-title">👮 НОВАЯ АНКЕТА</h3>
+                        <form id="helperForm" onsubmit="submitApplication(event)" class="form">
+                            <div class="form-group">
+                                <label>🎮 ИГРОВОЙ НИКНЕЙМ</label>
+                                <input type="text" id="helperNickname" placeholder="ВАШ НИК В MINECRAFT" required class="input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>👤 ИМЯ</label>
+                                <input type="text" id="helperName" placeholder="ВАШЕ НАСТОЯЩЕЕ ИМЯ" required class="input">
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>📅 СКОЛЬКО ЛЕТ</label>
+                                    <input type="number" id="helperAge" placeholder="ВАШ ВОЗРАСТ" required class="input">
+                                </div>
+                                
+                                <div class="form-group half">
+                                    <label>🌍 ЧАСОВОЙ ПОЯС</label>
+                                    <select id="helperTimezone" required class="select">
+                                        <option value="">ВЫБЕРИТЕ</option>
+                                        <option value="UTC+2">UTC+2 (КИЕВ)</option>
+                                        <option value="UTC+3">UTC+3 (МОСКВА)</option>
+                                        <option value="UTC+4">UTC+4</option>
+                                        <option value="UTC+5">UTC+5</option>
+                                        <option value="UTC+6">UTC+6</option>
+                                        <option value="UTC+7">UTC+7</option>
+                                        <option value="UTC+8">UTC+8</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>💼 ОПЫТ РАБОТЫ</label>
+                                <textarea id="helperExperience" placeholder="РАССКАЖИТЕ О ВАШЕМ ОПЫТЕ" required class="textarea" rows="3"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>❓ ПОЧЕМУ ХОТИТЕ СТАТЬ ХЕЛПЕРОМ?</label>
+                                <textarea id="helperReason" placeholder="ВАША МОТИВАЦИЯ" required class="textarea" rows="4"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>📝 ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ</label>
+                                <textarea id="helperAdditional" placeholder="ЕСЛИ ХОТИТЕ ЧТО-ТО ДОБАВИТЬ" class="textarea" rows="3"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="submit-btn">
+                                <span class="btn-icon">🌙</span>
+                                <span class="btn-text">ОТПРАВИТЬ АНКЕТУ</span>
+                                <span class="btn-icon">🌙</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="list-container">
+                        <h3 class="list-title">📋 ПОСЛЕДНИЕ ЗАЯВКИ</h3>
+                        <div id="applicationsList" class="items-list"></div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Модалка регистрации -->
+        <div id="registerModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">×</span>
+                <h2>📝 РЕГИСТРАЦИЯ</h2>
+                <form onsubmit="register(event)" class="modal-form">
+                    <div class="form-group">
+                        <label>НИКНЕЙМ</label>
+                        <input type="text" id="regUsername" placeholder="ВВЕДИТЕ НИК" required class="input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>ПАРОЛЬ</label>
+                        <input type="password" id="regPassword" placeholder="ВВЕДИТЕ ПАРОЛЬ" required class="input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>ПОВТОРИТЕ ПАРОЛЬ</label>
+                        <input type="password" id="regConfirmPassword" placeholder="ПОВТОРИТЕ ПАРОЛЬ" required class="input">
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <span class="btn-icon">🌙</span>
+                        <span class="btn-text">ЗАРЕГИСТРИРОВАТЬСЯ</span>
+                        <span class="btn-icon">🌙</span>
+                    </button>
+                </form>
+            </div>
         </div>
-    </main>
 
-    <!-- Модалка регистрации -->
-    <div id="registerModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">×</span>
-            <h2>📝 РЕГИСТРАЦИЯ</h2>
-            <form onsubmit="register(event)" class="modal-form">
-                <div class="form-group">
-                    <label>НИКНЕЙМ</label>
-                    <input type="text" id="regUsername" placeholder="ВВЕДИТЕ НИК" required class="input">
-                </div>
-                
-                <div class="form-group">
-                    <label>ПАРОЛЬ</label>
-                    <input type="password" id="regPassword" placeholder="ВВЕДИТЕ ПАРОЛЬ" required class="input">
-                </div>
-                
-                <div class="form-group">
-                    <label>ПОВТОРИТЕ ПАРОЛЬ</label>
-                    <input type="password" id="regConfirmPassword" placeholder="ПОВТОРИТЕ ПАРОЛЬ" required class="input">
-                </div>
-                
-                <button type="submit" class="submit-btn">
-                    <span class="btn-icon">⚔️</span>
-                    <span class="btn-text">ЗАРЕГИСТРИРОВАТЬСЯ</span>
-                    <span class="btn-icon">⚔️</span>
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Модалка смены пароля -->
-    <div id="changePasswordModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeChangePassword()">×</span>
-            <h2>🔑 СМЕНА ПАРОЛЯ</h2>
-            <form onsubmit="changePassword(event)" class="modal-form">
-                <div class="form-group">
-                    <label>СТАРЫЙ ПАРОЛЬ</label>
-                    <input type="password" id="oldPassword" placeholder="ВВЕДИТЕ СТАРЫЙ ПАРОЛЬ" required class="input">
-                </div>
-                
-                <div class="form-group">
-                    <label>НОВЫЙ ПАРОЛЬ</label>
-                    <input type="password" id="newPassword" placeholder="ВВЕДИТЕ НОВЫЙ ПАРОЛЬ" required class="input">
-                </div>
-                
-                <div class="form-group">
-                    <label>ПОВТОРИТЕ НОВЫЙ ПАРОЛЬ</label>
-                    <input type="password" id="confirmPassword" placeholder="ПОВТОРИТЕ НОВЫЙ ПАРОЛЬ" required class="input">
-                </div>
-                
-                <button type="submit" class="submit-btn">
-                    <span class="btn-icon">⚔️</span>
-                    <span class="btn-text">ИЗМЕНИТЬ ПАРОЛЬ</span>
-                    <span class="btn-icon">⚔️</span>
-                </button>
-            </form>
+        <!-- Модалка смены пароля -->
+        <div id="changePasswordModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeChangePassword()">×</span>
+                <h2>🔑 СМЕНА ПАРОЛЯ</h2>
+                <form onsubmit="changePassword(event)" class="modal-form">
+                    <div class="form-group">
+                        <label>СТАРЫЙ ПАРОЛЬ</label>
+                        <input type="password" id="oldPassword" placeholder="ВВЕДИТЕ СТАРЫЙ ПАРОЛЬ" required class="input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>НОВЫЙ ПАРОЛЬ</label>
+                        <input type="password" id="newPassword" placeholder="ВВЕДИТЕ НОВЫЙ ПАРОЛЬ" required class="input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>ПОВТОРИТЕ НОВЫЙ ПАРОЛЬ</label>
+                        <input type="password" id="confirmPassword" placeholder="ПОВТОРИТЕ НОВЫЙ ПАРОЛЬ" required class="input">
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <span class="btn-icon">🌙</span>
+                        <span class="btn-text">ИЗМЕНИТЬ ПАРОЛЬ</span>
+                        <span class="btn-icon">🌙</span>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
