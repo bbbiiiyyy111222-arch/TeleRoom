@@ -1,5 +1,5 @@
 /* ==============================================
-   MOONGRIEF-FORUM - ОСНОВНЫЕ СТИЛИ
+   MOONGRIEF-FORUM - ПОЛНЫЙ СТИЛЬ
    ============================================== */
 
 * {
@@ -15,39 +15,43 @@ body {
     line-height: 1.6;
     font-size: 12px;
     min-height: 100vh;
-    position: relative;
-    overflow-x: hidden;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
-    position: relative;
-    z-index: 1;
 }
 
 /* ==============================================
-   КАСТОМНЫЙ СКРОЛЛ
+   КРАСИВЫЙ СКРОЛЛ
    ============================================== */
 
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(74, 74, 138, 0.1);
+    background: #1a1a3a;
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
     background: #4a4a8a;
     border-radius: 10px;
+    border: 2px solid #2a2a4a;
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: #6a6aaa;
+}
+
+.rules-scroll {
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 15px;
+    padding-left: 5px;
 }
 
 /* ==============================================
@@ -70,11 +74,11 @@ body {
 .device-choice-content {
     text-align: center;
     padding: 50px 40px;
-    background: rgba(10, 10, 30, 0.9);
-    border-radius: 20px;
-    border: 2px solid #4a4a8a;
+    background: rgba(26, 26, 58, 0.9);
+    border: 3px solid #4a4a8a;
+    border-radius: 30px;
     box-shadow: 0 0 50px rgba(74, 74, 138, 0.5);
-    max-width: 700px;
+    max-width: 600px;
     width: 90%;
     backdrop-filter: blur(10px);
 }
@@ -100,9 +104,9 @@ body {
 }
 
 .device-btn {
-    background: rgba(0, 0, 0, 0.5);
-    border: 2px solid #4a4a8a;
-    border-radius: 15px;
+    background: #2a2a4a;
+    border: 3px solid #4a4a8a;
+    border-radius: 20px;
     padding: 30px 50px;
     cursor: pointer;
     transition: all 0.3s;
@@ -115,51 +119,20 @@ body {
 
 .device-btn:hover {
     background: #4a4a8a;
-    transform: translateY(-10px);
-    box-shadow: 0 10px 30px #4a4a8a;
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 10px 40px #4a4a8a;
+    border-color: #8a8aff;
 }
 
 .device-icon {
-    font-size: 48px;
+    font-size: 64px;
+    filter: drop-shadow(0 0 10px #8a8aff);
 }
 
 .device-name {
     color: white;
-    font-size: 14px;
-}
-
-.device-note {
-    color: #7a7aaa;
-    font-size: 10px;
-    margin-top: 30px;
-}
-
-/* ==============================================
-   КНОПКА СМЕНЫ УСТРОЙСТВА
-   ============================================== */
-
-.device-switch {
-    text-align: center;
-    padding: 10px;
-    background: rgba(26, 26, 58, 0.9);
-    border-bottom: 1px solid #4a4a8a;
-}
-
-.device-switch-btn {
-    background: #2a2a4a;
-    border: 1px solid #4a4a8a;
-    color: white;
-    padding: 10px 25px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 10px;
-    transition: all 0.3s;
-}
-
-.device-switch-btn:hover {
-    background: #4a4a8a;
-    box-shadow: 0 0 20px #4a4a8a;
+    font-size: 16px;
+    font-weight: bold;
 }
 
 /* ==============================================
@@ -168,11 +141,9 @@ body {
 
 .header {
     background: linear-gradient(135deg, #0f0f1f, #1a1a3a);
-    padding: 20px 0;
-    border-bottom: 3px solid #4a4a8a;
+    padding: 25px 0;
+    border-bottom: 4px solid #4a4a8a;
     box-shadow: 0 0 30px rgba(74, 74, 138, 0.3);
-    position: relative;
-    z-index: 100;
 }
 
 .header-content {
@@ -180,42 +151,42 @@ body {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 25px;
 }
 
 .logo h1 {
     color: #b0b0ff;
     font-size: 24px;
     margin-bottom: 10px;
-    text-shadow: 0 0 20px #4a4a8a;
+    text-shadow: 0 0 15px #4a4a8a;
 }
 
 .server-ip {
     display: flex;
     align-items: center;
     gap: 15px;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 8px 15px;
-    border-radius: 30px;
-    border: 1px solid #4a4a8a;
+    background: #2a2a4a;
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: 2px solid #4a4a8a;
 }
 
 .copy-btn {
     background: #4a4a8a;
     color: white;
     border: none;
-    padding: 5px 12px;
-    border-radius: 20px;
+    padding: 8px 15px;
+    border-radius: 30px;
     cursor: pointer;
     font-family: 'Press Start 2P', cursive;
-    font-size: 8px;
+    font-size: 10px;
     transition: all 0.3s;
 }
 
 .copy-btn:hover {
     background: #6a6aaa;
-    box-shadow: 0 0 15px #4a4a8a;
     transform: scale(1.05);
+    box-shadow: 0 0 20px #4a4a8a;
 }
 
 /* ==============================================
@@ -232,164 +203,141 @@ body {
     display: flex;
     align-items: center;
     gap: 15px;
-    background: rgba(0, 0, 0, 0.5);
+    background: #2a2a4a;
     padding: 8px 20px;
-    border-radius: 30px;
-    border: 1px solid #4a4a8a;
+    border-radius: 50px;
+    border: 2px solid #4a4a8a;
 }
 
-.moon-glow {
+.user-name {
     color: #b0b0ff;
     font-size: 12px;
+    font-weight: bold;
 }
 
-.auth-buttons {
-    display: flex;
-    gap: 10px;
+.auth-input {
+    background: #2a2a4a;
+    border: 2px solid #4a4a8a;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    width: 100px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 9px;
+}
+
+.auth-input:focus {
+    outline: none;
+    border-color: #8a8aff;
+    box-shadow: 0 0 15px #4a4a8a;
 }
 
 .btn-moon {
-    background: #2a2a4a;
-    border: 1px solid #4a4a8a;
-    color: #b0b0ff;
-    padding: 8px 12px;
-    border-radius: 20px;
+    background: #4a4a8a;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
     cursor: pointer;
     font-family: 'Press Start 2P', cursive;
-    font-size: 8px;
-    display: flex;
+    font-size: 9px;
+    transition: all 0.3s;
+    display: inline-flex;
     align-items: center;
     gap: 5px;
-    transition: all 0.3s;
 }
 
 .btn-moon:hover {
-    background: #4a4a8a;
-    color: white;
+    background: #6a6aaa;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px #4a4a8a;
 }
 
 .logout-btn:hover {
     background: #8a4a4a;
-    border-color: #b06a6a;
 }
 
 .login-form {
     display: flex;
     gap: 8px;
-    align-items: center;
     flex-wrap: wrap;
-}
-
-.moon-input {
-    background: #2a2a4a;
-    border: 1px solid #4a4a8a;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 20px;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 8px;
-    width: 100px;
-}
-
-.moon-input:focus {
-    outline: none;
-    border-color: #8a8aff;
-    box-shadow: 0 0 10px #4a4a8a;
 }
 
 /* ==============================================
-   НАВИГАЦИЯ
+   КНОПКА СМЕНЫ УСТРОЙСТВА
    ============================================== */
 
-.nav {
-    background: rgba(15, 15, 31, 0.95);
-    padding: 15px 0;
-    border-bottom: 1px solid #4a4a8a;
-    position: sticky;
-    top: 0;
-    z-index: 90;
-    backdrop-filter: blur(10px);
+.device-switch {
+    text-align: center;
+    padding: 15px;
+    background: #1a1a2a;
+    border-bottom: 2px solid #4a4a8a;
 }
 
-.nav .container {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.nav-link {
-    color: #b0b0ff;
-    text-decoration: none;
-    padding: 10px 20px;
-    border-radius: 30px;
-    font-size: 12px;
-    transition: all 0.3s;
-    border: 1px solid transparent;
-}
-
-.nav-link:hover {
-    background: rgba(74, 74, 138, 0.3);
-    border-color: #4a4a8a;
-    transform: translateY(-2px);
-}
-
-.nav-link.active {
-    background: #4a4a8a;
+.device-switch-btn {
+    background: #2a2a4a;
+    border: 2px solid #4a4a8a;
     color: white;
-    box-shadow: 0 0 20px #4a4a8a;
+    padding: 10px 25px;
+    border-radius: 40px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 10px;
+    transition: all 0.3s;
+}
+
+.device-switch-btn:hover {
+    background: #4a4a8a;
+    box-shadow: 0 0 25px #4a4a8a;
 }
 
 /* ==============================================
    ИНФО ПАНЕЛЬ
    ============================================== */
 
-.info-bar {
+.info-panel {
     background: #1a1a2a;
-    padding: 15px 0;
-    border-bottom: 1px solid #4a4a8a;
+    padding: 20px 0;
+    border-bottom: 2px solid #4a4a8a;
 }
 
-.info-content {
+.info-items {
     display: flex;
-    justify-content: center;
-    align-items: center;
     gap: 30px;
+    justify-content: center;
     flex-wrap: wrap;
 }
 
 .info-item {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
     background: #2a2a4a;
-    padding: 10px 20px;
-    border-radius: 40px;
-    border: 1px solid #4a4a8a;
+    padding: 12px 25px;
+    border-radius: 50px;
+    border: 2px solid #4a4a8a;
+    transition: all 0.3s;
+}
+
+.info-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px #4a4a8a;
+    border-color: #8a8aff;
 }
 
 .info-icon {
     font-size: 20px;
 }
 
-.info-text {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
 .info-label {
     color: #8a8aff;
-    font-size: 8px;
-    text-transform: uppercase;
+    font-size: 10px;
 }
 
 .info-link {
     color: #b0b0ff;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: bold;
 }
 
@@ -400,22 +348,57 @@ body {
 
 .info-value {
     color: white;
-    font-size: 14px;
     font-weight: bold;
+    font-size: 12px;
 }
 
-.info-badge {
+/* ==============================================
+   НАВИГАЦИЯ
+   ============================================== */
+
+.nav {
+    background: #1a1a3a;
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 2px solid #4a4a8a;
+}
+
+.nav .container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.nav-btn {
+    background: none;
+    border: 2px solid #4a4a8a;
+    color: #b0b0ff;
+    padding: 12px 25px;
+    border-radius: 40px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 11px;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.nav-btn:hover {
     background: #4a4a8a;
     color: white;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-size: 8px;
-    display: inline-block;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px #4a4a8a;
 }
 
-.bug-report {
-    background: #2a2a3a;
-    border-color: #8a4a4a;
+.nav-btn.active {
+    background: #4a4a8a;
+    color: white;
+    box-shadow: 0 0 20px #4a4a8a;
 }
 
 /* ==============================================
@@ -423,7 +406,7 @@ body {
    ============================================== */
 
 .main {
-    padding: 30px 0;
+    padding: 40px 0;
     min-height: calc(100vh - 400px);
 }
 
@@ -431,67 +414,83 @@ body {
     display: none;
 }
 
-.section.active-section {
+.section.active {
     display: block;
-    animation: fadeIn 0.5s;
+    animation: fadeIn 0.5s ease;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .section-title {
     color: #b0b0ff;
-    font-size: 20px;
-    margin-bottom: 25px;
+    font-size: 22px;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #4a4a8a;
+    text-shadow: 0 0 10px #4a4a8a;
     text-align: center;
-    text-shadow: 0 0 15px #4a4a8a;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #4a4a8a;
 }
 
 /* ==============================================
-   ПРАВИЛА
+   ПРАВИЛА - КРАСИВОЕ ОФОРМЛЕНИЕ
    ============================================== */
 
-.rules-scroll {
-    max-height: 500px;
-    overflow-y: auto;
-    padding-right: 10px;
+.rule-block {
+    background: #1a1a2a;
+    border-left: 6px solid #4a4a8a;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 25px;
+    transition: all 0.3s;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
 }
 
-.rule-block {
-    background: rgba(26, 26, 58, 0.7);
-    border-left: 4px solid #4a4a8a;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
+.rule-block:hover {
+    transform: translateX(10px);
+    box-shadow: -10px 10px 30px rgba(74, 74, 138, 0.3);
+    border-left-color: #8a8aff;
 }
 
 .rule-block h3 {
     color: #b0b0ff;
-    font-size: 14px;
-    margin-bottom: 15px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #4a4a8a;
 }
 
 .rule-item {
     display: flex;
-    gap: 15px;
-    padding: 8px 0;
+    gap: 20px;
+    padding: 12px 0;
     border-bottom: 1px solid #2a2a4a;
-    align-items: center;
+    align-items: flex-start;
+}
+
+.rule-item:last-child {
+    border-bottom: none;
 }
 
 .rule-num {
     color: #8a8aff;
-    min-width: 35px;
+    min-width: 45px;
     font-size: 12px;
+    font-weight: bold;
 }
 
 .rule-item p {
     color: #e0e0ff;
     font-size: 11px;
+    line-height: 1.6;
     flex: 1;
 }
 
@@ -500,34 +499,34 @@ body {
 }
 
 .rule-content ul {
-    list-style: none;
-    margin: 5px 0;
+    margin: 10px 0 10px 20px;
 }
 
 .rule-content li {
     color: #c0c0ff;
     font-size: 11px;
-    padding-left: 15px;
-    margin: 3px 0;
+    margin: 5px 0;
 }
 
 .punish {
     display: inline-block;
     background: #8a4a4a;
     color: white;
-    padding: 3px 10px;
-    border-radius: 15px;
-    font-size: 9px;
-    margin-top: 5px;
+    padding: 5px 15px;
+    border-radius: 30px;
+    font-size: 10px;
+    margin-top: 10px;
+    border: 1px solid #b06a6a;
 }
 
 .mini-punish {
+    display: inline-block;
     background: #4a4a8a;
     color: white;
-    padding: 2px 8px;
-    border-radius: 12px;
+    padding: 3px 10px;
+    border-radius: 20px;
     font-size: 8px;
-    margin-left: auto;
+    margin-left: 10px;
     white-space: nowrap;
 }
 
@@ -535,19 +534,60 @@ body {
    ФОРМЫ
    ============================================== */
 
-.form-container, .list-container {
-    background: rgba(26, 26, 58, 0.7);
-    border-radius: 15px;
-    padding: 25px;
-    margin-bottom: 25px;
-    border: 1px solid #4a4a8a;
+.form {
+    background: #1a1a2a;
+    border: 2px solid #4a4a8a;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
 }
 
-.form-title, .list-title {
-    color: #b0b0ff;
-    font-size: 14px;
-    margin-bottom: 20px;
-    text-align: center;
+.form-input, .form-textarea, .form select {
+    width: 100%;
+    background: #2a2a4a;
+    border: 2px solid #4a4a8a;
+    color: white;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 10px;
+    transition: all 0.3s;
+}
+
+.form-input:focus, .form-textarea:focus, .form select:focus {
+    outline: none;
+    border-color: #8a8aff;
+    box-shadow: 0 0 20px #4a4a8a;
+    background: #3a3a5a;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-btn {
+    background: #4a4a8a;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px;
+    width: 100%;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.form-btn:hover {
+    background: #6a6aaa;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px #4a4a8a;
 }
 
 .info-message {
@@ -555,147 +595,41 @@ body {
     align-items: center;
     gap: 15px;
     background: #2a2a4a;
-    padding: 12px 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #4a4a8a;
-}
-
-.info-message-icon {
-    font-size: 20px;
-}
-
-.info-message-text {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
-.info-message-text strong {
-    color: #b0b0ff;
-    font-size: 11px;
-}
-
-.info-message-text span {
-    color: #c0c0ff;
-    font-size: 10px;
-}
-
-.info-message-text a {
-    color: #b0b0ff;
-    text-decoration: none;
-}
-
-.info-message-text a:hover {
-    text-decoration: underline;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    color: #8a8aff;
-    font-size: 10px;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-}
-
-.form-row {
-    display: flex;
-    gap: 15px;
-}
-
-.form-group.half {
-    flex: 1;
-}
-
-.input, .textarea, .select {
-    width: 100%;
-    padding: 12px 15px;
-    background: #2a2a4a;
-    border: 1px solid #4a4a8a;
-    color: white;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 10px;
-    border-radius: 8px;
-}
-
-.input:focus, .textarea:focus, .select:focus {
-    outline: none;
-    border-color: #8a8aff;
-    box-shadow: 0 0 15px #4a4a8a;
-}
-
-.textarea {
-    resize: vertical;
-    min-height: 80px;
-}
-
-.select option {
-    background: #1a1a3a;
-    color: white;
-}
-
-.submit-btn {
-    background: #4a4a8a;
-    color: white;
-    border: none;
     padding: 15px 25px;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 12px;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: all 0.3s;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-
-.submit-btn:hover {
-    background: #6a6aaa;
-    transform: translateY(-3px);
-    box-shadow: 0 10px 30px #4a4a8a;
-}
-
-.btn-icon {
-    font-size: 14px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    border: 2px solid #4a4a8a;
 }
 
 /* ==============================================
-   ПЕРЕКЛЮЧАТЕЛЬ ПЛАТФОРМ
+   ТАБЫ (TIKTOK/YOUTUBE)
    ============================================== */
 
-.platform-switch {
+.tabs {
     display: flex;
     gap: 15px;
-    margin-bottom: 20px;
-    justify-content: center;
+    margin-bottom: 25px;
 }
 
-.platform-btn {
-    background: #2a2a4a;
+.tab {
+    background: #1a1a2a;
+    border: 2px solid #4a4a8a;
     color: #b0b0ff;
-    border: 1px solid #4a4a8a;
-    padding: 12px 25px;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 10px;
-    border-radius: 30px;
+    padding: 12px 20px;
+    border-radius: 15px;
     cursor: pointer;
-    transition: all 0.3s;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 11px;
     flex: 1;
-    max-width: 200px;
+    transition: all 0.3s;
 }
 
-.platform-btn:hover {
+.tab:hover {
     background: #4a4a8a;
     color: white;
 }
 
-.platform-btn.active {
+.tab.active {
     background: #4a4a8a;
     color: white;
     box-shadow: 0 0 20px #4a4a8a;
@@ -710,53 +644,67 @@ body {
 }
 
 /* ==============================================
+   СПИСКИ
+   ============================================== */
+
+.list-title {
+    color: #b0b0ff;
+    font-size: 16px;
+    margin: 25px 0 15px;
+}
+
+.list {
+    min-height: 100px;
+}
+
+.empty-list {
+    text-align: center;
+    padding: 50px;
+    background: #1a1a2a;
+    border: 2px dashed #4a4a8a;
+    border-radius: 20px;
+    color: #7a7aaa;
+    font-size: 12px;
+}
+
+/* ==============================================
    КАРТОЧКИ
    ============================================== */
 
-.complaint-card,
-.media-card,
-.application-card {
-    background: #2a2a4a;
-    border: 1px solid #4a4a8a;
-    border-radius: 10px;
-    padding: 15px;
+.complaint-card, .media-card, .application-card {
+    background: #1a1a2a;
+    border: 2px solid #4a4a8a;
+    border-radius: 15px;
+    padding: 20px;
     margin-bottom: 15px;
     transition: all 0.3s;
 }
 
-.complaint-card:hover,
-.media-card:hover,
-.application-card:hover {
-    transform: translateX(5px);
-    box-shadow: -5px 5px 20px rgba(74, 74, 138, 0.3);
+.complaint-card:hover, .media-card:hover, .application-card:hover {
+    transform: translateX(10px);
+    box-shadow: -10px 10px 25px rgba(74, 74, 138, 0.3);
     border-color: #8a8aff;
 }
 
-.complaint-header,
-.media-header,
-.application-header {
+.complaint-header, .media-header, .application-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #4a4a8a;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #4a4a8a;
 }
 
-.complaint-title,
-.media-title,
-.application-title {
+.complaint-title, .media-title, .application-title {
     color: #b0b0ff;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: bold;
 }
 
-.complaint-status,
-.media-status,
-.application-status {
-    padding: 3px 10px;
-    border-radius: 15px;
-    font-size: 8px;
+.complaint-status, .media-status, .application-status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 9px;
     font-weight: bold;
 }
 
@@ -775,22 +723,16 @@ body {
     color: white;
 }
 
-.complaint-body,
-.media-body,
-.application-body {
+.complaint-body, .media-body, .application-body {
     color: #c0c0ff;
     font-size: 10px;
 }
 
-.complaint-body p,
-.media-body p,
-.application-body p {
-    margin: 5px 0;
+.complaint-body p, .media-body p, .application-body p {
+    margin: 8px 0;
 }
 
-.complaint-body strong,
-.media-body strong,
-.application-body strong {
+.complaint-body strong, .media-body strong, .application-body strong {
     color: #b0b0ff;
     min-width: 80px;
     display: inline-block;
@@ -803,7 +745,7 @@ body {
 .modal {
     display: none;
     position: fixed;
-    z-index: 1000;
+    z-index: 2000;
     left: 0;
     top: 0;
     width: 100%;
@@ -813,55 +755,44 @@ body {
 }
 
 .modal-content {
-    background: linear-gradient(135deg, #0f0f1f, #1a1a3a);
+    background: linear-gradient(135deg, #1a1a3a, #0f0f1f);
     margin: 10% auto;
-    padding: 30px;
-    border-radius: 20px;
+    padding: 40px;
+    border: 3px solid #4a4a8a;
+    border-radius: 30px;
     width: 90%;
-    max-width: 400px;
-    border: 2px solid #4a4a8a;
+    max-width: 450px;
     position: relative;
+    box-shadow: 0 0 60px rgba(74, 74, 138, 0.5);
 }
 
 .modal-content h2 {
     color: #b0b0ff;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     text-align: center;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .close {
     position: absolute;
-    right: 15px;
-    top: 10px;
-    font-size: 24px;
+    right: 20px;
+    top: 15px;
+    font-size: 28px;
     cursor: pointer;
     color: #b0b0ff;
     transition: all 0.3s;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
 }
 
 .close:hover {
     color: white;
+    background: #4a4a8a;
     transform: rotate(90deg);
-}
-
-.modal-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-/* ==============================================
-   ПУСТЫЕ СОСТОЯНИЯ
-   ============================================== */
-
-.empty-list {
-    text-align: center;
-    padding: 40px;
-    background: #2a2a4a;
-    border-radius: 10px;
-    color: #7a7aaa;
-    font-size: 11px;
 }
 
 /* ==============================================
@@ -882,61 +813,59 @@ body {
         justify-content: center;
     }
     
-    .info-content {
+    .info-items {
         flex-direction: column;
         gap: 15px;
     }
     
     .info-item {
         width: 100%;
+        justify-content: center;
     }
     
     .nav .container {
         flex-wrap: nowrap;
         overflow-x: auto;
         justify-content: flex-start;
-        padding-bottom: 5px;
+        padding-bottom: 10px;
     }
     
-    .nav-link {
+    .nav-btn {
         white-space: nowrap;
-        font-size: 10px;
+        font-size: 9px;
         padding: 8px 15px;
-    }
-    
-    .form-row {
-        flex-direction: column;
-        gap: 0;
     }
     
     .rule-item {
         flex-direction: column;
-        align-items: flex-start;
         gap: 5px;
+    }
+    
+    .rule-num {
+        min-width: auto;
     }
     
     .mini-punish {
         margin-left: 0;
         margin-top: 5px;
+        display: inline-block;
     }
     
-    .platform-switch {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .platform-btn {
-        width: 100%;
-        max-width: none;
-    }
-    
-    .auth-buttons {
+    .tabs {
         flex-direction: column;
     }
     
-    .btn-moon {
-        width: 100%;
-        justify-content: center;
+    .device-btn {
+        min-width: 160px;
+        padding: 20px 30px;
+    }
+    
+    .device-icon {
+        font-size: 48px;
+    }
+    
+    .device-name {
+        font-size: 14px;
     }
 }
 
@@ -947,40 +876,26 @@ body {
     
     .server-ip {
         flex-direction: column;
-        gap: 8px;
+        gap: 10px;
     }
     
     .copy-btn {
         width: 100%;
     }
     
+    .auth-input {
+        width: 100%;
+    }
+    
+    .login-form {
+        flex-direction: column;
+    }
+    
     .section-title {
         font-size: 16px;
     }
     
-    .device-btn {
-        min-width: 160px;
-        padding: 20px 30px;
+    .modal-content {
+        padding: 30px 20px;
     }
-    
-    .device-icon {
-        font-size: 36px;
-    }
-    
-    .device-name {
-        font-size: 12px;
-    }
-}
-
-/* ==============================================
-   АНИМАЦИИ
-   ============================================== */
-
-@keyframes glow {
-    0%, 100% { text-shadow: 0 0 10px #4a4a8a; }
-    50% { text-shadow: 0 0 25px #8a8aff; }
-}
-
-.moon-glow {
-    animation: glow 3s infinite;
 }
