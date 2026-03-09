@@ -14,20 +14,6 @@ let currentDevice = localStorage.getItem('mg_device') || null;
 // Админы
 const admins = ['milfa', 'milk123', 'Xchik_'];
 
-// ==================== СОХРАНЕНИЕ ====================
-function saveData() {
-    localStorage.setItem('mg_users', JSON.stringify(users));
-    localStorage.setItem('mg_complaints', JSON.stringify(complaints));
-    localStorage.setItem('mg_media', JSON.stringify(media));
-    localStorage.setItem('mg_helpers', JSON.stringify(helpers));
-    
-    if (currentUser) {
-        localStorage.setItem('mg_currentUser', JSON.stringify(currentUser));
-    } else {
-        localStorage.removeItem('mg_currentUser');
-    }
-}
-
 // ==================== ВЫБОР УСТРОЙСТВА ====================
 function selectDevice(device) {
     console.log('Выбрано устройство:', device);
@@ -35,23 +21,30 @@ function selectDevice(device) {
     localStorage.setItem('mg_device', device);
     currentDevice = device;
     
-    document.getElementById('deviceChoice').style.display = 'none';
-    document.getElementById('mainSite').style.display = 'block';
+    const deviceChoice = document.getElementById('deviceChoice');
+    const mainSite = document.getElementById('mainSite');
+    const deviceSwitch = document.getElementById('deviceSwitch');
+    
+    if (deviceChoice) deviceChoice.style.display = 'none';
+    if (mainSite) mainSite.style.display = 'block';
     
     if (device === 'mobile') {
         document.body.classList.add('mobile-view');
-        document.getElementById('deviceSwitch').style.display = 'block';
+        if (deviceSwitch) deviceSwitch.style.display = 'block';
     } else {
         document.body.classList.remove('mobile-view');
-        document.getElementById('deviceSwitch').style.display = 'none';
+        if (deviceSwitch) deviceSwitch.style.display = 'none';
     }
     
     loadUserData();
 }
 
 function showDeviceChoice() {
-    document.getElementById('mainSite').style.display = 'none';
-    document.getElementById('deviceChoice').style.display = 'flex';
+    const deviceChoice = document.getElementById('deviceChoice');
+    const mainSite = document.getElementById('mainSite');
+    
+    if (mainSite) mainSite.style.display = 'none';
+    if (deviceChoice) deviceChoice.style.display = 'flex';
 }
 
 // ==================== IP ====================
@@ -70,8 +63,10 @@ function showSection(sectionId, event) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active-section'));
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
     
-    document.getElementById(sectionId).classList.add('active-section');
-    if (event) event.target.classList.add('active');
+    const section = document.getElementById(sectionId);
+    if (section) section.classList.add('active-section');
+    
+    if (event && event.target) event.target.classList.add('active');
     
     if (currentUser) {
         localStorage.setItem('mg_lastSection', sectionId);
@@ -101,12 +96,15 @@ function switchPlatform(platform) {
 
 // ==================== ЗАГРУЗКА ДАННЫХ ПОЛЬЗОВАТЕЛЯ ====================
 function loadUserData() {
+    const loginForm = document.getElementById('loginForm');
+    const userInfo = document.getElementById('userInfo');
+    const currentUserSpan = document.getElementById('currentUser');
+    const adminLink = document.getElementById('adminLink');
+    const complaintsList = document.getElementById('complaintsList');
+    const mediaList = document.getElementById('mediaList');
+    const helpersList = document.getElementById('applicationsList');
+    
     if (currentUser) {
-        const loginForm = document.getElementById('loginForm');
-        const userInfo = document.getElementById('userInfo');
-        const currentUserSpan = document.getElementById('currentUser');
-        const adminLink = document.getElementById('adminLink');
-        
         if (loginForm) loginForm.style.display = 'none';
         if (userInfo) userInfo.style.display = 'flex';
         if (currentUserSpan) currentUserSpan.textContent = currentUser.username;
@@ -119,13 +117,6 @@ function loadUserData() {
         loadPersonalMedia();
         loadPersonalHelpers();
     } else {
-        const loginForm = document.getElementById('loginForm');
-        const userInfo = document.getElementById('userInfo');
-        const adminLink = document.getElementById('adminLink');
-        const complaintsList = document.getElementById('complaintsList');
-        const mediaList = document.getElementById('mediaList');
-        const helpersList = document.getElementById('applicationsList');
-        
         if (loginForm) loginForm.style.display = 'flex';
         if (userInfo) userInfo.style.display = 'none';
         if (adminLink) adminLink.style.display = 'none';
@@ -259,8 +250,13 @@ function getStatusText(status) {
 
 // ==================== АВТОРИЗАЦИЯ ====================
 function login() {
-    const username = document.getElementById('username')?.value.trim() || '';
-    const password = document.getElementById('password')?.value || '';
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    
+    if (!usernameInput || !passwordInput) return;
+    
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
     
     if (!username || !password) {
         alert('Введите ник и пароль');
@@ -288,8 +284,8 @@ function login() {
         
         alert(`Добро пожаловать, ${username}!`);
         
-        if (document.getElementById('username')) document.getElementById('username').value = '';
-        if (document.getElementById('password')) document.getElementById('password').value = '';
+        usernameInput.value = '';
+        passwordInput.value = '';
         
         loadPersonalComplaints();
         loadPersonalMedia();
@@ -300,9 +296,15 @@ function login() {
 }
 
 function register() {
-    const username = document.getElementById('regUsername')?.value.trim() || '';
-    const password = document.getElementById('regPassword')?.value || '';
-    const confirm = document.getElementById('regConfirmPassword')?.value || '';
+    const usernameInput = document.getElementById('regUsername');
+    const passwordInput = document.getElementById('regPassword');
+    const confirmInput = document.getElementById('regConfirmPassword');
+    
+    if (!usernameInput || !passwordInput || !confirmInput) return;
+    
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
+    const confirm = confirmInput.value;
     
     if (!username || !password || !confirm) {
         alert('Заполните все поля');
@@ -369,9 +371,15 @@ function showChangePassword() {
 }
 
 function changePassword() {
-    const oldPass = document.getElementById('oldPassword')?.value || '';
-    const newPass = document.getElementById('newPassword')?.value || '';
-    const confirm = document.getElementById('confirmPassword')?.value || '';
+    const oldPassInput = document.getElementById('oldPassword');
+    const newPassInput = document.getElementById('newPassword');
+    const confirmInput = document.getElementById('confirmPassword');
+    
+    if (!oldPassInput || !newPassInput || !confirmInput) return;
+    
+    const oldPass = oldPassInput.value;
+    const newPass = newPassInput.value;
+    const confirm = confirmInput.value;
     
     if (!oldPass || !newPass || !confirm) {
         alert('Заполните все поля');
@@ -411,9 +419,15 @@ function submitComplaint(event) {
         return;
     }
     
-    const title = document.getElementById('complaintTitle')?.value.trim() || '';
-    const target = document.getElementById('complaintAgainst')?.value.trim() || '';
-    const desc = document.getElementById('complaintDesc')?.value.trim() || '';
+    const titleInput = document.getElementById('complaintTitle');
+    const targetInput = document.getElementById('complaintAgainst');
+    const descInput = document.getElementById('complaintDesc');
+    
+    if (!titleInput || !targetInput || !descInput) return;
+    
+    const title = titleInput.value.trim();
+    const target = targetInput.value.trim();
+    const desc = descInput.value.trim();
     
     if (!title || !target || !desc) {
         alert('Заполните все поля');
@@ -435,9 +449,9 @@ function submitComplaint(event) {
     
     alert('Жалоба отправлена!');
     
-    if (document.getElementById('complaintTitle')) document.getElementById('complaintTitle').value = '';
-    if (document.getElementById('complaintAgainst')) document.getElementById('complaintAgainst').value = '';
-    if (document.getElementById('complaintDesc')) document.getElementById('complaintDesc').value = '';
+    titleInput.value = '';
+    targetInput.value = '';
+    descInput.value = '';
     
     loadPersonalComplaints();
 }
@@ -450,12 +464,21 @@ function submitTTMedia(event) {
         return;
     }
     
-    const age = document.getElementById('ttAge')?.value || '';
-    const name = document.getElementById('ttName')?.value.trim() || '';
-    const nick = document.getElementById('ttNickname')?.value.trim() || '';
-    const subs = document.getElementById('ttSubs')?.value.trim() || '';
-    const views = document.getElementById('ttViews')?.value.trim() || '';
-    const link = document.getElementById('ttLink')?.value.trim() || '';
+    const ageInput = document.getElementById('ttAge');
+    const nameInput = document.getElementById('ttName');
+    const nickInput = document.getElementById('ttNickname');
+    const subsInput = document.getElementById('ttSubs');
+    const viewsInput = document.getElementById('ttViews');
+    const linkInput = document.getElementById('ttLink');
+    
+    if (!ageInput || !nameInput || !nickInput || !subsInput || !viewsInput || !linkInput) return;
+    
+    const age = ageInput.value;
+    const name = nameInput.value.trim();
+    const nick = nickInput.value.trim();
+    const subs = subsInput.value.trim();
+    const views = viewsInput.value.trim();
+    const link = linkInput.value.trim();
     
     if (!age || !name || !nick || !subs || !views || !link) {
         alert('Заполните все поля');
@@ -481,12 +504,12 @@ function submitTTMedia(event) {
     
     alert('Заявка на TikTok отправлена!');
     
-    if (document.getElementById('ttAge')) document.getElementById('ttAge').value = '';
-    if (document.getElementById('ttName')) document.getElementById('ttName').value = '';
-    if (document.getElementById('ttNickname')) document.getElementById('ttNickname').value = '';
-    if (document.getElementById('ttSubs')) document.getElementById('ttSubs').value = '';
-    if (document.getElementById('ttViews')) document.getElementById('ttViews').value = '';
-    if (document.getElementById('ttLink')) document.getElementById('ttLink').value = '';
+    ageInput.value = '';
+    nameInput.value = '';
+    nickInput.value = '';
+    subsInput.value = '';
+    viewsInput.value = '';
+    linkInput.value = '';
     
     loadPersonalMedia();
 }
@@ -499,12 +522,21 @@ function submitYTMedia(event) {
         return;
     }
     
-    const age = document.getElementById('ytAge')?.value || '';
-    const name = document.getElementById('ytName')?.value.trim() || '';
-    const nick = document.getElementById('ytNickname')?.value.trim() || '';
-    const subs = document.getElementById('ytSubs')?.value.trim() || '';
-    const views = document.getElementById('ytViews')?.value.trim() || '';
-    const link = document.getElementById('ytLink')?.value.trim() || '';
+    const ageInput = document.getElementById('ytAge');
+    const nameInput = document.getElementById('ytName');
+    const nickInput = document.getElementById('ytNickname');
+    const subsInput = document.getElementById('ytSubs');
+    const viewsInput = document.getElementById('ytViews');
+    const linkInput = document.getElementById('ytLink');
+    
+    if (!ageInput || !nameInput || !nickInput || !subsInput || !viewsInput || !linkInput) return;
+    
+    const age = ageInput.value;
+    const name = nameInput.value.trim();
+    const nick = nickInput.value.trim();
+    const subs = subsInput.value.trim();
+    const views = viewsInput.value.trim();
+    const link = linkInput.value.trim();
     
     if (!age || !name || !nick || !subs || !views || !link) {
         alert('Заполните все поля');
@@ -530,12 +562,12 @@ function submitYTMedia(event) {
     
     alert('Заявка на YouTube отправлена!');
     
-    if (document.getElementById('ytAge')) document.getElementById('ytAge').value = '';
-    if (document.getElementById('ytName')) document.getElementById('ytName').value = '';
-    if (document.getElementById('ytNickname')) document.getElementById('ytNickname').value = '';
-    if (document.getElementById('ytSubs')) document.getElementById('ytSubs').value = '';
-    if (document.getElementById('ytViews')) document.getElementById('ytViews').value = '';
-    if (document.getElementById('ytLink')) document.getElementById('ytLink').value = '';
+    ageInput.value = '';
+    nameInput.value = '';
+    nickInput.value = '';
+    subsInput.value = '';
+    viewsInput.value = '';
+    linkInput.value = '';
     
     loadPersonalMedia();
 }
@@ -548,13 +580,23 @@ function submitApplication(event) {
         return;
     }
     
-    const nick = document.getElementById('helperNickname')?.value.trim() || '';
-    const name = document.getElementById('helperName')?.value.trim() || '';
-    const age = document.getElementById('helperAge')?.value || '';
-    const tz = document.getElementById('helperTimezone')?.value || '';
-    const exp = document.getElementById('helperExperience')?.value.trim() || '';
-    const reason = document.getElementById('helperReason')?.value.trim() || '';
-    const additional = document.getElementById('helperAdditional')?.value.trim() || '';
+    const nickInput = document.getElementById('helperNickname');
+    const nameInput = document.getElementById('helperName');
+    const ageInput = document.getElementById('helperAge');
+    const tzInput = document.getElementById('helperTimezone');
+    const expInput = document.getElementById('helperExperience');
+    const reasonInput = document.getElementById('helperReason');
+    const additionalInput = document.getElementById('helperAdditional');
+    
+    if (!nickInput || !nameInput || !ageInput || !tzInput || !expInput || !reasonInput) return;
+    
+    const nick = nickInput.value.trim();
+    const name = nameInput.value.trim();
+    const age = ageInput.value;
+    const tz = tzInput.value;
+    const exp = expInput.value.trim();
+    const reason = reasonInput.value.trim();
+    const additional = additionalInput ? additionalInput.value.trim() : '';
     
     if (!nick || !name || !age || !tz || !exp || !reason) {
         alert('Заполните обязательные поля');
@@ -580,13 +622,13 @@ function submitApplication(event) {
     
     alert('Анкета отправлена!');
     
-    if (document.getElementById('helperNickname')) document.getElementById('helperNickname').value = '';
-    if (document.getElementById('helperName')) document.getElementById('helperName').value = '';
-    if (document.getElementById('helperAge')) document.getElementById('helperAge').value = '';
-    if (document.getElementById('helperTimezone')) document.getElementById('helperTimezone').value = '';
-    if (document.getElementById('helperExperience')) document.getElementById('helperExperience').value = '';
-    if (document.getElementById('helperReason')) document.getElementById('helperReason').value = '';
-    if (document.getElementById('helperAdditional')) document.getElementById('helperAdditional').value = '';
+    nickInput.value = '';
+    nameInput.value = '';
+    ageInput.value = '';
+    tzInput.value = '';
+    expInput.value = '';
+    reasonInput.value = '';
+    if (additionalInput) additionalInput.value = '';
     
     loadPersonalHelpers();
 }
@@ -626,12 +668,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         currentDevice = savedDevice;
+        loadUserData();
     } else {
         if (deviceChoice) deviceChoice.style.display = 'flex';
         if (mainSite) mainSite.style.display = 'none';
     }
-    
-    loadUserData();
     
     // Загружаем последнюю секцию
     const lastSection = localStorage.getItem('mg_lastSection') || 'rules';
