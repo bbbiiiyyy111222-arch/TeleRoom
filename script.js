@@ -1,21 +1,22 @@
 // ==============================================
-// ОСНОВНОЙ СКРИПТ MOONGRIEF - ИСПРАВЛЕННАЯ ВЕРСИЯ
+// ОСНОВНОЙ СКРИПТ BLADEBOX - ПОЛНАЯ ВЕРСИЯ
 // ==============================================
 
 // Данные
 let users = [];
 let complaints = [];
 let applications = [];
+let mediaApplications = [];
 let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 
 // ВСЕ OWNER
 const OWNERS = ['milfa', 'milk123', 'Xchik_'];
 
 // ==============================================
-// ФУНКЦИЯ ДЛЯ ОТОБРАЖЕНИЯ ВРЕМЕНИ (GMT+3)
+// ФУНКЦИЯ ДЛЯ ОТОБРАЖЕНИЯ ВРЕМЕНИ
 // ==============================================
 
-function formatDateToMSK(dateString) {
+function formatDate(dateString) {
     const date = new Date(dateString);
     
     const day = String(date.getDate()).padStart(2, '0');
@@ -26,6 +27,29 @@ function formatDateToMSK(dateString) {
     const seconds = String(date.getSeconds()).padStart(2, '0');
     
     return `${day}.${month}.${year}, ${hours}:${minutes}:${seconds}`;
+}
+
+// ==============================================
+// ПЕРЕКЛЮЧЕНИЕ ПЛАТФОРМ (TT/YT)
+// ==============================================
+
+function switchPlatform(platform) {
+    // Скрываем все формы
+    document.getElementById('ttForm').classList.remove('active');
+    document.getElementById('ytForm').classList.remove('active');
+    
+    // Убираем активный класс у кнопок
+    document.getElementById('switchTT').classList.remove('active');
+    document.getElementById('switchYT').classList.remove('active');
+    
+    // Показываем выбранную форму
+    if (platform === 'tt') {
+        document.getElementById('ttForm').classList.add('active');
+        document.getElementById('switchTT').classList.add('active');
+    } else {
+        document.getElementById('ytForm').classList.add('active');
+        document.getElementById('switchYT').classList.add('active');
+    }
 }
 
 // ==============================================
@@ -110,19 +134,21 @@ async function loadDataFromDB() {
         users = await window.getUsers() || [];
         complaints = await window.getComplaints() || [];
         applications = await window.getApplications() || [];
+        mediaApplications = await window.getMediaApplications() || [];
         
-        console.log('Загружено из базы:', { users, complaints, applications });
+        console.log('Загружено из базы:', { users, complaints, applications, mediaApplications });
     } catch (error) {
         console.error('Ошибка загрузки из БД:', error);
         users = [];
         complaints = [];
         applications = [];
+        mediaApplications = [];
     }
 }
 
 // Копирование IP
 function copyIP() {
-    navigator.clipboard.writeText('Moongrief.aurorix.pro');
+    navigator.clipboard.writeText('bladebox.aurorix.pro');
     alert('IP скопирован в буфер обмена!');
 }
 
@@ -383,7 +409,93 @@ async function submitComplaint(event) {
 }
 
 // ==============================================
-// ОТПРАВКА АНКЕТ
+// ОТПРАВКА МЕДИА-ЗАЯВОК (TIKTOK)
+// ==============================================
+
+async function submitTTMedia(event) {
+    event.preventDefault();
+    
+    if (!currentUser) {
+        alert('Сначала войдите в систему!');
+        return;
+    }
+    
+    try {
+        const mediaApp = {
+            id: Date.now(),
+            platform: 'tiktok',
+            age: document.getElementById('ttAge').value,
+            name: document.getElementById('ttName').value,
+            nickname: document.getElementById('ttNickname').value,
+            subscribers: document.getElementById('ttSubs').value,
+            views: document.getElementById('ttViews').value,
+            link: document.getElementById('ttLink').value,
+            author: currentUser.username,
+            date: new Date().toISOString(),
+            status: 'new',
+            response: null
+        };
+        
+        const saved = await window.saveMediaApplication(mediaApp);
+        
+        if (saved) {
+            alert('✅ Заявка на TikTok отправлена!');
+            document.getElementById('ttMediaForm').reset();
+            await loadLists();
+        } else {
+            alert('❌ Ошибка при отправке заявки!');
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('❌ Ошибка при отправке заявки');
+    }
+}
+
+// ==============================================
+// ОТПРАВКА МЕДИА-ЗАЯВОК (YOUTUBE)
+// ==============================================
+
+async function submitYTMedia(event) {
+    event.preventDefault();
+    
+    if (!currentUser) {
+        alert('Сначала войдите в систему!');
+        return;
+    }
+    
+    try {
+        const mediaApp = {
+            id: Date.now(),
+            platform: 'youtube',
+            age: document.getElementById('ytAge').value,
+            name: document.getElementById('ytName').value,
+            nickname: document.getElementById('ytNickname').value,
+            subscribers: document.getElementById('ytSubs').value,
+            views: document.getElementById('ytViews').value,
+            link: document.getElementById('ytLink').value,
+            author: currentUser.username,
+            date: new Date().toISOString(),
+            status: 'new',
+            response: null
+        };
+        
+        const saved = await window.saveMediaApplication(mediaApp);
+        
+        if (saved) {
+            alert('✅ Заявка на YouTube отправлена!');
+            document.getElementById('ytMediaForm').reset();
+            await loadLists();
+        } else {
+            alert('❌ Ошибка при отправке заявки!');
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('❌ Ошибка при отправке заявки');
+    }
+}
+
+// ==============================================
+// ОТПРАВКА АНКЕТ НА ХЕЛПЕРА
 // ==============================================
 
 async function submitApplication(event) {
@@ -426,7 +538,7 @@ async function submitApplication(event) {
 }
 
 // ==============================================
-// ЗАГРУЗКА ЖАЛОБ (КЛИКАБЕЛЬНЫЕ КАРТОЧКИ)
+// ЗАГРУЗКА ЖАЛОБ
 // ==============================================
 
 async function loadComplaints() {
@@ -437,13 +549,13 @@ async function loadComplaints() {
         complaints = await window.getComplaints() || [];
         
         if (complaints.length === 0) {
-            list.innerHTML = '<div class="empty-state">🌙 <h3>Нет жалоб</h3><p>Пока никто не подавал жалоб</p></div>';
+            list.innerHTML = '<div class="empty-state">⚔️ <h3>Нет жалоб</h3><p>Пока никто не подавал жалоб</p></div>';
             return;
         }
         
         let html = '';
         complaints.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(c => {
-            const formattedDate = formatDateToMSK(c.date);
+            const formattedDate = formatDate(c.date);
             
             html += `
                 <div class="complaint-card" onclick="openComplaintDetails(${c.id})">
@@ -470,7 +582,53 @@ async function loadComplaints() {
 }
 
 // ==============================================
-// ЗАГРУЗКА АНКЕТ (КЛИКАБЕЛЬНЫЕ КАРТОЧКИ)
+// ЗАГРУЗКА МЕДИА-ЗАЯВОК
+// ==============================================
+
+async function loadMediaApplications() {
+    const list = document.getElementById('mediaList');
+    if (!list) return;
+    
+    try {
+        mediaApplications = await window.getMediaApplications() || [];
+        
+        if (mediaApplications.length === 0) {
+            list.innerHTML = '<div class="empty-state">📱 <h3>Нет заявок на медию</h3><p>Пока никто не подавал заявки</p></div>';
+            return;
+        }
+        
+        let html = '';
+        mediaApplications.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(m => {
+            const formattedDate = formatDate(m.date);
+            const platformIcon = m.platform === 'tiktok' ? '📱' : '▶️';
+            const platformName = m.platform === 'tiktok' ? 'TikTok' : 'YouTube';
+            
+            html += `
+                <div class="media-card" onclick="openMediaDetails(${m.id})">
+                    <div class="media-header">
+                        <span class="media-title">${platformIcon} ${platformName} | ${m.nickname}</span>
+                        <span class="media-status ${getStatusClass(m.status)}">${getStatusText(m.status)}</span>
+                    </div>
+                    <div class="media-body">
+                        <p><strong>👤 Имя:</strong> ${m.name}</p>
+                        <p><strong>📅 Возраст:</strong> ${m.age}</p>
+                        <p><strong>📊 Подписчики:</strong> ${m.subscribers}</p>
+                        <p><strong>📅 Дата:</strong> ${formattedDate}</p>
+                        ${m.response ? `<p><strong>💬 Ответ:</strong> ${m.response.substring(0, 30)}${m.response.length > 30 ? '...' : ''}</p>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+        
+        list.innerHTML = html;
+    } catch (error) {
+        console.error('Ошибка загрузки медиа-заявок:', error);
+        list.innerHTML = '<div class="error-state">❌ Ошибка загрузки</div>';
+    }
+}
+
+// ==============================================
+// ЗАГРУЗКА АНКЕТ НА ХЕЛПЕРА
 // ==============================================
 
 async function loadApplications() {
@@ -481,13 +639,13 @@ async function loadApplications() {
         applications = await window.getApplications() || [];
         
         if (applications.length === 0) {
-            list.innerHTML = '<div class="empty-state">🌙 <h3>Нет анкет</h3><p>Пока никто не подавал заявки</p></div>';
+            list.innerHTML = '<div class="empty-state">👮 <h3>Нет анкет</h3><p>Пока никто не подавал заявки</p></div>';
             return;
         }
         
         let html = '';
         applications.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(a => {
-            const formattedDate = formatDateToMSK(a.date);
+            const formattedDate = formatDate(a.date);
             
             html += `
                 <div class="application-card" onclick="openApplicationDetails(${a.id})">
@@ -513,11 +671,12 @@ async function loadApplications() {
 }
 
 // ==============================================
-// ЗАГРУЗКА ОБОИХ СПИСКОВ
+// ЗАГРУЗКА ВСЕХ СПИСКОВ
 // ==============================================
 
 async function loadLists() {
     await loadComplaints();
+    await loadMediaApplications();
     await loadApplications();
 }
 
@@ -529,7 +688,7 @@ function openComplaintDetails(id) {
     const complaint = complaints.find(c => c.id === id);
     if (!complaint) return;
     
-    const formattedDate = formatDateToMSK(complaint.date);
+    const formattedDate = formatDate(complaint.date);
     
     let message = `📋 ЖАЛОБА\n\n`;
     message += `👤 От: ${complaint.author}\n`;
@@ -545,13 +704,39 @@ function openComplaintDetails(id) {
     alert(message);
 }
 
+function openMediaDetails(id) {
+    const media = mediaApplications.find(m => m.id === id);
+    if (!media) return;
+    
+    const formattedDate = formatDate(media.date);
+    const platformName = media.platform === 'tiktok' ? 'TikTok' : 'YouTube';
+    const platformIcon = media.platform === 'tiktok' ? '📱' : '▶️';
+    
+    let message = `${platformIcon} ЗАЯВКА НА ${platformName}\n\n`;
+    message += `👤 Имя: ${media.name}\n`;
+    message += `📅 Возраст: ${media.age}\n`;
+    message += `🎮 Никнейм: ${media.nickname}\n`;
+    message += `📊 Подписчики: ${media.subscribers}\n`;
+    message += `👀 Просмотры: ${media.views}\n`;
+    message += `🔗 Ссылка: ${media.link}\n`;
+    message += `👤 От: ${media.author}\n`;
+    message += `📅 Дата: ${formattedDate}\n`;
+    message += `📊 Статус: ${getStatusText(media.status)}\n`;
+    
+    if (media.response) {
+        message += `\n💬 Ответ: ${media.response}`;
+    }
+    
+    alert(message);
+}
+
 function openApplicationDetails(id) {
     const application = applications.find(a => a.id === id);
     if (!application) return;
     
-    const formattedDate = formatDateToMSK(application.date);
+    const formattedDate = formatDate(application.date);
     
-    let message = `📋 АНКЕТА НА ХЕЛПЕРА\n\n`;
+    let message = `👮 АНКЕТА НА ХЕЛПЕРА\n\n`;
     message += `🎮 Ник: ${application.nickname}\n`;
     message += `👤 Имя: ${application.name}\n`;
     message += `📅 Возраст: ${application.age}\n`;
