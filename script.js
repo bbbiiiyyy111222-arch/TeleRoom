@@ -32,27 +32,48 @@ function saveData() {
 }
 
 // ==============================================
-// ВЫБОР УСТРОЙСТВА
+// ВЫБОР УСТРОЙСТВА - ИСПРАВЛЕНО
 // ==============================================
 
 function selectDevice(device) {
+    console.log('Выбрано устройство:', device); // Для отладки
+    
+    // Сохраняем выбор
     localStorage.setItem('mg_device', device);
     currentDevice = device;
     
+    // Скрываем экран выбора
     const deviceChoice = document.getElementById('deviceChoice');
+    deviceChoice.style.display = 'none';
+    
+    // Показываем основной сайт
     const mainSite = document.getElementById('mainSite');
+    mainSite.style.display = 'block';
     
-    deviceChoice.style.opacity = '0';
+    // Применяем класс для мобильной версии если нужно
+    if (device === 'mobile') {
+        document.body.classList.add('mobile-view');
+        document.getElementById('deviceSwitch').style.display = 'block';
+    } else {
+        document.body.classList.remove('mobile-view');
+        document.getElementById('deviceSwitch').style.display = 'none';
+    }
     
-    setTimeout(() => {
-        deviceChoice.style.display = 'none';
-        mainSite.style.display = 'block';
-        setTimeout(() => mainSite.style.opacity = '1', 50);
-        
-        if (device === 'mobile') {
-            document.body.classList.add('mobile-view');
-            document.getElementById('deviceSwitch').style.display = 'block';
-        }
+    // Загружаем данные пользователя
+    loadUserData();
+    
+    // Показываем уведомление
+    showNotification(`🌙 ${device === 'mobile' ? 'Мобильная' : 'ПК'} версия активирована`, 'success');
+}
+
+function showDeviceChoice() {
+    // Скрываем основной сайт
+    document.getElementById('mainSite').style.display = 'none';
+    
+    // Показываем экран выбора
+    const deviceChoice = document.getElementById('deviceChoice');
+    deviceChoice.style.display = 'flex';
+}
         
         // Загружаем данные пользователя
         loadUserData();
