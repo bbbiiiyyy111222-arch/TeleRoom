@@ -1,15 +1,15 @@
 // ==============================================
-// БАЗА ДАННЫХ BLADEBOX - ПОЛНАЯ РАБОЧАЯ ВЕРСИЯ
+// БАЗА ДАННЫХ BLADEBOX - ИСПРАВЛЕННАЯ ВЕРСИЯ
 // ==============================================
 
-// Supabase подключение - ВСТАВЬТЕ СВОИ ДАННЫЕ!
-const SUPABASE_URL = 'https://ваш-проект.supabase.co';
-const SUPABASE_KEY = 'ваш-ключ';
+console.log('✅ db.js загружается...');
 
-// Создаем клиент
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Supabase подключение - ВАШИ РЕАЛЬНЫЕ ДАННЫЕ!
+const SUPABASE_URL = 'https://opeypwayctnnyrfkhajf.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wZXlwd2F5Y3RubnlyZmtoYWpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MzU4ODQsImV4cCI6MjA4ODUxMTg4NH0._Y1R1NNCVMyVgyeN7O7a24n4BGwc44c6vO1Q6MAf74A';
 
-console.log('✅ db.js загружен');
+// Создаем клиент с уникальным именем, чтобы не конфликтовать
+const bladeboxSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ==============================================
 // ПОЛЬЗОВАТЕЛИ
@@ -17,7 +17,7 @@ console.log('✅ db.js загружен');
 
 window.getUsers = async function() {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await bladeboxSupabase
             .from('users')
             .select('*');
         
@@ -34,7 +34,7 @@ window.getUsers = async function() {
 
 window.saveUser = async function(username, password) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await bladeboxSupabase
             .from('users')
             .insert([{ username, password }]);
         
@@ -51,7 +51,7 @@ window.saveUser = async function(username, password) {
 
 window.updateUserPassword = async function(username, password) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await bladeboxSupabase
             .from('users')
             .update({ password })
             .eq('username', username);
@@ -70,7 +70,7 @@ window.updateUserPassword = async function(username, password) {
 window.changePassword = async function(username, oldPassword, newPassword) {
     try {
         // Сначала проверяем старый пароль
-        const { data: user, error: findError } = await supabase
+        const { data: user, error: findError } = await bladeboxSupabase
             .from('users')
             .select('*')
             .eq('username', username)
@@ -82,7 +82,7 @@ window.changePassword = async function(username, oldPassword, newPassword) {
         }
         
         // Обновляем пароль
-        const { error: updateError } = await supabase
+        const { error: updateError } = await bladeboxSupabase
             .from('users')
             .update({ password: newPassword })
             .eq('username', username);
@@ -102,7 +102,7 @@ window.changePassword = async function(username, oldPassword, newPassword) {
 
 window.getComplaints = async function() {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await bladeboxSupabase
             .from('complaints')
             .select('*')
             .order('date', { ascending: false });
@@ -120,7 +120,7 @@ window.getComplaints = async function() {
 
 window.saveComplaint = async function(complaint) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await bladeboxSupabase
             .from('complaints')
             .insert([complaint]);
         
@@ -137,7 +137,7 @@ window.saveComplaint = async function(complaint) {
 
 window.updateComplaint = async function(id, updates) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await bladeboxSupabase
             .from('complaints')
             .update(updates)
             .eq('id', id);
@@ -155,7 +155,7 @@ window.updateComplaint = async function(id, updates) {
 
 window.deleteComplaint = async function(id) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await bladeboxSupabase
             .from('complaints')
             .delete()
             .eq('id', id);
@@ -177,7 +177,7 @@ window.deleteComplaint = async function(id) {
 
 window.getMediaApplications = async function() {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await bladeboxSupabase
             .from('media_applications')
             .select('*')
             .order('date', { ascending: false });
@@ -195,7 +195,7 @@ window.getMediaApplications = async function() {
 
 window.saveMediaApplication = async function(mediaApp) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await bladeboxSupabase
             .from('media_applications')
             .insert([mediaApp]);
         
@@ -212,7 +212,7 @@ window.saveMediaApplication = async function(mediaApp) {
 
 window.updateMediaApplication = async function(id, updates) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await bladeboxSupabase
             .from('media_applications')
             .update(updates)
             .eq('id', id);
@@ -230,7 +230,7 @@ window.updateMediaApplication = async function(id, updates) {
 
 window.deleteMediaApplication = async function(id) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await bladeboxSupabase
             .from('media_applications')
             .delete()
             .eq('id', id);
@@ -252,7 +252,7 @@ window.deleteMediaApplication = async function(id) {
 
 window.getApplications = async function() {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await bladeboxSupabase
             .from('applications')
             .select('*')
             .order('date', { ascending: false });
@@ -270,7 +270,7 @@ window.getApplications = async function() {
 
 window.saveApplication = async function(application) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await bladeboxSupabase
             .from('applications')
             .insert([application]);
         
@@ -287,7 +287,7 @@ window.saveApplication = async function(application) {
 
 window.updateApplication = async function(id, updates) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await bladeboxSupabase
             .from('applications')
             .update(updates)
             .eq('id', id);
@@ -305,7 +305,7 @@ window.updateApplication = async function(id, updates) {
 
 window.deleteApplication = async function(id) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await bladeboxSupabase
             .from('applications')
             .delete()
             .eq('id', id);
