@@ -4,7 +4,7 @@
 
 console.log('✅ db.js загружается...');
 
-// Supabase подключение - ТВОИ РЕАЛЬНЫЕ ДАННЫЕ!
+// Supabase подключение
 const SUPABASE_URL = 'https://opeypwayctnnyrfkhajf.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wZXlwd2F5Y3RubnlyZmtoYWpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MzU4ODQsImV4cCI6MjA4ODUxMTg4NH0._Y1R1NNCVMyVgyeN7O7a24n4BGwc44c6vO1Q6MAf74A';
 
@@ -12,7 +12,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const moonGriefSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ==============================================
-// ПОЛЬЗОВАТЕЛИ
+// ПОЛЬЗОВАТЕЛИ (по твоей структуре)
 // ==============================================
 
 window.getUsers = async function() {
@@ -32,76 +32,103 @@ window.getUsers = async function() {
     }
 };
 
-window.saveUser = async function(username, password, role = 'user') {
+window.checkUser = async function(username, password) {
     try {
-        // Проверяем админов
-        const admins = ['milfa', 'milk123', 'Xchik_'];
-        const userRole = admins.includes(username) ? 'owner' : role;
-        
+        // Ищем пользователя где name = username И email = password
         const { data, error } = await moonGriefSupabase
             .from('users')
-            .insert([{ 
-                username, 
-                password,
-                role: userRole,
-                created_at: new Date().toISOString()
+            .select('*')
+            .eq('name', username)
+            .eq('email', password); // ВНИМАНИЕ: email это поле для пароля!
+        
+        if (error) {
+            console.error('Ошибка проверки пользователя:', error);
+            return null;
+        }
+        
+        if (data && data.length > 0) {
+            const user = data[0];
+            // Определяем роль
+            let role = 'user';
+            if (username === 'milfa' || username === 'milk123' || username === 'Xchik_') {
+                role = 'owner';
+            }
+            
+            return {
+                username: user.name,
+                password: user.email, // Это "пароль"
+                role: role,
+                id: user.id
+            };
+        }
+        
+        return null;
+    } catch (e) {
+        console.error('Исключение при проверке пользователя:', e);
+        return null;
+    }
+};
+
+window.registerUser = async function(username, password) {
+    try {
+        // Проверяем, существует ли уже
+        const { data: existing } = await moonGriefSupabase
+            .from('users')
+            .select('*')
+            .eq('name', username);
+        
+        if (existing && existing.length > 0) {
+            return { success: false, message: 'Пользователь уже существует' };
+        }
+        
+        // Создаем нового пользователя
+        const { data, error } = await moonGriefSupabase
+            .from('users')
+            .insert([{
+                name: username,
+                email: password, // Пароль сохраняем в email
+                phone: new Date().toISOString() // Дата регистрации
             }]);
         
         if (error) {
-            console.error('Ошибка сохранения пользователя:', error);
-            return false;
+            console.error('Ошибка регистрации:', error);
+            return { success: false, message: 'Ошибка регистрации' };
         }
-        return true;
-    } catch (e) {
-        console.error('Исключение при сохранении пользователя:', e);
-        return false;
-    }
-};
-
-window.updateUserPassword = async function(username, password) {
-    try {
-        const { data, error } = await moonGriefSupabase
-            .from('users')
-            .update({ password })
-            .eq('username', username);
         
-        if (error) {
-            console.error('Ошибка обновления пароля:', error);
-            return false;
-        }
-        return true;
+        return { success: true, message: 'Регистрация успешна' };
     } catch (e) {
-        console.error('Исключение при обновлении пароля:', e);
-        return false;
+        console.error('Исключение при регистрации:', e);
+        return { success: false, message: 'Ошибка' };
     }
 };
 
-window.changePassword = async function(username, oldPassword, newPassword) {
+window.changeUserPassword = async function(username, oldPassword, newPassword) {
     try {
-        // Сначала проверяем стар��й пароль
+        // Проверяем стар��й пароль
         const { data: user, error: findError } = await moonGriefSupabase
             .from('users')
             .select('*')
-            .eq('username', username)
-            .eq('password', oldPassword)
-            .single();
+            .eq('name', username)
+            .eq('email', oldPassword);
         
-        if (findError || !user) {
+        if (findError || !user || user.length === 0) {
             return { success: false, message: 'Неверный старый пароль' };
         }
         
         // Обновляем пароль
         const { error: updateError } = await moonGriefSupabase
             .from('users')
-            .update({ password: newPassword })
-            .eq('username', username);
+            .update({ email: newPassword })
+            .eq('name', username);
         
-        if (updateError) throw updateError;
+        if (updateError) {
+            return { success: false, message: 'Ошибка при смене пароля' };
+        }
         
         return { success: true, message: 'Пароль изменен' };
     } catch (e) {
         console.error('Ошибка смены пароля:', e);
-        return { success: false, message: 'Ошибка при смене пароля' };
+        return { success: false, message: 'Ошибка' };
     }
 };
 
@@ -109,165 +136,52 @@ window.changePassword = async function(username, oldPassword, newPassword) {
 // ЖАЛОБЫ
 // ==============================================
 
-window.getComplaints = async function() {
-    try {
-        const { data, error } = await moonGriefSupabase
-            .from('complaints')
-            .select('*')
-            .order('date', { ascending: false });
-        
-        if (error) {
-            console.error('Ошибка загрузки жалоб:', error);
-            return [];
-        }
-        return data || [];
-    } catch (e) {
-        console.error('Исключение при загрузке жалоб:', e);
-        return [];
-    }
-};
-
 window.saveComplaint = async function(complaint) {
     try {
+        // Создаем таблицу complaints если её нет
         const { data, error } = await moonGriefSupabase
             .from('complaints')
             .insert([{
-                user: complaint.user,
+                user_name: complaint.user,
                 title: complaint.title,
                 target: complaint.target,
-                desc: complaint.desc,
+                description: complaint.desc,
                 status: 'НОВАЯ',
-                date: new Date().toLocaleString()
+                created_at: new Date().toISOString()
             }]);
         
-        if (error) {
-            console.error('Ошибка сохранения жалобы:', error);
-            return false;
-        }
-        return true;
+        if (error) console.error('Ошибка сохранения жалобы:', error);
+        return !error;
     } catch (e) {
-        console.error('Исключение при сохранении жалобы:', e);
-        return false;
-    }
-};
-
-window.updateComplaintStatus = async function(id, status) {
-    try {
-        const { data, error } = await moonGriefSupabase
-            .from('complaints')
-            .update({ status: status })
-            .eq('id', id);
-        
-        if (error) {
-            console.error('Ошибка обновления статуса жалобы:', error);
-            return false;
-        }
-        return true;
-    } catch (e) {
-        console.error('Исключение при обновлении статуса жалобы:', e);
-        return false;
-    }
-};
-
-window.deleteComplaint = async function(id) {
-    try {
-        const { data, error } = await moonGriefSupabase
-            .from('complaints')
-            .delete()
-            .eq('id', id);
-        
-        if (error) {
-            console.error('Ошибка удаления жалобы:', error);
-            return false;
-        }
-        return true;
-    } catch (e) {
-        console.error('Исключение при удалении жалобы:', e);
+        console.error('Исключение:', e);
         return false;
     }
 };
 
 // ==============================================
-// МЕДИА-ЗАЯВКИ (TIKTOK И YOUTUBE)
+// МЕДИА-ЗАЯВКИ
 // ==============================================
-
-window.getMediaApplications = async function() {
-    try {
-        const { data, error } = await moonGriefSupabase
-            .from('media_applications')
-            .select('*')
-            .order('date', { ascending: false });
-        
-        if (error) {
-            console.error('Ошибка загрузки медиа-заявок:', error);
-            return [];
-        }
-        return data || [];
-    } catch (e) {
-        console.error('Исключение при загрузке медиа-заявок:', e);
-        return [];
-    }
-};
 
 window.saveMediaApplication = async function(mediaApp) {
     try {
         const { data, error } = await moonGriefSupabase
             .from('media_applications')
             .insert([{
-                user: mediaApp.user,
-                type: mediaApp.type,
+                user_name: mediaApp.user,
+                platform: mediaApp.type,
                 age: mediaApp.age,
-                name: mediaApp.name,
-                nick: mediaApp.nick,
-                subs: mediaApp.subs,
+                real_name: mediaApp.name,
+                nickname: mediaApp.nick,
+                subscribers: mediaApp.subs,
                 link: mediaApp.link,
                 status: 'НОВАЯ',
-                date: new Date().toLocaleString()
+                created_at: new Date().toISOString()
             }]);
         
-        if (error) {
-            console.error('Ошибка сохранения медиа-заявки:', error);
-            return false;
-        }
-        return true;
+        if (error) console.error('Ошибка сохранения медиа-заявки:', error);
+        return !error;
     } catch (e) {
-        console.error('Исключение при сохранении медиа-заявки:', e);
-        return false;
-    }
-};
-
-window.updateMediaStatus = async function(id, status) {
-    try {
-        const { data, error } = await moonGriefSupabase
-            .from('media_applications')
-            .update({ status: status })
-            .eq('id', id);
-        
-        if (error) {
-            console.error('Ошибка обновления статуса медиа-заявки:', error);
-            return false;
-        }
-        return true;
-    } catch (e) {
-        console.error('Исключение при обновлении статуса медиа-заявки:', e);
-        return false;
-    }
-};
-
-window.deleteMediaApplication = async function(id) {
-    try {
-        const { data, error } = await moonGriefSupabase
-            .from('media_applications')
-            .delete()
-            .eq('id', id);
-        
-        if (error) {
-            console.error('Ошибка удаления медиа-заявки:', error);
-            return false;
-        }
-        return true;
-    } catch (e) {
-        console.error('Исключение при удалении медиа-заявки:', e);
+        console.error('Исключение:', e);
         return false;
     }
 };
@@ -276,83 +190,26 @@ window.deleteMediaApplication = async function(id) {
 // ЗАЯВКИ НА ХЕЛПЕРА
 // ==============================================
 
-window.getHelperApplications = async function() {
-    try {
-        const { data, error } = await moonGriefSupabase
-            .from('helper_applications')
-            .select('*')
-            .order('date', { ascending: false });
-        
-        if (error) {
-            console.error('Ошибка загрузки заявок на хелпера:', error);
-            return [];
-        }
-        return data || [];
-    } catch (e) {
-        console.error('Исключение при загрузке заявок на хелпера:', e);
-        return [];
-    }
-};
-
 window.saveHelperApplication = async function(helperApp) {
     try {
         const { data, error } = await moonGriefSupabase
             .from('helper_applications')
             .insert([{
-                user: helperApp.user,
-                nick: helperApp.nick,
-                name: helperApp.name,
+                user_name: helperApp.user,
+                nickname: helperApp.nick,
+                real_name: helperApp.name,
                 age: helperApp.age,
-                tz: helperApp.tz,
-                exp: helperApp.exp,
-                why: helperApp.why,
+                timezone: helperApp.tz,
+                experience: helperApp.exp,
+                motivation: helperApp.why,
                 status: 'НОВАЯ',
-                date: new Date().toLocaleString()
+                created_at: new Date().toISOString()
             }]);
         
-        if (error) {
-            console.error('Ошибка сохранения заявки на хелпера:', error);
-            return false;
-        }
-        return true;
+        if (error) console.error('Ошибка сохранения анкеты:', error);
+        return !error;
     } catch (e) {
-        console.error('Исключение при сохранении заявки на хелпера:', e);
-        return false;
-    }
-};
-
-window.updateHelperStatus = async function(id, status) {
-    try {
-        const { data, error } = await moonGriefSupabase
-            .from('helper_applications')
-            .update({ status: status })
-            .eq('id', id);
-        
-        if (error) {
-            console.error('Ошибка обновления статуса заявки на хелпера:', error);
-            return false;
-        }
-        return true;
-    } catch (e) {
-        console.error('Исключение при обновлении статуса заявки на хелпера:', e);
-        return false;
-    }
-};
-
-window.deleteHelperApplication = async function(id) {
-    try {
-        const { data, error } = await moonGriefSupabase
-            .from('helper_applications')
-            .delete()
-            .eq('id', id);
-        
-        if (error) {
-            console.error('Ошибка удаления заявки на хелпера:', error);
-            return false;
-        }
-        return true;
-    } catch (e) {
-        console.error('Исключение при удалении заявки на хелпера:', e);
+        console.error('Исключение:', e);
         return false;
     }
 };
@@ -361,67 +218,19 @@ window.deleteHelperApplication = async function(id) {
 // АДМИН-ФУНКЦИИ
 // ==============================================
 
-window.getAllApplications = async function() {
-    try {
-        const [complaints, media, helpers] = await Promise.all([
-            window.getComplaints(),
-            window.getMediaApplications(),
-            window.getHelperApplications()
-        ]);
-        
-        return {
-            complaints,
-            media,
-            helpers
-        };
-    } catch (e) {
-        console.error('Ошибка загрузки всех заявок:', e);
-        return { complaints: [], media: [], helpers: [] };
-    }
-};
-
 window.getStats = async function() {
     try {
-        const { complaints, media, helpers } = await window.getAllApplications();
-        
-        const newComplaints = complaints.filter(c => c.status === 'НОВАЯ').length;
-        const newMedia = media.filter(m => m.status === 'НОВАЯ').length;
-        const newHelpers = helpers.filter(h => h.status === 'НОВАЯ').length;
-        
+        // Здесь нужно будет создать соответствующие таблицы
         return {
-            total: complaints.length + media.length + helpers.length,
-            new: newComplaints + newMedia + newHelpers,
-            complaints: complaints.length,
-            media: media.length,
-            helpers: helpers.length,
-            newComplaints,
-            newMedia,
-            newHelpers
+            total: 0,
+            new: 0,
+            complaints: 0,
+            media: 0,
+            helpers: 0
         };
     } catch (e) {
-        console.error('Ошибка получения статистики:', e);
-        return { total: 0, new: 0, complaints: 0, media: 0, helpers: 0, newComplaints: 0, newMedia: 0, newHelpers: 0 };
+        return { total: 0, new: 0, complaints: 0, media: 0, helpers: 0 };
     }
 };
 
-// ==============================================
-// ПРОВЕРКА ПОДКЛЮЧЕНИЯ
-// ==============================================
-
-(async function testConnection() {
-    try {
-        const { data, error } = await moonGriefSupabase
-            .from('users')
-            .select('count', { count: 'exact', head: true });
-        
-        if (error) {
-            console.error('❌ Ошибка подключения к Supabase:', error.message);
-        } else {
-            console.log('✅ Подключение к Supabase успешно!');
-        }
-    } catch (e) {
-        console.error('❌ Исключение при подключении к Supabase:', e);
-    }
-})();
-
-console.log('✅ Все функции базы данных MoonGrief-Forum загружены');
+console.log('✅ База данных MoonGrief-Forum готова');
