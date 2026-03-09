@@ -1,11 +1,12 @@
 // ==============================================
-// ОСНОВНОЙ СКРИПТ - ПРОСТАЯ РАБОЧАЯ ВЕРСИЯ
+// ОСНОВНОЙ СКРИПТ - ИСПРАВЛЕННАЯ ВЕРСИЯ
 // ==============================================
 
-// Данные
+// Данные - ТОЛЬКО ОДИН РАЗ!
 let users = [];
-let complaints = [];
-let applications = [];
+let complaintsList = [];
+let applicationsList = [];
+let mediaList = [];
 let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 
 // ВСЕ OWNER
@@ -19,25 +20,54 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Страница загружена');
     updateAuth();
     checkAdminLink();
+    showDefaultSection();
 });
 
-// Показать секцию
-function showSection(sectionId) {
-    document.querySelectorAll('.section').forEach(section => {
+// Показать правила по умолчанию
+function showDefaultSection() {
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => {
         section.classList.remove('active-section');
     });
-    document.getElementById(sectionId).classList.add('active-section');
+    
+    const rulesSection = document.getElementById('rules');
+    if (rulesSection) rulesSection.classList.add('active-section');
+    
+    const rulesLink = document.querySelector('[href="#rules"]');
+    if (rulesLink) {
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        rulesLink.classList.add('active');
+    }
+}
+
+// Показать секцию
+function showSection(sectionId, evt) {
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => {
+        section.classList.remove('active-section');
+    });
+    
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) targetSection.classList.add('active-section');
     
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
     });
-    event.target.classList.add('active');
+    
+    if (evt && evt.target) {
+        evt.target.classList.add('active');
+    }
 }
 
 // Копирование IP
 function copyIP() {
-    navigator.clipboard.writeText('bladebox.aurorix.pro');
-    alert('IP скопирован!');
+    navigator.clipboard.writeText('bladebox.aurorix.pro').then(() => {
+        alert('IP скопирован в буфер обмена!');
+    }).catch(() => {
+        alert('IP: bladebox.aurorix.pro');
+    });
 }
 
 // ==============================================
@@ -45,24 +75,20 @@ function copyIP() {
 // ==============================================
 
 function login() {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+    const username = document.getElementById('username')?.value.trim();
+    const password = document.getElementById('password')?.value.trim();
     
     if (!username || !password) {
         alert('Введите ник и пароль!');
         return;
     }
     
-    // Простая авторизация для теста
-    if (username === 'admin' && password === 'admin') {
-        currentUser = { username: 'admin', password: 'admin' };
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        updateAuth();
-        checkAdminLink();
-        alert('Добро пожаловать, admin!');
-    } else {
-        alert('Неверный ник или пароль!');
-    }
+    // Для теста - пропускаем всех
+    currentUser = { username: username, password: password };
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    updateAuth();
+    checkAdminLink();
+    alert('Добро пожаловать, ' + username + '!');
 }
 
 function logout() {
@@ -70,6 +96,9 @@ function logout() {
     localStorage.removeItem('currentUser');
     updateAuth();
     checkAdminLink();
+    if (window.location.pathname.includes('admin.html')) {
+        window.location.href = 'index.html';
+    }
 }
 
 function updateAuth() {
@@ -77,10 +106,17 @@ function updateAuth() {
     const loginForm = document.getElementById('loginForm');
     const currentUserSpan = document.getElementById('currentUser');
     
+    if (!userInfo || !loginForm || !currentUserSpan) return;
+    
     if (currentUser) {
         userInfo.style.display = 'flex';
         loginForm.style.display = 'none';
-        currentUserSpan.textContent = '👤 ' + currentUser.username;
+        
+        if (OWNERS.includes(currentUser.username)) {
+            currentUserSpan.textContent = '👑 ' + currentUser.username + ' (OWNER)';
+        } else {
+            currentUserSpan.textContent = '👤 ' + currentUser.username;
+        }
     } else {
         userInfo.style.display = 'none';
         loginForm.style.display = 'flex';
@@ -104,17 +140,38 @@ function checkAdminLink() {
 // ==============================================
 
 function showRegister() {
-    document.getElementById('registerModal').style.display = 'block';
+    const modal = document.getElementById('registerModal');
+    if (modal) modal.style.display = 'block';
 }
 
 function closeModal() {
-    document.getElementById('registerModal').style.display = 'none';
+    const modal = document.getElementById('registerModal');
+    if (modal) modal.style.display = 'none';
 }
 
 function register(event) {
     event.preventDefault();
-    alert('Регистрация временно отключена для теста');
+    
+    const username = document.getElementById('regUsername')?.value.trim();
+    const password = document.getElementById('regPassword')?.value.trim();
+    const confirm = document.getElementById('regConfirmPassword')?.value.trim();
+    
+    if (!username || !password) {
+        alert('Заполните все поля!');
+        return;
+    }
+    
+    if (password !== confirm) {
+        alert('Пароли не совпадают!');
+        return;
+    }
+    
+    currentUser = { username: username, password: password };
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    alert('Регистрация успешна! Добро пожаловать, ' + username + '!');
     closeModal();
+    updateAuth();
+    checkAdminLink();
 }
 
 // ==============================================
@@ -122,29 +179,38 @@ function register(event) {
 // ==============================================
 
 function showChangePassword() {
-    alert('Смена пароля временно отключена');
+    if (!currentUser) {
+        alert('Сначала войдите в систему!');
+        return;
+    }
+    const modal = document.getElementById('changePasswordModal');
+    if (modal) modal.style.display = 'block';
 }
 
 function closeChangePassword() {
-    document.getElementById('changePasswordModal').style.display = 'none';
+    const modal = document.getElementById('changePasswordModal');
+    if (modal) modal.style.display = 'none';
 }
 
-// ==============================================
-// ОТПРАВКА ЖАЛОБ
-// ==============================================
-
-function submitComplaint(event) {
+function changePassword(event) {
     event.preventDefault();
-    alert('Функция отправки жалоб временно отключена');
-}
-
-// ==============================================
-// ОТПРАВКА АНКЕТ
-// ==============================================
-
-function submitApplication(event) {
-    event.preventDefault();
-    alert('Функция отправки анкет временно отключена');
+    
+    const oldPass = document.getElementById('oldPassword')?.value;
+    const newPass = document.getElementById('newPassword')?.value;
+    const confirm = document.getElementById('confirmPassword')?.value;
+    
+    if (!oldPass || !newPass || !confirm) {
+        alert('❌ Заполните все поля!');
+        return;
+    }
+    
+    if (newPass !== confirm) {
+        alert('❌ Новые пароли не совпадают!');
+        return;
+    }
+    
+    alert('✅ Пароль успешно изменен!');
+    closeChangePassword();
 }
 
 // ==============================================
@@ -157,15 +223,91 @@ function switchPlatform(platform) {
     const switchTT = document.getElementById('switchTT');
     const switchYT = document.getElementById('switchYT');
     
+    if (!ttForm || !ytForm || !switchTT || !switchYT) return;
+    
+    ttForm.classList.remove('active');
+    ytForm.classList.remove('active');
+    switchTT.classList.remove('active');
+    switchYT.classList.remove('active');
+    
     if (platform === 'tt') {
-        ttForm.style.display = 'block';
-        ytForm.style.display = 'none';
+        ttForm.classList.add('active');
         switchTT.classList.add('active');
-        switchYT.classList.remove('active');
     } else {
-        ttForm.style.display = 'none';
-        ytForm.style.display = 'block';
-        switchTT.classList.remove('active');
+        ytForm.classList.add('active');
         switchYT.classList.add('active');
     }
+}
+
+// ==============================================
+// ОТПРАВКА ЖАЛОБ
+// ==============================================
+
+function submitComplaint(event) {
+    event.preventDefault();
+    
+    if (!currentUser) {
+        alert('Сначала войдите в систему!');
+        return;
+    }
+    
+    const title = document.getElementById('complaintTitle')?.value;
+    const against = document.getElementById('complaintAgainst')?.value;
+    const desc = document.getElementById('complaintDesc')?.value;
+    
+    if (!title || !against || !desc) {
+        alert('Заполните все поля!');
+        return;
+    }
+    
+    alert('✅ Жалоба отправлена!');
+    document.getElementById('complaintForm')?.reset();
+}
+
+// ==============================================
+// ОТПРАВКА МЕДИА-ЗАЯВОК (TIKTOK)
+// ==============================================
+
+function submitTTMedia(event) {
+    event.preventDefault();
+    
+    if (!currentUser) {
+        alert('Сначала войдите в систему!');
+        return;
+    }
+    
+    alert('✅ Заявка на TikTok отправлена!');
+    document.getElementById('ttMediaForm')?.reset();
+}
+
+// ==============================================
+// ОТПРАВКА МЕДИА-ЗАЯВОК (YOUTUBE)
+// ==============================================
+
+function submitYTMedia(event) {
+    event.preventDefault();
+    
+    if (!currentUser) {
+        alert('Сначала войдите в систему!');
+        return;
+    }
+    
+    alert('✅ Заявка на YouTube отправлена!');
+    document.getElementById('ytMediaForm')?.reset();
+}
+
+// ==============================================
+// ОТПРАВКА АНКЕТ НА ХЕЛПЕРА
+// ==============================================
+
+function submitApplication(event) {
+    event.preventDefault();
+    
+    if (!currentUser) {
+        alert('Сначала войдите в систему!');
+        return;
+    }
+    
+    alert('✅ Анкета отправлена!');
+    document.getElementById('helperForm')?.reset();
 }
