@@ -13,7 +13,7 @@ let currentActionId = null;
 let currentActionType = null;
 let currentActionElement = null;
 
-// Админы
+// Админы (OWNER)
 const admins = ['milfa', 'milk123', 'Xchik_'];
 
 // ==============================================
@@ -27,6 +27,7 @@ function checkAdminAccess() {
     }
     
     document.getElementById('adminName').textContent = `🌙 ${currentAdmin.username}`;
+    document.getElementById('adminRole').textContent = 'OWNER';
     return true;
 }
 
@@ -36,46 +37,10 @@ function checkAdminAccess() {
 
 function copyIP() {
     navigator.clipboard.writeText('Moongrief.aurorix.pro').then(() => {
-        showNotification('IP скопирован!', 'success');
+        alert('📋 IP скопирован!');
+    }).catch(() => {
+        alert('❌ Ошибка копирования');
     });
-}
-
-// ==============================================
-// УВЕДОМЛЕНИЯ
-// ==============================================
-
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `admin-notification ${type}`;
-    notification.innerHTML = `
-        <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
-        <span>${message}</span>
-    `;
-    
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${type === 'success' ? '#4a9a7a' : type === 'error' ? '#9a4a4a' : '#4a4a8a'};
-        color: white;
-        padding: 12px 20px;
-        border-radius: 5px;
-        font-family: 'Roboto', sans-serif;
-        font-size: 13px;
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        animation: slideIn 0.3s;
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s';
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
 }
 
 // ==============================================
@@ -83,15 +48,19 @@ function showNotification(message, type = 'info') {
 // ==============================================
 
 function loadStats() {
-    const newComplaints = complaints.filter(c => c.status === 'new').length;
-    const newMedia = media.filter(m => m.status === 'new').length;
-    const newHelpers = helpers.filter(h => h.status === 'new').length;
+    const newComplaints = complaints.filter(c => c.status === 'НОВАЯ').length;
+    const newMedia = media.filter(m => m.status === 'НОВАЯ').length;
+    const newHelpers = helpers.filter(h => h.status === 'НОВАЯ').length;
     const total = complaints.length + media.length + helpers.length;
+    const newTotal = newComplaints + newMedia + newHelpers;
     
     document.getElementById('statComplaints').textContent = newComplaints;
     document.getElementById('statMedia').textContent = newMedia;
     document.getElementById('statHelpers').textContent = newHelpers;
     document.getElementById('statTotal').textContent = total;
+    
+    document.getElementById('totalStats').textContent = total;
+    document.getElementById('newStats').textContent = newTotal;
 }
 
 // ==============================================
@@ -113,7 +82,7 @@ function showAdminTab(tabName) {
     switch(tabName) {
         case 'complaints': loadComplaints(); break;
         case 'media': loadMedia(); break;
-        case 'helpers': loadHelpers(); break;
+        case 'applications': loadApplications(); break;
     }
 }
 
@@ -129,30 +98,37 @@ function loadComplaints() {
         return;
     }
     
-    list.innerHTML = complaints.map(c => `
-        <div class="admin-card" data-id="${c.id}" data-type="complaint">
-            <div class="admin-card-header">
-                <div class="admin-card-title">
-                    <span class="card-icon">⚠️</span>
-                    <h3>${c.title}</h3>
+    let html = '';
+    complaints.forEach(c => {
+        const statusClass = c.status === 'НОВАЯ' ? 'status-new' : c.status === 'ПРИНЯТО' ? 'status-accepted' : 'status-rejected';
+        
+        html += `
+            <div class="admin-card" data-id="${c.id}" data-type="complaint">
+                <div class="admin-card-header">
+                    <div class="admin-card-title">
+                        <span class="card-icon">⚠️</span>
+                        <h3>${c.title}</h3>
+                    </div>
+                    <span class="admin-status ${statusClass}">${c.status}</span>
                 </div>
-                <span class="admin-status status-${c.status}">${getStatusText(c.status)}</span>
+                
+                <div class="admin-card-body">
+                    <p><strong>От:</strong> ${c.user}</p>
+                    <p><strong>Нарушитель:</strong> ${c.target}</p>
+                    <p><strong>Описание:</strong> ${c.desc}</p>
+                    <p><strong>Дата:</strong> ${c.date}</p>
+                </div>
+                
+                <div class="admin-card-actions">
+                    <button onclick="acceptItem('complaint', ${c.id}, this)" class="admin-action accept" title="Принять">✓</button>
+                    <button onclick="rejectItem('complaint', ${c.id}, this)" class="admin-action reject" title="Отклонить">✗</button>
+                    <button onclick="showResponseModal('complaint', ${c.id}, '${c.user}', '${c.title}')" class="admin-action respond" title="Ответить">📝</button>
+                </div>
             </div>
-            
-            <div class="admin-card-body">
-                <p><strong>От:</strong> ${c.user}</p>
-                <p><strong>Нарушитель:</strong> ${c.target}</p>
-                <p><strong>Описание:</strong> ${c.desc}</p>
-                <p><strong>Дата:</strong> ${c.date}</p>
-            </div>
-            
-            <div class="admin-card-actions">
-                <button onclick="acceptItem('complaint', ${c.id}, this)" class="admin-action accept" title="Принять">✓</button>
-                <button onclick="rejectItem('complaint', ${c.id}, this)" class="admin-action reject" title="Отклонить">✗</button>
-                <button onclick="showResponseModal('complaint', ${c.id}, '${c.user}', '${c.title}')" class="admin-action respond" title="Ответить">📝</button>
-            </div>
-        </div>
-    `).join('');
+        `;
+    });
+    
+    list.innerHTML = html;
 }
 
 // ==============================================
@@ -167,86 +143,89 @@ function loadMedia() {
         return;
     }
     
-    list.innerHTML = media.map(m => `
-        <div class="admin-card" data-id="${m.id}" data-type="media">
-            <div class="admin-card-header">
-                <div class="admin-card-title">
-                    <span class="card-icon">${m.type === 'tt' ? '📱' : '▶️'}</span>
-                    <h3>${m.type === 'tt' ? 'TIKTOK' : 'YOUTUBE'} ЗАЯВКА</h3>
+    let html = '';
+    media.forEach(m => {
+        const platformIcon = m.type === 'tt' ? '📱' : '▶️';
+        const platformName = m.type === 'tt' ? 'TIKTOK' : 'YOUTUBE';
+        const statusClass = m.status === 'НОВАЯ' ? 'status-new' : m.status === 'ПРИНЯТО' ? 'status-accepted' : 'status-rejected';
+        
+        html += `
+            <div class="admin-card" data-id="${m.id}" data-type="media">
+                <div class="admin-card-header">
+                    <div class="admin-card-title">
+                        <span class="card-icon">${platformIcon}</span>
+                        <h3>${platformName} ЗАЯВКА</h3>
+                    </div>
+                    <span class="admin-status ${statusClass}">${m.status}</span>
                 </div>
-                <span class="admin-status status-${m.status}">${getStatusText(m.status)}</span>
+                
+                <div class="admin-card-body">
+                    <p><strong>Ник:</strong> ${m.nick}</p>
+                    <p><strong>Имя:</strong> ${m.name}</p>
+                    <p><strong>Возраст:</strong> ${m.age}</p>
+                    <p><strong>Подписчики:</strong> ${m.subs}</p>
+                    <p><strong>Ссылка:</strong> <a href="${m.link}" target="_blank">${m.link}</a></p>
+                    <p><strong>Дата:</strong> ${m.date}</p>
+                </div>
+                
+                <div class="admin-card-actions">
+                    <button onclick="acceptItem('media', ${m.id}, this)" class="admin-action accept" title="Принять">✓</button>
+                    <button onclick="rejectItem('media', ${m.id}, this)" class="admin-action reject" title="Отклонить">✗</button>
+                    <button onclick="showResponseModal('media', ${m.id}, '${m.nick}', '${platformName} ЗАЯВКА')" class="admin-action respond" title="Ответить">📝</button>
+                </div>
             </div>
-            
-            <div class="admin-card-body">
-                <p><strong>Ник:</strong> ${m.nick}</p>
-                <p><strong>Имя:</strong> ${m.name}</p>
-                <p><strong>Возраст:</strong> ${m.age}</p>
-                <p><strong>Подписчики:</strong> ${m.subs}</p>
-                <p><strong>Ссылка:</strong> <a href="${m.link}" target="_blank">${m.link}</a></p>
-                <p><strong>Дата:</strong> ${m.date}</p>
-            </div>
-            
-            <div class="admin-card-actions">
-                <button onclick="acceptItem('media', ${m.id}, this)" class="admin-action accept" title="Принять">✓</button>
-                <button onclick="rejectItem('media', ${m.id}, this)" class="admin-action reject" title="Отклонить">✗</button>
-                <button onclick="showResponseModal('media', ${m.id}, '${m.nick}', '${m.type === 'tt' ? 'TikTok' : 'YouTube'} заявка')" class="admin-action respond" title="Ответить">📝</button>
-            </div>
-        </div>
-    `).join('');
+        `;
+    });
+    
+    list.innerHTML = html;
 }
 
 // ==============================================
 // ЗАГРУЗКА ХЕЛПЕРОВ
 // ==============================================
 
-function loadHelpers() {
-    const list = document.getElementById('helpersList');
+function loadApplications() {
+    const list = document.getElementById('applicationsList');
     
     if (helpers.length === 0) {
         list.innerHTML = '<div class="empty-list">📭 Нет анкет</div>';
         return;
     }
     
-    list.innerHTML = helpers.map(h => `
-        <div class="admin-card" data-id="${h.id}" data-type="helper">
-            <div class="admin-card-header">
-                <div class="admin-card-title">
-                    <span class="card-icon">👮</span>
-                    <h3>АНКЕТА НА ХЕЛПЕРА</h3>
+    let html = '';
+    helpers.forEach(h => {
+        const statusClass = h.status === 'НОВАЯ' ? 'status-new' : h.status === 'ПРИНЯТО' ? 'status-accepted' : 'status-rejected';
+        
+        html += `
+            <div class="admin-card" data-id="${h.id}" data-type="helper">
+                <div class="admin-card-header">
+                    <div class="admin-card-title">
+                        <span class="card-icon">👮</span>
+                        <h3>АНКЕТА НА ХЕЛПЕРА</h3>
+                    </div>
+                    <span class="admin-status ${statusClass}">${h.status}</span>
                 </div>
-                <span class="admin-status status-${h.status}">${getStatusText(h.status)}</span>
+                
+                <div class="admin-card-body">
+                    <p><strong>Ник:</strong> ${h.nick}</p>
+                    <p><strong>Имя:</strong> ${h.name}</p>
+                    <p><strong>Возраст:</strong> ${h.age}</p>
+                    <p><strong>Часовой пояс:</strong> ${h.tz}</p>
+                    <p><strong>Опыт:</strong> ${h.exp}</p>
+                    <p><strong>Мотивация:</strong> ${h.why}</p>
+                    <p><strong>Дата:</strong> ${h.date}</p>
+                </div>
+                
+                <div class="admin-card-actions">
+                    <button onclick="acceptItem('helper', ${h.id}, this)" class="admin-action accept" title="Принять">✓</button>
+                    <button onclick="rejectItem('helper', ${h.id}, this)" class="admin-action reject" title="Отклонить">✗</button>
+                    <button onclick="showResponseModal('helper', ${h.id}, '${h.nick}', 'АНКЕТА НА ХЕЛПЕРА')" class="admin-action respond" title="Ответить">📝</button>
+                </div>
             </div>
-            
-            <div class="admin-card-body">
-                <p><strong>Ник:</strong> ${h.nick}</p>
-                <p><strong>Имя:</strong> ${h.name}</p>
-                <p><strong>Возраст:</strong> ${h.age}</p>
-                <p><strong>Часовой пояс:</strong> ${h.tz}</p>
-                <p><strong>Опыт:</strong> ${h.exp}</p>
-                <p><strong>Мотивация:</strong> ${h.why}</p>
-                <p><strong>Дата:</strong> ${h.date}</p>
-            </div>
-            
-            <div class="admin-card-actions">
-                <button onclick="acceptItem('helper', ${h.id}, this)" class="admin-action accept" title="Принять">✓</button>
-                <button onclick="rejectItem('helper', ${h.id}, this)" class="admin-action reject" title="Отклонить">✗</button>
-                <button onclick="showResponseModal('helper', ${h.id}, '${h.nick}', 'Анкета на хелпера')" class="admin-action respond" title="Ответить">📝</button>
-            </div>
-        </div>
-    `).join('');
-}
-
-// ==============================================
-// СТАТУСЫ
-// ==============================================
-
-function getStatusText(status) {
-    switch(status) {
-        case 'new': return 'НОВАЯ';
-        case 'accepted': return 'ПРИНЯТО';
-        case 'rejected': return 'ОТКЛОНЕНО';
-        default: return status;
-    }
+        `;
+    });
+    
+    list.innerHTML = html;
 }
 
 // ==============================================
@@ -266,14 +245,14 @@ function acceptItem(type, id, btn) {
     
     const item = array.find(i => i.id === id);
     if (item) {
-        item.status = 'accepted';
+        item.status = 'ПРИНЯТО';
         localStorage.setItem(`mg_${type === 'helper' ? 'helpers' : type + 's'}`, JSON.stringify(array));
     }
     
     statusBadge.textContent = 'ПРИНЯТО';
     statusBadge.className = 'admin-status status-accepted';
     
-    showNotification('✅ Заявка принята', 'success');
+    showNotification('✅ Заявка принята');
     loadStats();
 }
 
@@ -290,15 +269,42 @@ function rejectItem(type, id, btn) {
     
     const item = array.find(i => i.id === id);
     if (item) {
-        item.status = 'rejected';
+        item.status = 'ОТКЛОНЕНО';
         localStorage.setItem(`mg_${type === 'helper' ? 'helpers' : type + 's'}`, JSON.stringify(array));
     }
     
     statusBadge.textContent = 'ОТКЛОНЕНО';
     statusBadge.className = 'admin-status status-rejected';
     
-    showNotification('❌ Заявка отклонена', 'error');
+    showNotification('❌ Заявка отклонена');
     loadStats();
+}
+
+// ==============================================
+// УВЕДОМЛЕНИЯ
+// ==============================================
+
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'admin-notification';
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4a4a8a;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        z-index: 10000;
+        animation: slideIn 0.3s;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
 }
 
 // ==============================================
@@ -325,16 +331,14 @@ function closeResponseModal() {
 function sendResponse(event) {
     event.preventDefault();
     
-    const id = document.getElementById('responseId').value;
-    const type = document.getElementById('responseType').value;
     const response = document.getElementById('responseText').value;
     
     if (!response.trim()) {
-        showNotification('Введите текст ответа', 'error');
+        alert('Введите текст ответа');
         return;
     }
     
-    showNotification(`📨 Ответ на заявку #${id} отправлен`, 'success');
+    alert('📨 Ответ отправлен');
     closeResponseModal();
 }
 
@@ -380,7 +384,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadStats();
     loadComplaints();
     
-    // Добавляем стили для админки
+    // Добавляем стили
     const style = document.createElement('style');
     style.textContent = `
         .stats-grid {
@@ -391,13 +395,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         .stat-card {
-            background: #1a1a3a;
+            background: rgba(26, 26, 58, 0.8);
             border: 2px solid #4a4a8a;
-            border-radius: 10px;
+            border-radius: 20px;
             padding: 20px;
             display: flex;
             align-items: center;
             gap: 15px;
+            backdrop-filter: blur(5px);
         }
         
         .stat-icon {
@@ -406,7 +411,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         .stat-info h3 {
             color: #8a8aff;
-            font-size: 10px;
+            font-size: 11px;
             margin-bottom: 5px;
         }
         
@@ -418,27 +423,36 @@ document.addEventListener('DOMContentLoaded', function() {
         
         .admin-tabs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 15px;
+            margin-bottom: 25px;
         }
         
         .tab-btn {
-            background: #1a1a3a;
-            border: 1px solid #4a4a8a;
-            color: #b0b0ff;
-            padding: 12px 20px;
-            border-radius: 5px;
-            cursor: pointer;
             flex: 1;
+            background: rgba(42, 42, 74, 0.8);
+            border: 2px solid #4a4a8a;
+            color: #b0b0ff;
+            padding: 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 11px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn:hover {
+            background: #4a4a8a;
+            color: white;
         }
         
         .tab-btn.active {
-            background: #4a4a8a;
+            background: linear-gradient(135deg, #4a4a8a, #6a6aaa);
             color: white;
+            box-shadow: 0 0 25px #7a7aff;
         }
         
         .tab-content {
@@ -456,27 +470,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         .admin-refresh-btn {
-            background: #2a2a4a;
-            border: 1px solid #4a4a8a;
+            background: rgba(42, 42, 74, 0.8);
+            border: 2px solid #4a4a8a;
             color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
+            padding: 10px 20px;
+            border-radius: 30px;
             cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
+            transition: all 0.3s;
         }
         
         .admin-refresh-btn:hover {
             background: #4a4a8a;
+            box-shadow: 0 0 20px #7a7aff;
         }
         
         .admin-card {
-            background: #1a1a3a;
-            border: 1px solid #4a4a8a;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 15px;
+            background: rgba(26, 26, 58, 0.8);
+            border: 2px solid #4a4a8a;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+        }
+        
+        .admin-card:hover {
+            transform: translateX(10px);
+            box-shadow: -10px 10px 30px rgba(122, 122, 255, 0.3);
+            border-color: #8a8aff;
         }
         
         .admin-card-header {
@@ -485,7 +511,7 @@ document.addEventListener('DOMContentLoaded', function() {
             align-items: center;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #4a4a8a;
+            border-bottom: 2px solid #4a4a8a;
         }
         
         .admin-card-title {
@@ -500,33 +526,47 @@ document.addEventListener('DOMContentLoaded', function() {
         
         .admin-card-title h3 {
             color: #b0b0ff;
-            font-size: 12px;
+            font-size: 13px;
         }
         
         .admin-status {
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 9px;
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 10px;
             font-weight: bold;
         }
         
-        .status-new { background: #4a4a8a; color: white; }
-        .status-accepted { background: #4a9a7a; color: white; }
-        .status-rejected { background: #9a4a4a; color: white; }
+        .status-new {
+            background: #4a4a8a;
+            color: white;
+            box-shadow: 0 0 15px #4a4a8a;
+        }
+        
+        .status-accepted {
+            background: #4a9a7a;
+            color: white;
+            box-shadow: 0 0 15px #4a9a7a;
+        }
+        
+        .status-rejected {
+            background: #9a4a4a;
+            color: white;
+            box-shadow: 0 0 15px #9a4a4a;
+        }
         
         .admin-card-body {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         .admin-card-body p {
             color: #c0c0ff;
             font-size: 11px;
-            margin: 5px 0;
+            margin: 8px 0;
         }
         
         .admin-card-body strong {
             color: #b0b0ff;
-            min-width: 80px;
+            min-width: 90px;
             display: inline-block;
         }
         
@@ -541,20 +581,20 @@ document.addEventListener('DOMContentLoaded', function() {
         
         .admin-card-actions {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             justify-content: flex-end;
-            border-top: 1px solid #4a4a8a;
-            padding-top: 15px;
+            border-top: 2px solid #4a4a8a;
+            padding-top: 20px;
         }
         
         .admin-action {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             border: 2px solid;
-            background: #2a2a4a;
+            background: rgba(42, 42, 74, 0.8);
             cursor: pointer;
-            font-size: 18px;
+            font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -569,6 +609,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .admin-action.accept:hover {
             background: #4aff7a;
             color: #1a1a3a;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px #4aff7a;
         }
         
         .admin-action.reject {
@@ -579,6 +621,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .admin-action.reject:hover {
             background: #ff4a4a;
             color: #1a1a3a;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px #ff4a4a;
         }
         
         .admin-action.respond {
@@ -589,42 +633,31 @@ document.addEventListener('DOMContentLoaded', function() {
         .admin-action.respond:hover {
             background: #8a8aff;
             color: #1a1a3a;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px #8a8aff;
         }
         
         .response-info {
-            background: #2a2a4a;
-            padding: 10px;
-            border-radius: 5px;
+            background: rgba(42, 42, 74, 0.8);
+            padding: 12px;
+            border-radius: 10px;
             color: #b0b0ff;
+            border: 1px solid #4a4a8a;
         }
         
         .action-group {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             margin-top: 20px;
         }
         
         .cancel-btn {
-            background: #4a3a3a !important;
-            border-color: #9a6a6a !important;
-        }
-        
-        .empty-list {
-            text-align: center;
-            padding: 50px;
-            background: #1a1a3a;
-            border-radius: 10px;
-            color: #7a7aaa;
+            background: linear-gradient(135deg, #8a4a4a, #aa6a6a) !important;
         }
         
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
         }
     `;
     
