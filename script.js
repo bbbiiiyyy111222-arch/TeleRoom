@@ -1,8 +1,8 @@
 // ==============================================
-// ОСНОВНОЙ СКРИПТ BLADEBOX - ИСПРАВЛЕННАЯ ВЕРСИЯ
+// ОСНОВНОЙ СКРИПТ BLADEBOX - РАБОЧАЯ ВЕРСИЯ
 // ==============================================
 
-// Данные - ТОЛЬКО ОДИН РАЗ!
+// Данные
 let users = [];
 let complaints = [];
 let applications = [];
@@ -116,8 +116,8 @@ function showDefaultSection() {
     if (rulesLink) rulesLink.classList.add('active');
 }
 
-// Показать секцию - ВАЖНО!
-function showSection(sectionId, event) {
+// Показать секцию - ИСПРАВЛЕНО!
+window.showSection = function(sectionId, event) {
     const sections = document.querySelectorAll('.section');
     const targetSection = document.getElementById(sectionId);
     
@@ -137,7 +137,7 @@ function showSection(sectionId, event) {
         const link = document.querySelector(`[href="#${sectionId}"]`);
         if (link) link.classList.add('active');
     }
-}
+};
 
 // Загрузка данных из базы
 async function loadDataFromDB() {
@@ -162,16 +162,16 @@ async function loadDataFromDB() {
 }
 
 // Копирование IP
-function copyIP() {
+window.copyIP = function() {
     navigator.clipboard.writeText('bladebox.aurorix.pro');
     alert('IP скопирован в буфер обмена!');
-}
+};
 
 // ==============================================
 // АВТОРИЗАЦИЯ
 // ==============================================
 
-async function login() {
+window.login = async function() {
     const username = document.getElementById('username')?.value.trim();
     const password = document.getElementById('password')?.value.trim();
     
@@ -199,9 +199,9 @@ async function login() {
         console.error('Ошибка авторизации:', error);
         alert('Ошибка при авторизации');
     }
-}
+};
 
-function logout() {
+window.logout = function() {
     currentUser = null;
     localStorage.removeItem('currentUser');
     updateAuth();
@@ -209,7 +209,7 @@ function logout() {
     if (window.location.pathname.includes('admin.html')) {
         window.location.href = 'index.html';
     }
-}
+};
 
 function updateAuth() {
     const userInfo = document.getElementById('userInfo');
@@ -237,12 +237,12 @@ function updateAuth() {
 // РЕГИСТРАЦИЯ
 // ==============================================
 
-function showRegister() {
+window.showRegister = function() {
     const modal = document.getElementById('registerModal');
     if (modal) modal.style.display = 'block';
-}
+};
 
-function closeModal() {
+window.closeModal = function() {
     const modal = document.getElementById('registerModal');
     if (modal) modal.style.display = 'none';
     
@@ -253,9 +253,9 @@ function closeModal() {
     if (regUsername) regUsername.value = '';
     if (regPassword) regPassword.value = '';
     if (regConfirm) regConfirm.value = '';
-}
+};
 
-async function register(event) {
+window.register = async function(event) {
     event.preventDefault();
     
     const username = document.getElementById('regUsername')?.value.trim();
@@ -321,22 +321,22 @@ async function register(event) {
         console.error('Ошибка регистрации:', error);
         alert('Ошибка при регистрации');
     }
-}
+};
 
 // ==============================================
 // СМЕНА ПАРОЛЯ
 // ==============================================
 
-function showChangePassword() {
+window.showChangePassword = function() {
     if (!currentUser) {
         alert('Сначала войдите в систему!');
         return;
     }
     const modal = document.getElementById('changePasswordModal');
     if (modal) modal.style.display = 'block';
-}
+};
 
-function closeChangePassword() {
+window.closeChangePassword = function() {
     const modal = document.getElementById('changePasswordModal');
     if (modal) modal.style.display = 'none';
     
@@ -347,9 +347,9 @@ function closeChangePassword() {
     if (oldPass) oldPass.value = '';
     if (newPass) newPass.value = '';
     if (confirm) confirm.value = '';
-}
+};
 
-async function changePassword(event) {
+window.changePassword = async function(event) {
     event.preventDefault();
     
     const oldPass = document.getElementById('oldPassword')?.value;
@@ -394,7 +394,7 @@ async function changePassword(event) {
         console.error('Ошибка смены пароля:', error);
         alert('❌ Ошибка при смене пароля');
     }
-}
+};
 
 // Проверка доступа к админке
 function checkAdminLink() {
@@ -412,7 +412,7 @@ function checkAdminLink() {
 // ОТПРАВКА ЖАЛОБ
 // ==============================================
 
-async function submitComplaint(event) {
+window.submitComplaint = async function(event) {
     event.preventDefault();
     
     if (!currentUser) {
@@ -456,13 +456,13 @@ async function submitComplaint(event) {
         console.error('Ошибка:', error);
         alert('❌ Ошибка при отправке жалобы');
     }
-}
+};
 
 // ==============================================
 // ОТПРАВКА МЕДИА-ЗАЯВОК (TIKTOK)
 // ==============================================
 
-async function submitTTMedia(event) {
+window.submitTTMedia = async function(event) {
     event.preventDefault();
     
     if (!currentUser) {
@@ -513,13 +513,13 @@ async function submitTTMedia(event) {
         console.error('Ошибка:', error);
         alert('❌ Ошибка при отправке заявки');
     }
-}
+};
 
 // ==============================================
 // ОТПРАВКА МЕДИА-ЗАЯВОК (YOUTUBE)
 // ==============================================
 
-async function submitYTMedia(event) {
+window.submitYTMedia = async function(event) {
     event.preventDefault();
     
     if (!currentUser) {
@@ -570,13 +570,13 @@ async function submitYTMedia(event) {
         console.error('Ошибка:', error);
         alert('❌ Ошибка при отправке заявки');
     }
-}
+};
 
 // ==============================================
 // ОТПРАВКА АНКЕТ НА ХЕЛПЕРА
 // ==============================================
 
-async function submitApplication(event) {
+window.submitApplication = async function(event) {
     event.preventDefault();
     
     if (!currentUser) {
@@ -628,7 +628,7 @@ async function submitApplication(event) {
         console.error('Ошибка:', error);
         alert('❌ Ошибка при отправке анкеты');
     }
-}
+};
 
 // ==============================================
 // ЗАГРУЗКА ЖАЛОБ
@@ -783,7 +783,7 @@ async function loadLists() {
 // ДЕТАЛЬНЫЙ ПРОСМОТР
 // ==============================================
 
-function openComplaintDetails(id) {
+window.openComplaintDetails = function(id) {
     const complaint = complaints.find(c => c.id === id);
     if (!complaint) return;
     
@@ -801,9 +801,9 @@ function openComplaintDetails(id) {
     }
     
     alert(message);
-}
+};
 
-function openMediaDetails(id) {
+window.openMediaDetails = function(id) {
     const media = mediaApplications.find(m => m.id === id);
     if (!media) return;
     
@@ -827,9 +827,9 @@ function openMediaDetails(id) {
     }
     
     alert(message);
-}
+};
 
-function openApplicationDetails(id) {
+window.openApplicationDetails = function(id) {
     const application = applications.find(a => a.id === id);
     if (!application) return;
     
@@ -856,4 +856,4 @@ function openApplicationDetails(id) {
     }
     
     alert(message);
-}
+};
