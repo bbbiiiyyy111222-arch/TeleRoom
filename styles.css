@@ -1093,4 +1093,214 @@ body::before {
 .complaint-card, .media-card, .application-card {
     background: rgba(26, 26, 58, 0.8);
     border: 2px solid #4a4a8a;
-    border
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: all 0.3s;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+}
+
+.complaint-card:hover, .media-card:hover, .application-card:hover {
+    transform: translateX(10px) translateY(-3px);
+    box-shadow: -10px 10px 30px rgba(122, 122, 255, 0.4);
+    border-color: #8a8aff;
+    background: rgba(36, 36, 78, 0.9);
+}
+
+.complaint-header, .media-header, .application-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #4a4a8a;
+}
+
+.complaint-title, .media-title, .application-title {
+    color: #b0b0ff;
+    font-size: 13px;
+    font-weight: bold;
+    text-shadow: 0 0 5px #4a4a8a;
+}
+
+.complaint-status, .media-status, .application-status {
+    padding: 5px 15px;
+    border-radius: 30px;
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: 0 0 10px currentColor;
+}
+
+.status-new {
+    background: #4a4a8a;
+    color: white;
+    box-shadow: 0 0 15px #4a4a8a;
+}
+
+.status-accepted {
+    background: #4a9a7a;
+    color: white;
+    box-shadow: 0 0 15px #4a9a7a;
+}
+
+.status-rejected {
+    background: #9a4a4a;
+    color: white;
+    box-shadow: 0 0 15px #9a4a4a;
+}
+
+.complaint-body, .media-body, .application-body {
+    color: #c0c0ff;
+    font-size: 11px;
+}
+
+.complaint-body p, .media-body p, .application-body p {
+    margin: 8px 0;
+    line-height: 1.6;
+}
+
+.complaint-body strong, .media-body strong, .application-body strong {
+    color: #b0b0ff;
+    min-width: 100px;
+    display: inline-block;
+}
+
+/* ==============================================
+   МОДАЛЬНЫЕ ОКНА
+   ============================================== */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(15px);
+    animation: modalFade 0.3s;
+}
+
+@keyframes modalFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #1a1a3a, #0f0f1f);
+    margin: 5% auto;
+    padding: 40px;
+    border: 3px solid #4a4a8a;
+    border-radius: 40px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    animation: modalSlide 0.5s;
+    box-shadow: 0 0 100px rgba(122, 122, 255, 0.5);
+}
+
+@keyframes modalSlide {
+    from {
+        transform: translateY(-100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-content h2 {
+    color: #b0b0ff;
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 25px #7a7aff;
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 30px;
+    cursor: pointer;
+    color: #b0b0ff;
+    transition: all 0.3s;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(74, 74, 138, 0.3);
+}
+
+.close:hover {
+    color: white;
+    background: #4a4a8a;
+    transform: rotate(180deg) scale(1.1);
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ==============================================
+   ПУСТЫЕ СОСТОЯНИЯ
+   ============================================== */
+
+.empty-list {
+    text-align: center;
+    padding: 60px 20px;
+    background: rgba(26, 26, 58, 0.8);
+    border: 2px dashed #4a4a8a;
+    border-radius: 30px;
+    color: #7a7aaa;
+    font-size: 12px;
+    backdrop-filter: blur(5px);
+}
+
+/* ==============================================
+   АДАПТИВНОСТЬ
+   ============================================== */
+
+@media (max-width: 768px) {
+    .device-title { font-size: 24px; }
+    .device-btn { padding: 30px 40px; min-width: 220px; }
+    .device-icon { font-size: 60px; }
+    
+    .header-content { flex-direction: column; text-align: center; }
+    .logo h1 { font-size: 20px; }
+    .server-ip { flex-direction: column; }
+    
+    .info-items { flex-direction: column; }
+    .info-item { width: 100%; }
+    
+    .nav .container { flex-wrap: nowrap; overflow-x: auto; }
+    .nav-btn { white-space: nowrap; font-size: 10px; padding: 8px 15px; }
+    
+    .form-row { flex-direction: column; }
+    .rule-item { flex-direction: column; gap: 5px; }
+    .rule-num { min-width: auto; }
+    .mini-punish { margin-left: 0; margin-top: 5px; display: inline-block; }
+    
+    .tabs { flex-direction: column; }
+}
+
+@media (max-width: 480px) {
+    .device-title { font-size: 18px; }
+    .device-btn { padding: 20px 30px; min-width: 180px; }
+    .device-icon { font-size: 48px; }
+    .device-name { font-size: 14px; }
+    
+    .section-title { font-size: 18px; }
+    .form-title, .list-title { font-size: 14px; }
+    .submit-btn { font-size: 11px; }
+}
