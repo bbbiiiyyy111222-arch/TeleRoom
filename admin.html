@@ -3,82 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌙 MoonGrief-Forum - Админ панель</title>
+    <title>MoonGrief-Forum 🌙 Админ панель</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- ЗАЩИТА -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    
+    <script>
+        // Защита от просмотра кода
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', function(e) {
+            if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73) || (e.ctrlKey && e.keyCode == 85)) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
 </head>
 <body>
-    <!-- Кнопка смены устройства (только если зашли с мобильной версии) -->
-    <div class="device-switch" id="deviceSwitch">
-        <button onclick="showDeviceChoice()" class="device-switch-btn">
-            <span>🌙</span> СМЕНИТЬ УСТРОЙСТВО <span>🌙</span>
-        </button>
-    </div>
-
+    <!-- ШАПКА -->
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <h1 class="logo">🌙 MOONGRIEF ADMIN</h1>
-                <div class="auth">
-                    <span id="adminName" class="moon-glow"></span>
-                    <button onclick="logout()" class="btn-moon logout-btn">
-                        <span>🌙</span>
-                        <span>ВЫЙТИ</span>
-                    </button>
+                <div class="logo">
+                    <h1>🌙 MOONGRIEF ADMIN</h1>
+                    <div class="server-ip">
+                        <span>Сервер: Moongrief.aurorix.pro</span>
+                        <button onclick="copyIP()" class="copy-btn">📋 КОПИРОВАТЬ IP</button>
+                    </div>
+                </div>
+                
+                <!-- Админ информация -->
+                <div class="auth" id="auth">
+                    <div id="adminInfo">
+                        <span id="adminName" class="moon-glow"></span>
+                        <button onclick="logout()" class="btn-moon logout-btn">
+                            <span>🚪</span>
+                            <span>ВЫЙТИ</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </header>
 
+    <!-- МЕНЮ -->
     <nav class="nav">
         <div class="container">
             <a href="index.html" class="nav-link">🌙 ГЛАВНАЯ</a>
-            <a href="admin.html" class="nav-link active">🌙 АДМИН ПАНЕЛЬ</a>
+            <a href="admin.html" class="nav-link active">⚡ АДМИН ПАНЕЛЬ</a>
         </div>
     </nav>
 
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
     <main class="main">
         <div class="container">
-            <!-- Статистика -->
+            <!-- СТАТИСТИКА -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon">⚠️</div>
                     <div class="stat-info">
-                        <h3>НОВЫЕ ЖАЛОБЫ</h3>
-                        <span id="newComplaints" class="stat-number">0</span>
+                        <h3>ЖАЛОБЫ</h3>
+                        <span id="statComplaints" class="stat-number">0</span>
                     </div>
-                    <div class="stat-glow"></div>
                 </div>
                 
                 <div class="stat-card">
                     <div class="stat-icon">📱</div>
                     <div class="stat-info">
-                        <h3>МЕДИА-ЗАЯВКИ</h3>
-                        <span id="newMedia" class="stat-number">0</span>
+                        <h3>МЕДИА</h3>
+                        <span id="statMedia" class="stat-number">0</span>
                     </div>
-                    <div class="stat-glow"></div>
                 </div>
                 
                 <div class="stat-card">
                     <div class="stat-icon">👮</div>
                     <div class="stat-info">
-                        <h3>НОВЫЕ АНКЕТЫ</h3>
-                        <span id="newApplications" class="stat-number">0</span>
+                        <h3>ХЕЛПЕРЫ</h3>
+                        <span id="statHelpers" class="stat-number">0</span>
                     </div>
-                    <div class="stat-glow"></div>
                 </div>
                 
                 <div class="stat-card">
                     <div class="stat-icon">📊</div>
                     <div class="stat-info">
                         <h3>ВСЕГО</h3>
-                        <span id="total" class="stat-number">0</span>
+                        <span id="statTotal" class="stat-number">0</span>
                     </div>
-                    <div class="stat-glow"></div>
                 </div>
             </div>
 
-            <!-- Вкладки -->
+            <!-- ВКЛАДКИ -->
             <div class="admin-tabs">
                 <button class="tab-btn active" onclick="showAdminTab('complaints')">
                     <span class="tab-icon">⚠️</span>
@@ -88,17 +106,17 @@
                     <span class="tab-icon">📱</span>
                     <span class="tab-text">МЕДИА</span>
                 </button>
-                <button class="tab-btn" onclick="showAdminTab('applications')">
+                <button class="tab-btn" onclick="showAdminTab('helpers')">
                     <span class="tab-icon">👮</span>
-                    <span class="tab-text">АНКЕТЫ</span>
+                    <span class="tab-text">ХЕЛПЕРЫ</span>
                 </button>
             </div>
 
-            <!-- Контент вкладок -->
+            <!-- КОНТЕНТ ВКЛАДОК -->
             <div id="adminComplaints" class="tab-content active">
                 <div class="admin-controls">
-                    <button class="admin-refresh-btn" onclick="loadComplaints()">
-                        <span>🌙</span> ОБНОВИТЬ <span>🌙</span>
+                    <button onclick="loadComplaints()" class="admin-refresh-btn">
+                        <span>🔄</span> ОБНОВИТЬ
                     </button>
                 </div>
                 <div id="complaintsList" class="admin-list"></div>
@@ -106,55 +124,55 @@
             
             <div id="adminMedia" class="tab-content">
                 <div class="admin-controls">
-                    <button class="admin-refresh-btn" onclick="loadMedia()">
-                        <span>🌙</span> ОБНОВИТЬ <span>🌙</span>
+                    <button onclick="loadMedia()" class="admin-refresh-btn">
+                        <span>🔄</span> ОБНОВИТЬ
                     </button>
                 </div>
                 <div id="mediaList" class="admin-list"></div>
             </div>
             
-            <div id="adminApplications" class="tab-content">
+            <div id="adminHelpers" class="tab-content">
                 <div class="admin-controls">
-                    <button class="admin-refresh-btn" onclick="loadApplications()">
-                        <span>🌙</span> ОБНОВИТЬ <span>🌙</span>
+                    <button onclick="loadHelpers()" class="admin-refresh-btn">
+                        <span>🔄</span> ОБНОВИТЬ
                     </button>
                 </div>
-                <div id="applicationsList" class="admin-list"></div>
+                <div id="helpersList" class="admin-list"></div>
             </div>
         </div>
     </main>
 
-    <!-- Модальное окно для ответа -->
+    <!-- МОДАЛКА ОТВЕТА -->
     <div id="responseModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeResponseModal()">×</span>
-            <h2>🌙 ОТВЕТ НА ОБРАЩЕНИЕ</h2>
+            <h2>📝 ОТВЕТ НА ОБРАЩЕНИЕ</h2>
             <form id="responseForm" onsubmit="sendResponse(event)" class="modal-form">
                 <input type="hidden" id="responseId">
                 <input type="hidden" id="responseType">
                 
                 <div class="form-group">
-                    <label>👤 ПОЛЬЗОВАТЕЛЬ</label>
-                    <div id="responseUser" class="response-user"></div>
+                    <label>ПОЛЬЗОВАТЕЛЬ</label>
+                    <div id="responseUser" class="response-info"></div>
                 </div>
                 
                 <div class="form-group">
-                    <label>📝 ТЕМА</label>
-                    <div id="responseTopic" class="response-topic"></div>
+                    <label>ТЕМА</label>
+                    <div id="responseTopic" class="response-info"></div>
                 </div>
                 
                 <div class="form-group">
-                    <label>💬 ВАШ ОТВЕТ</label>
-                    <textarea id="responseText" placeholder="ВВЕДИТЕ ТЕКСТ ОТВЕТА..." required class="textarea" rows="6"></textarea>
+                    <label>ТЕКСТ ОТВЕТА</label>
+                    <textarea id="responseText" placeholder="ВВЕДИТЕ ТЕКСТ ОТВЕТА..." required class="textarea" rows="5"></textarea>
                 </div>
                 
                 <div class="action-group">
                     <button type="submit" class="submit-btn">
-                        <span class="btn-icon">🌙</span>
+                        <span class="btn-icon">📨</span>
                         <span class="btn-text">ОТПРАВИТЬ</span>
                     </button>
                     <button type="button" onclick="closeResponseModal()" class="submit-btn cancel-btn">
-                        <span class="btn-icon">✗</span>
+                        <span class="btn-icon">✖</span>
                         <span class="btn-text">ОТМЕНА</span>
                     </button>
                 </div>
@@ -162,26 +180,22 @@
         </div>
     </div>
 
-    <!-- Модальное окно подтверждения -->
+    <!-- МОДАЛКА ПОДТВЕРЖДЕНИЯ -->
     <div id="confirmModal" class="modal">
         <div class="modal-content" style="max-width: 400px;">
-            <h2>🌙 ПОДТВЕРЖДЕНИЕ</h2>
-            <p id="confirmMessage" style="text-align: center; margin: 30px 0; color: #b0b0ff; font-size: 14px;"></p>
+            <h2>⚡ ПОДТВЕРЖДЕНИЕ</h2>
+            <p id="confirmMessage" style="text-align: center; margin: 30px 0; color: #b0b0ff; font-size: 12px;"></p>
             <div class="action-group" style="justify-content: center;">
-                <button onclick="confirmAction()" class="submit-btn" style="width: auto; min-width: 120px;">
-                    <span class="btn-icon">✓</span>
-                    <span class="btn-text">ДА</span>
+                <button onclick="confirmAction()" class="submit-btn" style="width: auto; min-width: 100px;">
+                    <span>✓</span> ДА
                 </button>
-                <button onclick="closeConfirmModal()" class="submit-btn cancel-btn" style="width: auto; min-width: 120px;">
-                    <span class="btn-icon">✗</span>
-                    <span class="btn-text">НЕТ</span>
+                <button onclick="closeConfirmModal()" class="submit-btn cancel-btn" style="width: auto; min-width: 100px;">
+                    <span>✖</span> НЕТ
                 </button>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="db.js"></script>
     <script src="admin.js"></script>
 </body>
 </html>
