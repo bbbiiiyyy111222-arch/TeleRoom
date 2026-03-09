@@ -33,26 +33,26 @@
 </head>
 <body>
     <!-- Экран выбора устройства -->
-    <div id="deviceChoice" class="device-choice">
-        <div class="device-choice-content">
-            <h1 class="device-title">🌙 MOONGRIEF-FORUM</h1>
-            <p class="device-subtitle">ВЫБЕРИТЕ ВАШЕ УСТРОЙСТВО</p>
+<div id="deviceChoice" class="device-choice">
+    <div class="device-choice-content">
+        <h1 class="device-title">🌙 MOONGRIEF-FORUM</h1>
+        <p class="device-subtitle">ВЫБЕРИТЕ ВАШЕ УСТРОЙСТВО</p>
+        
+        <div class="device-buttons">
+            <button onclick="selectDevice('pc')" class="device-btn pc-btn">
+                <span class="device-icon">🖥️</span>
+                <span class="device-name">ПК / НОУТБУК</span>
+            </button>
             
-            <div class="device-buttons">
-                <button onclick="selectDevice('pc')" class="device-btn pc-btn">
-                    <span class="device-icon">🖥️</span>
-                    <span class="device-name">ПК / НОУТБУК</span>
-                </button>
-                
-                <button onclick="selectDevice('mobile')" class="device-btn mobile-btn">
-                    <span class="device-icon">📱</span>
-                    <span class="device-name">ТЕЛЕФОН</span>
-                </button>
-            </div>
-            
-            <p class="device-note">Выбор нужен для лучшего отображения сайта</p>
+            <button onclick="selectDevice('mobile')" class="device-btn mobile-btn">
+                <span class="device-icon">📱</span>
+                <span class="device-name">ТЕЛЕФОН</span>
+            </button>
         </div>
+        
+        <p class="device-note">Выбор нужен для лучшего отображения сайта</p>
     </div>
+</div>
 
     <!-- Основной сайт (изначально скрыт) -->
     <div id="mainSite" style="display: none;">
