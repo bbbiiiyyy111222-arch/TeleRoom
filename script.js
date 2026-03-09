@@ -1,5 +1,5 @@
 // ==============================================
-// MOONGRIEF-FORUM - ПОЛНЫЙ СКРИПТ
+// MOONGRIEF-FORUM - РАБОЧИЙ СКРИПТ
 // ==============================================
 
 // ==================== ДАННЫЕ ====================
@@ -11,8 +11,22 @@ let helpers = JSON.parse(localStorage.getItem('mg_helpers')) || [];
 let currentUser = JSON.parse(localStorage.getItem('mg_currentUser')) || null;
 let currentDevice = localStorage.getItem('mg_device') || null;
 
-// Админы
+// Админы (OWNER)
 const admins = ['milfa', 'milk123', 'Xchik_'];
+
+// ==================== СОХРАНЕНИЕ ====================
+function saveData() {
+    localStorage.setItem('mg_users', JSON.stringify(users));
+    localStorage.setItem('mg_complaints', JSON.stringify(complaints));
+    localStorage.setItem('mg_media', JSON.stringify(media));
+    localStorage.setItem('mg_helpers', JSON.stringify(helpers));
+    
+    if (currentUser) {
+        localStorage.setItem('mg_currentUser', JSON.stringify(currentUser));
+    } else {
+        localStorage.removeItem('mg_currentUser');
+    }
+}
 
 // ==================== ВЫБОР УСТРОЙСТВА ====================
 function selectDevice(device) {
@@ -21,76 +35,83 @@ function selectDevice(device) {
     localStorage.setItem('mg_device', device);
     currentDevice = device;
     
-    const deviceChoice = document.getElementById('deviceChoice');
-    const mainSite = document.getElementById('mainSite');
-    const deviceSwitch = document.getElementById('deviceSwitch');
-    
-    if (deviceChoice) deviceChoice.style.display = 'none';
-    if (mainSite) mainSite.style.display = 'block';
+    document.getElementById('deviceChoice').style.display = 'none';
+    document.getElementById('mainSite').style.display = 'block';
     
     if (device === 'mobile') {
         document.body.classList.add('mobile-view');
-        if (deviceSwitch) deviceSwitch.style.display = 'block';
+        document.getElementById('deviceSwitch').style.display = 'block';
     } else {
         document.body.classList.remove('mobile-view');
-        if (deviceSwitch) deviceSwitch.style.display = 'none';
+        document.getElementById('deviceSwitch').style.display = 'none';
     }
     
     loadUserData();
 }
 
 function showDeviceChoice() {
-    const deviceChoice = document.getElementById('deviceChoice');
-    const mainSite = document.getElementById('mainSite');
-    
-    if (mainSite) mainSite.style.display = 'none';
-    if (deviceChoice) deviceChoice.style.display = 'flex';
+    document.getElementById('mainSite').style.display = 'none';
+    document.getElementById('deviceChoice').style.display = 'flex';
 }
 
-// ==================== IP ====================
+// ==================== КОПИРОВАНИЕ IP ====================
 function copyIP() {
     navigator.clipboard.writeText('Moongrief.aurorix.pro').then(() => {
-        alert('📋 IP скопирован!');
+        alert('📋 IP скопирован! Заходи на сервер!');
     }).catch(() => {
         alert('❌ Ошибка копирования');
     });
 }
 
-// ==================== НАВИГАЦИЯ ====================
-function showSection(sectionId, event) {
-    if (event) event.preventDefault();
+// ==================== ПЕРЕКЛЮЧЕНИЕ РАЗДЕЛОВ ====================
+function showSection(sectionId) {
+    // Скрываем все разделы
+    document.querySelectorAll('.section').forEach(section => {
+        section.style.display = 'none';
+    });
     
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active-section'));
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    // Убираем активный класс со всех кнопок
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.style.background = 'none';
+        btn.style.color = '#b0b0ff';
+        btn.style.border = '1px solid #4a4a8a';
+    });
     
-    const section = document.getElementById(sectionId);
-    if (section) section.classList.add('active-section');
+    // Показываем выбранный раздел
+    document.getElementById(sectionId).style.display = 'block';
     
-    if (event && event.target) event.target.classList.add('active');
+    // Активируем кнопку
+    event.target.style.background = '#4a4a8a';
+    event.target.style.color = 'white';
+    event.target.style.border = 'none';
     
-    if (currentUser) {
-        localStorage.setItem('mg_lastSection', sectionId);
-    }
+    console.log('Переключено на раздел:', sectionId);
 }
 
-// ==================== ПЕРЕКЛЮЧЕНИЕ ПЛАТФОРМ ====================
+// ==================== ПЕРЕКЛЮЧЕНИЕ ПЛАТФОРМ (TIKTOK/YOUTUBE) ====================
 function switchPlatform(platform) {
-    const ttForm = document.getElementById('ttForm');
-    const ytForm = document.getElementById('ytForm');
-    const ttBtn = document.getElementById('switchTT');
-    const ytBtn = document.getElementById('switchYT');
+    // Скрываем все формы
+    document.getElementById('ttForm').style.display = 'none';
+    document.getElementById('ytForm').style.display = 'none';
     
-    if (ttForm) ttForm.classList.remove('active');
-    if (ytForm) ytForm.classList.remove('active');
-    if (ttBtn) ttBtn.classList.remove('active');
-    if (ytBtn) ytBtn.classList.remove('active');
+    // Убираем активный класс со всех табов
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.style.background = '#2a2a4a';
+        tab.style.color = '#b0b0ff';
+        tab.style.border = '1px solid #4a4a8a';
+    });
     
+    // Показываем выбранную форму
     if (platform === 'tt') {
-        if (ttForm) ttForm.classList.add('active');
-        if (ttBtn) ttBtn.classList.add('active');
+        document.getElementById('ttForm').style.display = 'block';
+        document.querySelectorAll('.tab')[0].style.background = '#4a4a8a';
+        document.querySelectorAll('.tab')[0].style.color = 'white';
+        document.querySelectorAll('.tab')[0].style.border = 'none';
     } else {
-        if (ytForm) ytForm.classList.add('active');
-        if (ytBtn) ytBtn.classList.add('active');
+        document.getElementById('ytForm').style.display = 'block';
+        document.querySelectorAll('.tab')[1].style.background = '#4a4a8a';
+        document.querySelectorAll('.tab')[1].style.color = 'white';
+        document.querySelectorAll('.tab')[1].style.border = 'none';
     }
 }
 
@@ -102,7 +123,7 @@ function loadUserData() {
     const adminLink = document.getElementById('adminLink');
     const complaintsList = document.getElementById('complaintsList');
     const mediaList = document.getElementById('mediaList');
-    const helpersList = document.getElementById('applicationsList');
+    const applicationsList = document.getElementById('applicationsList');
     
     if (currentUser) {
         if (loginForm) loginForm.style.display = 'none';
@@ -113,17 +134,18 @@ function loadUserData() {
             adminLink.style.display = 'inline-block';
         }
         
+        // Загружаем личные заявки
         loadPersonalComplaints();
         loadPersonalMedia();
-        loadPersonalHelpers();
+        loadPersonalApplications();
     } else {
         if (loginForm) loginForm.style.display = 'flex';
         if (userInfo) userInfo.style.display = 'none';
         if (adminLink) adminLink.style.display = 'none';
         
-        if (complaintsList) complaintsList.innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои жалобы</div>';
-        if (mediaList) mediaList.innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои заявки</div>';
-        if (helpersList) helpersList.innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои анкеты</div>';
+        if (complaintsList) complaintsList.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои жалобы</div>';
+        if (mediaList) mediaList.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои анкеты</div>';
+        if (applicationsList) applicationsList.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои анкеты</div>';
     }
 }
 
@@ -133,26 +155,26 @@ function loadPersonalComplaints() {
     if (!list) return;
     
     if (!currentUser) {
-        list.innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои жалобы</div>';
+        list.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои жалобы</div>';
         return;
     }
     
     const userComplaints = complaints.filter(c => c.user === currentUser.username);
     
     if (userComplaints.length === 0) {
-        list.innerHTML = '<div class="empty-list">📭 У вас пока нет жалоб</div>';
+        list.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">📭 У вас пока нет жалоб</div>';
         return;
     }
     
     let html = '';
     userComplaints.forEach(c => {
         html += `
-            <div class="complaint-card">
-                <div class="complaint-header">
-                    <span class="complaint-title">${c.title}</span>
-                    <span class="complaint-status status-${c.status}">${getStatusText(c.status)}</span>
+            <div style="background:#1a1a2a; border-left:4px solid #4a4a8a; border-radius:10px; padding:15px; margin-bottom:10px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span style="color:#b0b0ff; font-weight:bold;">${c.title}</span>
+                    <span style="background:#4a4a8a; color:white; padding:2px 10px; border-radius:15px; font-size:10px;">${c.status}</span>
                 </div>
-                <div class="complaint-body">
+                <div style="color:#c0c0ff; font-size:11px;">
                     <p><strong>Нарушитель:</strong> ${c.target}</p>
                     <p><strong>Описание:</strong> ${c.desc}</p>
                     <p><strong>Дата:</strong> ${c.date}</p>
@@ -169,14 +191,14 @@ function loadPersonalMedia() {
     if (!list) return;
     
     if (!currentUser) {
-        list.innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои заявки</div>';
+        list.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои анкеты</div>';
         return;
     }
     
     const userMedia = media.filter(m => m.user === currentUser.username);
     
     if (userMedia.length === 0) {
-        list.innerHTML = '<div class="empty-list">📭 У вас пока нет медиа-заявок</div>';
+        list.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">📭 У вас пока нет анкет</div>';
         return;
     }
     
@@ -186,12 +208,12 @@ function loadPersonalMedia() {
         const platformName = m.type === 'tt' ? 'TikTok' : 'YouTube';
         
         html += `
-            <div class="media-card">
-                <div class="media-header">
-                    <span class="media-title">${platformIcon} ${platformName}</span>
-                    <span class="media-status status-${m.status}">${getStatusText(m.status)}</span>
+            <div style="background:#1a1a2a; border-left:4px solid #4a4a8a; border-radius:10px; padding:15px; margin-bottom:10px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span style="color:#b0b0ff; font-weight:bold;">${platformIcon} ${platformName}</span>
+                    <span style="background:#4a4a8a; color:white; padding:2px 10px; border-radius:15px; font-size:10px;">${m.status}</span>
                 </div>
-                <div class="media-body">
+                <div style="color:#c0c0ff; font-size:11px;">
                     <p><strong>Ник:</strong> ${m.nick}</p>
                     <p><strong>Подписчики:</strong> ${m.subs}</p>
                     <p><strong>Дата:</strong> ${m.date}</p>
@@ -203,31 +225,31 @@ function loadPersonalMedia() {
     list.innerHTML = html;
 }
 
-function loadPersonalHelpers() {
+function loadPersonalApplications() {
     const list = document.getElementById('applicationsList');
     if (!list) return;
     
     if (!currentUser) {
-        list.innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои анкеты</div>';
+        list.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои анкеты</div>';
         return;
     }
     
     const userHelpers = helpers.filter(h => h.user === currentUser.username);
     
     if (userHelpers.length === 0) {
-        list.innerHTML = '<div class="empty-list">📭 У вас пока нет анкет</div>';
+        list.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">📭 У вас пока нет анкет</div>';
         return;
     }
     
     let html = '';
     userHelpers.forEach(h => {
         html += `
-            <div class="application-card">
-                <div class="application-header">
-                    <span class="application-title">👮 Анкета на хелпера</span>
-                    <span class="application-status status-${h.status}">${getStatusText(h.status)}</span>
+            <div style="background:#1a1a2a; border-left:4px solid #4a4a8a; border-radius:10px; padding:15px; margin-bottom:10px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span style="color:#b0b0ff; font-weight:bold;">👮 Хелпер</span>
+                    <span style="background:#4a4a8a; color:white; padding:2px 10px; border-radius:15px; font-size:10px;">${h.status}</span>
                 </div>
-                <div class="application-body">
+                <div style="color:#c0c0ff; font-size:11px;">
                     <p><strong>Ник:</strong> ${h.nick}</p>
                     <p><strong>Возраст:</strong> ${h.age}</p>
                     <p><strong>Дата:</strong> ${h.date}</p>
@@ -239,24 +261,10 @@ function loadPersonalHelpers() {
     list.innerHTML = html;
 }
 
-function getStatusText(status) {
-    switch(status) {
-        case 'new': return 'НОВАЯ';
-        case 'accepted': return 'ПРИНЯТО';
-        case 'rejected': return 'ОТКЛОНЕНО';
-        default: return status;
-    }
-}
-
 // ==================== АВТОРИЗАЦИЯ ====================
 function login() {
-    const usernameInput = document.getElementById('username');
-    const passwordInput = document.getElementById('password');
-    
-    if (!usernameInput || !passwordInput) return;
-    
-    const username = usernameInput.value.trim();
-    const password = passwordInput.value;
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
     
     if (!username || !password) {
         alert('Введите ник и пароль');
@@ -267,44 +275,33 @@ function login() {
     
     if (user) {
         currentUser = user;
-        localStorage.setItem('mg_currentUser', JSON.stringify(user));
+        saveData();
         
-        const loginForm = document.getElementById('loginForm');
-        const userInfo = document.getElementById('userInfo');
-        const currentUserSpan = document.getElementById('currentUser');
-        const adminLink = document.getElementById('adminLink');
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('userInfo').style.display = 'flex';
+        document.getElementById('currentUser').textContent = username;
         
-        if (loginForm) loginForm.style.display = 'none';
-        if (userInfo) userInfo.style.display = 'flex';
-        if (currentUserSpan) currentUserSpan.textContent = username;
-        
-        if (adminLink && admins.includes(username)) {
-            adminLink.style.display = 'inline-block';
+        if (admins.includes(username)) {
+            document.getElementById('adminLink').style.display = 'inline-block';
         }
         
-        alert(`Добро пожаловать, ${username}!`);
+        alert(`🌙 Добро пожаловать, ${username}!`);
         
-        usernameInput.value = '';
-        passwordInput.value = '';
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
         
         loadPersonalComplaints();
         loadPersonalMedia();
-        loadPersonalHelpers();
+        loadPersonalApplications();
     } else {
-        alert('Неверный ник или пароль');
+        alert('❌ Неверный ник или пароль');
     }
 }
 
 function register() {
-    const usernameInput = document.getElementById('regUsername');
-    const passwordInput = document.getElementById('regPassword');
-    const confirmInput = document.getElementById('regConfirmPassword');
-    
-    if (!usernameInput || !passwordInput || !confirmInput) return;
-    
-    const username = usernameInput.value.trim();
-    const password = passwordInput.value;
-    const confirm = confirmInput.value;
+    const username = document.getElementById('regUser').value.trim();
+    const password = document.getElementById('regPass').value;
+    const confirm = document.getElementById('regPass2').value;
     
     if (!username || !password || !confirm) {
         alert('Заполните все поля');
@@ -333,32 +330,25 @@ function register() {
     };
     
     users.push(newUser);
-    localStorage.setItem('mg_users', JSON.stringify(users));
+    saveData();
     
-    alert('Регистрация успешна! Теперь войдите.');
+    alert('✅ Регистрация успешна! Теперь войдите.');
     closeModal();
 }
 
 function logout() {
     currentUser = null;
-    localStorage.removeItem('mg_currentUser');
+    saveData();
     
-    const loginForm = document.getElementById('loginForm');
-    const userInfo = document.getElementById('userInfo');
-    const adminLink = document.getElementById('adminLink');
-    const complaintsList = document.getElementById('complaintsList');
-    const mediaList = document.getElementById('mediaList');
-    const helpersList = document.getElementById('applicationsList');
+    document.getElementById('loginForm').style.display = 'flex';
+    document.getElementById('userInfo').style.display = 'none';
+    document.getElementById('adminLink').style.display = 'none';
     
-    if (loginForm) loginForm.style.display = 'flex';
-    if (userInfo) userInfo.style.display = 'none';
-    if (adminLink) adminLink.style.display = 'none';
+    alert('🚪 Вы вышли из аккаунта');
     
-    if (complaintsList) complaintsList.innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои жалобы</div>';
-    if (mediaList) mediaList.innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои заявки</div>';
-    if (helpersList) helpersList.innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои анкеты</div>';
-    
-    alert('Вы вышли из аккаунта');
+    document.getElementById('complaintsList').innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои жалобы</div>';
+    document.getElementById('mediaList').innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои анкеты</div>';
+    document.getElementById('applicationsList').innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои анкеты</div>';
 }
 
 function showChangePassword() {
@@ -366,20 +356,13 @@ function showChangePassword() {
         alert('Сначала войдите');
         return;
     }
-    const modal = document.getElementById('changePasswordModal');
-    if (modal) modal.style.display = 'flex';
+    document.getElementById('changePassModal').style.display = 'flex';
 }
 
 function changePassword() {
-    const oldPassInput = document.getElementById('oldPassword');
-    const newPassInput = document.getElementById('newPassword');
-    const confirmInput = document.getElementById('confirmPassword');
-    
-    if (!oldPassInput || !newPassInput || !confirmInput) return;
-    
-    const oldPass = oldPassInput.value;
-    const newPass = newPassInput.value;
-    const confirm = confirmInput.value;
+    const oldPass = document.getElementById('oldPass').value;
+    const newPass = document.getElementById('newPass').value;
+    const confirm = document.getElementById('newPass2').value;
     
     if (!oldPass || !newPass || !confirm) {
         alert('Заполните все поля');
@@ -403,31 +386,21 @@ function changePassword() {
         users[index].password = newPass;
     }
     
-    localStorage.setItem('mg_users', JSON.stringify(users));
-    localStorage.setItem('mg_currentUser', JSON.stringify(currentUser));
-    
-    alert('Пароль изменен!');
-    closeChangePassword();
+    saveData();
+    alert('🔑 Пароль изменен!');
+    closeChangePass();
 }
 
 // ==================== ОТПРАВКА ФОРМ ====================
-function submitComplaint(event) {
-    if (event) event.preventDefault();
-    
+function submitComplaint() {
     if (!currentUser) {
         alert('Сначала войдите');
         return;
     }
     
-    const titleInput = document.getElementById('complaintTitle');
-    const targetInput = document.getElementById('complaintAgainst');
-    const descInput = document.getElementById('complaintDesc');
-    
-    if (!titleInput || !targetInput || !descInput) return;
-    
-    const title = titleInput.value.trim();
-    const target = targetInput.value.trim();
-    const desc = descInput.value.trim();
+    const title = document.getElementById('compTitle').value.trim();
+    const target = document.getElementById('compTarget').value.trim();
+    const desc = document.getElementById('compDesc').value.trim();
     
     if (!title || !target || !desc) {
         alert('Заполните все поля');
@@ -440,47 +413,35 @@ function submitComplaint(event) {
         title: title,
         target: target,
         desc: desc,
-        status: 'new',
+        status: 'НОВАЯ',
         date: new Date().toLocaleString()
     };
     
     complaints.push(newComplaint);
-    localStorage.setItem('mg_complaints', JSON.stringify(complaints));
+    saveData();
     
-    alert('Жалоба отправлена!');
+    alert('⚠️ Жалоба отправлена! Срок рассмотрения: 24 часа');
     
-    titleInput.value = '';
-    targetInput.value = '';
-    descInput.value = '';
+    document.getElementById('compTitle').value = '';
+    document.getElementById('compTarget').value = '';
+    document.getElementById('compDesc').value = '';
     
     loadPersonalComplaints();
 }
 
-function submitTTMedia(event) {
-    if (event) event.preventDefault();
-    
+function submitTT() {
     if (!currentUser) {
         alert('Сначала войдите');
         return;
     }
     
-    const ageInput = document.getElementById('ttAge');
-    const nameInput = document.getElementById('ttName');
-    const nickInput = document.getElementById('ttNickname');
-    const subsInput = document.getElementById('ttSubs');
-    const viewsInput = document.getElementById('ttViews');
-    const linkInput = document.getElementById('ttLink');
+    const age = document.getElementById('ttAge').value;
+    const name = document.getElementById('ttName').value.trim();
+    const nick = document.getElementById('ttNick').value.trim();
+    const subs = document.getElementById('ttSubs').value.trim();
+    const link = document.getElementById('ttLink').value.trim();
     
-    if (!ageInput || !nameInput || !nickInput || !subsInput || !viewsInput || !linkInput) return;
-    
-    const age = ageInput.value;
-    const name = nameInput.value.trim();
-    const nick = nickInput.value.trim();
-    const subs = subsInput.value.trim();
-    const views = viewsInput.value.trim();
-    const link = linkInput.value.trim();
-    
-    if (!age || !name || !nick || !subs || !views || !link) {
+    if (!age || !name || !nick || !subs || !link) {
         alert('Заполните все поля');
         return;
     }
@@ -493,52 +454,38 @@ function submitTTMedia(event) {
         name: name,
         nick: nick,
         subs: subs,
-        views: views,
         link: link,
-        status: 'new',
+        status: 'НОВАЯ',
         date: new Date().toLocaleString()
     };
     
     media.push(newMedia);
-    localStorage.setItem('mg_media', JSON.stringify(media));
+    saveData();
     
-    alert('Заявка на TikTok отправлена!');
+    alert('📱 Анкета на TikTok отправлена! Срок рассмотрения: 24 часа');
     
-    ageInput.value = '';
-    nameInput.value = '';
-    nickInput.value = '';
-    subsInput.value = '';
-    viewsInput.value = '';
-    linkInput.value = '';
+    document.getElementById('ttAge').value = '';
+    document.getElementById('ttName').value = '';
+    document.getElementById('ttNick').value = '';
+    document.getElementById('ttSubs').value = '';
+    document.getElementById('ttLink').value = '';
     
     loadPersonalMedia();
 }
 
-function submitYTMedia(event) {
-    if (event) event.preventDefault();
-    
+function submitYT() {
     if (!currentUser) {
         alert('Сначала войдите');
         return;
     }
     
-    const ageInput = document.getElementById('ytAge');
-    const nameInput = document.getElementById('ytName');
-    const nickInput = document.getElementById('ytNickname');
-    const subsInput = document.getElementById('ytSubs');
-    const viewsInput = document.getElementById('ytViews');
-    const linkInput = document.getElementById('ytLink');
+    const age = document.getElementById('ytAge').value;
+    const name = document.getElementById('ytName').value.trim();
+    const nick = document.getElementById('ytNick').value.trim();
+    const subs = document.getElementById('ytSubs').value.trim();
+    const link = document.getElementById('ytLink').value.trim();
     
-    if (!ageInput || !nameInput || !nickInput || !subsInput || !viewsInput || !linkInput) return;
-    
-    const age = ageInput.value;
-    const name = nameInput.value.trim();
-    const nick = nickInput.value.trim();
-    const subs = subsInput.value.trim();
-    const views = viewsInput.value.trim();
-    const link = linkInput.value.trim();
-    
-    if (!age || !name || !nick || !subs || !views || !link) {
+    if (!age || !name || !nick || !subs || !link) {
         alert('Заполните все поля');
         return;
     }
@@ -551,55 +498,40 @@ function submitYTMedia(event) {
         name: name,
         nick: nick,
         subs: subs,
-        views: views,
         link: link,
-        status: 'new',
+        status: 'НОВАЯ',
         date: new Date().toLocaleString()
     };
     
     media.push(newMedia);
-    localStorage.setItem('mg_media', JSON.stringify(media));
+    saveData();
     
-    alert('Заявка на YouTube отправлена!');
+    alert('▶️ Анкета на YouTube отправлена! Срок рассмотрения: 24 часа');
     
-    ageInput.value = '';
-    nameInput.value = '';
-    nickInput.value = '';
-    subsInput.value = '';
-    viewsInput.value = '';
-    linkInput.value = '';
+    document.getElementById('ytAge').value = '';
+    document.getElementById('ytName').value = '';
+    document.getElementById('ytNick').value = '';
+    document.getElementById('ytSubs').value = '';
+    document.getElementById('ytLink').value = '';
     
     loadPersonalMedia();
 }
 
-function submitApplication(event) {
-    if (event) event.preventDefault();
-    
+function submitHelper() {
     if (!currentUser) {
         alert('Сначала войдите');
         return;
     }
     
-    const nickInput = document.getElementById('helperNickname');
-    const nameInput = document.getElementById('helperName');
-    const ageInput = document.getElementById('helperAge');
-    const tzInput = document.getElementById('helperTimezone');
-    const expInput = document.getElementById('helperExperience');
-    const reasonInput = document.getElementById('helperReason');
-    const additionalInput = document.getElementById('helperAdditional');
+    const nick = document.getElementById('helpNick').value.trim();
+    const name = document.getElementById('helpName').value.trim();
+    const age = document.getElementById('helpAge').value;
+    const tz = document.getElementById('helpTz').value;
+    const exp = document.getElementById('helpExp').value.trim();
+    const why = document.getElementById('helpWhy').value.trim();
     
-    if (!nickInput || !nameInput || !ageInput || !tzInput || !expInput || !reasonInput) return;
-    
-    const nick = nickInput.value.trim();
-    const name = nameInput.value.trim();
-    const age = ageInput.value;
-    const tz = tzInput.value;
-    const exp = expInput.value.trim();
-    const reason = reasonInput.value.trim();
-    const additional = additionalInput ? additionalInput.value.trim() : '';
-    
-    if (!nick || !name || !age || !tz || !exp || !reason) {
-        alert('Заполните обязательные поля');
+    if (!nick || !name || !age || !tz || !exp || !why) {
+        alert('Заполните все поля');
         return;
     }
     
@@ -611,42 +543,37 @@ function submitApplication(event) {
         age: age,
         tz: tz,
         exp: exp,
-        reason: reason,
-        additional: additional,
-        status: 'new',
+        why: why,
+        status: 'НОВАЯ',
         date: new Date().toLocaleString()
     };
     
     helpers.push(newHelper);
-    localStorage.setItem('mg_helpers', JSON.stringify(helpers));
+    saveData();
     
-    alert('Анкета отправлена!');
+    alert('👮 Анкета на хелпера отправлена! Срок рассмотрения: 24 часа');
     
-    nickInput.value = '';
-    nameInput.value = '';
-    ageInput.value = '';
-    tzInput.value = '';
-    expInput.value = '';
-    reasonInput.value = '';
-    if (additionalInput) additionalInput.value = '';
+    document.getElementById('helpNick').value = '';
+    document.getElementById('helpName').value = '';
+    document.getElementById('helpAge').value = '';
+    document.getElementById('helpTz').value = 'ЧАСОВОЙ ПОЯС';
+    document.getElementById('helpExp').value = '';
+    document.getElementById('helpWhy').value = '';
     
-    loadPersonalHelpers();
+    loadPersonalApplications();
 }
 
 // ==================== МОДАЛКИ ====================
 function showRegister() {
-    const modal = document.getElementById('registerModal');
-    if (modal) modal.style.display = 'flex';
+    document.getElementById('registerModal').style.display = 'flex';
 }
 
 function closeModal() {
-    const modal = document.getElementById('registerModal');
-    if (modal) modal.style.display = 'none';
+    document.getElementById('registerModal').style.display = 'none';
 }
 
-function closeChangePassword() {
-    const modal = document.getElementById('changePasswordModal');
-    if (modal) modal.style.display = 'none';
+function closeChangePass() {
+    document.getElementById('changePassModal').style.display = 'none';
 }
 
 // ==================== ИНИЦИАЛИЗАЦИЯ ====================
@@ -654,39 +581,24 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('MoonGrief-Forum загружен');
     
     const savedDevice = localStorage.getItem('mg_device');
-    const deviceChoice = document.getElementById('deviceChoice');
-    const mainSite = document.getElementById('mainSite');
     
-    if (savedDevice && deviceChoice && mainSite) {
-        deviceChoice.style.display = 'none';
-        mainSite.style.display = 'block';
+    if (savedDevice) {
+        document.getElementById('deviceChoice').style.display = 'none';
+        document.getElementById('mainSite').style.display = 'block';
         
         if (savedDevice === 'mobile') {
             document.body.classList.add('mobile-view');
-            const deviceSwitch = document.getElementById('deviceSwitch');
-            if (deviceSwitch) deviceSwitch.style.display = 'block';
+            document.getElementById('deviceSwitch').style.display = 'block';
         }
         
         currentDevice = savedDevice;
         loadUserData();
     } else {
-        if (deviceChoice) deviceChoice.style.display = 'flex';
-        if (mainSite) mainSite.style.display = 'none';
+        document.getElementById('deviceChoice').style.display = 'flex';
     }
     
-    // Загружаем последнюю секцию
-    const lastSection = localStorage.getItem('mg_lastSection') || 'rules';
-    const section = document.getElementById(lastSection);
-    if (section) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active-section'));
-        section.classList.add('active-section');
-        
-        const activeLink = document.querySelector(`.nav-link[href="#${lastSection}"]`);
-        if (activeLink) {
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            activeLink.classList.add('active');
-        }
-    }
+    // Показываем первый раздел
+    document.getElementById('rules').style.display = 'block';
 });
 
 // Закрытие модалок по клику вне
@@ -694,4 +606,4 @@ window.onclick = function(event) {
     if (event.target.classList.contains('modal')) {
         event.target.style.display = 'none';
     }
-};
+}
