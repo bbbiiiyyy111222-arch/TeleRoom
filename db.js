@@ -1,201 +1,107 @@
-// ==============================================
-// БАЗА ДАННЫХ MOONGRIEF
-// ==============================================
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚔️ BLADEBOX - Админ панель</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">⚔️ BLADEBOX ADMIN</h1>
+                <div class="auth">
+                    <span id="adminName" class="moon-glow"></span>
+                    <button onclick="logout()" class="btn-moon logout-btn">
+                        <span>⚔️</span>
+                        <span>ВЫЙТИ</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
 
-const SUPABASE_URL = 'https://opeypwayctnnyrfkhajf.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wZXlwd2F5Y3RubnlyZmtoYWpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MzU4ODQsImV4cCI6MjA4ODUxMTg4NH0._Y1R1NNCVMyVgyeN7O7a24n4BGwc44c6vO1Q6MAf74A';
+    <nav class="nav">
+        <div class="container">
+            <a href="index.html" class="nav-link">⚔️ ГЛАВНАЯ</a>
+            <a href="admin.html" class="nav-link active">⚔️ АДМИН ПАНЕЛЬ</a>
+        </div>
+    </nav>
 
-console.log('🔄 Подключение к Supabase');
+    <main class="main">
+        <div class="container">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-info">
+                        <h3>НОВЫЕ ЖАЛОБЫ</h3>
+                        <span id="newComplaints" class="stat-number">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📱</div>
+                    <div class="stat-info">
+                        <h3>МЕДИА-ЗАЯВКИ</h3>
+                        <span id="newMedia" class="stat-number">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👮</div>
+                    <div class="stat-info">
+                        <h3>НОВЫЕ АНКЕТЫ</h3>
+                        <span id="newApplications" class="stat-number">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-info">
+                        <h3>ВСЕГО</h3>
+                        <span id="total" class="stat-number">0</span>
+                    </div>
+                </div>
+            </div>
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showAdminTab('complaints')">⚠️ ЖАЛОБЫ</button>
+                <button class="tab-btn" onclick="showAdminTab('media')">📱 МЕДИА</button>
+                <button class="tab-btn" onclick="showAdminTab('applications')">👮 АНКЕТЫ</button>
+            </div>
 
-// ==============================================
-// ПОЛЬЗОВАТЕЛИ
-// ==============================================
+            <div id="adminComplaints" class="tab-content active"></div>
+            <div id="adminMedia" class="tab-content"></div>
+            <div id="adminApplications" class="tab-content"></div>
+        </div>
+    </main>
 
-window.getUsers = async function() {
-    try {
-        const { data, error } = await supabaseClient
-            .from('users')
-            .select('*');
-        if (error) throw error;
-        return data || [];
-    } catch (e) {
-        console.error('Ошибка загрузки пользователей:', e);
-        return [];
-    }
-}
+    <div id="responseModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeResponseModal()">×</span>
+            <h2>⚔️ ОТВЕТ НА ОБРАЩЕНИЕ</h2>
+            <form id="responseForm" onsubmit="sendResponse(event)" class="modal-form">
+                <input type="hidden" id="responseId">
+                <input type="hidden" id="responseType">
+                <div class="form-group">
+                    <label>💬 ВАШ ОТВЕТ</label>
+                    <textarea id="responseText" placeholder="ВВЕДИТЕ ТЕКСТ ОТВЕТА..." required class="textarea" rows="6"></textarea>
+                </div>
+                <div class="action-group" style="justify-content: center;">
+                    <button type="submit" class="submit-btn" style="width: auto; min-width: 200px;">
+                        <span class="btn-icon">⚔️</span>
+                        <span class="btn-text">ОТПРАВИТЬ</span>
+                    </button>
+                    <button type="button" onclick="closeResponseModal()" class="submit-btn" style="width: auto; min-width: 200px; background: #3a2a2a;">
+                        <span class="btn-icon">✗</span>
+                        <span class="btn-text">ОТМЕНА</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-window.saveUser = async function(username, password) {
-    try {
-        const { error } = await supabaseClient
-            .from('users')
-            .insert([{ username, password }]);
-        if (error) throw error;
-        return true;
-    } catch (e) {
-        console.error('Ошибка сохранения пользователя:', e);
-        return false;
-    }
-}
-
-window.updateUserPassword = async function(username, password) {
-    try {
-        const { error } = await supabaseClient
-            .from('users')
-            .update({ password })
-            .eq('username', username);
-        if (error) throw error;
-        return true;
-    } catch (e) {
-        console.error('Ошибка обновления пароля:', e);
-        return false;
-    }
-}
-
-window.changePassword = async function(username, oldPassword, newPassword) {
-    try {
-        const { data: user, error: findError } = await supabaseClient
-            .from('users')
-            .select('*')
-            .eq('username', username)
-            .eq('password', oldPassword)
-            .single();
-        
-        if (findError || !user) {
-            return { success: false, message: 'Неверный старый пароль' };
-        }
-        
-        const { error: updateError } = await supabaseClient
-            .from('users')
-            .update({ password: newPassword })
-            .eq('username', username);
-        
-        if (updateError) throw updateError;
-        
-        return { success: true, message: 'Пароль изменен' };
-    } catch (e) {
-        console.error('Ошибка смены пароля:', e);
-        return { success: false, message: 'Ошибка при смене пароля' };
-    }
-}
-
-// ==============================================
-// ЖАЛОБЫ
-// ==============================================
-
-window.getComplaints = async function() {
-    try {
-        const { data, error } = await supabaseClient
-            .from('complaints')
-            .select('*')
-            .order('date', { ascending: false });
-        if (error) throw error;
-        return data || [];
-    } catch (e) {
-        console.error('Ошибка загрузки жалоб:', e);
-        return [];
-    }
-}
-
-window.saveComplaint = async function(complaint) {
-    try {
-        const { error } = await supabaseClient
-            .from('complaints')
-            .insert([complaint]);
-        if (error) throw error;
-        return true;
-    } catch (e) {
-        console.error('Ошибка сохранения жалобы:', e);
-        return false;
-    }
-}
-
-window.updateComplaint = async function(id, updates) {
-    try {
-        const { error } = await supabaseClient
-            .from('complaints')
-            .update(updates)
-            .eq('id', id);
-        if (error) throw error;
-        return true;
-    } catch (e) {
-        console.error('Ошибка обновления жалобы:', e);
-        return false;
-    }
-}
-
-window.deleteComplaint = async function(id) {
-    try {
-        const { error } = await supabaseClient
-            .from('complaints')
-            .delete()
-            .eq('id', id);
-        if (error) throw error;
-        return true;
-    } catch (e) {
-        console.error('Ошибка удаления жалобы:', e);
-        return false;
-    }
-}
-
-// ==============================================
-// ЗАЯВКИ
-// ==============================================
-
-window.getApplications = async function() {
-    try {
-        const { data, error } = await supabaseClient
-            .from('applications')
-            .select('*')
-            .order('date', { ascending: false });
-        if (error) throw error;
-        return data || [];
-    } catch (e) {
-        console.error('Ошибка загрузки заявок:', e);
-        return [];
-    }
-}
-
-window.saveApplication = async function(application) {
-    try {
-        const { error } = await supabaseClient
-            .from('applications')
-            .insert([application]);
-        if (error) throw error;
-        return true;
-    } catch (e) {
-        console.error('Ошибка сохранения заявки:', e);
-        return false;
-    }
-}
-
-window.updateApplication = async function(id, updates) {
-    try {
-        const { error } = await supabaseClient
-            .from('applications')
-            .update(updates)
-            .eq('id', id);
-        if (error) throw error;
-        return true;
-    } catch (e) {
-        console.error('Ошибка обновления заявки:', e);
-        return false;
-    }
-}
-
-window.deleteApplication = async function(id) {
-    try {
-        const { error } = await supabaseClient
-            .from('applications')
-            .delete()
-            .eq('id', id);
-        if (error) throw error;
-        return true;
-    } catch (e) {
-        console.error('Ошибка удаления заявки:', e);
-        return false;
-    }
-}
-
-console.log('✅ db.js загружен');
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="db.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
