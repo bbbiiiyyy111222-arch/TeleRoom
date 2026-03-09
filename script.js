@@ -1,5 +1,5 @@
 // ==============================================
-// MOONGRIEF-FORUM - РАБОЧИЙ СКРИПТ
+// MOONGRIEF-FORUM - УЛЬТРА МАКС РАБОЧИЙ СКРИПТ
 // ==============================================
 
 // ==================== ДАННЫЕ ====================
@@ -30,8 +30,6 @@ function saveData() {
 
 // ==================== ВЫБОР УСТРОЙСТВА ====================
 function selectDevice(device) {
-    console.log('Выбрано устройство:', device);
-    
     localStorage.setItem('mg_device', device);
     currentDevice = device;
     
@@ -65,87 +63,57 @@ function copyIP() {
 
 // ==================== ПЕРЕКЛЮЧЕНИЕ РАЗДЕЛОВ ====================
 function showSection(sectionId) {
-    // Скрываем все разделы
     document.querySelectorAll('.section').forEach(section => {
-        section.style.display = 'none';
+        section.classList.remove('active');
     });
     
-    // Убираем активный класс со всех кнопок
     document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.style.background = 'none';
-        btn.style.color = '#b0b0ff';
-        btn.style.border = '1px solid #4a4a8a';
+        btn.classList.remove('active');
     });
     
-    // Показываем выбранный раздел
-    document.getElementById(sectionId).style.display = 'block';
-    
-    // Активируем кнопку
-    event.target.style.background = '#4a4a8a';
-    event.target.style.color = 'white';
-    event.target.style.border = 'none';
-    
-    console.log('Переключено на раздел:', sectionId);
+    document.getElementById(sectionId).classList.add('active');
+    event.target.classList.add('active');
 }
 
-// ==================== ПЕРЕКЛЮЧЕНИЕ ПЛАТФОРМ (TIKTOK/YOUTUBE) ====================
+// ==================== ПЕРЕКЛЮЧЕНИЕ ПЛАТФОРМ ====================
 function switchPlatform(platform) {
-    // Скрываем все формы
-    document.getElementById('ttForm').style.display = 'none';
-    document.getElementById('ytForm').style.display = 'none';
-    
-    // Убираем активный класс со всех табов
+    document.getElementById('ttForm').classList.remove('active');
+    document.getElementById('ytForm').classList.remove('active');
     document.querySelectorAll('.tab').forEach(tab => {
-        tab.style.background = '#2a2a4a';
-        tab.style.color = '#b0b0ff';
-        tab.style.border = '1px solid #4a4a8a';
+        tab.classList.remove('active');
     });
     
-    // Показываем выбранную форму
     if (platform === 'tt') {
-        document.getElementById('ttForm').style.display = 'block';
-        document.querySelectorAll('.tab')[0].style.background = '#4a4a8a';
-        document.querySelectorAll('.tab')[0].style.color = 'white';
-        document.querySelectorAll('.tab')[0].style.border = 'none';
+        document.getElementById('ttForm').classList.add('active');
+        document.querySelectorAll('.tab')[0].classList.add('active');
     } else {
-        document.getElementById('ytForm').style.display = 'block';
-        document.querySelectorAll('.tab')[1].style.background = '#4a4a8a';
-        document.querySelectorAll('.tab')[1].style.color = 'white';
-        document.querySelectorAll('.tab')[1].style.border = 'none';
+        document.getElementById('ytForm').classList.add('active');
+        document.querySelectorAll('.tab')[1].classList.add('active');
     }
 }
 
-// ==================== ЗАГРУЗКА ДАННЫХ ПОЛЬЗОВАТЕЛЯ ====================
+// ==================== ЗАГРУЗКА ДАННЫХ ====================
 function loadUserData() {
-    const loginForm = document.getElementById('loginForm');
-    const userInfo = document.getElementById('userInfo');
-    const currentUserSpan = document.getElementById('currentUser');
-    const adminLink = document.getElementById('adminLink');
-    const complaintsList = document.getElementById('complaintsList');
-    const mediaList = document.getElementById('mediaList');
-    const applicationsList = document.getElementById('applicationsList');
-    
     if (currentUser) {
-        if (loginForm) loginForm.style.display = 'none';
-        if (userInfo) userInfo.style.display = 'flex';
-        if (currentUserSpan) currentUserSpan.textContent = currentUser.username;
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('userInfo').style.display = 'flex';
+        document.getElementById('currentUser').textContent = currentUser.username;
         
-        if (adminLink && admins.includes(currentUser.username)) {
-            adminLink.style.display = 'inline-block';
+        if (admins.includes(currentUser.username)) {
+            document.getElementById('adminLink').style.display = 'inline-block';
         }
         
-        // Загружаем личные заявки
         loadPersonalComplaints();
         loadPersonalMedia();
         loadPersonalApplications();
     } else {
-        if (loginForm) loginForm.style.display = 'flex';
-        if (userInfo) userInfo.style.display = 'none';
-        if (adminLink) adminLink.style.display = 'none';
+        document.getElementById('loginForm').style.display = 'flex';
+        document.getElementById('userInfo').style.display = 'none';
+        document.getElementById('adminLink').style.display = 'none';
         
-        if (complaintsList) complaintsList.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои жалобы</div>';
-        if (mediaList) mediaList.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои анкеты</div>';
-        if (applicationsList) applicationsList.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои анкеты</div>';
+        document.getElementById('complaintsList').innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои жалобы</div>';
+        document.getElementById('mediaList').innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои анкеты</div>';
+        document.getElementById('applicationsList').innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои анкеты</div>';
     }
 }
 
@@ -155,26 +123,26 @@ function loadPersonalComplaints() {
     if (!list) return;
     
     if (!currentUser) {
-        list.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои жалобы</div>';
+        list.innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои жалобы</div>';
         return;
     }
     
     const userComplaints = complaints.filter(c => c.user === currentUser.username);
     
     if (userComplaints.length === 0) {
-        list.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">📭 У вас пока нет жалоб</div>';
+        list.innerHTML = '<div class="empty-list">📭 У вас пока нет жалоб</div>';
         return;
     }
     
     let html = '';
     userComplaints.forEach(c => {
         html += `
-            <div style="background:#1a1a2a; border-left:4px solid #4a4a8a; border-radius:10px; padding:15px; margin-bottom:10px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <span style="color:#b0b0ff; font-weight:bold;">${c.title}</span>
-                    <span style="background:#4a4a8a; color:white; padding:2px 10px; border-radius:15px; font-size:10px;">${c.status}</span>
+            <div class="complaint-card">
+                <div class="complaint-header">
+                    <span class="complaint-title">${c.title}</span>
+                    <span class="complaint-status status-${c.status === 'НОВАЯ' ? 'new' : c.status === 'ПРИНЯТО' ? 'accepted' : 'rejected'}">${c.status}</span>
                 </div>
-                <div style="color:#c0c0ff; font-size:11px;">
+                <div class="complaint-body">
                     <p><strong>Нарушитель:</strong> ${c.target}</p>
                     <p><strong>Описание:</strong> ${c.desc}</p>
                     <p><strong>Дата:</strong> ${c.date}</p>
@@ -191,14 +159,14 @@ function loadPersonalMedia() {
     if (!list) return;
     
     if (!currentUser) {
-        list.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои анкеты</div>';
+        list.innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои анкеты</div>';
         return;
     }
     
     const userMedia = media.filter(m => m.user === currentUser.username);
     
     if (userMedia.length === 0) {
-        list.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">📭 У вас пока нет анкет</div>';
+        list.innerHTML = '<div class="empty-list">📭 У вас пока нет анкет</div>';
         return;
     }
     
@@ -208,12 +176,12 @@ function loadPersonalMedia() {
         const platformName = m.type === 'tt' ? 'TikTok' : 'YouTube';
         
         html += `
-            <div style="background:#1a1a2a; border-left:4px solid #4a4a8a; border-radius:10px; padding:15px; margin-bottom:10px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <span style="color:#b0b0ff; font-weight:bold;">${platformIcon} ${platformName}</span>
-                    <span style="background:#4a4a8a; color:white; padding:2px 10px; border-radius:15px; font-size:10px;">${m.status}</span>
+            <div class="media-card">
+                <div class="media-header">
+                    <span class="media-title">${platformIcon} ${platformName}</span>
+                    <span class="media-status status-${m.status === 'НОВАЯ' ? 'new' : m.status === 'ПРИНЯТО' ? 'accepted' : 'rejected'}">${m.status}</span>
                 </div>
-                <div style="color:#c0c0ff; font-size:11px;">
+                <div class="media-body">
                     <p><strong>Ник:</strong> ${m.nick}</p>
                     <p><strong>Подписчики:</strong> ${m.subs}</p>
                     <p><strong>Дата:</strong> ${m.date}</p>
@@ -230,26 +198,26 @@ function loadPersonalApplications() {
     if (!list) return;
     
     if (!currentUser) {
-        list.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои анкеты</div>';
+        list.innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои анкеты</div>';
         return;
     }
     
     const userHelpers = helpers.filter(h => h.user === currentUser.username);
     
     if (userHelpers.length === 0) {
-        list.innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">📭 У вас пока нет анкет</div>';
+        list.innerHTML = '<div class="empty-list">📭 У вас пока нет анкет</div>';
         return;
     }
     
     let html = '';
     userHelpers.forEach(h => {
         html += `
-            <div style="background:#1a1a2a; border-left:4px solid #4a4a8a; border-radius:10px; padding:15px; margin-bottom:10px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <span style="color:#b0b0ff; font-weight:bold;">👮 Хелпер</span>
-                    <span style="background:#4a4a8a; color:white; padding:2px 10px; border-radius:15px; font-size:10px;">${h.status}</span>
+            <div class="application-card">
+                <div class="application-header">
+                    <span class="application-title">👮 Анкета на хелпера</span>
+                    <span class="application-status status-${h.status === 'НОВАЯ' ? 'new' : h.status === 'ПРИНЯТО' ? 'accepted' : 'rejected'}">${h.status}</span>
                 </div>
-                <div style="color:#c0c0ff; font-size:11px;">
+                <div class="application-body">
                     <p><strong>Ник:</strong> ${h.nick}</p>
                     <p><strong>Возраст:</strong> ${h.age}</p>
                     <p><strong>Дата:</strong> ${h.date}</p>
@@ -298,7 +266,9 @@ function login() {
     }
 }
 
-function register() {
+function register(event) {
+    if (event) event.preventDefault();
+    
     const username = document.getElementById('regUser').value.trim();
     const password = document.getElementById('regPass').value;
     const confirm = document.getElementById('regPass2').value;
@@ -346,9 +316,7 @@ function logout() {
     
     alert('🚪 Вы вышли из аккаунта');
     
-    document.getElementById('complaintsList').innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои жалобы</div>';
-    document.getElementById('mediaList').innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои анкеты</div>';
-    document.getElementById('applicationsList').innerHTML = '<div style="text-align:center; padding:30px; background:#1a1a2a; border-radius:10px; color:#7a7aaa;">🌙 Войдите чтобы увидеть свои анкеты</div>';
+    loadUserData();
 }
 
 function showChangePassword() {
@@ -359,7 +327,9 @@ function showChangePassword() {
     document.getElementById('changePassModal').style.display = 'flex';
 }
 
-function changePassword() {
+function changePassword(event) {
+    if (event) event.preventDefault();
+    
     const oldPass = document.getElementById('oldPass').value;
     const newPass = document.getElementById('newPass').value;
     const confirm = document.getElementById('newPass2').value;
@@ -392,7 +362,9 @@ function changePassword() {
 }
 
 // ==================== ОТПРАВКА ФОРМ ====================
-function submitComplaint() {
+function submitComplaint(event) {
+    if (event) event.preventDefault();
+    
     if (!currentUser) {
         alert('Сначала войдите');
         return;
@@ -429,7 +401,9 @@ function submitComplaint() {
     loadPersonalComplaints();
 }
 
-function submitTT() {
+function submitTT(event) {
+    if (event) event.preventDefault();
+    
     if (!currentUser) {
         alert('Сначала войдите');
         return;
@@ -473,7 +447,9 @@ function submitTT() {
     loadPersonalMedia();
 }
 
-function submitYT() {
+function submitYT(event) {
+    if (event) event.preventDefault();
+    
     if (!currentUser) {
         alert('Сначала войдите');
         return;
@@ -517,7 +493,9 @@ function submitYT() {
     loadPersonalMedia();
 }
 
-function submitHelper() {
+function submitHelper(event) {
+    if (event) event.preventDefault();
+    
     if (!currentUser) {
         alert('Сначала войдите');
         return;
@@ -556,7 +534,7 @@ function submitHelper() {
     document.getElementById('helpNick').value = '';
     document.getElementById('helpName').value = '';
     document.getElementById('helpAge').value = '';
-    document.getElementById('helpTz').value = 'ЧАСОВОЙ ПОЯС';
+    document.getElementById('helpTz').value = '';
     document.getElementById('helpExp').value = '';
     document.getElementById('helpWhy').value = '';
     
@@ -578,8 +556,6 @@ function closeChangePass() {
 
 // ==================== ИНИЦИАЛИЗАЦИЯ ====================
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('MoonGrief-Forum загружен');
-    
     const savedDevice = localStorage.getItem('mg_device');
     
     if (savedDevice) {
@@ -593,12 +569,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         currentDevice = savedDevice;
         loadUserData();
-    } else {
-        document.getElementById('deviceChoice').style.display = 'flex';
     }
     
-    // Показываем первый раздел
-    document.getElementById('rules').style.display = 'block';
+    // Добавляем тестового админа если нет пользователей
+    if (users.length === 0) {
+        users.push({ username: 'milfa', password: 'admin123', role: 'admin' });
+        users.push({ username: 'milk123', password: 'admin123', role: 'admin' });
+        users.push({ username: 'Xchik_', password: 'admin123', role: 'admin' });
+        saveData();
+    }
 });
 
 // Закрытие модалок по клику вне
