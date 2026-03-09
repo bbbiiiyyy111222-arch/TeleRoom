@@ -2,7 +2,7 @@
 // ОСНОВНОЙ СКРИПТ BLADEBOX - ИСПРАВЛЕННАЯ ВЕРСИЯ
 // ==============================================
 
-// Данные - ОДИН РАЗ!
+// Данные - ТОЛЬКО ОДИН РАЗ!
 let users = [];
 let complaints = [];
 let applications = [];
@@ -116,7 +116,7 @@ function showDefaultSection() {
     if (rulesLink) rulesLink.classList.add('active');
 }
 
-// Показать секцию
+// Показать секцию - ВАЖНО!
 function showSection(sectionId, event) {
     const sections = document.querySelectorAll('.section');
     const targetSection = document.getElementById(sectionId);
