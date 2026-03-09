@@ -1,8 +1,8 @@
 // ==============================================
-// ОСНОВНОЙ СКРИПТ BLADEBOX - ПОЛНАЯ ВЕРСИЯ
+// ОСНОВНОЙ СКРИПТ BLADEBOX - ИСПРАВЛЕННАЯ ВЕРСИЯ
 // ==============================================
 
-// Данные
+// Данные - ОДИН РАЗ!
 let users = [];
 let complaints = [];
 let applications = [];
@@ -30,29 +30,6 @@ function formatDate(dateString) {
 }
 
 // ==============================================
-// ПЕРЕКЛЮЧЕНИЕ ПЛАТФОРМ (TT/YT)
-// ==============================================
-
-function switchPlatform(platform) {
-    // Скрываем все формы
-    document.getElementById('ttForm').classList.remove('active');
-    document.getElementById('ytForm').classList.remove('active');
-    
-    // Убираем активный класс у кнопок
-    document.getElementById('switchTT').classList.remove('active');
-    document.getElementById('switchYT').classList.remove('active');
-    
-    // Показываем выбранную форму
-    if (platform === 'tt') {
-        document.getElementById('ttForm').classList.add('active');
-        document.getElementById('switchTT').classList.add('active');
-    } else {
-        document.getElementById('ytForm').classList.add('active');
-        document.getElementById('switchYT').classList.add('active');
-    }
-}
-
-// ==============================================
 // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ СТАТУСОВ
 // ==============================================
 
@@ -77,6 +54,32 @@ function getStatusClass(status) {
 }
 
 // ==============================================
+// ПЕРЕКЛЮЧЕНИЕ ПЛАТФОРМ (TT/YT)
+// ==============================================
+
+function switchPlatform(platform) {
+    const ttForm = document.getElementById('ttForm');
+    const ytForm = document.getElementById('ytForm');
+    const switchTT = document.getElementById('switchTT');
+    const switchYT = document.getElementById('switchYT');
+    
+    if (!ttForm || !ytForm || !switchTT || !switchYT) return;
+    
+    ttForm.classList.remove('active');
+    ytForm.classList.remove('active');
+    switchTT.classList.remove('active');
+    switchYT.classList.remove('active');
+    
+    if (platform === 'tt') {
+        ttForm.classList.add('active');
+        switchTT.classList.add('active');
+    } else {
+        ytForm.classList.add('active');
+        switchYT.classList.add('active');
+    }
+}
+
+// ==============================================
 // ЗАГРУЗКА ПРИ СТАРТЕ
 // ==============================================
 
@@ -96,25 +99,33 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // Показать правила по умолчанию
 function showDefaultSection() {
-    document.querySelectorAll('.section').forEach(section => {
+    const sections = document.querySelectorAll('.section');
+    const rulesLink = document.querySelector('[href="#rules"]');
+    
+    sections.forEach(section => {
         section.classList.remove('active-section');
     });
-    document.getElementById('rules').classList.add('active-section');
+    
+    const rulesSection = document.getElementById('rules');
+    if (rulesSection) rulesSection.classList.add('active-section');
     
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
     });
-    const rulesLink = document.querySelector('[href="#rules"]');
+    
     if (rulesLink) rulesLink.classList.add('active');
 }
 
 // Показать секцию
 function showSection(sectionId, event) {
-    document.querySelectorAll('.section').forEach(section => {
+    const sections = document.querySelectorAll('.section');
+    const targetSection = document.getElementById(sectionId);
+    
+    sections.forEach(section => {
         section.classList.remove('active-section');
     });
     
-    document.getElementById(sectionId).classList.add('active-section');
+    if (targetSection) targetSection.classList.add('active-section');
     
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
@@ -131,18 +142,22 @@ function showSection(sectionId, event) {
 // Загрузка данных из базы
 async function loadDataFromDB() {
     try {
-        users = await window.getUsers() || [];
-        complaints = await window.getComplaints() || [];
-        applications = await window.getApplications() || [];
-        mediaApplications = await window.getMediaApplications() || [];
+        if (typeof window.getUsers === 'function') {
+            users = await window.getUsers() || [];
+        }
+        if (typeof window.getComplaints === 'function') {
+            complaints = await window.getComplaints() || [];
+        }
+        if (typeof window.getApplications === 'function') {
+            applications = await window.getApplications() || [];
+        }
+        if (typeof window.getMediaApplications === 'function') {
+            mediaApplications = await window.getMediaApplications() || [];
+        }
         
         console.log('Загружено из базы:', { users, complaints, applications, mediaApplications });
     } catch (error) {
         console.error('Ошибка загрузки из БД:', error);
-        users = [];
-        complaints = [];
-        applications = [];
-        mediaApplications = [];
     }
 }
 
@@ -157,8 +172,8 @@ function copyIP() {
 // ==============================================
 
 async function login() {
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
+    const username = document.getElementById('username')?.value.trim();
+    const password = document.getElementById('password')?.value.trim();
     
     if (!username || !password) {
         alert('Введите ник и пароль!');
@@ -166,17 +181,19 @@ async function login() {
     }
     
     try {
-        users = await window.getUsers();
-        const user = users.find(u => u.username === username && u.password === password);
-        
-        if (user) {
-            currentUser = user;
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            updateAuth();
-            checkAdminLink();
-            alert('Добро пожаловать, ' + username + '!');
-        } else {
-            alert('Неверный ник или пароль!');
+        if (typeof window.getUsers === 'function') {
+            users = await window.getUsers();
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateAuth();
+                checkAdminLink();
+                alert('Добро пожаловать, ' + username + '!');
+            } else {
+                alert('Неверный ник или пароль!');
+            }
         }
     } catch (error) {
         console.error('Ошибка авторизации:', error);
@@ -199,6 +216,8 @@ function updateAuth() {
     const loginForm = document.getElementById('loginForm');
     const currentUserSpan = document.getElementById('currentUser');
     
+    if (!userInfo || !loginForm || !currentUserSpan) return;
+    
     if (currentUser) {
         userInfo.style.display = 'flex';
         loginForm.style.display = 'none';
@@ -219,22 +238,29 @@ function updateAuth() {
 // ==============================================
 
 function showRegister() {
-    document.getElementById('registerModal').style.display = 'block';
+    const modal = document.getElementById('registerModal');
+    if (modal) modal.style.display = 'block';
 }
 
 function closeModal() {
-    document.getElementById('registerModal').style.display = 'none';
-    document.getElementById('regUsername').value = '';
-    document.getElementById('regPassword').value = '';
-    document.getElementById('regConfirmPassword').value = '';
+    const modal = document.getElementById('registerModal');
+    if (modal) modal.style.display = 'none';
+    
+    const regUsername = document.getElementById('regUsername');
+    const regPassword = document.getElementById('regPassword');
+    const regConfirm = document.getElementById('regConfirmPassword');
+    
+    if (regUsername) regUsername.value = '';
+    if (regPassword) regPassword.value = '';
+    if (regConfirm) regConfirm.value = '';
 }
 
 async function register(event) {
     event.preventDefault();
     
-    const username = document.getElementById('regUsername').value.trim();
-    const password = document.getElementById('regPassword').value.trim();
-    const confirm = document.getElementById('regConfirmPassword').value.trim();
+    const username = document.getElementById('regUsername')?.value.trim();
+    const password = document.getElementById('regPassword')?.value.trim();
+    const confirm = document.getElementById('regConfirmPassword')?.value.trim();
     
     if (!username || !password) {
         alert('Заполните все поля!');
@@ -252,40 +278,44 @@ async function register(event) {
     }
     
     try {
-        users = await window.getUsers();
-        const existingUser = users.find(u => u.username === username);
-        
-        if (existingUser) {
-            if (OWNERS.includes(username)) {
-                const updated = await window.updateUserPassword(username, password);
-                if (updated) {
+        if (typeof window.getUsers === 'function') {
+            users = await window.getUsers();
+            const existingUser = users.find(u => u.username === username);
+            
+            if (existingUser) {
+                if (OWNERS.includes(username)) {
+                    const updated = await window.updateUserPassword(username, password);
+                    if (updated) {
+                        currentUser = { username, password };
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        alert('Пароль установлен! Добро пожаловать, ' + username + '!');
+                        closeModal();
+                        updateAuth();
+                        checkAdminLink();
+                    } else {
+                        alert('Ошибка при установке пароля!');
+                    }
+                } else {
+                    alert('Пользователь уже существует!');
+                }
+                return;
+            }
+            
+            if (typeof window.saveUser === 'function') {
+                const saved = await window.saveUser(username, password);
+                
+                if (saved) {
                     currentUser = { username, password };
                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    alert('Пароль установлен! Добро пожаловать, ' + username + '!');
+                    
+                    alert('Регистрация успешна! Добро пожаловать, ' + username + '!');
                     closeModal();
                     updateAuth();
                     checkAdminLink();
                 } else {
-                    alert('Ошибка при установке пароля!');
+                    alert('Ошибка при регистрации!');
                 }
-            } else {
-                alert('Пользователь уже существует!');
             }
-            return;
-        }
-        
-        const saved = await window.saveUser(username, password);
-        
-        if (saved) {
-            currentUser = { username, password };
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            
-            alert('Регистрация успешна! Добро пожаловать, ' + username + '!');
-            closeModal();
-            updateAuth();
-            checkAdminLink();
-        } else {
-            alert('Ошибка при регистрации!');
         }
     } catch (error) {
         console.error('Ошибка регистрации:', error);
@@ -302,22 +332,29 @@ function showChangePassword() {
         alert('Сначала войдите в систему!');
         return;
     }
-    document.getElementById('changePasswordModal').style.display = 'block';
+    const modal = document.getElementById('changePasswordModal');
+    if (modal) modal.style.display = 'block';
 }
 
 function closeChangePassword() {
-    document.getElementById('changePasswordModal').style.display = 'none';
-    document.getElementById('oldPassword').value = '';
-    document.getElementById('newPassword').value = '';
-    document.getElementById('confirmPassword').value = '';
+    const modal = document.getElementById('changePasswordModal');
+    if (modal) modal.style.display = 'none';
+    
+    const oldPass = document.getElementById('oldPassword');
+    const newPass = document.getElementById('newPassword');
+    const confirm = document.getElementById('confirmPassword');
+    
+    if (oldPass) oldPass.value = '';
+    if (newPass) newPass.value = '';
+    if (confirm) confirm.value = '';
 }
 
 async function changePassword(event) {
     event.preventDefault();
     
-    const oldPass = document.getElementById('oldPassword').value;
-    const newPass = document.getElementById('newPassword').value;
-    const confirm = document.getElementById('confirmPassword').value;
+    const oldPass = document.getElementById('oldPassword')?.value;
+    const newPass = document.getElementById('newPassword')?.value;
+    const confirm = document.getElementById('confirmPassword')?.value;
     
     if (!currentUser) {
         alert('❌ Ошибка авторизации');
@@ -340,16 +377,18 @@ async function changePassword(event) {
     }
     
     try {
-        const result = await window.changePassword(currentUser.username, oldPass, newPass);
-        
-        if (result && result.success) {
-            currentUser.password = newPass;
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        if (typeof window.changePassword === 'function') {
+            const result = await window.changePassword(currentUser.username, oldPass, newPass);
             
-            alert('✅ Пароль успешно изменен!');
-            closeChangePassword();
-        } else {
-            alert('❌ ' + (result?.message || 'Ошибка при смене пароля'));
+            if (result && result.success) {
+                currentUser.password = newPass;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                alert('✅ Пароль успешно изменен!');
+                closeChangePassword();
+            } else {
+                alert('❌ ' + (result?.message || 'Ошибка при смене пароля'));
+            }
         }
     } catch (error) {
         console.error('Ошибка смены пароля:', error);
@@ -381,26 +420,37 @@ async function submitComplaint(event) {
         return;
     }
     
+    const title = document.getElementById('complaintTitle')?.value;
+    const against = document.getElementById('complaintAgainst')?.value;
+    const desc = document.getElementById('complaintDesc')?.value;
+    
+    if (!title || !against || !desc) {
+        alert('Заполните все поля!');
+        return;
+    }
+    
     try {
         const complaint = {
             id: Date.now(),
-            title: document.getElementById('complaintTitle').value,
-            against: document.getElementById('complaintAgainst').value,
-            description: document.getElementById('complaintDesc').value,
+            title: title,
+            against: against,
+            description: desc,
             author: currentUser.username,
             date: new Date().toISOString(),
             status: 'new',
             response: null
         };
         
-        const saved = await window.saveComplaint(complaint);
-        
-        if (saved) {
-            alert('✅ Жалоба отправлена!');
-            document.getElementById('complaintForm').reset();
-            await loadLists();
-        } else {
-            alert('❌ Ошибка при отправке жалобы!');
+        if (typeof window.saveComplaint === 'function') {
+            const saved = await window.saveComplaint(complaint);
+            
+            if (saved) {
+                alert('✅ Жалоба отправлена!');
+                document.getElementById('complaintForm')?.reset();
+                await loadLists();
+            } else {
+                alert('❌ Ошибка при отправке жалобы!');
+            }
         }
     } catch (error) {
         console.error('Ошибка:', error);
@@ -420,30 +470,44 @@ async function submitTTMedia(event) {
         return;
     }
     
+    const age = document.getElementById('ttAge')?.value;
+    const name = document.getElementById('ttName')?.value;
+    const nickname = document.getElementById('ttNickname')?.value;
+    const subs = document.getElementById('ttSubs')?.value;
+    const views = document.getElementById('ttViews')?.value;
+    const link = document.getElementById('ttLink')?.value;
+    
+    if (!age || !name || !nickname || !subs || !views || !link) {
+        alert('Заполните все поля!');
+        return;
+    }
+    
     try {
         const mediaApp = {
             id: Date.now(),
             platform: 'tiktok',
-            age: document.getElementById('ttAge').value,
-            name: document.getElementById('ttName').value,
-            nickname: document.getElementById('ttNickname').value,
-            subscribers: document.getElementById('ttSubs').value,
-            views: document.getElementById('ttViews').value,
-            link: document.getElementById('ttLink').value,
+            age: age,
+            name: name,
+            nickname: nickname,
+            subscribers: subs,
+            views: views,
+            link: link,
             author: currentUser.username,
             date: new Date().toISOString(),
             status: 'new',
             response: null
         };
         
-        const saved = await window.saveMediaApplication(mediaApp);
-        
-        if (saved) {
-            alert('✅ Заявка на TikTok отправлена!');
-            document.getElementById('ttMediaForm').reset();
-            await loadLists();
-        } else {
-            alert('❌ Ошибка при отправке заявки!');
+        if (typeof window.saveMediaApplication === 'function') {
+            const saved = await window.saveMediaApplication(mediaApp);
+            
+            if (saved) {
+                alert('✅ Заявка на TikTok отправлена!');
+                document.getElementById('ttMediaForm')?.reset();
+                await loadLists();
+            } else {
+                alert('❌ Ошибка при отправке заявки!');
+            }
         }
     } catch (error) {
         console.error('Ошибка:', error);
@@ -463,30 +527,44 @@ async function submitYTMedia(event) {
         return;
     }
     
+    const age = document.getElementById('ytAge')?.value;
+    const name = document.getElementById('ytName')?.value;
+    const nickname = document.getElementById('ytNickname')?.value;
+    const subs = document.getElementById('ytSubs')?.value;
+    const views = document.getElementById('ytViews')?.value;
+    const link = document.getElementById('ytLink')?.value;
+    
+    if (!age || !name || !nickname || !subs || !views || !link) {
+        alert('Заполните все поля!');
+        return;
+    }
+    
     try {
         const mediaApp = {
             id: Date.now(),
             platform: 'youtube',
-            age: document.getElementById('ytAge').value,
-            name: document.getElementById('ytName').value,
-            nickname: document.getElementById('ytNickname').value,
-            subscribers: document.getElementById('ytSubs').value,
-            views: document.getElementById('ytViews').value,
-            link: document.getElementById('ytLink').value,
+            age: age,
+            name: name,
+            nickname: nickname,
+            subscribers: subs,
+            views: views,
+            link: link,
             author: currentUser.username,
             date: new Date().toISOString(),
             status: 'new',
             response: null
         };
         
-        const saved = await window.saveMediaApplication(mediaApp);
-        
-        if (saved) {
-            alert('✅ Заявка на YouTube отправлена!');
-            document.getElementById('ytMediaForm').reset();
-            await loadLists();
-        } else {
-            alert('❌ Ошибка при отправке заявки!');
+        if (typeof window.saveMediaApplication === 'function') {
+            const saved = await window.saveMediaApplication(mediaApp);
+            
+            if (saved) {
+                alert('✅ Заявка на YouTube отправлена!');
+                document.getElementById('ytMediaForm')?.reset();
+                await loadLists();
+            } else {
+                alert('❌ Ошибка при отправке заявки!');
+            }
         }
     } catch (error) {
         console.error('Ошибка:', error);
@@ -506,30 +584,45 @@ async function submitApplication(event) {
         return;
     }
     
+    const nickname = document.getElementById('helperNickname')?.value;
+    const name = document.getElementById('helperName')?.value;
+    const age = document.getElementById('helperAge')?.value;
+    const timezone = document.getElementById('helperTimezone')?.value;
+    const experience = document.getElementById('helperExperience')?.value;
+    const reason = document.getElementById('helperReason')?.value;
+    const additional = document.getElementById('helperAdditional')?.value || 'Не указано';
+    
+    if (!nickname || !name || !age || !timezone || !experience || !reason) {
+        alert('Заполните все поля!');
+        return;
+    }
+    
     try {
         const application = {
             id: Date.now(),
-            nickname: document.getElementById('helperNickname').value,
-            name: document.getElementById('helperName').value,
-            age: document.getElementById('helperAge').value,
-            timezone: document.getElementById('helperTimezone').value,
-            experience: document.getElementById('helperExperience').value,
-            reason: document.getElementById('helperReason').value,
-            additional: document.getElementById('helperAdditional').value || 'Не указано',
+            nickname: nickname,
+            name: name,
+            age: age,
+            timezone: timezone,
+            experience: experience,
+            reason: reason,
+            additional: additional,
             author: currentUser.username,
             date: new Date().toISOString(),
             status: 'new',
             response: null
         };
         
-        const saved = await window.saveApplication(application);
-        
-        if (saved) {
-            alert('✅ Анкета отправлена!');
-            document.getElementById('helperForm').reset();
-            await loadLists();
-        } else {
-            alert('❌ Ошибка при отправке анкеты!');
+        if (typeof window.saveApplication === 'function') {
+            const saved = await window.saveApplication(application);
+            
+            if (saved) {
+                alert('✅ Анкета отправлена!');
+                document.getElementById('helperForm')?.reset();
+                await loadLists();
+            } else {
+                alert('❌ Ошибка при отправке анкеты!');
+            }
         }
     } catch (error) {
         console.error('Ошибка:', error);
@@ -546,7 +639,9 @@ async function loadComplaints() {
     if (!list) return;
     
     try {
-        complaints = await window.getComplaints() || [];
+        if (typeof window.getComplaints === 'function') {
+            complaints = await window.getComplaints() || [];
+        }
         
         if (complaints.length === 0) {
             list.innerHTML = '<div class="empty-state">⚔️ <h3>Нет жалоб</h3><p>Пока никто не подавал жалоб</p></div>';
@@ -590,7 +685,9 @@ async function loadMediaApplications() {
     if (!list) return;
     
     try {
-        mediaApplications = await window.getMediaApplications() || [];
+        if (typeof window.getMediaApplications === 'function') {
+            mediaApplications = await window.getMediaApplications() || [];
+        }
         
         if (mediaApplications.length === 0) {
             list.innerHTML = '<div class="empty-state">📱 <h3>Нет заявок на медию</h3><p>Пока никто не подавал заявки</p></div>';
@@ -636,7 +733,9 @@ async function loadApplications() {
     if (!list) return;
     
     try {
-        applications = await window.getApplications() || [];
+        if (typeof window.getApplications === 'function') {
+            applications = await window.getApplications() || [];
+        }
         
         if (applications.length === 0) {
             list.innerHTML = '<div class="empty-state">👮 <h3>Нет анкет</h3><p>Пока никто не подавал заявки</p></div>';
