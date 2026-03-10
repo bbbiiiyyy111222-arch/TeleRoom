@@ -1,66 +1,121 @@
 // ==============================================
-// MOONGRIEF-FORUM - АДМИН ПАНЕЛЬ
+// MOONGRIEF-FORUM - АДМИН ПАНЕЛЬ (ИСПРАВЛЕНО)
 // ==============================================
 
-// Данные (общие с основным сайтом)
-let users = JSON.parse(localStorage.getItem('mg_users')) || [];
-let complaints = JSON.parse(localStorage.getItem('mg_complaints')) || [];
-let media = JSON.parse(localStorage.getItem('mg_media')) || [];
-let helpers = JSON.parse(localStorage.getItem('mg_helpers')) || [];
+console.log('✅ admin.js загружается...');
 
-let currentAdmin = JSON.parse(localStorage.getItem('mg_currentUser')) || null;
+// Глобальные функции для HTML
+window.showAdminTab = showAdminTab;
+window.loadComplaints = loadComplaints;
+window.loadMedia = loadMedia;
+window.loadApplications = loadApplications;
+window.updateStatus = updateStatus;
+window.copyIP = copyIP;
+window.logout = logout;
+window.showResponseModal = showResponseModal;
+window.closeResponseModal = closeResponseModal;
+window.sendResponse = sendResponse;
+window.confirmAction = confirmAction;
+window.closeConfirmModal = closeConfirmModal;
+
+// Данные
+let complaints = [];
+let media = [];
+let helpers = [];
+let currentAdmin = null;
 let currentActionId = null;
 let currentActionType = null;
-let currentActionElement = null;
+let confirmCallback = null;
 
-// Админы (OWNER)
-const admins = ['milfa', 'milk123', 'Xchik_'];
+// Админы
+const ADMINS = ['milfa', 'milk123', 'Xchik_'];
 
 // ==============================================
-// ПРОВЕРКА ДОСТУПА
+// ИНИЦИАЛИЗАЦИЯ
 // ==============================================
 
-function checkAdminAccess() {
-    if (!currentAdmin || !admins.includes(currentAdmin.username)) {
-        window.location.href = 'index.html';
-        return false;
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('🚀 Запуск админ панели...');
+    
+    // Загружаем текущего пользователя
+    const savedUser = localStorage.getItem('mg_currentUser');
+    if (savedUser) {
+        currentAdmin = JSON.parse(savedUser);
+        console.log('👤 Текущий пользователь:', currentAdmin);
     }
     
-    document.getElementById('adminName').textContent = `🌙 ${currentAdmin.username}`;
-    document.getElementById('adminRole').textContent = 'OWNER';
-    return true;
-}
+    // Проверяем доступ
+    if (!currentAdmin || !ADMINS.includes(currentAdmin.username)) {
+        console.log('❌ Нет доступа');
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    // Отображаем имя админа
+    const adminNameEl = document.getElementById('adminName');
+    if (adminNameEl) adminNameEl.textContent = `🌙 ${currentAdmin.username}`;
+    
+    // Загружаем данные
+    await loadAllData();
+});
 
 // ==============================================
-// КОПИРОВАНИЕ IP
+// ЗАГРУЗКА ДАННЫХ
 // ==============================================
 
-function copyIP() {
-    navigator.clipboard.writeText('Moongrief.aurorix.pro').then(() => {
-        alert('📋 IP скопирован!');
-    }).catch(() => {
-        alert('❌ Ошибка копирования');
-    });
+async function loadAllData() {
+    console.log('📥 Загрузка данных...');
+    
+    try {
+        // Жалобы
+        if (window.getComplaints) {
+            complaints = await window.getComplaints();
+            console.log('📋 Жалоб:', complaints.length);
+        }
+        
+        // Медиа
+        if (window.getMediaApplications) {
+            media = await window.getMediaApplications();
+            console.log('📋 Медиа:', media.length);
+        }
+        
+        // Хелперы
+        if (window.getHelperApplications) {
+            helpers = await window.getHelperApplications();
+            console.log('📋 Хелперов:', helpers.length);
+        }
+        
+        updateStats();
+        renderComplaints();
+        
+    } catch (e) {
+        console.error('❌ Ошибка загрузки:', e);
+    }
 }
 
 // ==============================================
 // СТАТИСТИКА
 // ==============================================
 
-function loadStats() {
+function updateStats() {
     const newComplaints = complaints.filter(c => c.status === 'НОВАЯ').length;
     const newMedia = media.filter(m => m.status === 'НОВАЯ').length;
     const newHelpers = helpers.filter(h => h.status === 'НОВАЯ').length;
     const total = complaints.length + media.length + helpers.length;
-    const newTotal = newComplaints + newMedia + newHelpers;
     
-    document.getElementById('statComplaints').textContent = newComplaints;
-    document.getElementById('statMedia').textContent = newMedia;
-    document.getElementById('statHelpers').textContent = newHelpers;
-    document.getElementById('statTotal').textContent = total;
+    const elements = {
+        statComplaints: newComplaints,
+        statMedia: newMedia,
+        statHelpers: newHelpers,
+        statTotal: total,
+        totalStats: total,
+        newStats: newComplaints + newMedia + newHelpers
+    };
     
-    document.getElementById('totalStats').textContent = total;
-    document.getElementById('newStats').textContent = newTotal;
+    for (let [id, value] of Object.entries(elements)) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+    }
 }
 
 // ==============================================
@@ -68,61 +123,70 @@ function loadStats() {
 // ==============================================
 
 function showAdminTab(tabName) {
+    console.log('🔄 Переключение на:', tabName);
+    
+    // Скрываем все вкладки
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
     });
     
+    // Убираем активный класс с кнопок
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     
-    document.getElementById(`admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
-    event.target.classList.add('active');
+    // Показываем выбранную вкладку
+    const tabId = 'admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+    const tabEl = document.getElementById(tabId);
+    if (tabEl) tabEl.classList.add('active');
     
-    switch(tabName) {
-        case 'complaints': loadComplaints(); break;
-        case 'media': loadMedia(); break;
-        case 'applications': loadApplications(); break;
+    // Активируем кнопку
+    if (event && event.target) {
+        event.target.classList.add('active');
     }
+    
+    // Отрисовываем нужный контент
+    if (tabName === 'complaints') renderComplaints();
+    if (tabName === 'media') renderMedia();
+    if (tabName === 'applications') renderHelpers();
 }
 
 // ==============================================
-// ЗАГРУЗКА ЖАЛОБ
+// ОТРИСОВКА ЖАЛОБ
 // ==============================================
 
-function loadComplaints() {
+function renderComplaints() {
     const list = document.getElementById('complaintsList');
+    if (!list) return;
     
-    if (complaints.length === 0) {
+    if (!complaints || complaints.length === 0) {
         list.innerHTML = '<div class="empty-list">📭 Нет жалоб</div>';
         return;
     }
     
     let html = '';
     complaints.forEach(c => {
-        const statusClass = c.status === 'НОВАЯ' ? 'status-new' : c.status === 'ПРИНЯТО' ? 'status-accepted' : 'status-rejected';
+        const statusClass = c.status === 'НОВАЯ' ? 'status-new' : 
+                           c.status === 'ПРИНЯТО' ? 'status-accepted' : 'status-rejected';
         
         html += `
-            <div class="admin-card" data-id="${c.id}" data-type="complaint">
+            <div class="admin-card" data-id="${c.id}">
                 <div class="admin-card-header">
                     <div class="admin-card-title">
                         <span class="card-icon">⚠️</span>
-                        <h3>${c.title}</h3>
+                        <h3>${c.title || 'Жалоба'}</h3>
                     </div>
-                    <span class="admin-status ${statusClass}">${c.status}</span>
+                    <span class="admin-status ${statusClass}">${c.status || 'НОВАЯ'}</span>
                 </div>
-                
                 <div class="admin-card-body">
-                    <p><strong>От:</strong> ${c.user}</p>
-                    <p><strong>Нарушитель:</strong> ${c.target}</p>
-                    <p><strong>Описание:</strong> ${c.desc}</p>
-                    <p><strong>Дата:</strong> ${c.date}</p>
+                    <p><strong>От:</strong> ${c.user_name || 'Неизвестно'}</p>
+                    <p><strong>Нарушитель:</strong> ${c.target || 'Не указан'}</p>
+                    <p><strong>Описание:</strong> ${c.description || 'Нет описания'}</p>
+                    <p><strong>Дата:</strong> ${c.date || c.created_at || 'Неизвестно'}</p>
                 </div>
-                
                 <div class="admin-card-actions">
-                    <button onclick="acceptItem('complaint', ${c.id}, this)" class="admin-action accept" title="Принять">✓</button>
-                    <button onclick="rejectItem('complaint', ${c.id}, this)" class="admin-action reject" title="Отклонить">✗</button>
-                    <button onclick="showResponseModal('complaint', ${c.id}, '${c.user}', '${c.title}')" class="admin-action respond" title="Ответить">📝</button>
+                    <button onclick="updateStatus('complaint', ${c.id}, 'ПРИНЯТО')" class="admin-action accept">✓</button>
+                    <button onclick="updateStatus('complaint', ${c.id}, 'ОТКЛОНЕНО')" class="admin-action reject">✗</button>
                 </div>
             </div>
         `;
@@ -132,46 +196,41 @@ function loadComplaints() {
 }
 
 // ==============================================
-// ЗАГРУЗКА МЕДИА
+// ОТРИСОВКА МЕДИА
 // ==============================================
 
-function loadMedia() {
+function renderMedia() {
     const list = document.getElementById('mediaList');
+    if (!list) return;
     
-    if (media.length === 0) {
+    if (!media || media.length === 0) {
         list.innerHTML = '<div class="empty-list">📭 Нет медиа-заявок</div>';
         return;
     }
     
     let html = '';
     media.forEach(m => {
-        const platformIcon = m.type === 'tt' ? '📱' : '▶️';
-        const platformName = m.type === 'tt' ? 'TIKTOK' : 'YOUTUBE';
-        const statusClass = m.status === 'НОВАЯ' ? 'status-new' : m.status === 'ПРИНЯТО' ? 'status-accepted' : 'status-rejected';
+        const statusClass = m.status === 'НОВАЯ' ? 'status-new' : 
+                           m.status === 'ПРИНЯТО' ? 'status-accepted' : 'status-rejected';
         
         html += `
-            <div class="admin-card" data-id="${m.id}" data-type="media">
+            <div class="admin-card" data-id="${m.id}">
                 <div class="admin-card-header">
                     <div class="admin-card-title">
-                        <span class="card-icon">${platformIcon}</span>
-                        <h3>${platformName} ЗАЯВКА</h3>
+                        <span class="card-icon">📱</span>
+                        <h3>${m.platform === 'tt' ? 'TIKTOK' : 'YOUTUBE'} ЗАЯВКА</h3>
                     </div>
-                    <span class="admin-status ${statusClass}">${m.status}</span>
+                    <span class="admin-status ${statusClass}">${m.status || 'НОВАЯ'}</span>
                 </div>
-                
                 <div class="admin-card-body">
-                    <p><strong>Ник:</strong> ${m.nick}</p>
-                    <p><strong>Имя:</strong> ${m.name}</p>
-                    <p><strong>Возраст:</strong> ${m.age}</p>
-                    <p><strong>Подписчики:</strong> ${m.subs}</p>
-                    <p><strong>Ссылка:</strong> <a href="${m.link}" target="_blank">${m.link}</a></p>
-                    <p><strong>Дата:</strong> ${m.date}</p>
+                    <p><strong>От:</strong> ${m.user_name || 'Неизвестно'}</p>
+                    <p><strong>Ник:</strong> ${m.nickname || 'Не указан'}</p>
+                    <p><strong>Подписчики:</strong> ${m.subscribers || '0'}</p>
+                    <p><strong>Дата:</strong> ${m.date || m.created_at || 'Неизвестно'}</p>
                 </div>
-                
                 <div class="admin-card-actions">
-                    <button onclick="acceptItem('media', ${m.id}, this)" class="admin-action accept" title="Принять">✓</button>
-                    <button onclick="rejectItem('media', ${m.id}, this)" class="admin-action reject" title="Отклонить">✗</button>
-                    <button onclick="showResponseModal('media', ${m.id}, '${m.nick}', '${platformName} ЗАЯВКА')" class="admin-action respond" title="Ответить">📝</button>
+                    <button onclick="updateStatus('media', ${m.id}, 'ПРИНЯТО')" class="admin-action accept">✓</button>
+                    <button onclick="updateStatus('media', ${m.id}, 'ОТКЛОНЕНО')" class="admin-action reject">✗</button>
                 </div>
             </div>
         `;
@@ -181,45 +240,41 @@ function loadMedia() {
 }
 
 // ==============================================
-// ЗАГРУЗКА ХЕЛПЕРОВ
+// ОТРИСОВКА ХЕЛПЕРОВ
 // ==============================================
 
-function loadApplications() {
+function renderHelpers() {
     const list = document.getElementById('applicationsList');
+    if (!list) return;
     
-    if (helpers.length === 0) {
-        list.innerHTML = '<div class="empty-list">📭 Нет анкет</div>';
+    if (!helpers || helpers.length === 0) {
+        list.innerHTML = '<div class="empty-list">📭 Нет заявок на хелпера</div>';
         return;
     }
     
     let html = '';
     helpers.forEach(h => {
-        const statusClass = h.status === 'НОВАЯ' ? 'status-new' : h.status === 'ПРИНЯТО' ? 'status-accepted' : 'status-rejected';
+        const statusClass = h.status === 'НОВАЯ' ? 'status-new' : 
+                           h.status === 'ПРИНЯТО' ? 'status-accepted' : 'status-rejected';
         
         html += `
-            <div class="admin-card" data-id="${h.id}" data-type="helper">
+            <div class="admin-card" data-id="${h.id}">
                 <div class="admin-card-header">
                     <div class="admin-card-title">
                         <span class="card-icon">👮</span>
                         <h3>АНКЕТА НА ХЕЛПЕРА</h3>
                     </div>
-                    <span class="admin-status ${statusClass}">${h.status}</span>
+                    <span class="admin-status ${statusClass}">${h.status || 'НОВАЯ'}</span>
                 </div>
-                
                 <div class="admin-card-body">
-                    <p><strong>Ник:</strong> ${h.nick}</p>
-                    <p><strong>Имя:</strong> ${h.name}</p>
-                    <p><strong>Возраст:</strong> ${h.age}</p>
-                    <p><strong>Часовой пояс:</strong> ${h.tz}</p>
-                    <p><strong>Опыт:</strong> ${h.exp}</p>
-                    <p><strong>Мотивация:</strong> ${h.why}</p>
-                    <p><strong>Дата:</strong> ${h.date}</p>
+                    <p><strong>От:</strong> ${h.user_name || 'Неизвестно'}</p>
+                    <p><strong>Ник:</strong> ${h.nickname || 'Не указан'}</p>
+                    <p><strong>Возраст:</strong> ${h.age || 'Не указан'}</p>
+                    <p><strong>Дата:</strong> ${h.date || h.created_at || 'Неизвестно'}</p>
                 </div>
-                
                 <div class="admin-card-actions">
-                    <button onclick="acceptItem('helper', ${h.id}, this)" class="admin-action accept" title="Принять">✓</button>
-                    <button onclick="rejectItem('helper', ${h.id}, this)" class="admin-action reject" title="Отклонить">✗</button>
-                    <button onclick="showResponseModal('helper', ${h.id}, '${h.nick}', 'АНКЕТА НА ХЕЛПЕРА')" class="admin-action respond" title="Ответить">📝</button>
+                    <button onclick="updateStatus('helper', ${h.id}, 'ПРИНЯТО')" class="admin-action accept">✓</button>
+                    <button onclick="updateStatus('helper', ${h.id}, 'ОТКЛОНЕНО')" class="admin-action reject">✗</button>
                 </div>
             </div>
         `;
@@ -229,129 +284,93 @@ function loadApplications() {
 }
 
 // ==============================================
-// ДЕЙСТВИЯ
+// ОБНОВЛЕНИЕ СТАТУСА
 // ==============================================
 
-function acceptItem(type, id, btn) {
-    const card = btn.closest('.admin-card');
-    const statusBadge = card.querySelector('.admin-status');
+async function updateStatus(type, id, newStatus) {
+    console.log(`🔄 Обновление ${type} #${id} -> ${newStatus}`);
     
-    let array;
-    switch(type) {
-        case 'complaint': array = complaints; break;
-        case 'media': array = media; break;
-        case 'helper': array = helpers; break;
+    let success = false;
+    
+    if (type === 'complaint' && window.updateComplaintStatus) {
+        success = await window.updateComplaintStatus(id, newStatus);
+    }
+    if (type === 'media' && window.updateMediaStatus) {
+        success = await window.updateMediaStatus(id, newStatus);
+    }
+    if (type === 'helper' && window.updateHelperStatus) {
+        success = await window.updateHelperStatus(id, newStatus);
     }
     
-    const item = array.find(i => i.id === id);
-    if (item) {
-        item.status = 'ПРИНЯТО';
-        localStorage.setItem(`mg_${type === 'helper' ? 'helpers' : type + 's'}`, JSON.stringify(array));
+    if (success) {
+        alert(`✅ Статус изменен на ${newStatus}`);
+        await loadAllData();
+    } else {
+        alert('❌ Ошибка обновления');
     }
-    
-    statusBadge.textContent = 'ПРИНЯТО';
-    statusBadge.className = 'admin-status status-accepted';
-    
-    showNotification('✅ Заявка принята');
-    loadStats();
-}
-
-function rejectItem(type, id, btn) {
-    const card = btn.closest('.admin-card');
-    const statusBadge = card.querySelector('.admin-status');
-    
-    let array;
-    switch(type) {
-        case 'complaint': array = complaints; break;
-        case 'media': array = media; break;
-        case 'helper': array = helpers; break;
-    }
-    
-    const item = array.find(i => i.id === id);
-    if (item) {
-        item.status = 'ОТКЛОНЕНО';
-        localStorage.setItem(`mg_${type === 'helper' ? 'helpers' : type + 's'}`, JSON.stringify(array));
-    }
-    
-    statusBadge.textContent = 'ОТКЛОНЕНО';
-    statusBadge.className = 'admin-status status-rejected';
-    
-    showNotification('❌ Заявка отклонена');
-    loadStats();
 }
 
 // ==============================================
-// УВЕДОМЛЕНИЯ
+// ЗАГРУЗКА ПО КНОПКАМ
 // ==============================================
 
-function showNotification(message) {
-    const notification = document.createElement('div');
-    notification.className = 'admin-notification';
-    notification.textContent = message;
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #4a4a8a;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 5px;
-        z-index: 10000;
-        animation: slideIn 0.3s;
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
+async function loadComplaints() {
+    await loadAllData();
+    renderComplaints();
+}
+
+async function loadMedia() {
+    await loadAllData();
+    renderMedia();
+}
+
+async function loadApplications() {
+    await loadAllData();
+    renderHelpers();
 }
 
 // ==============================================
-// МОДАЛКА ОТВЕТА
+// МОДАЛКИ
 // ==============================================
 
 function showResponseModal(type, id, user, topic) {
     currentActionId = id;
     currentActionType = type;
     
-    document.getElementById('responseId').value = id;
-    document.getElementById('responseType').value = type;
-    document.getElementById('responseUser').textContent = user;
-    document.getElementById('responseTopic').textContent = topic;
-    document.getElementById('responseText').value = '';
+    const userEl = document.getElementById('responseUser');
+    const topicEl = document.getElementById('responseTopic');
+    if (userEl) userEl.textContent = user;
+    if (topicEl) topicEl.textContent = topic;
     
-    document.getElementById('responseModal').style.display = 'flex';
+    const modal = document.getElementById('responseModal');
+    if (modal) modal.style.display = 'flex';
 }
 
 function closeResponseModal() {
-    document.getElementById('responseModal').style.display = 'none';
+    const modal = document.getElementById('responseModal');
+    if (modal) modal.style.display = 'none';
 }
 
 function sendResponse(event) {
-    event.preventDefault();
+    if (event) event.preventDefault();
     
-    const response = document.getElementById('responseText').value;
-    
-    if (!response.trim()) {
+    const text = document.getElementById('responseText');
+    if (text && text.value.trim()) {
+        alert('📨 Ответ отправлен');
+        closeResponseModal();
+        text.value = '';
+    } else {
         alert('Введите текст ответа');
-        return;
     }
-    
-    alert('📨 Ответ отправлен');
-    closeResponseModal();
 }
-
-// ==============================================
-// МОДАЛКА ПОДТВЕРЖДЕНИЯ
-// ==============================================
-
-let confirmCallback = null;
 
 function showConfirm(message, callback) {
     confirmCallback = callback;
-    document.getElementById('confirmMessage').textContent = message;
-    document.getElementById('confirmModal').style.display = 'flex';
+    const msgEl = document.getElementById('confirmMessage');
+    if (msgEl) msgEl.textContent = message;
+    
+    const modal = document.getElementById('confirmModal');
+    if (modal) modal.style.display = 'flex';
 }
 
 function confirmAction() {
@@ -360,319 +379,22 @@ function confirmAction() {
 }
 
 function closeConfirmModal() {
-    document.getElementById('confirmModal').style.display = 'none';
+    const modal = document.getElementById('confirmModal');
+    if (modal) modal.style.display = 'none';
     confirmCallback = null;
 }
 
 // ==============================================
-// ВЫХОД
+// IP И ВЫХОД
 // ==============================================
+
+function copyIP() {
+    navigator.clipboard.writeText('Moongrief.aurorix.pro');
+    alert('📋 IP скопирован!');
+}
 
 function logout() {
-    showConfirm('Выйти из админ панели?', () => {
+    if (confirm('Выйти из админ панели?')) {
         window.location.href = 'index.html';
-    });
+    }
 }
-
-// ==============================================
-// ИНИЦИАЛИЗАЦИЯ
-// ==============================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    if (!checkAdminAccess()) return;
-    
-    loadStats();
-    loadComplaints();
-    
-    // Добавляем стили
-    const style = document.createElement('style');
-    style.textContent = `
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: rgba(26, 26, 58, 0.8);
-            border: 2px solid #4a4a8a;
-            border-radius: 20px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            backdrop-filter: blur(5px);
-        }
-        
-        .stat-icon {
-            font-size: 32px;
-        }
-        
-        .stat-info h3 {
-            color: #8a8aff;
-            font-size: 11px;
-            margin-bottom: 5px;
-        }
-        
-        .stat-number {
-            color: white;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        
-        .admin-tabs {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .tab-btn {
-            flex: 1;
-            background: rgba(42, 42, 74, 0.8);
-            border: 2px solid #4a4a8a;
-            color: #b0b0ff;
-            padding: 15px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s;
-        }
-        
-        .tab-btn:hover {
-            background: #4a4a8a;
-            color: white;
-        }
-        
-        .tab-btn.active {
-            background: linear-gradient(135deg, #4a4a8a, #6a6aaa);
-            color: white;
-            box-shadow: 0 0 25px #7a7aff;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .admin-controls {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 20px;
-        }
-        
-        .admin-refresh-btn {
-            background: rgba(42, 42, 74, 0.8);
-            border: 2px solid #4a4a8a;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-        
-        .admin-refresh-btn:hover {
-            background: #4a4a8a;
-            box-shadow: 0 0 20px #7a7aff;
-        }
-        
-        .admin-card {
-            background: rgba(26, 26, 58, 0.8);
-            border: 2px solid #4a4a8a;
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 20px;
-            backdrop-filter: blur(5px);
-            transition: all 0.3s;
-        }
-        
-        .admin-card:hover {
-            transform: translateX(10px);
-            box-shadow: -10px 10px 30px rgba(122, 122, 255, 0.3);
-            border-color: #8a8aff;
-        }
-        
-        .admin-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #4a4a8a;
-        }
-        
-        .admin-card-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .card-icon {
-            font-size: 20px;
-        }
-        
-        .admin-card-title h3 {
-            color: #b0b0ff;
-            font-size: 13px;
-        }
-        
-        .admin-status {
-            padding: 5px 15px;
-            border-radius: 30px;
-            font-size: 10px;
-            font-weight: bold;
-        }
-        
-        .status-new {
-            background: #4a4a8a;
-            color: white;
-            box-shadow: 0 0 15px #4a4a8a;
-        }
-        
-        .status-accepted {
-            background: #4a9a7a;
-            color: white;
-            box-shadow: 0 0 15px #4a9a7a;
-        }
-        
-        .status-rejected {
-            background: #9a4a4a;
-            color: white;
-            box-shadow: 0 0 15px #9a4a4a;
-        }
-        
-        .admin-card-body {
-            margin-bottom: 20px;
-        }
-        
-        .admin-card-body p {
-            color: #c0c0ff;
-            font-size: 11px;
-            margin: 8px 0;
-        }
-        
-        .admin-card-body strong {
-            color: #b0b0ff;
-            min-width: 90px;
-            display: inline-block;
-        }
-        
-        .admin-card-body a {
-            color: #8a8aff;
-            text-decoration: none;
-        }
-        
-        .admin-card-body a:hover {
-            text-decoration: underline;
-        }
-        
-        .admin-card-actions {
-            display: flex;
-            gap: 15px;
-            justify-content: flex-end;
-            border-top: 2px solid #4a4a8a;
-            padding-top: 20px;
-        }
-        
-        .admin-action {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: 2px solid;
-            background: rgba(42, 42, 74, 0.8);
-            cursor: pointer;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-        
-        .admin-action.accept {
-            color: #4aff7a;
-            border-color: #4aff7a;
-        }
-        
-        .admin-action.accept:hover {
-            background: #4aff7a;
-            color: #1a1a3a;
-            transform: scale(1.1);
-            box-shadow: 0 0 20px #4aff7a;
-        }
-        
-        .admin-action.reject {
-            color: #ff4a4a;
-            border-color: #ff4a4a;
-        }
-        
-        .admin-action.reject:hover {
-            background: #ff4a4a;
-            color: #1a1a3a;
-            transform: scale(1.1);
-            box-shadow: 0 0 20px #ff4a4a;
-        }
-        
-        .admin-action.respond {
-            color: #8a8aff;
-            border-color: #8a8aff;
-        }
-        
-        .admin-action.respond:hover {
-            background: #8a8aff;
-            color: #1a1a3a;
-            transform: scale(1.1);
-            box-shadow: 0 0 20px #8a8aff;
-        }
-        
-        .response-info {
-            background: rgba(42, 42, 74, 0.8);
-            padding: 12px;
-            border-radius: 10px;
-            color: #b0b0ff;
-            border: 1px solid #4a4a8a;
-        }
-        
-        .action-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .cancel-btn {
-            background: linear-gradient(135deg, #8a4a4a, #aa6a6a) !important;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-    `;
-    
-    document.head.appendChild(style);
-});
-
-// Закрытие модалок по клику вне
-window.onclick = function(event) {
-    const responseModal = document.getElementById('responseModal');
-    const confirmModal = document.getElementById('confirmModal');
-    
-    if (event.target === responseModal) closeResponseModal();
-    if (event.target === confirmModal) closeConfirmModal();
-}
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="db.js"></script>
-<script src="admin.js"></script>
