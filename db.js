@@ -1,5 +1,5 @@
 // ==============================================
-// MOONGRIEF-FORUM - БАЗА ДАННЫХ (ДЕБАГ ВЕРСИЯ)
+// MOONGRIEF-FORUM - БАЗА ДАННЫХ (ФИНАЛ)
 // ==============================================
 
 console.log('✅ db.js загружается...');
@@ -9,7 +9,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 if (!window.mgSupabase) {
     window.mgSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log('✅ Создан клиент Supabase');
+    console.log('✅ Клиент Supabase создан');
 }
 
 // ==============================================
@@ -18,91 +18,110 @@ if (!window.mgSupabase) {
 
 window.checkUser = async function(username, password) {
     try {
-        console.log(`🔍 Проверка пользователя: ${username}`);
-        
         const { data, error } = await window.mgSupabase
             .from('users')
             .select('*')
             .eq('username', username);
         
-        if (error) {
-            console.error('Ошибка запроса:', error);
-            return null;
-        }
-        
-        if (!data || data.length === 0) {
-            console.log('❌ Пользователь не найден');
-            return null;
-        }
+        if (error || !data || data.length === 0) return null;
         
         const user = data[0];
-        console.log('👤 Найден пользователь:', user.username, 'пароль в БД:', user.password);
-        
         if (user.password === password) {
-            console.log('✅ Пароль верный');
-            
             let role = 'user';
             if (username === 'milfa' || username === 'milk123' || username === 'Xchik_') {
                 role = 'owner';
             }
-            
             return {
                 username: user.username,
                 password: user.password,
                 role: role
             };
-        } else {
-            console.log('❌ Неверный пароль');
-            return null;
         }
+        return null;
     } catch (e) {
-        console.error('Ошибка:', e);
+        console.error('Ошибка checkUser:', e);
         return null;
     }
 };
 
 // ==============================================
-// ЖАЛОБЫ - УПРОЩЕННАЯ ВЕРСИЯ
+// ЖАЛОБЫ - ПО ТВОЕЙ ТАБЛИЦЕ
 // ==============================================
 
 window.saveComplaint = async function(complaint) {
     try {
         console.log('💾 Сохраняем жалобу:', complaint);
         
-        // Проверяем соединение
-        const testConnection = await window.mgSupabase.from('complaints').select('count').limit(1);
-        console.log('Тест соединения:', testConnection);
-        
         const { data, error } = await window.mgSupabase
             .from('complaints')
             .insert({
-                user_name: complaint.user,
+                author: complaint.user,
                 title: complaint.title,
                 against: complaint.target,
                 description: complaint.desc,
                 status: 'НОВАЯ',
-                date: new Date().toLocaleString('ru-RU')
+                date: new Date().toISOString()
             })
             .select();
         
         if (error) {
-            console.error('❌ Ошибка сохранения:', error);
-            alert('Ошибка: ' + error.message);
+            console.error('❌ Ошибка:', error);
             return false;
         }
         
         console.log('✅ Жалоба сохранена:', data);
-        alert('✅ Жалоба отправлена!');
         return true;
     } catch (e) {
-        console.error('❌ Критическая ошибка:', e);
-        alert('Ошибка: ' + e.message);
+        console.error('❌ Ошибка:', e);
+        return false;
+    }
+};
+
+window.getComplaints = async function() {
+    try {
+        const { data, error } = await window.mgSupabase
+            .from('complaints')
+            .select('*')
+            .order('id', { ascending: false });
+        
+        return data || [];
+    } catch (e) {
+        console.error('Ошибка загрузки жалоб:', e);
+        return [];
+    }
+};
+
+window.getUserComplaints = async function(username) {
+    try {
+        const { data, error } = await window.mgSupabase
+            .from('complaints')
+            .select('*')
+            .eq('author', username)
+            .order('id', { ascending: false });
+        
+        return data || [];
+    } catch (e) {
+        console.error('Ошибка загрузки жалоб пользователя:', e);
+        return [];
+    }
+};
+
+window.updateComplaintStatus = async function(id, status) {
+    try {
+        const { error } = await window.mgSupabase
+            .from('complaints')
+            .update({ status: status })
+            .eq('id', id);
+        
+        return !error;
+    } catch (e) {
+        console.error('Ошибка обновления статуса:', e);
         return false;
     }
 };
 
 // ==============================================
-// МЕДИА - УПРОЩЕННАЯ ВЕРСИЯ
+// МЕДИА-ЗАЯВКИ - ПО ТВОЕЙ ТАБЛИЦЕ
 // ==============================================
 
 window.saveMediaApplication = async function(mediaApp) {
@@ -120,28 +139,69 @@ window.saveMediaApplication = async function(mediaApp) {
                 subscribers: mediaApp.subs,
                 link: mediaApp.link,
                 status: 'НОВАЯ',
-                date: new Date().toLocaleString('ru-RU')
+                date: new Date().toLocaleString('ru-RU'),
+                created_at: new Date().toISOString()
             })
             .select();
         
         if (error) {
-            console.error('❌ Ошибка сохранения:', error);
-            alert('Ошибка: ' + error.message);
+            console.error('❌ Ошибка:', error);
             return false;
         }
         
         console.log('✅ Медиа сохранено:', data);
-        alert('✅ Заявка отправлена!');
         return true;
     } catch (e) {
         console.error('❌ Ошибка:', e);
-        alert('Ошибка: ' + e.message);
+        return false;
+    }
+};
+
+window.getMediaApplications = async function() {
+    try {
+        const { data, error } = await window.mgSupabase
+            .from('media_applications')
+            .select('*')
+            .order('id', { ascending: false });
+        
+        return data || [];
+    } catch (e) {
+        console.error('Ошибка загрузки медиа:', e);
+        return [];
+    }
+};
+
+window.getUserMediaApplications = async function(username) {
+    try {
+        const { data, error } = await window.mgSupabase
+            .from('media_applications')
+            .select('*')
+            .eq('user_name', username)
+            .order('id', { ascending: false });
+        
+        return data || [];
+    } catch (e) {
+        console.error('Ошибка загрузки медиа пользователя:', e);
+        return [];
+    }
+};
+
+window.updateMediaStatus = async function(id, status) {
+    try {
+        const { error } = await window.mgSupabase
+            .from('media_applications')
+            .update({ status: status })
+            .eq('id', id);
+        
+        return !error;
+    } catch (e) {
+        console.error('Ошибка обновления статуса медиа:', e);
         return false;
     }
 };
 
 // ==============================================
-// ХЕЛПЕРЫ - УПРОЩЕННАЯ ВЕРСИЯ
+// ХЕЛПЕРЫ - ПО ТВОЕЙ ТАБЛИЦЕ
 // ==============================================
 
 window.saveHelperApplication = async function(helperApp) {
@@ -159,89 +219,21 @@ window.saveHelperApplication = async function(helperApp) {
                 experience: helperApp.exp,
                 motivation: helperApp.why,
                 status: 'НОВАЯ',
-                date: new Date().toLocaleString('ru-RU')
+                date: new Date().toLocaleString('ru-RU'),
+                created_at: new Date().toISOString()
             })
             .select();
         
         if (error) {
-            console.error('❌ Ошибка сохранения:', error);
-            alert('Ошибка: ' + error.message);
+            console.error('❌ Ошибка:', error);
             return false;
         }
         
         console.log('✅ Хелпер сохранен:', data);
-        alert('✅ Анкета отправлена!');
         return true;
     } catch (e) {
         console.error('❌ Ошибка:', e);
-        alert('Ошибка: ' + e.message);
         return false;
-    }
-};
-
-// ==============================================
-// ФУНКЦИИ ДЛЯ ЗАГРУЗКИ
-// ==============================================
-
-window.getComplaints = async function() {
-    try {
-        const { data, error } = await window.mgSupabase
-            .from('complaints')
-            .select('*')
-            .order('id', { ascending: false });
-        
-        if (error) throw error;
-        return data || [];
-    } catch (e) {
-        console.error('Ошибка загрузки жалоб:', e);
-        return [];
-    }
-};
-
-window.getUserComplaints = async function(username) {
-    try {
-        const { data, error } = await window.mgSupabase
-            .from('complaints')
-            .select('*')
-            .eq('user_name', username)
-            .order('id', { ascending: false });
-        
-        if (error) throw error;
-        return data || [];
-    } catch (e) {
-        console.error('Ошибка загрузки жалоб пользователя:', e);
-        return [];
-    }
-};
-
-window.getMediaApplications = async function() {
-    try {
-        const { data, error } = await window.mgSupabase
-            .from('media_applications')
-            .select('*')
-            .order('id', { ascending: false });
-        
-        if (error) throw error;
-        return data || [];
-    } catch (e) {
-        console.error('Ошибка загрузки медиа:', e);
-        return [];
-    }
-};
-
-window.getUserMediaApplications = async function(username) {
-    try {
-        const { data, error } = await window.mgSupabase
-            .from('media_applications')
-            .select('*')
-            .eq('user_name', username)
-            .order('id', { ascending: false });
-        
-        if (error) throw error;
-        return data || [];
-    } catch (e) {
-        console.error('Ошибка загрузки медиа пользователя:', e);
-        return [];
     }
 };
 
@@ -252,7 +244,6 @@ window.getHelperApplications = async function() {
             .select('*')
             .order('id', { ascending: false });
         
-        if (error) throw error;
         return data || [];
     } catch (e) {
         console.error('Ошибка загрузки хелперов:', e);
@@ -268,49 +259,10 @@ window.getUserHelperApplications = async function(username) {
             .eq('user_name', username)
             .order('id', { ascending: false });
         
-        if (error) throw error;
         return data || [];
     } catch (e) {
         console.error('Ошибка загрузки хелперов пользователя:', e);
         return [];
-    }
-};
-
-// ==============================================
-// ОБНОВЛЕНИЕ СТАТУСОВ
-// ==============================================
-
-window.updateComplaintStatus = async function(id, status) {
-    try {
-        const { error } = await window.mgSupabase
-            .from('complaints')
-            .update({ status: status })
-            .eq('id', id);
-        
-        if (error) throw error;
-        alert('✅ Статус обновлен');
-        return true;
-    } catch (e) {
-        console.error('Ошибка:', e);
-        alert('❌ Ошибка обновления');
-        return false;
-    }
-};
-
-window.updateMediaStatus = async function(id, status) {
-    try {
-        const { error } = await window.mgSupabase
-            .from('media_applications')
-            .update({ status: status })
-            .eq('id', id);
-        
-        if (error) throw error;
-        alert('✅ Статус обновлен');
-        return true;
-    } catch (e) {
-        console.error('Ошибка:', e);
-        alert('❌ Ошибка обновления');
-        return false;
     }
 };
 
@@ -321,14 +273,44 @@ window.updateHelperStatus = async function(id, status) {
             .update({ status: status })
             .eq('id', id);
         
-        if (error) throw error;
-        alert('✅ Статус обновлен');
-        return true;
+        return !error;
     } catch (e) {
-        console.error('Ошибка:', e);
-        alert('❌ Ошибка обновления');
+        console.error('Ошибка обновления статуса хелпера:', e);
         return false;
     }
 };
 
-console.log('✅ db.js готов к работе');
+// ==============================================
+// СТАТИСТИКА
+// ==============================================
+
+window.getStats = async function() {
+    try {
+        const complaints = await window.getComplaints();
+        const media = await window.getMediaApplications();
+        const helpers = await window.getHelperApplications();
+        
+        return {
+            total: complaints.length + media.length + helpers.length,
+            new: complaints.filter(c => c.status === 'НОВАЯ').length + 
+                 media.filter(m => m.status === 'НОВАЯ').length + 
+                 helpers.filter(h => h.status === 'НОВАЯ').length,
+            complaints: complaints.length,
+            media: media.length,
+            helpers: helpers.length,
+            newComplaints: complaints.filter(c => c.status === 'НОВАЯ').length,
+            newMedia: media.filter(m => m.status === 'НОВАЯ').length,
+            newHelpers: helpers.filter(h => h.status === 'НОВАЯ').length
+        };
+    } catch (e) {
+        console.error('Ошибка статистики:', e);
+        return {
+            total: 0, new: 0,
+            complaints: 0, media: 0, helpers: 0,
+            newComplaints: 0, newMedia: 0, newHelpers: 0
+        };
+    }
+};
+
+console.log('✅ db.js готов к работе!');
+console.log('📊 Таблицы: complaints, media_applications, helper_applications');
