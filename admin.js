@@ -1,5 +1,5 @@
 // ==============================================
-// MOONGRIEF-FORUM - АДМИН ПАНЕЛЬ
+// MOONGRIEF-FORUM - АДМИН ПАНЕЛЬ (ПОЛНОЕ ОТОБРАЖЕНИЕ)
 // ==============================================
 
 console.log('✅ admin.js загружается...');
@@ -18,6 +18,9 @@ let media = [];
 let helpers = [];
 let currentAdmin = null;
 
+const ADMINS = ['milfa', 'milk123', 'Xchik_'];
+
+// Загрузка страницы
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 Запуск админ панели...');
     
@@ -27,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.log('👤 Текущий пользователь:', currentAdmin);
     }
     
-    if (!currentAdmin || !['milfa', 'milk123', 'Xchik_'].includes(currentAdmin.username)) {
+    if (!currentAdmin || !ADMINS.includes(currentAdmin.username)) {
         console.log('❌ Нет доступа');
         window.location.href = 'index.html';
         return;
@@ -39,28 +42,35 @@ document.addEventListener('DOMContentLoaded', async function() {
     await loadAllData();
 });
 
+// Загрузка всех данных
 async function loadAllData() {
     console.log('📥 Загрузка данных...');
     
-    if (window.getComplaints) {
-        complaints = await window.getComplaints();
-        console.log('📋 Жалоб:', complaints.length);
+    try {
+        if (window.getComplaints) {
+            complaints = await window.getComplaints();
+            console.log('📋 Жалоб загружено:', complaints.length);
+        }
+        
+        if (window.getMediaApplications) {
+            media = await window.getMediaApplications();
+            console.log('📋 Медиа загружено:', media.length);
+        }
+        
+        if (window.getHelperApplications) {
+            helpers = await window.getHelperApplications();
+            console.log('📋 Хелперов загружено:', helpers.length);
+        }
+        
+        updateStats();
+        renderComplaints();
+        
+    } catch (e) {
+        console.error('❌ Ошибка загрузки:', e);
     }
-    
-    if (window.getMediaApplications) {
-        media = await window.getMediaApplications();
-        console.log('📋 Медиа:', media.length);
-    }
-    
-    if (window.getHelperApplications) {
-        helpers = await window.getHelperApplications();
-        console.log('📋 Хелперов:', helpers.length);
-    }
-    
-    updateStats();
-    renderComplaints();
 }
 
+// Обновление статистики
 function updateStats() {
     const newComplaints = complaints.filter(c => c.status === 'НОВАЯ').length;
     const newMedia = media.filter(m => m.status === 'НОВАЯ').length;
@@ -82,20 +92,34 @@ function updateStats() {
     }
 }
 
+// Переключение вкладок
 function showAdminTab(tabName) {
-    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    console.log('🔄 Переключение на вкладку:', tabName);
+    
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
     
     const tabId = 'admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
     const tabEl = document.getElementById(tabId);
     if (tabEl) tabEl.classList.add('active');
     
-    if (event && event.target) event.target.classList.add('active');
+    if (event && event.target) {
+        event.target.classList.add('active');
+    }
     
     if (tabName === 'complaints') renderComplaints();
     if (tabName === 'media') renderMedia();
     if (tabName === 'applications') renderHelpers();
 }
+
+// ==============================================
+// ОТОБРАЖЕНИЕ ЖАЛОБ (ПОЛНОЕ)
+// ==============================================
 
 function renderComplaints() {
     const list = document.getElementById('complaintsList');
@@ -120,15 +144,18 @@ function renderComplaints() {
                     </div>
                     <span class="admin-status ${statusClass}">${c.status || 'НОВАЯ'}</span>
                 </div>
+                
                 <div class="admin-card-body">
-                    <p><strong>От:</strong> ${c.user_name || 'Неизвестно'}</p>
-                    <p><strong>Нарушитель:</strong> ${c.target || 'Не указан'}</p>
+                    <p><strong>От:</strong> ${c.author || 'Неизвестно'}</p>
+                    <p><strong>Нарушитель:</strong> ${c.against || 'Не указан'}</p>
                     <p><strong>Описание:</strong> ${c.description || 'Нет описания'}</p>
-                    <p><strong>Дата:</strong> ${c.date || c.created_at || 'Неизвестно'}</p>
+                    <p><strong>Дата:</strong> ${new Date(c.date).toLocaleString('ru-RU') || 'Неизвестно'}</p>
+                    ${c.response ? `<p><strong>Ответ:</strong> ${c.response}</p>` : ''}
                 </div>
+                
                 <div class="admin-card-actions">
-                    <button onclick="updateStatus('complaint', ${c.id}, 'ПРИНЯТО')" class="admin-action accept">✓</button>
-                    <button onclick="updateStatus('complaint', ${c.id}, 'ОТКЛОНЕНО')" class="admin-action reject">✗</button>
+                    <button onclick="updateStatus('complaint', ${c.id}, 'ПРИНЯТО')" class="admin-action accept" title="Принять">✓</button>
+                    <button onclick="updateStatus('complaint', ${c.id}, 'ОТКЛОНЕНО')" class="admin-action reject" title="Отклонить">✗</button>
                 </div>
             </div>
         `;
@@ -136,6 +163,10 @@ function renderComplaints() {
     
     list.innerHTML = html;
 }
+
+// ==============================================
+// ОТОБРАЖЕНИЕ МЕДИА (ПОЛНОЕ)
+// ==============================================
 
 function renderMedia() {
     const list = document.getElementById('mediaList');
@@ -151,23 +182,33 @@ function renderMedia() {
         const statusClass = m.status === 'НОВАЯ' ? 'status-new' : 
                            m.status === 'ПРИНЯТО' ? 'status-accepted' : 'status-rejected';
         
+        const platformName = m.platform === 'tt' ? 'TIKTOK' : 'YOUTUBE';
+        const platformIcon = m.platform === 'tt' ? '📱' : '▶️';
+        
         html += `
             <div class="admin-card" data-id="${m.id}">
                 <div class="admin-card-header">
                     <div class="admin-card-title">
-                        <span class="card-icon">📱</span>
-                        <h3>${m.platform === 'tt' ? 'TIKTOK' : 'YOUTUBE'}</h3>
+                        <span class="card-icon">${platformIcon}</span>
+                        <h3>${platformName} ЗАЯВКА</h3>
                     </div>
                     <span class="admin-status ${statusClass}">${m.status || 'НОВАЯ'}</span>
                 </div>
+                
                 <div class="admin-card-body">
                     <p><strong>От:</strong> ${m.user_name || 'Неизвестно'}</p>
+                    <p><strong>Платформа:</strong> ${platformName}</p>
+                    <p><strong>Возраст:</strong> ${m.age || 'Не указан'}</p>
+                    <p><strong>Имя:</strong> ${m.real_name || 'Не указано'}</p>
                     <p><strong>Ник:</strong> ${m.nickname || 'Не указан'}</p>
-                    <p><strong>Дата:</strong> ${m.date || m.created_at || 'Неизвестно'}</p>
+                    <p><strong>Подписчики:</strong> ${m.subscribers || '0'}</p>
+                    <p><strong>Ссылка:</strong> <a href="${m.link}" target="_blank">${m.link || 'Нет'}</a></p>
+                    <p><strong>Дата:</strong> ${m.date || new Date(m.created_at).toLocaleString('ru-RU') || 'Неизвестно'}</p>
                 </div>
+                
                 <div class="admin-card-actions">
-                    <button onclick="updateStatus('media', ${m.id}, 'ПРИНЯТО')" class="admin-action accept">✓</button>
-                    <button onclick="updateStatus('media', ${m.id}, 'ОТКЛОНЕНО')" class="admin-action reject">✗</button>
+                    <button onclick="updateStatus('media', ${m.id}, 'ПРИНЯТО')" class="admin-action accept" title="Принять">✓</button>
+                    <button onclick="updateStatus('media', ${m.id}, 'ОТКЛОНЕНО')" class="admin-action reject" title="Отклонить">✗</button>
                 </div>
             </div>
         `;
@@ -175,6 +216,10 @@ function renderMedia() {
     
     list.innerHTML = html;
 }
+
+// ==============================================
+// ОТОБРАЖЕНИЕ ХЕЛПЕРОВ (ПОЛНОЕ)
+// ==============================================
 
 function renderHelpers() {
     const list = document.getElementById('applicationsList');
@@ -195,18 +240,25 @@ function renderHelpers() {
                 <div class="admin-card-header">
                     <div class="admin-card-title">
                         <span class="card-icon">👮</span>
-                        <h3>ХЕЛПЕР</h3>
+                        <h3>АНКЕТА НА ХЕЛПЕРА</h3>
                     </div>
                     <span class="admin-status ${statusClass}">${h.status || 'НОВАЯ'}</span>
                 </div>
+                
                 <div class="admin-card-body">
                     <p><strong>От:</strong> ${h.user_name || 'Неизвестно'}</p>
                     <p><strong>Ник:</strong> ${h.nickname || 'Не указан'}</p>
-                    <p><strong>Дата:</strong> ${h.date || h.created_at || 'Неизвестно'}</p>
+                    <p><strong>Имя:</strong> ${h.real_name || 'Не указано'}</p>
+                    <p><strong>Возраст:</strong> ${h.age || 'Не указан'}</p>
+                    <p><strong>Часовой пояс:</strong> ${h.timezone || 'Не указан'}</p>
+                    <p><strong>Опыт:</strong> ${h.experience || 'Не указан'}</p>
+                    <p><strong>Мотивация:</strong> ${h.motivation || 'Не указана'}</p>
+                    <p><strong>Дата:</strong> ${h.date || new Date(h.created_at).toLocaleString('ru-RU') || 'Неизвестно'}</p>
                 </div>
+                
                 <div class="admin-card-actions">
-                    <button onclick="updateStatus('helper', ${h.id}, 'ПРИНЯТО')" class="admin-action accept">✓</button>
-                    <button onclick="updateStatus('helper', ${h.id}, 'ОТКЛОНЕНО')" class="admin-action reject">✗</button>
+                    <button onclick="updateStatus('helper', ${h.id}, 'ПРИНЯТО')" class="admin-action accept" title="Принять">✓</button>
+                    <button onclick="updateStatus('helper', ${h.id}, 'ОТКЛОНЕНО')" class="admin-action reject" title="Отклонить">✗</button>
                 </div>
             </div>
         `;
@@ -215,7 +267,13 @@ function renderHelpers() {
     list.innerHTML = html;
 }
 
+// ==============================================
+// ОБНОВЛЕНИЕ СТАТУСА
+// ==============================================
+
 async function updateStatus(type, id, newStatus) {
+    console.log(`🔄 Обновление ${type} #${id} -> ${newStatus}`);
+    
     let success = false;
     
     if (type === 'complaint' && window.updateComplaintStatus) {
@@ -236,13 +294,35 @@ async function updateStatus(type, id, newStatus) {
     }
 }
 
-async function loadComplaints() { await loadAllData(); renderComplaints(); }
-async function loadMedia() { await loadAllData(); renderMedia(); }
-async function loadApplications() { await loadAllData(); renderHelpers(); }
+// ==============================================
+// ЗАГРУЗКА ПО КНОПКАМ
+// ==============================================
+
+async function loadComplaints() {
+    await loadAllData();
+    renderComplaints();
+}
+
+async function loadMedia() {
+    await loadAllData();
+    renderMedia();
+}
+
+async function loadApplications() {
+    await loadAllData();
+    renderHelpers();
+}
+
+// ==============================================
+// IP И ВЫХОД
+// ==============================================
 
 function copyIP() {
-    navigator.clipboard.writeText('Moongrief.aurorix.pro');
-    alert('📋 IP скопирован!');
+    navigator.clipboard.writeText('Moongrief.aurorix.pro').then(() => {
+        alert('📋 IP скопирован!');
+    }).catch(() => {
+        alert('❌ Ошибка копирования');
+    });
 }
 
 function logout() {
