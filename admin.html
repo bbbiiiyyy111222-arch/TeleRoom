@@ -1,230 +1,398 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoonGrief-Forum 🌙 Админ панель</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+// ==============================================
+// MOONGRIEF-FORUM - АДМИН ПАНЕЛЬ
+// ==============================================
+
+console.log('✅ admin.js загружается...');
+
+// Данные
+let users = [];
+let complaints = [];
+let media = [];
+let helpers = [];
+
+let currentAdmin = JSON.parse(localStorage.getItem('mg_currentUser')) || null;
+let currentActionId = null;
+let currentActionType = null;
+
+// Админы (OWNER)
+const admins = ['milfa', 'milk123', 'Xchik_'];
+
+// ==============================================
+// ПРОВЕРКА ДОСТУПА
+// ==============================================
+
+async function checkAdminAccess() {
+    console.log('🔍 Проверка доступа админа...');
     
-    <!-- Защита -->
-    <script>
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('keydown', function(e) {
-            if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73) || (e.ctrlKey && e.keyCode == 85)) {
-                e.preventDefault();
-                return false;
+    // Загружаем текущего пользователя из localStorage
+    currentAdmin = JSON.parse(localStorage.getItem('mg_currentUser')) || null;
+    
+    if (!currentAdmin) {
+        console.log('❌ Нет текущего пользователя');
+        window.location.href = 'index.html';
+        return false;
+    }
+    
+    console.log('👤 Текущий пользователь:', currentAdmin);
+    
+    if (!admins.includes(currentAdmin.username)) {
+        console.log('❌ Нет прав администратора');
+        window.location.href = 'index.html';
+        return false;
+    }
+    
+    document.getElementById('adminName').textContent = `🌙 ${currentAdmin.username}`;
+    document.getElementById('adminRole').textContent = 'OWNER';
+    
+    console.log('✅ Доступ разрешен');
+    return true;
+}
+
+// ==============================================
+// КОПИРОВАНИЕ IP
+// ==============================================
+
+function copyIP() {
+    navigator.clipboard.writeText('Moongrief.aurorix.pro').then(() => {
+        alert('📋 IP скопирован!');
+    }).catch(() => {
+        alert('❌ Ошибка копирования');
+    });
+}
+
+// ==============================================
+// ЗАГРУЗКА ДАННЫХ
+// ==============================================
+
+async function loadAllData() {
+    console.log('📥 Загрузка всех данных...');
+    
+    try {
+        // Загружаем жалобы
+        if (window.getComplaints) {
+            complaints = await window.getComplaints();
+            console.log('📋 Жалобы загружены:', complaints.length);
+        } else {
+            console.warn('⚠️ Функция getComplaints не найдена');
+            complaints = [];
+        }
+        
+        // Загружаем медиа
+        if (window.getMediaApplications) {
+            media = await window.getMediaApplications();
+            console.log('📋 Медиа загружены:', media.length);
+        } else {
+            console.warn('⚠️ Функция getMediaApplications не найдена');
+            media = [];
+        }
+        
+        // Загружаем хелперов
+        if (window.getHelperApplications) {
+            helpers = await window.getHelperApplications();
+            console.log('📋 Хелперы загружены:', helpers.length);
+        } else {
+            console.warn('⚠️ Функция getHelperApplications не найдена');
+            helpers = [];
+        }
+        
+        // Обновляем статистику
+        updateStats();
+        
+    } catch (error) {
+        console.error('❌ Ошибка загрузки данных:', error);
+    }
+}
+
+// ==============================================
+// СТАТИСТИКА
+// ==============================================
+
+function updateStats() {
+    const newComplaints = complaints.filter(c => c.status === 'НОВАЯ').length;
+    const newMedia = media.filter(m => m.status === 'НОВАЯ').length;
+    const newHelpers = helpers.filter(h => h.status === 'НОВАЯ').length;
+    const total = complaints.length + media.length + helpers.length;
+    
+    document.getElementById('statComplaints').textContent = newComplaints;
+    document.getElementById('statMedia').textContent = newMedia;
+    document.getElementById('statHelpers').textContent = newHelpers;
+    document.getElementById('statTotal').textContent = total;
+    
+    document.getElementById('totalStats').textContent = total;
+    document.getElementById('newStats').textContent = newComplaints + newMedia + newHelpers;
+    
+    console.log('📊 Статистика обновлена');
+}
+
+// ==============================================
+// ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+// ==============================================
+
+function showAdminTab(tabName) {
+    console.log('🔄 Переключение на вкладку:', tabName);
+    
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    document.getElementById(`admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
+    event.target.classList.add('active');
+    
+    switch(tabName) {
+        case 'complaints': renderComplaints(); break;
+        case 'media': renderMedia(); break;
+        case 'applications': renderHelpers(); break;
+    }
+}
+
+// ==============================================
+// ОТОБРАЖЕНИЕ ЖАЛОБ
+// ==============================================
+
+function renderComplaints() {
+    const list = document.getElementById('complaintsList');
+    
+    if (!complaints || complaints.length === 0) {
+        list.innerHTML = '<div class="empty-list">📭 Нет жалоб</div>';
+        return;
+    }
+    
+    let html = '';
+    complaints.forEach(c => {
+        const statusClass = c.status === 'НОВАЯ' ? 'status-new' : 
+                           c.status === 'ПРИНЯТО' ? 'status-accepted' : 'status-rejected';
+        
+        html += `
+            <div class="admin-card" data-id="${c.id}" data-type="complaint">
+                <div class="admin-card-header">
+                    <div class="admin-card-title">
+                        <span class="card-icon">⚠️</span>
+                        <h3>${c.title || 'Без названия'}</h3>
+                    </div>
+                    <span class="admin-status ${statusClass}">${c.status || 'НОВАЯ'}</span>
+                </div>
+                
+                <div class="admin-card-body">
+                    <p><strong>От:</strong> ${c.user_name || c.user || 'Неизвестно'}</p>
+                    <p><strong>Нарушитель:</strong> ${c.target || 'Не указан'}</p>
+                    <p><strong>Описание:</strong> ${c.description || c.desc || 'Нет описания'}</p>
+                    <p><strong>Дата:</strong> ${c.date || c.created_at || 'Неизвестно'}</p>
+                </div>
+                
+                <div class="admin-card-actions">
+                    <button onclick="updateStatus('complaint', ${c.id}, 'ПРИНЯТО')" class="admin-action accept" title="Принять">✓</button>
+                    <button onclick="updateStatus('complaint', ${c.id}, 'ОТКЛОНЕНО')" class="admin-action reject" title="Отклонить">✗</button>
+                </div>
+            </div>
+        `;
+    });
+    
+    list.innerHTML = html;
+}
+
+// ==============================================
+// ОТОБРАЖЕНИЕ МЕДИА
+// ==============================================
+
+function renderMedia() {
+    const list = document.getElementById('mediaList');
+    
+    if (!media || media.length === 0) {
+        list.innerHTML = '<div class="empty-list">📭 Нет медиа-заявок</div>';
+        return;
+    }
+    
+    let html = '';
+    media.forEach(m => {
+        const platformIcon = m.platform === 'tt' ? '📱' : '▶️';
+        const platformName = m.platform === 'tt' ? 'TIKTOK' : 'YOUTUBE';
+        const statusClass = m.status === 'НОВАЯ' ? 'status-new' : 
+                           m.status === 'ПРИНЯТО' ? 'status-accepted' : 'status-rejected';
+        
+        html += `
+            <div class="admin-card" data-id="${m.id}" data-type="media">
+                <div class="admin-card-header">
+                    <div class="admin-card-title">
+                        <span class="card-icon">${platformIcon}</span>
+                        <h3>${platformName} ЗАЯВКА</h3>
+                    </div>
+                    <span class="admin-status ${statusClass}">${m.status || 'НОВАЯ'}</span>
+                </div>
+                
+                <div class="admin-card-body">
+                    <p><strong>От:</strong> ${m.user_name || m.user || 'Неизвестно'}</p>
+                    <p><strong>Ник:</strong> ${m.nickname || m.nick || 'Не указан'}</p>
+                    <p><strong>Подписчики:</strong> ${m.subscribers || m.subs || '0'}</p>
+                    <p><strong>Ссылка:</strong> <a href="${m.link}" target="_blank">${m.link || 'Нет'}</a></p>
+                    <p><strong>Дата:</strong> ${m.date || m.created_at || 'Неизвестно'}</p>
+                </div>
+                
+                <div class="admin-card-actions">
+                    <button onclick="updateStatus('media', ${m.id}, 'ПРИНЯТО')" class="admin-action accept" title="Принять">✓</button>
+                    <button onclick="updateStatus('media', ${m.id}, 'ОТКЛОНЕНО')" class="admin-action reject" title="Отклонить">✗</button>
+                </div>
+            </div>
+        `;
+    });
+    
+    list.innerHTML = html;
+}
+
+// ==============================================
+// ОТОБРАЖЕНИЕ ХЕЛПЕРОВ
+// ==============================================
+
+function renderHelpers() {
+    const list = document.getElementById('applicationsList');
+    
+    if (!helpers || helpers.length === 0) {
+        list.innerHTML = '<div class="empty-list">📭 Нет заявок на хелпера</div>';
+        return;
+    }
+    
+    let html = '';
+    helpers.forEach(h => {
+        const statusClass = h.status === 'НОВАЯ' ? 'status-new' : 
+                           h.status === 'ПРИНЯТО' ? 'status-accepted' : 'status-rejected';
+        
+        html += `
+            <div class="admin-card" data-id="${h.id}" data-type="helper">
+                <div class="admin-card-header">
+                    <div class="admin-card-title">
+                        <span class="card-icon">👮</span>
+                        <h3>АНКЕТА НА ХЕЛПЕРА</h3>
+                    </div>
+                    <span class="admin-status ${statusClass}">${h.status || 'НОВАЯ'}</span>
+                </div>
+                
+                <div class="admin-card-body">
+                    <p><strong>От:</strong> ${h.user_name || h.user || 'Неизвестно'}</p>
+                    <p><strong>Ник:</strong> ${h.nickname || h.nick || 'Не указан'}</p>
+                    <p><strong>Возраст:</strong> ${h.age || 'Не указан'}</p>
+                    <p><strong>Дата:</strong> ${h.date || h.created_at || 'Неизвестно'}</p>
+                </div>
+                
+                <div class="admin-card-actions">
+                    <button onclick="updateStatus('helper', ${h.id}, 'ПРИНЯТО')" class="admin-action accept" title="Принять">✓</button>
+                    <button onclick="updateStatus('helper', ${h.id}, 'ОТКЛОНЕНО')" class="admin-action reject" title="Отклонить">✗</button>
+                </div>
+            </div>
+        `;
+    });
+    
+    list.innerHTML = html;
+}
+
+// ==============================================
+// ОБНОВЛЕНИЕ СТАТУСА
+// ==============================================
+
+async function updateStatus(type, id, newStatus) {
+    console.log(`🔄 Обновление статуса ${type} #${id} на ${newStatus}`);
+    
+    let success = false;
+    
+    switch(type) {
+        case 'complaint':
+            if (window.updateComplaintStatus) {
+                success = await window.updateComplaintStatus(id, newStatus);
             }
-        });
-    </script>
-</head>
-<body>
-    <!-- ШАПКА -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <h1>🌙 MOONGRIEF ADMIN</h1>
-                    <div class="server-ip">
-                        <span>Сервер: Moongrief.aurorix.pro</span>
-                        <button onclick="copyIP()" class="copy-btn">📋 КОПИРОВАТЬ IP</button>
-                    </div>
-                </div>
-                
-                <!-- АДМИН ИНФО -->
-                <div class="auth" id="auth">
-                    <div id="adminInfo">
-                        <span id="adminName" class="user-name"></span>
-                        <button onclick="logout()" class="btn-moon logout-btn">
-                            <span>🚪</span>
-                            <span>ВЫЙТИ</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
+            break;
+        case 'media':
+            if (window.updateMediaStatus) {
+                success = await window.updateMediaStatus(id, newStatus);
+            }
+            break;
+        case 'helper':
+            if (window.updateHelperStatus) {
+                success = await window.updateHelperStatus(id, newStatus);
+            }
+            break;
+    }
+    
+    if (success) {
+        alert(`✅ Статус обновлен на ${newStatus}`);
+        await loadAllData();
+        renderComplaints();
+        renderMedia();
+        renderHelpers();
+    } else {
+        alert('❌ Ошибка обновления статуса');
+    }
+}
 
-    <!-- НАВИГАЦИЯ -->
-    <nav class="nav">
-        <div class="container">
-            <a href="index.html" class="nav-btn">🌙 ГЛАВНАЯ</a>
-            <button class="nav-btn active" onclick="showAdminTab('complaints')">⚠️ ЖАЛОБЫ</button>
-            <button class="nav-btn" onclick="showAdminTab('media')">📱 МЕДИА</button>
-            <button class="nav-btn" onclick="showAdminTab('applications')">👮 ХЕЛПЕРЫ</button>
-        </div>
-    </nav>
+// ==============================================
+// КНОПКА ОБНОВЛЕНИЯ
+// ==============================================
 
-    <!-- ИНФОРМАЦИОННАЯ ПАНЕЛЬ -->
-    <div class="info-panel">
-        <div class="container">
-            <div class="info-items">
-                <div class="info-item">
-                    <span class="info-icon">👑</span>
-                    <div class="info-text">
-                        <span class="info-label">АДМИН</span>
-                        <span class="info-value" id="adminRole">OWNER</span>
-                    </div>
-                </div>
-                
-                <div class="info-item">
-                    <span class="info-icon">📊</span>
-                    <div class="info-text">
-                        <span class="info-label">ВСЕГО ЗАЯВОК</span>
-                        <span class="info-value" id="totalStats">0</span>
-                    </div>
-                </div>
+async function loadComplaints() {
+    await loadAllData();
+    renderComplaints();
+}
 
-                <div class="info-item">
-                    <span class="info-icon">⏳</span>
-                    <div class="info-text">
-                        <span class="info-label">НОВЫЕ</span>
-                        <span class="info-value" id="newStats">0</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+async function loadMedia() {
+    await loadAllData();
+    renderMedia();
+}
 
-    <!-- ОСНОВНОЙ КОНТЕНТ -->
-    <main class="main">
-        <div class="container">
-            <!-- СТАТИСТИКА -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">⚠️</div>
-                    <div class="stat-info">
-                        <h3>ЖАЛОБЫ</h3>
-                        <span id="statComplaints" class="stat-number">0</span>
-                    </div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon">📱</div>
-                    <div class="stat-info">
-                        <h3>МЕДИА</h3>
-                        <span id="statMedia" class="stat-number">0</span>
-                    </div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon">👮</div>
-                    <div class="stat-info">
-                        <h3>ХЕЛПЕРЫ</h3>
-                        <span id="statHelpers" class="stat-number">0</span>
-                    </div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon">📊</div>
-                    <div class="stat-info">
-                        <h3>ВСЕГО</h3>
-                        <span id="statTotal" class="stat-number">0</span>
-                    </div>
-                </div>
-            </div>
+async function loadApplications() {
+    await loadAllData();
+    renderHelpers();
+}
 
-            <!-- ВКЛАДКИ -->
-            <div class="admin-tabs">
-                <button class="tab-btn active" onclick="showAdminTab('complaints')">
-                    <span class="tab-icon">⚠️</span>
-                    <span class="tab-text">ЖАЛОБЫ</span>
-                </button>
-                <button class="tab-btn" onclick="showAdminTab('media')">
-                    <span class="tab-icon">📱</span>
-                    <span class="tab-text">МЕДИА</span>
-                </button>
-                <button class="tab-btn" onclick="showAdminTab('applications')">
-                    <span class="tab-icon">👮</span>
-                    <span class="tab-text">ХЕЛПЕРЫ</span>
-                </button>
-            </div>
+// ==============================================
+// ВЫХОД
+// ==============================================
 
-            <!-- КОНТЕНТ ВКЛАДОК -->
-            <div id="adminComplaints" class="tab-content active">
-                <div class="admin-controls">
-                    <button onclick="loadComplaints()" class="admin-refresh-btn">
-                        <span>🔄</span> ОБНОВИТЬ
-                    </button>
-                </div>
-                <div id="complaintsList" class="admin-list"></div>
-            </div>
-            
-            <div id="adminMedia" class="tab-content">
-                <div class="admin-controls">
-                    <button onclick="loadMedia()" class="admin-refresh-btn">
-                        <span>🔄</span> ОБНОВИТЬ
-                    </button>
-                </div>
-                <div id="mediaList" class="admin-list"></div>
-            </div>
-            
-            <div id="adminApplications" class="tab-content">
-                <div class="admin-controls">
-                    <button onclick="loadApplications()" class="admin-refresh-btn">
-                        <span>🔄</span> ОБНОВИТЬ
-                    </button>
-                </div>
-                <div id="applicationsList" class="admin-list"></div>
-            </div>
-        </div>
-    </main>
+function logout() {
+    if (confirm('Выйти из админ панели?')) {
+        window.location.href = 'index.html';
+    }
+}
 
-    <!-- МОДАЛКА ОТВЕТА -->
-    <div id="responseModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeResponseModal()">✖</span>
-            <h2>📝 ОТВЕТ НА ОБРАЩЕНИЕ</h2>
-            <form id="responseForm" onsubmit="sendResponse(event)" class="modal-form">
-                <input type="hidden" id="responseId">
-                <input type="hidden" id="responseType">
-                
-                <div class="form-group">
-                    <label>ПОЛЬЗОВАТЕЛЬ</label>
-                    <div id="responseUser" class="response-info"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label>ТЕМА</label>
-                    <div id="responseTopic" class="response-info"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label>ТЕКСТ ОТВЕТА</label>
-                    <textarea id="responseText" placeholder="ВВЕДИТЕ ТЕКСТ ОТВЕТА..." required class="form-textarea" rows="5"></textarea>
-                </div>
-                
-                <div class="action-group">
-                    <button type="submit" class="submit-btn">
-                        <span class="btn-icon">📨</span>
-                        <span class="btn-text">ОТПРАВИТЬ</span>
-                    </button>
-                    <button type="button" onclick="closeResponseModal()" class="submit-btn cancel-btn">
-                        <span class="btn-icon">✖</span>
-                        <span class="btn-text">ОТМЕНА</span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+// ==============================================
+// ИНИЦИАЛИЗАЦИЯ
+// ==============================================
 
-    <!-- МОДАЛКА ПОДТВЕРЖДЕНИЯ -->
-    <div id="confirmModal" class="modal">
-        <div class="modal-content" style="max-width: 400px;">
-            <h2>⚡ ПОДТВЕРЖДЕНИЕ</h2>
-            <p id="confirmMessage" style="text-align: center; margin: 30px 0; color: #b0b0ff; font-size: 12px;"></p>
-            <div class="action-group" style="justify-content: center;">
-                <button onclick="confirmAction()" class="submit-btn" style="width: auto; min-width: 100px;">
-                    <span>✓</span> ДА
-                </button>
-                <button onclick="closeConfirmModal()" class="submit-btn cancel-btn" style="width: auto; min-width: 100px;">
-                    <span>✖</span> НЕТ
-                </button>
-            </div>
-        </div>
-    </div>
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('🚀 Админ панель загружается...');
+    
+    const hasAccess = await checkAdminAccess();
+    if (!hasAccess) return;
+    
+    await loadAllData();
+    renderComplaints();
+    
+    console.log('✅ Админ панель готова');
+});
 
-    <script src="db.js"></script>
-    <script src="admin.js"></script>
-</body>
-</html>
+// ==============================================
+// СТИЛИ ДЛЯ АДМИНКИ (ДОБАВЛЯЕМ В КОНЦЕ)
+// ==============================================
+
+const style = document.createElement('style');
+style.textContent = `
+    .admin-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4a4a8a;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        z-index: 10000;
+        animation: slideIn 0.3s;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+`;
+
+document.head.appendChild(style);
