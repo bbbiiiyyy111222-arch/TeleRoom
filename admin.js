@@ -672,3 +672,7 @@ window.onclick = function(event) {
     if (event.target === responseModal) closeResponseModal();
     if (event.target === confirmModal) closeConfirmModal();
 }
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="db.js"></script>
+<script src="admin.js"></script>
