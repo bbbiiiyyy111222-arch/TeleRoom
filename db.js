@@ -12,10 +12,9 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const moonGriefSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ==============================================
-// ПОЛЬЗОВАТЕЛИ - СВОИ ПАРОЛИ У КАЖДОГО
+// ПОЛЬЗОВАТЕЛИ - ПАРОЛИ ИЗ ТАБЛИЦЫ (ПОЛЕ email)
 // ==============================================
 
-// Получить всех пользователей
 window.getUsers = async function() {
     try {
         const { data, error } = await moonGriefSupabase
@@ -33,17 +32,16 @@ window.getUsers = async function() {
     }
 };
 
-// Проверка при входе - каждый со СВОИМ паролем
+// Проверка при входе - пароли из таблицы (поле email)
 window.checkUser = async function(username, password) {
     try {
-        console.log('Проверка пользователя:', username, 'с паролем:', password);
+        console.log('🔍 Проверка пользователя:', username);
         
-        // Ищем пользователя по имени И паролю (email)
+        // Ищем пользователя по имени
         const { data, error } = await moonGriefSupabase
             .from('users')
             .select('*')
-            .eq('name', username)
-            .eq('email', password); // email = пароль
+            .eq('name', username);
         
         if (error) {
             console.error('Ошибка проверки пользователя:', error);
@@ -52,23 +50,31 @@ window.checkUser = async function(username, password) {
         
         if (data && data.length > 0) {
             const user = data[0];
-            // Определяем роль (админы)
-            let role = 'user';
-            if (username === 'milfa' || username === 'milk123' || username === 'Xchik_') {
-                role = 'owner';
-            }
             
-            console.log('✅ Пользователь найден:', user.name);
-            return {
-                username: user.name,
-                password: user.email, // Сохраняем реальный пароль
-                role: role,
-                email: user.email,
-                phone: user.phone
-            };
+            // Сверяем пароль с полем email
+            if (user.email === password) {
+                console.log('✅ Пароль верный');
+                
+                // Определяем роль (админы)
+                let role = 'user';
+                if (username === 'milfa' || username === 'milk123' || username === 'Xchik_') {
+                    role = 'owner';
+                }
+                
+                return {
+                    username: user.name,
+                    password: user.email,
+                    role: role,
+                    email: user.email,
+                    phone: user.phone
+                };
+            } else {
+                console.log('❌ Неверный пароль');
+                return null;
+            }
         }
         
-        console.log('❌ Пользователь не найден или неверный пароль');
+        console.log('❌ Пользователь не найден');
         return null;
     } catch (e) {
         console.error('Исключение при проверке пользователя:', e);
@@ -380,10 +386,11 @@ window.getStats = async function() {
         } else {
             console.log('✅ Подключение к Supabase успешно!');
             console.log('📊 Найдено пользователей:', data.length);
-            console.log('👥 Список пользователей и их пароли (email):');
+            console.log('👥 Список пользователей и их пароли (поле email):');
             data.forEach(user => {
                 console.log(`   - ${user.name}: пароль "${user.email}"`);
             });
+            console.log('🔑 Входите со своими паролями из таблицы!');
         }
     } catch (e) {
         console.error('❌ Исключение при подключении к Supabase:', e);
@@ -391,3 +398,4 @@ window.getStats = async function() {
 })();
 
 console.log('✅ Все функции базы данных MoonGrief-Forum загружены');
+console.log('📋 Пароли берутся из поля email в таблице users');
