@@ -1,5 +1,5 @@
 // ==============================================
-// MOONGRIEF-FORUM - БАЗА ДАННЫХ (ИСПРАВЛЕНО)
+// MOONGRIEF-FORUM - БАЗА ДАННЫХ (ФИНАЛ)
 // ==============================================
 
 console.log('✅ db.js загружается...');
@@ -58,7 +58,7 @@ window.checkUser = async function(username, password) {
 };
 
 // ==============================================
-// ЖАЛОБЫ - ИСПРАВЛЕНО (используем against вместо target)
+// ЖАЛОБЫ - ТОЧНО ПО ТВОЕЙ ТАБЛИЦЕ
 // ==============================================
 
 window.saveComplaint = async function(complaint) {
@@ -70,7 +70,7 @@ window.saveComplaint = async function(complaint) {
             .insert([{
                 user_name: complaint.user,
                 title: complaint.title,
-                against: complaint.target,  // target меняем на against
+                against: complaint.target,  // target -> against
                 description: complaint.desc,
                 status: 'НОВАЯ',
                 date: new Date().toLocaleString('ru-RU')
@@ -78,14 +78,17 @@ window.saveComplaint = async function(complaint) {
             .select();
         
         if (error) {
-            console.error('❌ Ошибка SQL:', error);
+            console.error('❌ Ошибка:', error);
+            alert('Ошибка: ' + error.message);
             return false;
         }
         
         console.log('✅ Жалоба сохранена:', data);
+        alert('✅ Жалоба отправлена!');
         return true;
     } catch (e) {
         console.error('❌ Ошибка:', e);
+        alert('Ошибка: ' + e.message);
         return false;
     }
 };
@@ -129,15 +132,17 @@ window.updateComplaintStatus = async function(id, status) {
             .eq('id', id);
         
         if (error) throw error;
+        alert('✅ Статус обновлен');
         return true;
     } catch (e) {
         console.error('Ошибка обновления статуса:', e);
+        alert('❌ Ошибка обновления');
         return false;
     }
 };
 
 // ==============================================
-// МЕДИА-ЗАЯВКИ (без изменений)
+// МЕДИА-ЗАЯВКИ
 // ==============================================
 
 window.saveMediaApplication = async function(mediaApp) {
@@ -161,13 +166,16 @@ window.saveMediaApplication = async function(mediaApp) {
         
         if (error) {
             console.error('❌ Ошибка:', error);
+            alert('Ошибка: ' + error.message);
             return false;
         }
         
         console.log('✅ Медиа сохранено:', data);
+        alert('✅ Заявка отправлена!');
         return true;
     } catch (e) {
         console.error('❌ Ошибка:', e);
+        alert('Ошибка: ' + e.message);
         return false;
     }
 };
@@ -211,15 +219,17 @@ window.updateMediaStatus = async function(id, status) {
             .eq('id', id);
         
         if (error) throw error;
+        alert('✅ Статус обновлен');
         return true;
     } catch (e) {
         console.error('Ошибка обновления статуса медиа:', e);
+        alert('❌ Ошибка обновления');
         return false;
     }
 };
 
 // ==============================================
-// ХЕЛПЕРЫ (без изменений)
+// ХЕЛПЕРЫ
 // ==============================================
 
 window.saveHelperApplication = async function(helperApp) {
@@ -243,13 +253,16 @@ window.saveHelperApplication = async function(helperApp) {
         
         if (error) {
             console.error('❌ Ошибка:', error);
+            alert('Ошибка: ' + error.message);
             return false;
         }
         
         console.log('✅ Хелпер сохранен:', data);
+        alert('✅ Анкета отправлена!');
         return true;
     } catch (e) {
         console.error('❌ Ошибка:', e);
+        alert('Ошибка: ' + e.message);
         return false;
     }
 };
@@ -293,11 +306,13 @@ window.updateHelperStatus = async function(id, status) {
             .eq('id', id);
         
         if (error) throw error;
+        alert('✅ Статус обновлен');
         return true;
     } catch (e) {
         console.error('Ошибка обновления статуса хелпера:', e);
+        alert('❌ Ошибка обновления');
         return false;
     }
 };
 
-console.log('✅ db.js готов');
+console.log('✅ db.js готов к работе');
