@@ -12,9 +12,10 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const moonGriefSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ==============================================
-// ПОЛЬЗОВАТЕЛИ (по твоей структуре)
+// ПОЛЬЗОВАТЕЛИ - СВОИ ПАРОЛИ У КАЖДОГО
 // ==============================================
 
+// Получить всех пользователей
 window.getUsers = async function() {
     try {
         const { data, error } = await moonGriefSupabase
@@ -32,14 +33,17 @@ window.getUsers = async function() {
     }
 };
 
+// Проверка при входе - каждый со СВОИМ паролем
 window.checkUser = async function(username, password) {
     try {
-        // Ищем пользователя где name = username И email = password
+        console.log('Проверка пользователя:', username, 'с паролем:', password);
+        
+        // Ищем пользователя по имени И паролю (email)
         const { data, error } = await moonGriefSupabase
             .from('users')
             .select('*')
             .eq('name', username)
-            .eq('email', password); // ВНИМАНИЕ: email это поле для пароля!
+            .eq('email', password); // email = пароль
         
         if (error) {
             console.error('Ошибка проверки пользователя:', error);
@@ -48,20 +52,23 @@ window.checkUser = async function(username, password) {
         
         if (data && data.length > 0) {
             const user = data[0];
-            // Определяем роль
+            // Определяем роль (админы)
             let role = 'user';
             if (username === 'milfa' || username === 'milk123' || username === 'Xchik_') {
                 role = 'owner';
             }
             
+            console.log('✅ Пользователь найден:', user.name);
             return {
                 username: user.name,
-                password: user.email, // Это "пароль"
+                password: user.email, // Сохраняем реальный пароль
                 role: role,
-                id: user.id
+                email: user.email,
+                phone: user.phone
             };
         }
         
+        console.log('❌ Пользователь не найден или неверный пароль');
         return null;
     } catch (e) {
         console.error('Исключение при проверке пользователя:', e);
@@ -69,6 +76,7 @@ window.checkUser = async function(username, password) {
     }
 };
 
+// Регистрация нового пользователя
 window.registerUser = async function(username, password) {
     try {
         // Проверяем, существует ли уже
@@ -87,7 +95,7 @@ window.registerUser = async function(username, password) {
             .insert([{
                 name: username,
                 email: password, // Пароль сохраняем в email
-                phone: new Date().toISOString() // Дата регистрации
+                phone: new Date().toISOString()
             }]);
         
         if (error) {
@@ -102,9 +110,10 @@ window.registerUser = async function(username, password) {
     }
 };
 
+// Смена пароля
 window.changeUserPassword = async function(username, oldPassword, newPassword) {
     try {
-        // Проверяем стар��й пароль
+        // Проверяем старый пароль
         const { data: user, error: findError } = await moonGriefSupabase
             .from('users')
             .select('*')
@@ -138,7 +147,6 @@ window.changeUserPassword = async function(username, oldPassword, newPassword) {
 
 window.saveComplaint = async function(complaint) {
     try {
-        // Создаем таблицу complaints если её нет
         const { data, error } = await moonGriefSupabase
             .from('complaints')
             .insert([{
@@ -147,14 +155,36 @@ window.saveComplaint = async function(complaint) {
                 target: complaint.target,
                 description: complaint.desc,
                 status: 'НОВАЯ',
+                date: new Date().toLocaleString(),
                 created_at: new Date().toISOString()
             }]);
         
-        if (error) console.error('Ошибка сохранения жалобы:', error);
-        return !error;
+        if (error) {
+            console.error('Ошибка сохранения жалобы:', error);
+            return false;
+        }
+        return true;
     } catch (e) {
         console.error('Исключение:', e);
         return false;
+    }
+};
+
+window.getComplaints = async function() {
+    try {
+        const { data, error } = await moonGriefSupabase
+            .from('complaints')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('Ошибка загрузки жалоб:', error);
+            return [];
+        }
+        return data || [];
+    } catch (e) {
+        console.error('Исключение:', e);
+        return [];
     }
 };
 
@@ -175,14 +205,36 @@ window.saveMediaApplication = async function(mediaApp) {
                 subscribers: mediaApp.subs,
                 link: mediaApp.link,
                 status: 'НОВАЯ',
+                date: new Date().toLocaleString(),
                 created_at: new Date().toISOString()
             }]);
         
-        if (error) console.error('Ошибка сохранения медиа-заявки:', error);
-        return !error;
+        if (error) {
+            console.error('Ошибка сохранения медиа-заявки:', error);
+            return false;
+        }
+        return true;
     } catch (e) {
         console.error('Исключение:', e);
         return false;
+    }
+};
+
+window.getMediaApplications = async function() {
+    try {
+        const { data, error } = await moonGriefSupabase
+            .from('media_applications')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('Ошибка загрузки медиа-заявок:', error);
+            return [];
+        }
+        return data || [];
+    } catch (e) {
+        console.error('Исключение:', e);
+        return [];
     }
 };
 
@@ -203,34 +255,139 @@ window.saveHelperApplication = async function(helperApp) {
                 experience: helperApp.exp,
                 motivation: helperApp.why,
                 status: 'НОВАЯ',
+                date: new Date().toLocaleString(),
                 created_at: new Date().toISOString()
             }]);
         
-        if (error) console.error('Ошибка сохранения анкеты:', error);
-        return !error;
+        if (error) {
+            console.error('Ошибка сохранения анкеты:', error);
+            return false;
+        }
+        return true;
     } catch (e) {
         console.error('Исключение:', e);
         return false;
     }
 };
 
+window.getHelperApplications = async function() {
+    try {
+        const { data, error } = await moonGriefSupabase
+            .from('helper_applications')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('Ошибка загрузки анкет:', error);
+            return [];
+        }
+        return data || [];
+    } catch (e) {
+        console.error('Исключение:', e);
+        return [];
+    }
+};
+
 // ==============================================
-// АДМИН-ФУНКЦИИ
+// ОБНОВЛЕНИЕ СТАТУСОВ (ДЛЯ АДМИНКИ)
+// ==============================================
+
+window.updateComplaintStatus = async function(id, status) {
+    try {
+        const { error } = await moonGriefSupabase
+            .from('complaints')
+            .update({ status: status })
+            .eq('id', id);
+        
+        return !error;
+    } catch (e) {
+        return false;
+    }
+};
+
+window.updateMediaStatus = async function(id, status) {
+    try {
+        const { error } = await moonGriefSupabase
+            .from('media_applications')
+            .update({ status: status })
+            .eq('id', id);
+        
+        return !error;
+    } catch (e) {
+        return false;
+    }
+};
+
+window.updateHelperStatus = async function(id, status) {
+    try {
+        const { error } = await moonGriefSupabase
+            .from('helper_applications')
+            .update({ status: status })
+            .eq('id', id);
+        
+        return !error;
+    } catch (e) {
+        return false;
+    }
+};
+
+// ==============================================
+// СТАТИСТИКА
 // ==============================================
 
 window.getStats = async function() {
     try {
-        // Здесь нужно будет создать соответствующие таблицы
+        const complaints = await window.getComplaints();
+        const media = await window.getMediaApplications();
+        const helpers = await window.getHelperApplications();
+        
+        const newComplaints = complaints.filter(c => c.status === 'НОВАЯ').length;
+        const newMedia = media.filter(m => m.status === 'НОВАЯ').length;
+        const newHelpers = helpers.filter(h => h.status === 'НОВАЯ').length;
+        
         return {
-            total: 0,
-            new: 0,
-            complaints: 0,
-            media: 0,
-            helpers: 0
+            total: complaints.length + media.length + helpers.length,
+            new: newComplaints + newMedia + newHelpers,
+            complaints: complaints.length,
+            media: media.length,
+            helpers: helpers.length,
+            newComplaints,
+            newMedia,
+            newHelpers
         };
     } catch (e) {
-        return { total: 0, new: 0, complaints: 0, media: 0, helpers: 0 };
+        console.error('Ошибка статистики:', e);
+        return {
+            total: 0, new: 0,
+            complaints: 0, media: 0, helpers: 0,
+            newComplaints: 0, newMedia: 0, newHelpers: 0
+        };
     }
 };
 
-console.log('✅ База данных MoonGrief-Forum готова');
+// ==============================================
+// ПРОВЕРКА ПОДКЛЮЧЕНИЯ
+// ==============================================
+
+(async function testConnection() {
+    try {
+        const { data, error } = await moonGriefSupabase
+            .from('users')
+            .select('*');
+        
+        if (error) {
+            console.error('❌ Ошибка подключения к Supabase:', error.message);
+        } else {
+            console.log('✅ Подключение к Supabase успешно!');
+            console.log('📊 Найдено пользователей:', data.length);
+            console.log('👥 Список пользователей и их пароли (email):');
+            data.forEach(user => {
+                console.log(`   - ${user.name}: пароль "${user.email}"`);
+            });
+        }
+    } catch (e) {
+        console.error('❌ Исключение при подключении к Supabase:', e);
+    }
+})();
+
+console.log('✅ Все функции базы данных MoonGrief-Forum загружены');
