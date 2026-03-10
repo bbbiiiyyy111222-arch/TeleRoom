@@ -1,5 +1,5 @@
 // ==============================================
-// MOONGRIEF-FORUM - БАЗА ДАННЫХ
+// MOONGRIEF-FORUM - БАЗА ДАННЫХ (ИСПРАВЛЕНО)
 // ==============================================
 
 console.log('✅ db.js загружается...');
@@ -7,7 +7,11 @@ console.log('✅ db.js загружается...');
 const SUPABASE_URL = 'https://opeypwayctnnyrfkhajf.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wZXlwd2F5Y3RubnlyZmtoYWpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MzU4ODQsImV4cCI6MjA4ODUxMTg4NH0._Y1R1NNCVMyVgyeN7O7a24n4BGwc44c6vO1Q6MAf74A';
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Проверяем не создан ли уже клиент
+if (!window.mgSupabase) {
+    window.mgSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('✅ Создан новый клиент Supabase');
+}
 
 // ==============================================
 // ПОЛЬЗОВАТЕЛИ
@@ -15,7 +19,7 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 window.getUsers = async function() {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.mgSupabase
             .from('users')
             .select('*');
         
@@ -31,7 +35,7 @@ window.checkUser = async function(username, password) {
     try {
         console.log(`🔍 Проверка пользователя: ${username}`);
         
-        const { data, error } = await supabase
+        const { data, error } = await window.mgSupabase
             .from('users')
             .select('*')
             .eq('username', username);
@@ -44,7 +48,6 @@ window.checkUser = async function(username, password) {
         }
         
         const user = data[0];
-        console.log('👤 Найден пользователь:', user);
         
         if (user.password === password) {
             console.log('✅ Пароль верный');
@@ -77,7 +80,7 @@ window.saveComplaint = async function(complaint) {
     try {
         console.log('💾 Сохраняем жалобу:', complaint);
         
-        const { data, error } = await supabase
+        const { data, error } = await window.mgSupabase
             .from('complaints')
             .insert([{
                 user_name: complaint.user,
@@ -102,7 +105,7 @@ window.saveComplaint = async function(complaint) {
 
 window.getComplaints = async function() {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.mgSupabase
             .from('complaints')
             .select('*')
             .order('created_at', { ascending: false });
@@ -119,7 +122,7 @@ window.getComplaints = async function() {
 
 window.getUserComplaints = async function(username) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.mgSupabase
             .from('complaints')
             .select('*')
             .eq('user_name', username)
@@ -135,7 +138,7 @@ window.getUserComplaints = async function(username) {
 
 window.updateComplaintStatus = async function(id, status) {
     try {
-        const { error } = await supabase
+        const { error } = await window.mgSupabase
             .from('complaints')
             .update({ status: status })
             .eq('id', id);
@@ -156,7 +159,7 @@ window.saveMediaApplication = async function(mediaApp) {
     try {
         console.log('💾 Сохраняем медиа-заявку:', mediaApp);
         
-        const { data, error } = await supabase
+        const { data, error } = await window.mgSupabase
             .from('media_applications')
             .insert([{
                 user_name: mediaApp.user,
@@ -184,7 +187,7 @@ window.saveMediaApplication = async function(mediaApp) {
 
 window.getMediaApplications = async function() {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.mgSupabase
             .from('media_applications')
             .select('*')
             .order('created_at', { ascending: false });
@@ -201,7 +204,7 @@ window.getMediaApplications = async function() {
 
 window.getUserMediaApplications = async function(username) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.mgSupabase
             .from('media_applications')
             .select('*')
             .eq('user_name', username)
@@ -217,7 +220,7 @@ window.getUserMediaApplications = async function(username) {
 
 window.updateMediaStatus = async function(id, status) {
     try {
-        const { error } = await supabase
+        const { error } = await window.mgSupabase
             .from('media_applications')
             .update({ status: status })
             .eq('id', id);
@@ -238,7 +241,7 @@ window.saveHelperApplication = async function(helperApp) {
     try {
         console.log('💾 Сохраняем заявку на хелпера:', helperApp);
         
-        const { data, error } = await supabase
+        const { data, error } = await window.mgSupabase
             .from('helper_applications')
             .insert([{
                 user_name: helperApp.user,
@@ -266,7 +269,7 @@ window.saveHelperApplication = async function(helperApp) {
 
 window.getHelperApplications = async function() {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.mgSupabase
             .from('helper_applications')
             .select('*')
             .order('created_at', { ascending: false });
@@ -283,7 +286,7 @@ window.getHelperApplications = async function() {
 
 window.getUserHelperApplications = async function(username) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.mgSupabase
             .from('helper_applications')
             .select('*')
             .eq('user_name', username)
@@ -299,7 +302,7 @@ window.getUserHelperApplications = async function(username) {
 
 window.updateHelperStatus = async function(id, status) {
     try {
-        const { error } = await supabase
+        const { error } = await window.mgSupabase
             .from('helper_applications')
             .update({ status: status })
             .eq('id', id);
@@ -353,7 +356,7 @@ window.getStats = async function() {
     const tables = ['users', 'complaints', 'media_applications', 'helper_applications'];
     
     for (const table of tables) {
-        const { data, error } = await supabase
+        const { data, error } = await window.mgSupabase
             .from(table)
             .select('count', { count: 'exact', head: true });
         
@@ -365,7 +368,7 @@ window.getStats = async function() {
     }
     
     // Показываем пользователей
-    const { data: users } = await supabase
+    const { data: users } = await window.mgSupabase
         .from('users')
         .select('username, password');
     
