@@ -72,7 +72,7 @@ body::before {
 }
 
 /* ==============================================
-   ЭКРАН ВЫБОРА УСТРОЙСТВА - МЕГА КРАСИВО
+   ЭКРАН ВЫБОРА УСТРОЙСТВА
    ============================================== */
 
 .device-choice {
@@ -199,62 +199,7 @@ body::before {
 }
 
 /* ==============================================
-   КНОПКА СМЕНЫ УСТРОЙСТВА - СУПЕР ВИДНАЯ
-   ============================================== */
-
-.device-switch {
-    text-align: center;
-    padding: 20px;
-    background: linear-gradient(90deg, #1a1a3a, #2a2a5a, #1a1a3a);
-    border-bottom: 4px solid #9a9aff;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 10px 40px rgba(154, 154, 255, 0.7);
-    animation: rainbow 5s infinite;
-}
-
-@keyframes rainbow {
-    0%, 100% { background: linear-gradient(90deg, #1a1a3a, #2a2a5a, #1a1a3a); }
-    50% { background: linear-gradient(90deg, #2a2a5a, #3a3a7a, #2a2a5a); }
-}
-
-.device-switch-btn {
-    background: linear-gradient(135deg, #2a2a6a, #4a4a9a, #6a6aba);
-    border: 4px solid #b0b0ff;
-    color: white;
-    padding: 20px 45px;
-    border-radius: 60px;
-    cursor: pointer;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 18px;
-    transition: all 0.4s;
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 25px;
-    box-shadow: 0 0 50px #b0b0ff, 0 0 100px #7a7aff;
-    animation: buttonPulse 2s infinite;
-    font-weight: bold;
-    letter-spacing: 3px;
-}
-
-@keyframes buttonPulse {
-    0%, 100% { box-shadow: 0 0 50px #b0b0ff; transform: scale(1); }
-    50% { box-shadow: 0 0 80px #ffffff, 0 0 120px #b0b0ff; transform: scale(1.05); }
-}
-
-.device-switch-btn:hover {
-    transform: scale(1.1) translateY(-5px);
-    background: linear-gradient(135deg, #3a3a8a, #5a5aba, #7a7ada);
-    box-shadow: 0 0 80px #ffffff, 0 0 120px #b0b0ff;
-}
-
-/* ==============================================
-   ШАПКА - УЛУЧШЕННАЯ
+   ШАПКА
    ============================================== */
 
 .header {
@@ -281,6 +226,16 @@ body::before {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 25px;
+    position: relative;
+    z-index: 101;
 }
 
 .logo h1 {
@@ -362,7 +317,7 @@ body::before {
 }
 
 /* ==============================================
-   АВТОРИЗАЦИЯ - СТИЛЬНАЯ
+   АВТОРИЗАЦИЯ
    ============================================== */
 
 .auth {
@@ -446,7 +401,62 @@ body::before {
 }
 
 /* ==============================================
-   НАВИГАЦИЯ - КРУТАЯ
+   КНОПКА СМЕНЫ УСТРОЙСТВА
+   ============================================== */
+
+.device-switch {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(90deg, #1a1a3a, #2a2a5a, #1a1a3a);
+    border-bottom: 4px solid #9a9aff;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 10px 40px rgba(154, 154, 255, 0.7);
+    animation: rainbow 5s infinite;
+}
+
+@keyframes rainbow {
+    0%, 100% { background: linear-gradient(90deg, #1a1a3a, #2a2a5a, #1a1a3a); }
+    50% { background: linear-gradient(90deg, #2a2a5a, #3a3a7a, #2a2a5a); }
+}
+
+.device-switch-btn {
+    background: linear-gradient(135deg, #2a2a6a, #4a4a9a, #6a6aba);
+    border: 4px solid #b0b0ff;
+    color: white;
+    padding: 20px 45px;
+    border-radius: 60px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 18px;
+    transition: all 0.4s;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    box-shadow: 0 0 50px #b0b0ff, 0 0 100px #7a7aff;
+    animation: buttonPulse 2s infinite;
+    font-weight: bold;
+    letter-spacing: 3px;
+}
+
+@keyframes buttonPulse {
+    0%, 100% { box-shadow: 0 0 50px #b0b0ff; transform: scale(1); }
+    50% { box-shadow: 0 0 80px #ffffff, 0 0 120px #b0b0ff; transform: scale(1.05); }
+}
+
+.device-switch-btn:hover {
+    transform: scale(1.1) translateY(-5px);
+    background: linear-gradient(135deg, #3a3a8a, #5a5aba, #7a7ada);
+    box-shadow: 0 0 80px #ffffff, 0 0 120px #b0b0ff;
+}
+
+/* ==============================================
+   НАВИГАЦИЯ
    ============================================== */
 
 .nav {
@@ -500,7 +510,7 @@ body::before {
 }
 
 /* ==============================================
-   ИНФОРМАЦИОННАЯ ПАНЕЛЬ - МЕГА
+   ИНФОРМАЦИОННАЯ ПАНЕЛЬ
    ============================================== */
 
 .info-panel {
@@ -643,7 +653,7 @@ body::before {
 }
 
 /* ==============================================
-   ПРАВИЛА - РОСКОШНЫЕ
+   ПРАВИЛА
    ============================================== */
 
 .rules-scroll {
@@ -705,7 +715,7 @@ body::before {
 }
 
 /* ==============================================
-   ФОРМЫ - ШИКАРНЫЕ
+   ФОРМЫ
    ============================================== */
 
 .form-container {
@@ -732,17 +742,88 @@ body::before {
     text-shadow: 0 0 25px #b0b0ff;
 }
 
+.info-message {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: linear-gradient(135deg, #2a2a5a, #1a1a3a);
+    padding: 15px 25px;
+    border-radius: 60px;
+    margin-bottom: 25px;
+    border: 2px solid #7a7aff;
+    box-shadow: 0 0 25px rgba(74, 74, 138, 0.3);
+}
+
+.info-message-icon {
+    font-size: 28px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.info-message-text {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-message-text strong {
+    color: #b0b0ff;
+    font-size: 14px;
+}
+
+.info-message-text span {
+    color: #c0c0ff;
+    font-size: 11px;
+}
+
+.info-message-text a {
+    color: #b0b0ff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.info-message-text a:hover {
+    text-decoration: underline;
+    color: white;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #8a8aff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-group.half {
+    flex: 1;
+}
+
 .form-input, .form-textarea, .form-select {
     width: 100%;
-    padding: 18px 25px;
+    padding: 15px 20px;
     background: rgba(30, 30, 70, 0.9);
-    border: 3px solid #5a5a9a;
+    border: 2px solid #5a5a9a;
     color: white;
     font-family: 'Press Start 2P', cursive;
-    font-size: 12px;
-    border-radius: 25px;
-    transition: all 0.4s;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    font-size: 11px;
+    border-radius: 15px;
+    transition: all 0.3s;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .form-input:focus, .form-textarea:focus, .form-select:focus {
@@ -753,21 +834,41 @@ body::before {
     background: rgba(40, 40, 90, 0.95);
 }
 
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 20px;
+}
+
+.form-select option {
+    background: #1a1a3a;
+    color: white;
+    padding: 10px;
+}
+
 .submit-btn {
     background: linear-gradient(135deg, #4a4a9a, #7a7aff, #4a4a9a);
     color: white;
     border: 3px solid #b0b0ff;
-    padding: 22px 35px;
+    padding: 18px 30px;
     font-family: 'Press Start 2P', cursive;
-    font-size: 16px;
-    border-radius: 70px;
+    font-size: 14px;
+    border-radius: 50px;
     cursor: pointer;
-    transition: all 0.5s;
+    transition: all 0.4s;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: 15px;
     box-shadow: 0 15px 50px rgba(122, 122, 255, 0.6);
     position: relative;
     overflow: hidden;
@@ -783,7 +884,7 @@ body::before {
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.4);
     transform: translate(-50%, -50%);
-    transition: width 0.8s, height 0.8s;
+    transition: width 0.6s, height 0.6s;
     pointer-events: none;
     display: flex;
     align-items: center;
@@ -792,333 +893,152 @@ body::before {
 }
 
 .submit-btn:hover::before {
-    width: 700px;
-    height: 700px;
-    font-size: 300px;
+    width: 500px;
+    height: 500px;
+    font-size: 200px;
     opacity: 0.25;
 }
 
 .submit-btn:hover {
     background: linear-gradient(135deg, #5a5aba, #8a8aff, #5a5aba);
-    transform: translateY(-8px) scale(1.05);
+    transform: translateY(-5px) scale(1.02);
     box-shadow: 0 25px 70px #b0b0ff;
     border-color: #ffffff;
 }
 
+.btn-icon {
+    font-size: 18px;
+    filter: drop-shadow(0 0 5px white);
+}
+
 /* ==============================================
-   ТАБЫ - КРАСИВЫЕ
+   ТАБЫ
    ============================================== */
 
 .tabs {
     display: flex;
-    gap: 25px;
-    margin-bottom: 35px;
+    gap: 15px;
+    margin-bottom: 25px;
 }
 
 .tab {
     flex: 1;
     background: rgba(30, 30, 70, 0.8);
-    border: 3px solid #5a5a9a;
+    border: 2px solid #5a5a9a;
     color: #c0c0ff;
-    padding: 18px 25px;
-    border-radius: 70px;
+    padding: 15px 20px;
+    border-radius: 50px;
     cursor: pointer;
     font-family: 'Press Start 2P', cursive;
-    font-size: 14px;
-    transition: all 0.4s;
+    font-size: 12px;
+    transition: all 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 15px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    gap: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .tab:hover {
     background: linear-gradient(135deg, #4a4a9a, #7a7aff);
     color: white;
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px #7a7aff;
-    border-color: #ffffff;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px #7a7aff;
 }
 
 .tab.active {
     background: linear-gradient(135deg, #5a5aba, #8a8aff);
     color: white;
-    box-shadow: 0 0 50px #b0b0ff;
+    box-shadow: 0 0 30px #b0b0ff;
     border-color: #ffffff;
 }
 
+#ttForm, #ytForm {
+    display: none;
+}
+
+#ttForm.active, #ytForm.active {
+    display: block;
+}
+
 /* ==============================================
-   КАРТОЧКИ - ЭФФЕКТНЫЕ
+   КАРТОЧКИ
    ============================================== */
 
 .complaint-card, .media-card, .application-card {
     background: rgba(20, 20, 50, 0.85);
-    border: 3px solid #5a5a9a;
-    border-radius: 30px;
-    padding: 25px;
-    margin-bottom: 20px;
-    transition: all 0.5s;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6);
+    border: 2px solid #5a5a9a;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: all 0.3s;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .complaint-card:hover, .media-card:hover, .application-card:hover {
-    transform: translateX(20px) translateY(-5px);
-    box-shadow: -20px 20px 50px rgba(176, 176, 255, 0.5);
+    transform: translateX(10px) translateY(-3px);
+    box-shadow: -15px 15px 40px rgba(122, 122, 255, 0.4);
     border-color: #ffffff;
-    background: rgba(30, 30, 70, 0.9);
 }
 
 .complaint-header, .media-header, .application-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 3px solid #5a5a9a;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #5a5a9a;
 }
 
 .complaint-title, .media-title, .application-title {
     color: #ffffff;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
-    text-shadow: 0 0 15px #b0b0ff;
+    text-shadow: 0 0 10px #b0b0ff;
+}
+
+.complaint-status, .media-status, .application-status {
+    padding: 5px 12px;
+    border-radius: 30px;
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 
 .status-new {
     background: linear-gradient(135deg, #4a4a9a, #7a7aff);
     color: white;
-    box-shadow: 0 0 25px #7a7aff;
+    box-shadow: 0 0 15px #7a7aff;
 }
 
 .status-accepted {
     background: linear-gradient(135deg, #2a7a5a, #4a9a7a);
     color: white;
-    box-shadow: 0 0 25px #4a9a7a;
+    box-shadow: 0 0 15px #4a9a7a;
 }
 
 .status-rejected {
     background: linear-gradient(135deg, #8a4a4a, #aa6a6a);
     color: white;
-    box-shadow: 0 0 25px #aa6a6a;
+    box-shadow: 0 0 15px #aa6a6a;
 }
 
-/* ==============================================
-   МОДАЛКИ - ШИКАРНЫЕ
-   ============================================== */
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 10000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.95);
-    backdrop-filter: blur(25px);
+.complaint-body, .media-body, .application-body {
+    color: #f0f0ff;
+    font-size: 11px;
 }
 
-.modal-content {
-    background: linear-gradient(135deg, #1a1a4a, #0a0a2a);
-    margin: 5% auto;
-    padding: 50px;
-    border: 4px solid #7a7aff;
-    border-radius: 70px;
-    width: 90%;
-    max-width: 550px;
-    position: relative;
-    animation: modalEntrance 0.6s;
-    box-shadow: 0 0 150px rgba(176, 176, 255, 0.7);
+.complaint-body p, .media-body p, .application-body p {
+    margin: 8px 0;
+    line-height: 1.6;
 }
 
-@keyframes modalEntrance {
-    from {
-        transform: translateY(-150px) scale(0.8);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-    }
-}
-
-.modal-content h2 {
+.complaint-body strong, .media-body strong, .application-body strong {
     color: #ffffff;
-    margin-bottom: 40px;
-    text-align: center;
-    font-size: 24px;
-    text-shadow: 0 0 40px #b0b0ff;
-}
-
-.close {
-    position: absolute;
-    right: 25px;
-    top: 20px;
-    font-size: 35px;
-    cursor: pointer;
-    color: #b0b0ff;
-    transition: all 0.4s;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: rgba(122, 122, 255, 0.2);
-}
-
-.close:hover {
-    color: white;
-    background: #7a7aff;
-    transform: rotate(360deg) scale(1.2);
-    box-shadow: 0 0 50px #b0b0ff;
-}
-
-/* ==============================================
-   АДАПТИВНОСТЬ ДЛЯ ТЕЛЕФОНОВ
-   ============================================== */
-
-@media (max-width: 768px) {
-    .device-title { font-size: 28px; }
-    .device-btn { padding: 30px 40px; min-width: 240px; }
-    .device-icon { font-size: 70px; }
-    .device-name { font-size: 18px; }
-    
-    .device-switch-btn { font-size: 14px; padding: 15px 30px; }
-    
-    .header-content { flex-direction: column; text-align: center; }
-    .logo h1 { font-size: 24px; }
-    .server-ip { flex-direction: column; }
-    
-    .nav { top: 70px; }
-    .nav .container { flex-wrap: nowrap; overflow-x: auto; }
-    .nav-btn { white-space: nowrap; font-size: 11px; padding: 10px 20px; }
-    
-    .info-item { min-width: 100%; flex-direction: column; text-align: center; }
-    
-    .form-row { flex-direction: column; }
-    .tabs { flex-direction: column; }
-    
-    .rule-block:hover { transform: translateX(10px); }
-    
-    .submit-btn { font-size: 13px; padding: 18px 25px; }
-}
-
-@media (max-width: 480px) {
-    .device-title { font-size: 22px; }
-    .device-btn { padding: 20px 30px; min-width: 200px; }
-    .device-icon { font-size: 55px; }
-    
-    .section-title { font-size: 18px; }
-    .form-title { font-size: 16px; }
-    
-    .info-link { font-size: 16px; }
-    .info-value { font-size: 18px; }
-}
-
-/* ==============================================
-   ДОПОЛНИТЕЛЬНЫЕ КРАСОТЫ
-   ============================================== */
-
-.highlight {
-    color: #ffffff;
-    background: linear-gradient(135deg, #4a4a9a, #7a7aff);
-    padding: 3px 10px;
-    border-radius: 20px;
-    border: 2px solid #b0b0ff;
-    box-shadow: 0 0 20px #7a7aff;
-}
-
-.empty-list {
-    text-align: center;
-    padding: 70px 30px;
-    background: rgba(20, 20, 50, 0.85);
-    border: 3px dashed #7a7aff;
-    border-radius: 50px;
-    color: #b0b0ff;
-    font-size: 14px;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 0 50px rgba(122, 122, 255, 0.3);
-}
-
-/* Анимации для всех элементов */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.section {
-    animation: fadeInUp 0.6s ease;
-}
-
-/* ==============================================
-   ИСПРАВЛЕНИЕ ОТДАЛЕННОГО ЭКРАНА
-   ============================================== */
-
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    overflow-x: hidden;
-}
-
-body {
-    font-size: 12px;
-    line-height: 1.4;
-}
-
-.container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 10px;
-}
-
-/* Убираем лишние отступы */
-.header, .nav, .info-panel, .main {
-    width: 100%;
-}
-
-/* Исправляем масштаб для мобильных */
-@media (max-width: 768px) {
-    body {
-        font-size: 11px;
-    }
-    
-    .container {
-        padding: 0 8px;
-    }
-    
-    /* Убираем трансформации которые отдаляют */
-    .device-choice-content {
-        transform: none !important;
-        animation: none !important;
-    }
-    
-    .device-btn:hover {
-        transform: translateY(-3px) !important;
-    }
-    
-    /* Фиксируем размеры */
-    .logo h1 {
-        font-size: 16px;
-    }
-    
-    .server-ip {
-        padding: 6px 10px;
-    }
-    
-    .auth-input {
-        width: 90px;
-    }
+    min-width: 80px;
+    display: inline-block;
+    text-shadow: 0 0 5px #b0b0ff;
 }
 
 /* ==============================================
@@ -1202,26 +1122,8 @@ body {
     word-break: break-all;
 }
 
-/* Адаптация для мобильных */
-@media (max-width: 768px) {
-    .photo-btn {
-        padding: 10px 15px;
-        font-size: 9px;
-    }
-    
-    .photo-icon {
-        font-size: 16px;
-    }
-    
-    .photo-remove {
-        width: 25px;
-        height: 25px;
-        font-size: 12px;
-    }
-}
-
 /* ==============================================
-   СТИЛИ ДЛЯ ФОТО В КАРТОЧКАХ
+   СТИЛИ ДЛЯ КАРТОЧЕК ПРОБЛЕМ
    ============================================== */
 
 .problem-card {
@@ -1230,6 +1132,13 @@ body {
     border-radius: 15px;
     padding: 15px;
     margin-bottom: 15px;
+    transition: all 0.3s;
+}
+
+.problem-card:hover {
+    transform: translateX(10px);
+    box-shadow: -15px 15px 30px rgba(122, 122, 255, 0.4);
+    border-color: #ffffff;
 }
 
 .problem-header {
@@ -1282,3 +1191,251 @@ body {
     background: #0a0a1a;
 }
 
+/* ==============================================
+   МОДАЛКИ
+   ============================================== */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(25px);
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #1a1a4a, #0a0a2a);
+    margin: 5% auto;
+    padding: 50px;
+    border: 4px solid #7a7aff;
+    border-radius: 70px;
+    width: 90%;
+    max-width: 550px;
+    position: relative;
+    animation: modalEntrance 0.6s;
+    box-shadow: 0 0 150px rgba(176, 176, 255, 0.7);
+}
+
+@keyframes modalEntrance {
+    from {
+        transform: translateY(-150px) scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-content h2 {
+    color: #ffffff;
+    margin-bottom: 40px;
+    text-align: center;
+    font-size: 24px;
+    text-shadow: 0 0 40px #b0b0ff;
+}
+
+.close {
+    position: absolute;
+    right: 25px;
+    top: 20px;
+    font-size: 35px;
+    cursor: pointer;
+    color: #b0b0ff;
+    transition: all 0.4s;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(122, 122, 255, 0.2);
+}
+
+.close:hover {
+    color: white;
+    background: #7a7aff;
+    transform: rotate(360deg) scale(1.2);
+    box-shadow: 0 0 50px #b0b0ff;
+}
+
+/* ==============================================
+   ПУСТЫЕ СОСТОЯНИЯ
+   ============================================== */
+
+.empty-list {
+    text-align: center;
+    padding: 60px 20px;
+    background: rgba(20, 20, 50, 0.85);
+    border: 2px dashed #7a7aff;
+    border-radius: 30px;
+    color: #b0b0ff;
+    font-size: 12px;
+    backdrop-filter: blur(5px);
+}
+
+/* ==============================================
+   АДАПТИВНОСТЬ ДЛЯ ТЕЛЕФОНОВ
+   ============================================== */
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+
+    .device-title {
+        font-size: 28px;
+    }
+
+    .device-btn {
+        padding: 30px 40px;
+        min-width: 240px;
+    }
+
+    .device-icon {
+        font-size: 70px;
+    }
+
+    .device-name {
+        font-size: 18px;
+    }
+
+    .device-switch-btn {
+        font-size: 14px;
+        padding: 15px 30px;
+    }
+
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .logo h1 {
+        font-size: 24px;
+    }
+
+    .server-ip {
+        flex-direction: column;
+    }
+
+    .nav {
+        top: 70px;
+    }
+
+    .nav .container {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        justify-content: flex-start;
+    }
+
+    .nav-btn {
+        white-space: nowrap;
+        font-size: 11px;
+        padding: 10px 20px;
+    }
+
+    .info-items {
+        flex-direction: column;
+    }
+
+    .info-item {
+        min-width: 100%;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .form-row {
+        flex-direction: column;
+    }
+
+    .tabs {
+        flex-direction: column;
+    }
+
+    .rule-block:hover {
+        transform: translateX(10px);
+    }
+
+    .submit-btn {
+        font-size: 13px;
+        padding: 18px 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .device-title {
+        font-size: 22px;
+    }
+
+    .device-btn {
+        padding: 20px 30px;
+        min-width: 200px;
+    }
+
+    .device-icon {
+        font-size: 55px;
+    }
+
+    .section-title {
+        font-size: 18px;
+    }
+
+    .form-title {
+        font-size: 16px;
+    }
+
+    .info-link {
+        font-size: 16px;
+    }
+
+    .info-value {
+        font-size: 18px;
+    }
+
+    .photo-btn {
+        padding: 10px 15px;
+        font-size: 9px;
+    }
+
+    .photo-icon {
+        font-size: 16px;
+    }
+
+    .photo-remove {
+        width: 25px;
+        height: 25px;
+        font-size: 12px;
+    }
+}
+
+/* ==============================================
+   ДОПОЛНИТЕЛЬНЫЕ КРАСОТЫ
+   ============================================== */
+
+.highlight {
+    color: #ffffff;
+    background: linear-gradient(135deg, #4a4a9a, #7a7aff);
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 2px solid #b0b0ff;
+    box-shadow: 0 0 20px #7a7aff;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section {
+    animation: fadeInUp 0.6s ease;
+}
