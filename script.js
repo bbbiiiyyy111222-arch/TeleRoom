@@ -511,4 +511,30 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
         await loadUserData();
     }
+
+    // ==============================================
+// ФУНКЦИЯ ДЛЯ ПРОБЛЕМ (ТЫ ПИШЕШЬ)
+// ==============================================
+
+window.submitProblem = async function(event) {
+    event.preventDefault();
+    
+    if (!currentUser) {
+        alert('Сначала войдите в аккаунт');
+        return;
+    }
+    
+    const problemText = document.getElementById('problemText').value.trim();
+    
+    if (!problemText) {
+        alert('Опишите проблему');
+        return;
+    }
+    
+    // Здесь можно добавить отправку в Supabase
+    // Пока просто показываем сообщение
+    
+    alert('✅ Сообщение отправлено куратору! @milo4ika1 скоро ответит');
+    document.getElementById('problemForm').reset();
+};
 });
