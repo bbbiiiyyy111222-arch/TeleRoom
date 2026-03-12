@@ -695,8 +695,79 @@ function loadProblems() {
     list.innerHTML = html;
 }
 
+// ==============================================
+// ПРОСМОТР ФОТО В УВЕЛИЧЕННОМ РАЗМЕРЕ
+// ==============================================
+
+function viewPhoto(imageSrc) {
+    // Удаляем старую модалку если есть
+    const oldModal = document.getElementById('photoViewModal');
+    if (oldModal) oldModal.remove();
+    
+    // Создаем новую модалку
+    const modal = document.createElement('div');
+    modal.id = 'photoViewModal';
+    modal.className = 'photo-modal';
+    modal.onclick = function() { this.remove(); };
+    
+    const img = document.createElement('img');
+    img.src = imageSrc;
+    img.alt = 'Просмотр фото';
+    
+    const closeBtn = document.createElement('span');
+    closeBtn.className = 'close-photo';
+    closeBtn.innerHTML = '✖';
+    closeBtn.onclick = function(e) {
+        e.stopPropagation();
+        modal.remove();
+    };
+    
+    modal.appendChild(img);
+    modal.appendChild(closeBtn);
+    document.body.appendChild(modal);
+    modal.style.display = 'flex';
+}
+
+// Обновленная функция загрузки проблем с возможностью просмотра фото
+function loadProblems() {
+    const list = document.getElementById('problemsList');
+    if (!list) return;
+    
+    const problems = JSON.parse(localStorage.getItem('mg_problems')) || [];
+    
+    if (problems.length === 0) {
+        list.innerHTML = '<div class="empty-list">📭 Список проблем пуст</div>';
+        return;
+    }
+    
+    let html = '';
+    problems.reverse().forEach(p => {
+        html += `
+            <div class="problem-card">
+                <div class="problem-header">
+                    <span class="problem-title">⚠️ ${p.title}</span>
+                    <span class="problem-date">${p.date}</span>
+                </div>
+                <div class="problem-body">
+                    <p><strong>📝 Описание:</strong> ${p.description}</p>
+                    <p><strong>✅ Решение:</strong> ${p.solution}</p>
+                    ${p.photo ? `
+                    <div class="problem-photo" onclick="viewPhoto('${p.photo}')">
+                        <img src="${p.photo}" alt="Фото проблемы">
+                    </div>
+                    ` : ''}
+                    <p><small>👤 Добавил: ${p.author}</small></p>
+                </div>
+            </div>
+        `;
+    });
+    
+    list.innerHTML = html;
+}
+
 // Вызываем загрузку при открытии раздела
 document.addEventListener('DOMContentLoaded', function() {
     // ... существующий код ...
     loadProblems();
 });
+
