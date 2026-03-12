@@ -1,11 +1,13 @@
 // ==============================================
-// MOONGRIEF-FORUM - ОСНОВНОЙ СКРИПТ (SUPABASE)
+// MOONGRIEF-FORUM - ПОЛНЫЙ СКРИПТ (С ФОТО/ВИДЕО)
 // ==============================================
 
 console.log('🌙 MoonGrief-Forum загружается...');
 
 let currentUser = null;
 let currentDevice = localStorage.getItem('mg_device') || null;
+let complaintFiles = []; // Для хранения файлов жалобы
+let currentPhotoData = null; // Для фото в проблемах
 
 // ==============================================
 // ВЫБОР УСТРОЙСТВА
@@ -65,7 +67,6 @@ window.showSection = function(sectionId) {
         event.target.style.color = 'white';
     }
     
-    // Загружаем данные при переключении на раздел
     if (sectionId === 'problems') {
         loadProblems();
     }
@@ -160,7 +161,7 @@ window.logout = function() {
 };
 
 // ==============================================
-// ЗАГРУЗКА ЛИЧНЫХ ЗАЯВОК (ЧЕРЕЗ SUPABASE)
+// ЗАГРУЗКА ЛИЧНЫХ ЗАЯВОК
 // ==============================================
 
 async function loadPersonalComplaints() {
@@ -188,6 +189,17 @@ async function loadPersonalComplaints() {
         
         let html = '';
         data.forEach(c => {
+            const files = c.files || [];
+            const filesHtml = files.length > 0 ? 
+                `<div class="complaint-files">
+                    ${files.map((f, i) => `
+                        <div class="complaint-file-item ${f.type.startsWith('video/') ? 'video-preview' : ''}" 
+                             onclick="viewMedia('${f.data}', '${f.type}')">
+                            ${f.type.startsWith('video/') ? '▶️' : '📷'}
+                        </div>
+                    `).join('')}
+                </div>` : '';
+            
             html += `
                 <div class="complaint-card">
                     <div class="complaint-header">
@@ -198,6 +210,7 @@ async function loadPersonalComplaints() {
                         <p><strong>Нарушитель:</strong> ${c.against || c.target || 'Не указан'}</p>
                         <p><strong>Описание:</strong> ${c.description || c.desc || 'Нет описания'}</p>
                         <p><strong>Дата:</strong> ${c.date || new Date().toLocaleString()}</p>
+                        ${filesHtml}
                     </div>
                 </div>
             `;
@@ -304,8 +317,62 @@ async function loadPersonalHelpers() {
 }
 
 // ==============================================
-// ОТПРАВКА ФОРМ (ЧЕРЕЗ SUPABASE)
+// ОТПРАВКА ЖАЛОБ С ФАЙЛАМИ
 // ==============================================
+
+window.handleComplaintFiles = function(event) {
+    const files = Array.from(event.target.files);
+    
+    files.forEach(file => {
+        if (file.size > 10 * 1024 * 1024) {
+            alert(`❌ Файл ${file.name} слишком большой! Максимум 10MB`);
+            return;
+        }
+        
+        if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+            alert(`❌ Файл ${file.name} должен быть изображением или видео`);
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            complaintFiles.push({
+                name: file.name,
+                type: file.type,
+                data: e.target.result
+            });
+            updateComplaintFilesPreview();
+        };
+        reader.readAsDataURL(file);
+    });
+};
+
+function updateComplaintFilesPreview() {
+    const preview = document.getElementById('complaintFilesPreview');
+    if (!preview) return;
+    
+    if (complaintFiles.length === 0) {
+        preview.innerHTML = '';
+        return;
+    }
+    
+    let html = '';
+    complaintFiles.forEach((file, index) => {
+        html += `
+            <div class="file-preview-item" onclick="viewMedia('${file.data}', '${file.type}')">
+                ${file.type.startsWith('video/') ? '▶️' : '📷'}
+                <span class="file-remove" onclick="removeComplaintFile(${index}); event.stopPropagation();">✖</span>
+            </div>
+        `;
+    });
+    
+    preview.innerHTML = html;
+}
+
+window.removeComplaintFile = function(index) {
+    complaintFiles.splice(index, 1);
+    updateComplaintFilesPreview();
+};
 
 window.submitComplaint = async function(event) {
     if (event) event.preventDefault();
@@ -332,22 +399,31 @@ window.submitComplaint = async function(event) {
                 title: title,
                 against: target,
                 description: desc,
+                files: complaintFiles,
                 status: 'НОВАЯ',
                 date: new Date().toLocaleString()
             }]);
         
         if (error) throw error;
         
-        alert('✅ Жалоба отправлена!');
+        alert('✅ Жалоба отправлена!' + (complaintFiles.length > 0 ? ` (${complaintFiles.length} файлов)` : ''));
+        
         document.getElementById('compTitle').value = '';
         document.getElementById('compTarget').value = '';
         document.getElementById('compDesc').value = '';
+        complaintFiles = [];
+        updateComplaintFilesPreview();
+        
         loadPersonalComplaints();
     } catch (e) {
         console.error('Ошибка отправки жалобы:', e);
         alert('❌ Ошибка при отправке');
     }
 };
+
+// ==============================================
+// ОТПРАВКА МЕДИА
+// ==============================================
 
 window.submitTT = async function(event) {
     if (event) event.preventDefault();
@@ -447,6 +523,10 @@ window.submitYT = async function(event) {
     }
 };
 
+// ==============================================
+// ОТПРАВКА ХЕЛПЕРОВ
+// ==============================================
+
 window.submitHelper = async function(event) {
     if (event) event.preventDefault();
     
@@ -499,10 +579,8 @@ window.submitHelper = async function(event) {
 };
 
 // ==============================================
-// ФУНКЦИИ ДЛЯ РАБОТЫ С ФОТО
+// ФУНКЦИИ ДЛЯ ФОТО В ПРОБЛЕМАХ
 // ==============================================
-
-let currentPhotoData = null;
 
 window.handlePhotoSelect = function(event) {
     const file = event.target.files[0];
@@ -547,7 +625,7 @@ window.removePhoto = function() {
 };
 
 // ==============================================
-// ПРОБЛЕМЫ (С ФОТО В SUPABASE)
+// ПРОБЛЕМЫ
 // ==============================================
 
 window.addProblem = async function(event) {
@@ -568,7 +646,6 @@ window.addProblem = async function(event) {
     }
     
     try {
-        // Создаем таблицу problems если её нет
         const { error } = await window.mgSupabase
             .from('problems')
             .insert([{
@@ -590,17 +667,10 @@ window.addProblem = async function(event) {
         loadProblems();
     } catch (e) {
         console.error('Ошибка добавления проблемы:', e);
-        
-        // Если таблицы нет, создадим через SQL
-        if (e.message.includes('relation "problems" does not exist')) {
-            alert('❌ Таблица problems не создана. Создайте её в Supabase:\n\nCREATE TABLE problems (\n  id BIGSERIAL PRIMARY KEY,\n  title TEXT NOT NULL,\n  description TEXT NOT NULL,\n  solution TEXT NOT NULL,\n  photo TEXT,\n  author TEXT NOT NULL,\n  date TEXT NOT NULL,\n  created_at TIMESTAMP DEFAULT NOW()\n);');
-        } else {
-            alert('❌ Ошибка при добавлении: ' + e.message);
-        }
+        alert('❌ Ошибка при добавлении. Проверьте консоль.');
     }
 };
 
-// Загрузка списка проблем
 async function loadProblems() {
     const list = document.getElementById('problemsList');
     if (!list) return;
@@ -630,7 +700,7 @@ async function loadProblems() {
                         <p><strong>📝 Описание:</strong> ${p.description}</p>
                         <p><strong>✅ Решение:</strong> ${p.solution}</p>
                         ${p.photo ? `
-                        <div class="problem-photo" onclick="viewPhoto('${p.photo}')">
+                        <div class="problem-photo" onclick="viewMedia('${p.photo}', 'image/jpeg')">
                             <img src="${p.photo}" alt="Фото проблемы">
                         </div>
                         ` : ''}
@@ -648,44 +718,36 @@ async function loadProblems() {
 }
 
 // ==============================================
-// ПРОСМОТР ФОТО
+// ПРОСМОТР МЕДИА
 // ==============================================
 
-window.viewPhoto = function(imageSrc) {
-    // Удаляем старую модалку если есть
-    const oldModal = document.getElementById('photoViewModal');
+window.viewMedia = function(dataUrl, type) {
+    const oldModal = document.getElementById('mediaViewModal');
     if (oldModal) oldModal.remove();
     
-    // Создаем новую модалку
     const modal = document.createElement('div');
-    modal.id = 'photoViewModal';
-    modal.className = 'photo-modal';
-    modal.style.cssText = `
-        display: flex;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.95);
-        justify-content: center;
-        align-items: center;
-        z-index: 100000;
-        cursor: pointer;
-    `;
-    
+    modal.id = 'mediaViewModal';
+    modal.className = 'media-view-modal';
     modal.onclick = function() { this.remove(); };
     
-    const img = document.createElement('img');
-    img.src = imageSrc;
-    img.style.cssText = `
-        max-width: 90%;
-        max-height: 90%;
-        border: 3px solid #4a4a8a;
-        border-radius: 10px;
-    `;
+    let mediaElement;
+    if (type.startsWith('video/')) {
+        mediaElement = document.createElement('video');
+        mediaElement.src = dataUrl;
+        mediaElement.controls = true;
+        mediaElement.style.maxWidth = '90%';
+        mediaElement.style.maxHeight = '90%';
+    } else {
+        mediaElement = document.createElement('img');
+        mediaElement.src = dataUrl;
+        mediaElement.style.maxWidth = '90%';
+        mediaElement.style.maxHeight = '90%';
+        mediaElement.style.border = '3px solid #4a4a8a';
+        mediaElement.style.borderRadius = '10px';
+    }
     
     const closeBtn = document.createElement('span');
+    closeBtn.className = 'close-media';
     closeBtn.innerHTML = '✖';
     closeBtn.style.cssText = `
         position: absolute;
@@ -702,6 +764,7 @@ window.viewPhoto = function(imageSrc) {
         background: rgba(74, 74, 138, 0.5);
         border-radius: 50%;
         border: 2px solid #7a7aff;
+        z-index: 100001;
     `;
     
     closeBtn.onclick = function(e) {
@@ -709,7 +772,21 @@ window.viewPhoto = function(imageSrc) {
         modal.remove();
     };
     
-    modal.appendChild(img);
+    modal.style.cssText = `
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        justify-content: center;
+        align-items: center;
+        z-index: 100000;
+        cursor: pointer;
+    `;
+    
+    modal.appendChild(mediaElement);
     modal.appendChild(closeBtn);
     document.body.appendChild(modal);
 };
