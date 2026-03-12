@@ -570,3 +570,133 @@ document.addEventListener('DOMContentLoaded', function() {
         loadUserData();
     }
 });
+
+// ==============================================
+// ФУНКЦИИ ДЛЯ РАБОТЫ С ФОТО
+// ==============================================
+
+let currentPhotoData = null;
+
+window.handlePhotoSelect = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Проверка размера (макс 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+        alert('❌ Файл слишком большой! Максимум 5MB');
+        return;
+    }
+    
+    // Проверка типа
+    if (!file.type.startsWith('image/')) {
+        alert('❌ Можно загружать только изображения');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        currentPhotoData = e.target.result;
+        
+        const preview = document.getElementById('photoPreview');
+        const previewImg = document.getElementById('previewImage');
+        const photoName = document.getElementById('photoName');
+        
+        previewImg.src = e.target.result;
+        preview.style.display = 'block';
+        photoName.textContent = file.name;
+    };
+    reader.readAsDataURL(file);
+};
+
+window.removePhoto = function() {
+    currentPhotoData = null;
+    document.getElementById('photoPreview').style.display = 'none';
+    document.getElementById('photoName').textContent = '';
+    document.getElementById('problemPhoto').value = '';
+};
+
+window.addProblem = function(event) {
+    event.preventDefault();
+    
+    if (!currentUser || currentUser.role !== 'owner') {
+        alert('❌ Только администратор может добавлять проблемы');
+        return;
+    }
+    
+    const title = document.getElementById('problemTitle').value;
+    const desc = document.getElementById('problemDesc').value;
+    const solution = document.getElementById('problemSolution').value;
+    
+    if (!title || !desc || !solution) {
+        alert('❌ Заполните все поля');
+        return;
+    }
+    
+    // Создаем объект проблемы
+    const problem = {
+        id: Date.now(),
+        title: title,
+        description: desc,
+        solution: solution,
+        photo: currentPhotoData,
+        date: new Date().toLocaleString(),
+        author: currentUser.username
+    };
+    
+    // Сохраняем в localStorage
+    const problems = JSON.parse(localStorage.getItem('mg_problems')) || [];
+    problems.push(problem);
+    localStorage.setItem('mg_problems', JSON.stringify(problems));
+    
+    alert('✅ Проблема добавлена' + (currentPhotoData ? ' с фото' : ''));
+    
+    // Очищаем форму
+    document.getElementById('problemForm').reset();
+    removePhoto();
+    
+    // Обновляем список
+    loadProblems();
+};
+
+// Загрузка списка проблем
+function loadProblems() {
+    const list = document.getElementById('problemsList');
+    if (!list) return;
+    
+    const problems = JSON.parse(localStorage.getItem('mg_problems')) || [];
+    
+    if (problems.length === 0) {
+        list.innerHTML = '<div class="empty-list">📭 Список проблем пуст</div>';
+        return;
+    }
+    
+    let html = '';
+    problems.reverse().forEach(p => {
+        html += `
+            <div class="problem-card">
+                <div class="problem-header">
+                    <span class="problem-title">⚠️ ${p.title}</span>
+                    <span class="problem-date">${p.date}</span>
+                </div>
+                <div class="problem-body">
+                    <p><strong>📝 Описание:</strong> ${p.description}</p>
+                    <p><strong>✅ Решение:</strong> ${p.solution}</p>
+                    ${p.photo ? `
+                    <div class="problem-photo">
+                        <img src="${p.photo}" alt="Фото проблемы">
+                    </div>
+                    ` : ''}
+                    <p><small>👤 Добавил: ${p.author}</small></p>
+                </div>
+            </div>
+        `;
+    });
+    
+    list.innerHTML = html;
+}
+
+// Вызываем загрузку при открытии раздела
+document.addEventListener('DOMContentLoaded', function() {
+    // ... существующий код ...
+    loadProblems();
+});
