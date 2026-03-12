@@ -5,822 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>MoonGrief-Forum 🌙 Minecraft сервер</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    
-    <style>
-        
-        /* ==============================================
-           ЭКРАН ВЫБОРА УСТРОЙСТВА
-           ============================================== */
-
-        .device-choice {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: #0a0a1a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-        }
-
-        .device-choice-content {
-            text-align: center;
-            padding: 30px 20px;
-            background: #1a1a3a;
-            border: 3px solid #4a4a8a;
-            border-radius: 30px;
-            max-width: 500px;
-            width: 90%;
-        }
-
-        .device-title {
-            color: #b0b0ff;
-            font-size: 24px;
-            margin-bottom: 15px;
-        }
-
-        .device-subtitle {
-            color: #8a8aff;
-            font-size: 12px;
-            margin-bottom: 20px;
-        }
-
-        .device-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .device-btn {
-            background: #2a2a4a;
-            border: 2px solid #4a4a8a;
-            border-radius: 20px;
-            padding: 20px 30px;
-            cursor: pointer;
-            transition: 0.3s;
-            min-width: 150px;
-        }
-
-        .device-btn:hover {
-            background: #4a4a8a;
-            transform: translateY(-5px);
-        }
-
-        .device-icon {
-            font-size: 48px;
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        .device-name {
-            color: white;
-            font-size: 12px;
-        }
-
-        /* ==============================================
-           ШАПКА
-           ============================================== */
-
-        .header {
-            background: #1a1a3a;
-            padding: 15px 0;
-            border-bottom: 3px solid #4a4a8a;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .logo h1 {
-            color: #b0b0ff;
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-
-        .server-ip {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #2a2a4a;
-            padding: 6px 12px;
-            border-radius: 30px;
-            border: 1px solid #4a4a8a;
-            flex-wrap: wrap;
-        }
-
-        .server-ip span {
-            color: #b0b0ff;
-            font-size: 10px;
-        }
-
-        .copy-btn {
-            background: #4a4a8a;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 8px;
-        }
-
-        /* ==============================================
-           АВТОРИЗАЦИЯ
-           ============================================== */
-
-        .auth {
-            display: flex;
-            align-items: center;
-        }
-
-        #userInfo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #2a2a4a;
-            padding: 6px 15px;
-            border-radius: 30px;
-            border: 1px solid #4a4a8a;
-            flex-wrap: wrap;
-        }
-
-        .user-name {
-            color: #b0b0ff;
-            font-size: 10px;
-        }
-
-        .btn-moon {
-            background: #4a4a8a;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 8px;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .login-form {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .auth-input {
-            background: #2a2a4a;
-            border: 1px solid #4a4a8a;
-            color: white;
-            padding: 5px 8px;
-            border-radius: 20px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 7px;
-            width: 80px;
-        }
-
-        /* ==============================================
-           КНОПКА СМЕНЫ УСТРОЙСТВА
-           ============================================== */
-
-        .device-switch {
-            text-align: center;
-            padding: 10px;
-            background: #1a1a2a;
-            border-bottom: 2px solid #4a4a8a;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .device-switch-btn {
-            background: #2a2a4a;
-            border: 2px solid #4a4a8a;
-            color: white;
-            padding: 8px 20px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
-            max-width: 400px;
-            width: 100%;
-        }
-
-        /* ==============================================
-           НАВИГАЦИЯ
-           ============================================== */
-
-        .nav {
-            background: #1a1a3a;
-            padding: 10px 0;
-            border-bottom: 2px solid #4a4a8a;
-            position: sticky;
-            top: 50px;
-            z-index: 90;
-        }
-
-        .nav .container {
-            display: flex;
-            gap: 5px;
-            overflow-x: auto;
-            padding-bottom: 5px;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .nav-btn {
-            background: #2a2a4a;
-            border: 1px solid #4a4a8a;
-            color: #b0b0ff;
-            padding: 8px 12px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 9px;
-            flex-shrink: 0;
-        }
-
-        .nav-btn.active {
-            background: #4a4a8a;
-            color: white;
-        }
-
-        /* ==============================================
-           ИНФОРМАЦИОННАЯ ПАНЕЛЬ
-           ============================================== */
-
-        .info-panel {
-            background: #1a1a2a;
-            padding: 15px 0;
-            border-bottom: 2px solid #4a4a8a;
-        }
-
-        .info-items {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .info-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #2a2a4a;
-            padding: 8px 15px;
-            border-radius: 40px;
-            border: 1px solid #4a4a8a;
-            min-width: 250px;
-            flex: 1;
-        }
-
-        .info-icon {
-            font-size: 20px;
-        }
-
-        .info-text {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .info-label {
-            color: #8a8aff;
-            font-size: 7px;
-            text-transform: uppercase;
-        }
-
-        .info-link, .info-value {
-            color: #b0b0ff;
-            font-size: 10px;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        .info-badge {
-            background: #4a4a8a;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 20px;
-            font-size: 6px;
-            display: inline-block;
-            width: fit-content;
-        }
-
-        /* ==============================================
-           ОСНОВНОЙ КОНТЕНТ
-           ============================================== */
-
-        .main {
-            padding: 20px 0;
-        }
-
-        .section {
-            display: none;
-        }
-
-        .section.active {
-            display: block;
-        }
-
-        .section-title {
-            color: #b0b0ff;
-            font-size: 16px;
-            margin-bottom: 20px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #4a4a8a;
-            text-align: center;
-        }
-
-        /* ==============================================
-           ПРАВИЛА (ТВОИ, БЕЗ ИЗМЕНЕНИЙ)
-           ============================================== */
-
-        .rules-scroll {
-            max-height: 500px;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-
-        .rule-block {
-            background: #1a1a2a;
-            border-left: 4px solid #4a4a8a;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .rule-block h3 {
-            color: #b0b0ff;
-            font-size: 12px;
-            margin-bottom: 10px;
-        }
-
-        .rule-item {
-            display: flex;
-            gap: 10px;
-            padding: 8px 0;
-            border-bottom: 1px solid #2a2a4a;
-        }
-
-        .rule-num {
-            color: #8a8aff;
-            min-width: 40px;
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        .rule-item p {
-            color: #e0e0ff;
-            font-size: 10px;
-            flex: 1;
-        }
-
-        .rule-content {
-            flex: 1;
-        }
-
-        .rule-content ul {
-            margin: 5px 0 5px 15px;
-        }
-
-        .rule-content li {
-            color: #c0c0ff;
-            font-size: 9px;
-            margin: 3px 0;
-        }
-
-        .punish {
-            display: inline-block;
-            background: #8a4a4a;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 15px;
-            font-size: 8px;
-            margin-top: 5px;
-        }
-
-        .mini-punish {
-            display: inline-block;
-            background: #4a4a8a;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-size: 7px;
-            margin-left: 5px;
-            white-space: nowrap;
-        }
-
-        /* ==============================================
-           ФОРМЫ
-           ============================================== */
-
-        .form-container {
-            background: #1a1a2a;
-            border: 2px solid #4a4a8a;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .form-title {
-            color: #b0b0ff;
-            font-size: 14px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .info-message {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #2a2a4a;
-            padding: 10px 15px;
-            border-radius: 40px;
-            margin-bottom: 15px;
-            border: 1px solid #4a4a8a;
-        }
-
-        .info-message-icon {
-            font-size: 20px;
-        }
-
-        .info-message-text {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .info-message-text strong {
-            color: #b0b0ff;
-            font-size: 10px;
-        }
-
-        .info-message-text a {
-            color: #b0b0ff;
-            text-decoration: none;
-        }
-
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            display: block;
-            color: #8a8aff;
-            font-size: 8px;
-            margin-bottom: 3px;
-            text-transform: uppercase;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .form-group.half {
-            flex: 1;
-        }
-
-        .form-input, .form-textarea, .form-select {
-            width: 100%;
-            padding: 8px 12px;
-            background: #2a2a4a;
-            border: 1px solid #4a4a8a;
-            color: white;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 8px;
-            border-radius: 10px;
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 60px;
-        }
-
-        .submit-btn {
-            background: #4a4a8a;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
-            border-radius: 30px;
-            cursor: pointer;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        /* ==============================================
-           ТАБЫ
-           ============================================== */
-
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-
-        .tab {
-            flex: 1;
-            background: #2a2a4a;
-            border: 1px solid #4a4a8a;
-            color: #b0b0ff;
-            padding: 8px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 8px;
-            text-align: center;
-        }
-
-        .tab.active {
-            background: #4a4a8a;
-            color: white;
-        }
-
-        #ttForm, #ytForm {
-            display: none;
-        }
-
-        #ttForm.active, #ytForm.active {
-            display: block;
-        }
-
-        /* ==============================================
-           КАРТОЧКИ ДЛЯ ЖАЛОБ
-           ============================================== */
-
-        .complaint-card, .media-card, .application-card {
-            background: #1a1a2a;
-            border: 1px solid #4a4a8a;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 10px;
-        }
-
-        .complaint-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #4a4a8a;
-        }
-
-        .complaint-title {
-            color: #b0b0ff;
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        .complaint-status {
-            padding: 2px 8px;
-            border-radius: 15px;
-            font-size: 7px;
-        }
-
-        .status-new {
-            background: #4a4a8a;
-            color: white;
-        }
-
-        .complaint-body {
-            color: #c0c0ff;
-            font-size: 8px;
-        }
-
-        .complaint-body p {
-            margin: 4px 0;
-        }
-
-        .complaint-body strong {
-            color: #b0b0ff;
-            min-width: 60px;
-            display: inline-block;
-        }
-
-        /* ==============================================
-           ПРОБЛЕМЫ (ТОЛЬКО ДЛЯ АДМИНОВ)
-           ============================================== */
-
-        .admin-only {
-            display: none;
-        }
-
-        /* ==============================================
-           МОДАЛКИ
-           ============================================== */
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-        }
-
-        .modal-content {
-            background: #1a1a3a;
-            width: 90%;
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
-            border: 2px solid #4a4a8a;
-            border-radius: 20px;
-            position: relative;
-        }
-
-        .modal-content h2 {
-            color: #b0b0ff;
-            margin-bottom: 15px;
-            text-align: center;
-            font-size: 14px;
-        }
-
-        .close {
-            position: absolute;
-            right: 10px;
-            top: 5px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #b0b0ff;
-        }
-
-        /* ==============================================
-           ПУСТЫЕ СОСТОЯНИЯ
-           ============================================== */
-
-        .empty-list {
-            text-align: center;
-            padding: 30px;
-            background: #1a1a2a;
-            border: 2px dashed #4a4a8a;
-            border-radius: 15px;
-            color: #7a7aaa;
-            font-size: 9px;
-        }
-
-        /* ==============================================
-           МОБИЛЬНАЯ АДАПТАЦИЯ
-           ============================================== */
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 0 10px;
-            }
-
-            .header-content {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .logo h1 {
-                font-size: 16px;
-            }
-
-            .server-ip {
-                justify-content: center;
-            }
-
-            .auth {
-                width: 100%;
-            }
-
-            .login-form {
-                justify-content: center;
-            }
-
-            .auth-input {
-                width: 100px;
-            }
-
-            .nav .container {
-                gap: 3px;
-            }
-
-            .nav-btn {
-                font-size: 8px;
-                padding: 6px 10px;
-            }
-
-            .info-items {
-                flex-direction: column;
-            }
-
-            .info-item {
-                width: 100%;
-                min-width: auto;
-            }
-
-            .rule-item {
-                flex-direction: column;
-                gap: 3px;
-            }
-
-            .rule-num {
-                min-width: auto;
-            }
-
-            .mini-punish {
-                margin-left: 0;
-                margin-top: 3px;
-                display: inline-block;
-            }
-
-            .form-row {
-                flex-direction: column;
-                gap: 5px;
-            }
-
-            .tabs {
-                flex-direction: column;
-            }
-
-            .device-switch-btn {
-                font-size: 9px;
-                padding: 6px 15px;
-            }
-
-            .device-btn {
-                padding: 15px 20px;
-                min-width: 130px;
-            }
-
-            .device-icon {
-                font-size: 40px;
-            }
-
-            .device-name {
-                font-size: 10px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .device-title {
-                font-size: 20px;
-            }
-
-            .device-btn {
-                padding: 12px 15px;
-                min-width: 120px;
-            }
-
-            .device-icon {
-                font-size: 36px;
-            }
-
-            .logo h1 {
-                font-size: 14px;
-            }
-
-            .server-ip span {
-                font-size: 8px;
-            }
-
-            .copy-btn {
-                font-size: 7px;
-                padding: 4px 8px;
-            }
-
-            .auth-input {
-                width: 80px;
-                font-size: 6px;
-            }
-
-            .btn-moon {
-                font-size: 7px;
-                padding: 4px 8px;
-            }
-
-            .section-title {
-                font-size: 14px;
-            }
-
-            .form-title {
-                font-size: 12px;
-            }
-
-            .submit-btn {
-                font-size: 9px;
-                padding: 10px 15px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
     
     <script>
         // Защита
@@ -845,12 +30,15 @@
         let complaints = JSON.parse(localStorage.getItem('mg_complaints')) || [];
         let mediaApps = JSON.parse(localStorage.getItem('mg_media')) || [];
         let helpers = JSON.parse(localStorage.getItem('mg_helpers')) || [];
+        let problems = JSON.parse(localStorage.getItem('mg_problems')) || [];
+        let currentPhotoData = null;
 
         // Сохранение
         function saveData() {
             localStorage.setItem('mg_complaints', JSON.stringify(complaints));
             localStorage.setItem('mg_media', JSON.stringify(mediaApps));
             localStorage.setItem('mg_helpers', JSON.stringify(helpers));
+            localStorage.setItem('mg_problems', JSON.stringify(problems));
             if (currentUser) {
                 localStorage.setItem('mg_currentUser', JSON.stringify(currentUser));
             }
@@ -885,6 +73,10 @@
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
             event.target.classList.add('active');
+            
+            if (sectionId === 'problems') {
+                loadProblems();
+            }
         };
 
         // Переключение платформ
@@ -1049,7 +241,40 @@
             loadUserComplaints();
         };
 
-        // Отправка проблем (только для админов)
+        // Функции для фото
+        window.handlePhotoSelect = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 5 * 1024 * 1024) {
+                alert('❌ Файл слишком большой! Максимум 5MB');
+                return;
+            }
+            
+            if (!file.type.startsWith('image/')) {
+                alert('❌ Можно загружать только изображения');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentPhotoData = e.target.result;
+                
+                document.getElementById('photoPreview').style.display = 'block';
+                document.getElementById('previewImage').src = e.target.result;
+                document.getElementById('photoName').textContent = file.name;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.removePhoto = function() {
+            currentPhotoData = null;
+            document.getElementById('photoPreview').style.display = 'none';
+            document.getElementById('photoName').textContent = '';
+            document.getElementById('problemPhoto').value = '';
+        };
+
+        // Добавление проблемы (только для админов)
         window.addProblem = function(event) {
             event.preventDefault();
             
@@ -1058,9 +283,69 @@
                 return;
             }
             
-            alert('✅ Проблема добавлена!');
+            const title = document.getElementById('problemTitle').value;
+            const desc = document.getElementById('problemDesc').value;
+            const solution = document.getElementById('problemSolution').value;
+            
+            if (!title || !desc || !solution) {
+                alert('❌ Заполните все поля');
+                return;
+            }
+            
+            const newProblem = {
+                id: Date.now(),
+                title: title,
+                description: desc,
+                solution: solution,
+                photo: currentPhotoData,
+                date: new Date().toLocaleString(),
+                author: currentUser.username
+            };
+            
+            problems.push(newProblem);
+            saveData();
+            
+            alert('✅ Проблема добавлена' + (currentPhotoData ? ' с фото' : ''));
+            
             document.getElementById('problemForm').reset();
+            removePhoto();
+            loadProblems();
         };
+
+        // Загрузка списка проблем
+        function loadProblems() {
+            const list = document.getElementById('problemsList');
+            if (!list) return;
+            
+            if (problems.length === 0) {
+                list.innerHTML = '<div class="empty-list">📭 Список проблем пуст</div>';
+                return;
+            }
+            
+            let html = '';
+            problems.reverse().forEach(p => {
+                html += `
+                    <div class="problem-card">
+                        <div class="problem-header">
+                            <span class="problem-title">⚠️ ${p.title}</span>
+                            <span class="problem-date">${p.date}</span>
+                        </div>
+                        <div class="problem-body">
+                            <p><strong>📝 Описание:</strong> ${p.description}</p>
+                            <p><strong>✅ Решение:</strong> ${p.solution}</p>
+                            ${p.photo ? `
+                            <div class="problem-photo">
+                                <img src="${p.photo}" alt="Фото проблемы">
+                            </div>
+                            ` : ''}
+                            <p><small>👤 Добавил: ${p.author}</small></p>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            list.innerHTML = html;
+        }
 
         // Модалки
         window.showRegister = function() { document.getElementById('registerModal').style.display = 'flex'; };
@@ -1162,7 +447,7 @@
                     <div class="info-item">
                         <span class="info-icon">👑</span>
                         <div class="info-text">
-                            <span class="info-label">НАШ КУРАТОР В</span>
+                            <span class="info-label">НАШ КУРАТОР</span>
                             <a href="https://t.me/milo4ika1" target="_blank" class="info-link">@milo4ika1</a>
                             <span class="info-badge telegram">TELEGRAM</span>
                         </div>
@@ -1182,9 +467,9 @@
                     <div class="info-item">
                         <span class="info-icon">🐛</span>
                         <div class="info-text">
-                            <span class="info-label">НАШЛИ БАГ НА ФОРУМЕ?</span>
+                            <span class="info-label">НАШЛИ БАГ?</span>
                             <a href="https://t.me/milo4ika1" target="_blank" class="info-link">@milo4ika1</a>
-                            <span class="info-badge">НАПИШТЕ СОЗДАТЕЛЮ ФОРУМА</span>
+                            <span class="info-badge">НАПИШИТЕ СОЗДАТЕЛЮ ФОРУМА</span>
                         </div>
                     </div>
                 </div>
@@ -1652,66 +937,68 @@
                     </div>
                 </div>
 
-               <!-- ПРОБЛЕМЫ (ТОЛЬКО ДЛЯ АДМИНОВ) -->
-<div id="problems" class="section">
-    <h2 class="section-title">❗ УПРАВЛЕНИЕ ПРОБЛЕМАМИ</h2>
-    
-    <div class="info-message">
-        <span class="info-message-icon">👑</span>
-        <div class="info-message-text">
-            <strong>ТОЛЬКО ДЛЯ АДМИНИСТРАТОРОВ</strong>
-            <span>milfa, milk123, Xchik_</span>
-        </div>
-    </div>
-    
-    <div class="form-container">
-        <h3 class="form-title">➕ ДОБАВИТЬ ПРОБЛЕМУ</h3>
-        <form id="problemForm" onsubmit="addProblem(event)" class="form">
-            <div class="form-group">
-                <label>НАЗВАНИЕ ПРОБЛЕМЫ</label>
-                <input type="text" id="problemTitle" placeholder="НАПРИМЕР: НЕ РАБОТАЕТ ВХОД" required class="form-input">
-            </div>
-            
-            <div class="form-group">
-                <label>ОПИСАНИЕ</label>
-                <textarea id="problemDesc" placeholder="ПОДРОБНО ОПИШИТЕ ПРОБЛЕМУ" required class="form-textarea" rows="3"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label>РЕШЕНИЕ</label>
-                <textarea id="problemSolution" placeholder="КАК ИСПРАВИТЬ ПРОБЛЕМУ" required class="form-textarea" rows="3"></textarea>
-            </div>
-            
-            <!-- КНОПКА ДЛЯ ФОТО -->
-            <div class="form-group">
-                <label>📷 ПРИКРЕПИТЬ ФОТО (НЕОБЯЗАТЕЛЬНО)</label>
-                <div class="photo-upload">
-                    <input type="file" id="problemPhoto" accept="image/*" onchange="handlePhotoSelect(event)" style="display: none;">
-                    <button type="button" onclick="document.getElementById('problemPhoto').click()" class="photo-btn">
-                        <span class="photo-icon">📷</span>
-                        <span class="photo-text">ВЫБРАТЬ ФОТО</span>
-                    </button>
-                    <div id="photoPreview" class="photo-preview" style="display: none;">
-                        <img id="previewImage" src="#" alt="Preview">
-                        <button type="button" onclick="removePhoto()" class="photo-remove">✖</button>
+                <!-- ПРОБЛЕМЫ (ТОЛЬКО ДЛЯ АДМИНОВ) -->
+                <div id="problems" class="section">
+                    <h2 class="section-title">❗ УПРАВЛЕНИЕ ПРОБЛЕМАМИ</h2>
+                    
+                    <div class="info-message">
+                        <span class="info-message-icon">👑</span>
+                        <div class="info-message-text">
+                            <strong>ТОЛЬКО ДЛЯ АДМИНИСТРАТОРОВ</strong>
+                            <span>milfa, milk123, Xchik_</span>
+                        </div>
                     </div>
-                    <div id="photoName" class="photo-name"></div>
+                    
+                    <div class="form-container">
+                        <h3 class="form-title">➕ ДОБАВИТЬ ПРОБЛЕМУ</h3>
+                        <form id="problemForm" onsubmit="addProblem(event)" class="form">
+                            <div class="form-group">
+                                <label>НАЗВАНИЕ ПРОБЛЕМЫ</label>
+                                <input type="text" id="problemTitle" placeholder="НАПРИМЕР: НЕ РАБОТАЕТ ВХОД" required class="form-input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>ОПИСАНИЕ</label>
+                                <textarea id="problemDesc" placeholder="ПОДРОБНО ОПИШИТЕ ПРОБЛЕМУ" required class="form-textarea" rows="3"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>РЕШЕНИЕ</label>
+                                <textarea id="problemSolution" placeholder="КАК ИСПРАВИТЬ ПРОБЛЕМУ" required class="form-textarea" rows="3"></textarea>
+                            </div>
+                            
+                            <!-- КНОПКА ДЛЯ ФОТО -->
+                            <div class="form-group">
+                                <label>📷 ПРИКРЕПИТЬ ФОТО (НЕОБЯЗАТЕЛЬНО)</label>
+                                <div class="photo-upload">
+                                    <input type="file" id="problemPhoto" accept="image/*" onchange="handlePhotoSelect(event)" style="display: none;">
+                                    <button type="button" onclick="document.getElementById('problemPhoto').click()" class="photo-btn">
+                                        <span class="photo-icon">📷</span>
+                                        <span class="photo-text">ВЫБРАТЬ ФОТО</span>
+                                    </button>
+                                    <div id="photoPreview" class="photo-preview" style="display: none;">
+                                        <img id="previewImage" src="#" alt="Preview">
+                                        <button type="button" onclick="removePhoto()" class="photo-remove">✖</button>
+                                    </div>
+                                    <div id="photoName" class="photo-name"></div>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="submit-btn">
+                                <span class="btn-icon">➕</span>
+                                <span class="btn-text">ДОБАВИТЬ ПРОБЛЕМУ</span>
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- СПИСОК ПРОБЛЕМ -->
+                    <div class="list-container">
+                        <h3 class="list-title">📋 СПИСОК ПРОБЛЕМ</h3>
+                        <div id="problemsList" class="items-list"></div>
+                    </div>
                 </div>
             </div>
-            
-            <button type="submit" class="submit-btn">
-                <span class="btn-icon">➕</span>
-                <span class="btn-text">ДОБАВИТЬ ПРОБЛЕМУ</span>
-            </button>
-        </form>
-    </div>
-    
-    <!-- СПИСОК ПРОБЛЕМ -->
-    <div class="list-container">
-        <h3 class="list-title">📋 СПИСОК ПРОБЛЕМ</h3>
-        <div id="problemsList" class="items-list"></div>
-    </div>
-</div>
+        </main>
 
         <!-- МОДАЛКИ -->
         <div id="registerModal" class="modal">
