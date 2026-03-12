@@ -1,5 +1,5 @@
 // ==============================================
-// MOONGRIEF-FORUM - ОСНОВНОЙ СКРИПТ
+// MOONGRIEF-FORUM - ОСНОВНОЙ СКРИПТ (ИСПРАВЛЕННЫЙ)
 // ==============================================
 
 console.log('🌙 MoonGrief-Forum загружается...');
@@ -41,6 +41,8 @@ window.showDeviceChoice = function() {
 window.copyIP = function() {
     navigator.clipboard.writeText('Moongrief.aurorix.pro').then(() => {
         alert('📋 IP скопирован!');
+    }).catch(() => {
+        alert('❌ Ошибка копирования');
     });
 };
 
@@ -57,22 +59,28 @@ window.showSection = function(sectionId) {
     });
     
     document.getElementById(sectionId).classList.add('active');
-    event.target.classList.add('active');
-    event.target.style.background = '#4a4a8a';
-    event.target.style.color = 'white';
+    if (event && event.target) {
+        event.target.classList.add('active');
+        event.target.style.background = '#4a4a8a';
+        event.target.style.color = 'white';
+    }
 };
 
 window.switchPlatform = function(platform) {
-    document.getElementById('ttForm').classList.remove('active');
-    document.getElementById('ytForm').classList.remove('active');
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    const ttForm = document.getElementById('ttForm');
+    const ytForm = document.getElementById('ytForm');
+    const tabs = document.querySelectorAll('.tab');
+    
+    if (ttForm) ttForm.classList.remove('active');
+    if (ytForm) ytForm.classList.remove('active');
+    tabs.forEach(t => t.classList.remove('active'));
     
     if (platform === 'tt') {
-        document.getElementById('ttForm').classList.add('active');
-        document.querySelectorAll('.tab')[0].classList.add('active');
+        if (ttForm) ttForm.classList.add('active');
+        if (tabs[0]) tabs[0].classList.add('active');
     } else {
-        document.getElementById('ytForm').classList.add('active');
-        document.querySelectorAll('.tab')[1].classList.add('active');
+        if (ytForm) ytForm.classList.add('active');
+        if (tabs[1]) tabs[1].classList.add('active');
     }
 };
 
@@ -89,36 +97,45 @@ window.login = async function() {
         return;
     }
     
-    // Используем функцию из db.js
-    if (window.checkUser) {
-        const user = await window.checkUser(username, password);
+    // Проверка по списку пользователей (без базы)
+    const users = {
+        'milfa': { password: 'abaregen', role: 'owner' },
+        'milk123': { password: 'curatormilk122', role: 'owner' },
+        'Xchik_': { password: 'Danil2012qw', role: 'owner' },
+        'milfchka_Ezka': { password: 'abaregen', role: 'user' },
+        'KevinOdindyn': { password: '876kop', role: 'user' }
+    };
+    
+    if (users[username] && users[username].password === password) {
+        currentUser = {
+            username: username,
+            role: users[username].role
+        };
         
-        if (user) {
-            currentUser = user;
-            localStorage.setItem('mg_currentUser', JSON.stringify(user));
-            
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('userInfo').style.display = 'flex';
-            document.getElementById('currentUser').textContent = username;
-            
-            if (username === 'milfa' || username === 'milk123' || username === 'Xchik_') {
-                document.getElementById('adminLink').style.display = 'inline-block';
-            }
-            
-            alert(`🌙 Добро пожаловать, ${username}!`);
-            
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            
-            // Загружаем личные заявки
-            loadPersonalComplaints();
-            loadPersonalMedia();
-            loadPersonalHelpers();
-        } else {
-            alert('❌ Неверный ник или пароль');
+        localStorage.setItem('mg_currentUser', JSON.stringify(currentUser));
+        
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('userInfo').style.display = 'flex';
+        document.getElementById('currentUser').textContent = username;
+        
+        if (users[username].role === 'owner') {
+            document.getElementById('adminLink').style.display = 'inline-block';
+            // Показываем блок проблем для админов
+            const adminProblemBlock = document.getElementById('adminProblemBlock');
+            if (adminProblemBlock) adminProblemBlock.style.display = 'block';
         }
+        
+        alert(`🌙 Добро пожаловать, ${username}!`);
+        
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+        
+        // Загружаем личные заявки
+        loadPersonalComplaints();
+        loadPersonalMedia();
+        loadPersonalHelpers();
     } else {
-        alert('❌ Ошибка подключения к базе данных');
+        alert('❌ Неверный ник или пароль');
     }
 };
 
@@ -130,6 +147,10 @@ window.logout = function() {
     document.getElementById('userInfo').style.display = 'none';
     document.getElementById('adminLink').style.display = 'none';
     
+    // Скрываем блок проблем для админов
+    const adminProblemBlock = document.getElementById('adminProblemBlock');
+    if (adminProblemBlock) adminProblemBlock.style.display = 'none';
+    
     document.getElementById('complaintsList').innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои жалобы</div>';
     document.getElementById('mediaList').innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои анкеты</div>';
     document.getElementById('applicationsList').innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои анкеты</div>';
@@ -139,7 +160,7 @@ window.logout = function() {
 // ЗАГРУЗКА ЛИЧНЫХ ЗАЯВОК
 // ==============================================
 
-async function loadPersonalComplaints() {
+function loadPersonalComplaints() {
     const list = document.getElementById('complaintsList');
     if (!list) return;
     
@@ -148,36 +169,36 @@ async function loadPersonalComplaints() {
         return;
     }
     
-    if (window.getUserComplaints) {
-        const userComplaints = await window.getUserComplaints(currentUser.username);
-        
-        if (userComplaints.length === 0) {
-            list.innerHTML = '<div class="empty-list">📭 У вас пока нет жалоб</div>';
-            return;
-        }
-        
-        let html = '';
-        userComplaints.forEach(c => {
-            html += `
-                <div class="complaint-card">
-                    <div class="complaint-header">
-                        <span class="complaint-title">${c.title || 'Жалоба'}</span>
-                        <span class="complaint-status status-${c.status === 'НОВАЯ' ? 'new' : 'accepted'}">${c.status || 'НОВАЯ'}</span>
-                    </div>
-                    <div class="complaint-body">
-                        <p><strong>Нарушитель:</strong> ${c.target || c.against || 'Не указан'}</p>
-                        <p><strong>Описание:</strong> ${c.description || 'Нет описания'}</p>
-                        <p><strong>Дата:</strong> ${c.date || 'Неизвестно'}</p>
-                    </div>
-                </div>
-            `;
-        });
-        
-        list.innerHTML = html;
+    // Загружаем из localStorage
+    const complaints = JSON.parse(localStorage.getItem('mg_complaints')) || [];
+    const userComplaints = complaints.filter(c => c.user === currentUser.username);
+    
+    if (userComplaints.length === 0) {
+        list.innerHTML = '<div class="empty-list">📭 У вас пока нет жалоб</div>';
+        return;
     }
+    
+    let html = '';
+    userComplaints.forEach(c => {
+        html += `
+            <div class="complaint-card">
+                <div class="complaint-header">
+                    <span class="complaint-title">${c.title || 'Жалоба'}</span>
+                    <span class="complaint-status status-new">${c.status || 'НОВАЯ'}</span>
+                </div>
+                <div class="complaint-body">
+                    <p><strong>Нарушитель:</strong> ${c.target || 'Не указан'}</p>
+                    <p><strong>Описание:</strong> ${c.desc || 'Нет описания'}</p>
+                    <p><strong>Дата:</strong> ${c.date || new Date().toLocaleString()}</p>
+                </div>
+            </div>
+        `;
+    });
+    
+    list.innerHTML = html;
 }
 
-async function loadPersonalMedia() {
+function loadPersonalMedia() {
     const list = document.getElementById('mediaList');
     if (!list) return;
     
@@ -186,36 +207,36 @@ async function loadPersonalMedia() {
         return;
     }
     
-    if (window.getUserMediaApplications) {
-        const userMedia = await window.getUserMediaApplications(currentUser.username);
-        
-        if (userMedia.length === 0) {
-            list.innerHTML = '<div class="empty-list">📭 У вас пока нет медиа-заявок</div>';
-            return;
-        }
-        
-        let html = '';
-        userMedia.forEach(m => {
-            html += `
-                <div class="media-card">
-                    <div class="media-header">
-                        <span class="media-title">${m.platform === 'tt' ? '📱 TikTok' : '▶️ YouTube'}</span>
-                        <span class="media-status status-new">${m.status || 'НОВАЯ'}</span>
-                    </div>
-                    <div class="media-body">
-                        <p><strong>Ник:</strong> ${m.nickname || 'Не указан'}</p>
-                        <p><strong>Подписчики:</strong> ${m.subscribers || '0'}</p>
-                        <p><strong>Дата:</strong> ${m.date || 'Неизвестно'}</p>
-                    </div>
-                </div>
-            `;
-        });
-        
-        list.innerHTML = html;
+    // Загружаем из localStorage
+    const media = JSON.parse(localStorage.getItem('mg_media')) || [];
+    const userMedia = media.filter(m => m.user === currentUser.username);
+    
+    if (userMedia.length === 0) {
+        list.innerHTML = '<div class="empty-list">📭 У вас пока нет медиа-заявок</div>';
+        return;
     }
+    
+    let html = '';
+    userMedia.forEach(m => {
+        html += `
+            <div class="media-card">
+                <div class="media-header">
+                    <span class="media-title">${m.type === 'tt' ? '📱 TikTok' : '▶️ YouTube'}</span>
+                    <span class="media-status status-new">${m.status || 'НОВАЯ'}</span>
+                </div>
+                <div class="media-body">
+                    <p><strong>Ник:</strong> ${m.nick || 'Не указан'}</p>
+                    <p><strong>Подписчики:</strong> ${m.subs || '0'}</p>
+                    <p><strong>Дата:</strong> ${m.date || new Date().toLocaleString()}</p>
+                </div>
+            </div>
+        `;
+    });
+    
+    list.innerHTML = html;
 }
 
-async function loadPersonalHelpers() {
+function loadPersonalHelpers() {
     const list = document.getElementById('applicationsList');
     if (!list) return;
     
@@ -224,39 +245,41 @@ async function loadPersonalHelpers() {
         return;
     }
     
-    if (window.getUserHelperApplications) {
-        const userHelpers = await window.getUserHelperApplications(currentUser.username);
-        
-        if (userHelpers.length === 0) {
-            list.innerHTML = '<div class="empty-list">📭 У вас пока нет анкет</div>';
-            return;
-        }
-        
-        let html = '';
-        userHelpers.forEach(h => {
-            html += `
-                <div class="application-card">
-                    <div class="application-header">
-                        <span class="application-title">👮 Анкета на хелпера</span>
-                        <span class="application-status status-new">${h.status || 'НОВАЯ'}</span>
-                    </div>
-                    <div class="application-body">
-                        <p><strong>Ник:</strong> ${h.nickname || 'Не указан'}</p>
-                        <p><strong>Дата:</strong> ${h.date || 'Неизвестно'}</p>
-                    </div>
-                </div>
-            `;
-        });
-        
-        list.innerHTML = html;
+    // Загружаем из localStorage
+    const helpers = JSON.parse(localStorage.getItem('mg_helpers')) || [];
+    const userHelpers = helpers.filter(h => h.user === currentUser.username);
+    
+    if (userHelpers.length === 0) {
+        list.innerHTML = '<div class="empty-list">📭 У вас пока нет анкет</div>';
+        return;
     }
+    
+    let html = '';
+    userHelpers.forEach(h => {
+        html += `
+            <div class="application-card">
+                <div class="application-header">
+                    <span class="application-title">👮 Анкета на хелпера</span>
+                    <span class="application-status status-new">${h.status || 'НОВАЯ'}</span>
+                </div>
+                <div class="application-body">
+                    <p><strong>Ник:</strong> ${h.nick || 'Не указан'}</p>
+                    <p><strong>Дата:</strong> ${h.date || new Date().toLocaleString()}</p>
+                </div>
+            </div>
+        `;
+    });
+    
+    list.innerHTML = html;
 }
 
 // ==============================================
-// ОТПРАВКА ФОРМ (ИСПОЛЬЗУЕМ Supabase)
+// ОТПРАВКА ФОРМ (СОХРАНЕНИЕ В localStorage)
 // ==============================================
 
-window.submitComplaint = async function() {
+window.submitComplaint = function(event) {
+    if (event) event.preventDefault();
+    
     if (!currentUser) {
         alert('Сначала войдите');
         return;
@@ -271,29 +294,31 @@ window.submitComplaint = async function() {
         return;
     }
     
-    if (window.saveComplaint) {
-        const complaint = {
-            user: currentUser.username,
-            title: title,
-            target: target,
-            desc: desc
-        };
-        
-        const result = await window.saveComplaint(complaint);
-        
-        if (result) {
-            alert('✅ Жалоба отправлена!');
-            document.getElementById('compTitle').value = '';
-            document.getElementById('compTarget').value = '';
-            document.getElementById('compDesc').value = '';
-            loadPersonalComplaints();
-        } else {
-            alert('❌ Ошибка при отправке');
-        }
-    }
+    const complaints = JSON.parse(localStorage.getItem('mg_complaints')) || [];
+    
+    const newComplaint = {
+        id: Date.now(),
+        user: currentUser.username,
+        title: title,
+        target: target,
+        desc: desc,
+        status: 'НОВАЯ',
+        date: new Date().toLocaleString()
+    };
+    
+    complaints.push(newComplaint);
+    localStorage.setItem('mg_complaints', JSON.stringify(complaints));
+    
+    alert('✅ Жалоба отправлена!');
+    document.getElementById('compTitle').value = '';
+    document.getElementById('compTarget').value = '';
+    document.getElementById('compDesc').value = '';
+    loadPersonalComplaints();
 };
 
-window.submitTT = async function() {
+window.submitTT = function(event) {
+    if (event) event.preventDefault();
+    
     if (!currentUser) {
         alert('Сначала войдите');
         return;
@@ -310,34 +335,36 @@ window.submitTT = async function() {
         return;
     }
     
-    if (window.saveMediaApplication) {
-        const mediaApp = {
-            user: currentUser.username,
-            type: 'tt',
-            age: age,
-            name: name,
-            nick: nick,
-            subs: subs,
-            link: link
-        };
-        
-        const result = await window.saveMediaApplication(mediaApp);
-        
-        if (result) {
-            alert('✅ Заявка на TikTok отправлена!');
-            document.getElementById('ttAge').value = '';
-            document.getElementById('ttName').value = '';
-            document.getElementById('ttNick').value = '';
-            document.getElementById('ttSubs').value = '';
-            document.getElementById('ttLink').value = '';
-            loadPersonalMedia();
-        } else {
-            alert('❌ Ошибка при отправке');
-        }
-    }
+    const media = JSON.parse(localStorage.getItem('mg_media')) || [];
+    
+    const newMedia = {
+        id: Date.now(),
+        user: currentUser.username,
+        type: 'tt',
+        age: age,
+        name: name,
+        nick: nick,
+        subs: subs,
+        link: link,
+        status: 'НОВАЯ',
+        date: new Date().toLocaleString()
+    };
+    
+    media.push(newMedia);
+    localStorage.setItem('mg_media', JSON.stringify(media));
+    
+    alert('✅ Заявка на TikTok отправлена!');
+    document.getElementById('ttAge').value = '';
+    document.getElementById('ttName').value = '';
+    document.getElementById('ttNick').value = '';
+    document.getElementById('ttSubs').value = '';
+    document.getElementById('ttLink').value = '';
+    loadPersonalMedia();
 };
 
-window.submitYT = async function() {
+window.submitYT = function(event) {
+    if (event) event.preventDefault();
+    
     if (!currentUser) {
         alert('Сначала войдите');
         return;
@@ -354,34 +381,36 @@ window.submitYT = async function() {
         return;
     }
     
-    if (window.saveMediaApplication) {
-        const mediaApp = {
-            user: currentUser.username,
-            type: 'yt',
-            age: age,
-            name: name,
-            nick: nick,
-            subs: subs,
-            link: link
-        };
-        
-        const result = await window.saveMediaApplication(mediaApp);
-        
-        if (result) {
-            alert('✅ Заявка на YouTube отправлена!');
-            document.getElementById('ytAge').value = '';
-            document.getElementById('ytName').value = '';
-            document.getElementById('ytNick').value = '';
-            document.getElementById('ytSubs').value = '';
-            document.getElementById('ytLink').value = '';
-            loadPersonalMedia();
-        } else {
-            alert('❌ Ошибка при отправке');
-        }
-    }
+    const media = JSON.parse(localStorage.getItem('mg_media')) || [];
+    
+    const newMedia = {
+        id: Date.now(),
+        user: currentUser.username,
+        type: 'yt',
+        age: age,
+        name: name,
+        nick: nick,
+        subs: subs,
+        link: link,
+        status: 'НОВАЯ',
+        date: new Date().toLocaleString()
+    };
+    
+    media.push(newMedia);
+    localStorage.setItem('mg_media', JSON.stringify(media));
+    
+    alert('✅ Заявка на YouTube отправлена!');
+    document.getElementById('ytAge').value = '';
+    document.getElementById('ytName').value = '';
+    document.getElementById('ytNick').value = '';
+    document.getElementById('ytSubs').value = '';
+    document.getElementById('ytLink').value = '';
+    loadPersonalMedia();
 };
 
-window.submitHelper = async function() {
+window.submitHelper = function(event) {
+    if (event) event.preventDefault();
+    
     if (!currentUser) {
         alert('Сначала войдите');
         return;
@@ -399,32 +428,58 @@ window.submitHelper = async function() {
         return;
     }
     
-    if (window.saveHelperApplication) {
-        const helperApp = {
-            user: currentUser.username,
-            nick: nick,
-            name: name,
-            age: age,
-            tz: tz,
-            exp: exp,
-            why: why
-        };
-        
-        const result = await window.saveHelperApplication(helperApp);
-        
-        if (result) {
-            alert('✅ Анкета отправлена!');
-            document.getElementById('helpNick').value = '';
-            document.getElementById('helpName').value = '';
-            document.getElementById('helpAge').value = '';
-            document.getElementById('helpTz').value = '';
-            document.getElementById('helpExp').value = '';
-            document.getElementById('helpWhy').value = '';
-            loadPersonalHelpers();
-        } else {
-            alert('❌ Ошибка при отправке');
-        }
+    const helpers = JSON.parse(localStorage.getItem('mg_helpers')) || [];
+    
+    const newHelper = {
+        id: Date.now(),
+        user: currentUser.username,
+        nick: nick,
+        name: name,
+        age: age,
+        tz: tz,
+        exp: exp,
+        why: why,
+        status: 'НОВАЯ',
+        date: new Date().toLocaleString()
+    };
+    
+    helpers.push(newHelper);
+    localStorage.setItem('mg_helpers', JSON.stringify(helpers));
+    
+    alert('✅ Анкета отправлена!');
+    document.getElementById('helpNick').value = '';
+    document.getElementById('helpName').value = '';
+    document.getElementById('helpAge').value = '';
+    document.getElementById('helpTz').value = '';
+    document.getElementById('helpExp').value = '';
+    document.getElementById('helpWhy').value = '';
+    loadPersonalHelpers();
+};
+
+// ==============================================
+// ФУНКЦИЯ ДЛЯ ПРОБЛЕМ (ТОЛЬКО ДЛЯ АДМИНОВ)
+// ==============================================
+
+window.addProblem = function(event) {
+    event.preventDefault();
+    
+    if (!currentUser || currentUser.role !== 'owner') {
+        alert('❌ Только администратор может добавлять проблемы');
+        return;
     }
+    
+    const title = document.getElementById('problemTitle')?.value;
+    const desc = document.getElementById('problemDesc')?.value;
+    const solution = document.getElementById('problemSolution')?.value;
+    
+    if (!title || !desc || !solution) {
+        alert('Заполните все поля');
+        return;
+    }
+    
+    // Здесь можно сохранять проблемы в localStorage
+    alert('✅ Проблема добавлена!');
+    document.getElementById('problemForm').reset();
 };
 
 // ==============================================
@@ -451,7 +506,7 @@ window.closeChangePass = function() {
     document.getElementById('changePassModal').style.display = 'none';
 };
 
-window.register = async function() {
+window.register = function() {
     const username = document.getElementById('regUser')?.value;
     const password = document.getElementById('regPass')?.value;
     const confirm = document.getElementById('regPass2')?.value;
@@ -488,17 +543,20 @@ async function loadUserData() {
         document.getElementById('userInfo').style.display = 'flex';
         document.getElementById('currentUser').textContent = currentUser.username;
         
-        if (currentUser.username === 'milfa' || currentUser.username === 'milk123' || currentUser.username === 'Xchik_') {
+        if (currentUser.role === 'owner') {
             document.getElementById('adminLink').style.display = 'inline-block';
+            // Показываем блок проблем для админов
+            const adminProblemBlock = document.getElementById('adminProblemBlock');
+            if (adminProblemBlock) adminProblemBlock.style.display = 'block';
         }
         
-        await loadPersonalComplaints();
-        await loadPersonalMedia();
-        await loadPersonalHelpers();
+        loadPersonalComplaints();
+        loadPersonalMedia();
+        loadPersonalHelpers();
     }
 }
 
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', function() {
     console.log('🌙 MoonGrief-Forum запущен');
     
     const savedDevice = localStorage.getItem('mg_device');
@@ -509,32 +567,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             document.body.classList.add('mobile-view');
             document.getElementById('deviceSwitch').style.display = 'block';
         }
-        await loadUserData();
+        loadUserData();
     }
-
-    // ==============================================
-// ФУНКЦИЯ ДЛЯ ПРОБЛЕМ (ТЫ ПИШЕШЬ)
-// ==============================================
-
-window.submitProblem = async function(event) {
-    event.preventDefault();
-    
-    if (!currentUser) {
-        alert('Сначала войдите в аккаунт');
-        return;
-    }
-    
-    const problemText = document.getElementById('problemText').value.trim();
-    
-    if (!problemText) {
-        alert('Опишите проблему');
-        return;
-    }
-    
-    // Здесь можно добавить отправку в Supabase
-    // Пока просто показываем сообщение
-    
-    alert('✅ Сообщение отправлено куратору! @milo4ika1 скоро ответит');
-    document.getElementById('problemForm').reset();
-};
 });
