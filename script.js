@@ -1,13 +1,13 @@
 // ==============================================
-// MOONGRIEF-FORUM - ПОЛНЫЙ СКРИПТ (С ФОТО/ВИДЕО)
+// MOONGRIEF-FORUM - ПОЛНЫЙ ИСПРАВЛЕННЫЙ СКРИПТ
 // ==============================================
 
 console.log('🌙 MoonGrief-Forum загружается...');
 
 let currentUser = null;
 let currentDevice = localStorage.getItem('mg_device') || null;
-let complaintFiles = []; // Для хранения файлов жалобы
-let currentPhotoData = null; // Для фото в проблемах
+let complaintFiles = [];
+let currentPhotoData = null;
 
 // ==============================================
 // ВЫБОР УСТРОЙСТВА
@@ -67,8 +67,18 @@ window.showSection = function(sectionId) {
         event.target.style.color = 'white';
     }
     
+    // Загружаем данные при переключении
     if (sectionId === 'problems') {
         loadProblems();
+    }
+    if (sectionId === 'complaints' && currentUser) {
+        loadPersonalComplaints();
+    }
+    if (sectionId === 'media' && currentUser) {
+        loadPersonalMedia();
+    }
+    if (sectionId === 'applications' && currentUser) {
+        loadPersonalHelpers();
     }
 };
 
@@ -91,7 +101,7 @@ window.switchPlatform = function(platform) {
 };
 
 // ==============================================
-// АВТОРИЗАЦИЯ (ЧЕРЕЗ SUPABASE)
+// АВТОРИЗАЦИЯ
 // ==============================================
 
 window.login = async function() {
@@ -117,7 +127,7 @@ window.login = async function() {
             
             currentUser = {
                 username: user.username,
-                role: user.role || 'user'
+                role: user.role || (username === 'milfa' || username === 'milk123' || username === 'Xchik_' ? 'owner' : 'user')
             };
             
             localStorage.setItem('mg_currentUser', JSON.stringify(currentUser));
@@ -158,6 +168,7 @@ window.logout = function() {
     document.getElementById('complaintsList').innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои жалобы</div>';
     document.getElementById('mediaList').innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои анкеты</div>';
     document.getElementById('applicationsList').innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои анкеты</div>';
+    document.getElementById('problemsList').innerHTML = '<div class="empty-list">📭 Список проблем пуст</div>';
 };
 
 // ==============================================
@@ -191,12 +202,11 @@ async function loadPersonalComplaints() {
         data.forEach(c => {
             const files = c.files || [];
             const filesHtml = files.length > 0 ? 
-                `<div class="complaint-files">
+                `<div class="complaint-files" style="display:flex; gap:5px; margin-top:5px;">
                     ${files.map((f, i) => `
-                        <div class="complaint-file-item ${f.type.startsWith('video/') ? 'video-preview' : ''}" 
-                             onclick="viewMedia('${f.data}', '${f.type}')">
-                            ${f.type.startsWith('video/') ? '▶️' : '📷'}
-                        </div>
+                        <span onclick="viewMedia('${f.data}', '${f.type}')" style="cursor:pointer; background:#2a2a4a; padding:3px 8px; border-radius:5px;">
+                            ${f.type.startsWith('video/') ? '▶️' : '📷'} Файл ${i+1}
+                        </span>
                     `).join('')}
                 </div>` : '';
             
@@ -359,9 +369,9 @@ function updateComplaintFilesPreview() {
     let html = '';
     complaintFiles.forEach((file, index) => {
         html += `
-            <div class="file-preview-item" onclick="viewMedia('${file.data}', '${file.type}')">
-                ${file.type.startsWith('video/') ? '▶️' : '📷'}
-                <span class="file-remove" onclick="removeComplaintFile(${index}); event.stopPropagation();">✖</span>
+            <div style="display:inline-block; margin:5px; background:#2a2a4a; padding:5px; border-radius:5px;">
+                ${file.type.startsWith('video/') ? '▶️' : '📷'} ${file.name}
+                <span onclick="removeComplaintFile(${index})" style="margin-left:5px; cursor:pointer; color:#ff6a6a;">✖</span>
             </div>
         `;
     });
@@ -625,13 +635,73 @@ window.removePhoto = function() {
 };
 
 // ==============================================
-// ПРОБЛЕМЫ
+// ПРОБЛЕМЫ (ВИДНЫ ВСЕМ)
 // ==============================================
+
+async function loadProblems() {
+    const list = document.getElementById('problemsList');
+    if (!list) return;
+    
+    try {
+        console.log('🔄 Загрузка проблем...');
+        
+        const { data, error } = await window.mgSupabase
+            .from('problems')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('Ошибка загрузки:', error);
+            list.innerHTML = '<div class="empty-list">❌ Ошибка загрузки проблем</div>';
+            return;
+        }
+        
+        if (!data || data.length === 0) {
+            list.innerHTML = '<div class="empty-list">📭 Список проблем пуст</div>';
+            return;
+        }
+        
+        console.log(`✅ Загружено ${data.length} проблем`);
+        
+        let html = '';
+        data.forEach(p => {
+            html += `
+                <div class="problem-card">
+                    <div class="problem-header">
+                        <span class="problem-title">⚠️ ${p.title}</span>
+                        <span class="problem-date">${p.date || 'Дата неизвестна'}</span>
+                    </div>
+                    <div class="problem-body">
+                        <p><strong>📝 Описание:</strong> ${p.description}</p>
+                        <p><strong>✅ Решение:</strong> ${p.solution}</p>
+                        ${p.photo ? `
+                        <div class="problem-photo" onclick="viewMedia('${p.photo}', 'image/jpeg')" style="cursor:pointer;">
+                            <img src="${p.photo}" alt="Фото проблемы" style="max-width:100%; max-height:200px; border-radius:5px;">
+                        </div>
+                        ` : ''}
+                        <p><small>👤 Добавил: ${p.author || 'Администратор'}</small></p>
+                    </div>
+                </div>
+            `;
+        });
+        
+        list.innerHTML = html;
+        
+    } catch (e) {
+        console.error('Критическая ошибка:', e);
+        list.innerHTML = '<div class="empty-list">❌ Ошибка при загрузке</div>';
+    }
+}
 
 window.addProblem = async function(event) {
     event.preventDefault();
     
-    if (!currentUser || currentUser.role !== 'owner') {
+    if (!currentUser) {
+        alert('❌ Сначала войдите в аккаунт');
+        return;
+    }
+    
+    if (currentUser.role !== 'owner') {
         alert('❌ Только администратор может добавлять проблемы');
         return;
     }
@@ -646,7 +716,9 @@ window.addProblem = async function(event) {
     }
     
     try {
-        const { error } = await window.mgSupabase
+        console.log('💾 Сохраняем проблему...');
+        
+        const { data, error } = await window.mgSupabase
             .from('problems')
             .insert([{
                 title: title,
@@ -656,66 +728,24 @@ window.addProblem = async function(event) {
                 author: currentUser.username,
                 date: new Date().toLocaleString(),
                 created_at: new Date().toISOString()
-            }]);
+            }])
+            .select();
         
         if (error) throw error;
         
+        console.log('✅ Проблема сохранена:', data);
         alert('✅ Проблема добавлена' + (currentPhotoData ? ' с фото' : ''));
         
         document.getElementById('problemForm').reset();
         removePhoto();
-        loadProblems();
+        
+        await loadProblems();
+        
     } catch (e) {
-        console.error('Ошибка добавления проблемы:', e);
-        alert('❌ Ошибка при добавлении. Проверьте консоль.');
+        console.error('❌ Ошибка сохранения:', e);
+        alert('❌ Ошибка: ' + e.message);
     }
 };
-
-async function loadProblems() {
-    const list = document.getElementById('problemsList');
-    if (!list) return;
-    
-    try {
-        const { data, error } = await window.mgSupabase
-            .from('problems')
-            .select('*')
-            .order('created_at', { ascending: false });
-        
-        if (error) throw error;
-        
-        if (!data || data.length === 0) {
-            list.innerHTML = '<div class="empty-list">📭 Список проблем пуст</div>';
-            return;
-        }
-        
-        let html = '';
-        data.forEach(p => {
-            html += `
-                <div class="problem-card">
-                    <div class="problem-header">
-                        <span class="problem-title">⚠️ ${p.title}</span>
-                        <span class="problem-date">${p.date}</span>
-                    </div>
-                    <div class="problem-body">
-                        <p><strong>📝 Описание:</strong> ${p.description}</p>
-                        <p><strong>✅ Решение:</strong> ${p.solution}</p>
-                        ${p.photo ? `
-                        <div class="problem-photo" onclick="viewMedia('${p.photo}', 'image/jpeg')">
-                            <img src="${p.photo}" alt="Фото проблемы">
-                        </div>
-                        ` : ''}
-                        <p><small>👤 Добавил: ${p.author}</small></p>
-                    </div>
-                </div>
-            `;
-        });
-        
-        list.innerHTML = html;
-    } catch (e) {
-        console.error('Ошибка загрузки проблем:', e);
-        list.innerHTML = '<div class="empty-list">❌ Ошибка загрузки</div>';
-    }
-}
 
 // ==============================================
 // ПРОСМОТР МЕДИА
@@ -727,7 +757,20 @@ window.viewMedia = function(dataUrl, type) {
     
     const modal = document.createElement('div');
     modal.id = 'mediaViewModal';
-    modal.className = 'media-view-modal';
+    modal.style.cssText = `
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        justify-content: center;
+        align-items: center;
+        z-index: 100000;
+        cursor: pointer;
+    `;
+    
     modal.onclick = function() { this.remove(); };
     
     let mediaElement;
@@ -747,7 +790,6 @@ window.viewMedia = function(dataUrl, type) {
     }
     
     const closeBtn = document.createElement('span');
-    closeBtn.className = 'close-media';
     closeBtn.innerHTML = '✖';
     closeBtn.style.cssText = `
         position: absolute;
@@ -771,20 +813,6 @@ window.viewMedia = function(dataUrl, type) {
         e.stopPropagation();
         modal.remove();
     };
-    
-    modal.style.cssText = `
-        display: flex;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.95);
-        justify-content: center;
-        align-items: center;
-        z-index: 100000;
-        cursor: pointer;
-    `;
     
     modal.appendChild(mediaElement);
     modal.appendChild(closeBtn);
