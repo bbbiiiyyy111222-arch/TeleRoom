@@ -635,7 +635,7 @@ window.removePhoto = function() {
 };
 
 // ==============================================
-// ПРОБЛЕМЫ (ВИДНЫ ВСЕМ)
+// ПРОБЛЕМЫ (ВИДНЫ ВСЕМ - ИСПРАВЛЕНО)
 // ==============================================
 
 async function loadProblems() {
@@ -643,8 +643,9 @@ async function loadProblems() {
     if (!list) return;
     
     try {
-        console.log('🔄 Загрузка проблем...');
+        console.log('🔄 Загрузка проблем для всех пользователей...');
         
+        // Просто загружаем все проблемы без фильтрации
         const { data, error } = await window.mgSupabase
             .from('problems')
             .select('*')
@@ -656,6 +657,7 @@ async function loadProblems() {
             return;
         }
         
+        // Проверяем есть ли данные
         if (!data || data.length === 0) {
             list.innerHTML = '<div class="empty-list">📭 Список проблем пуст</div>';
             return;
@@ -668,15 +670,15 @@ async function loadProblems() {
             html += `
                 <div class="problem-card">
                     <div class="problem-header">
-                        <span class="problem-title">⚠️ ${p.title}</span>
+                        <span class="problem-title">⚠️ ${p.title || 'Без названия'}</span>
                         <span class="problem-date">${p.date || 'Дата неизвестна'}</span>
                     </div>
                     <div class="problem-body">
-                        <p><strong>📝 Описание:</strong> ${p.description}</p>
-                        <p><strong>✅ Решение:</strong> ${p.solution}</p>
+                        <p><strong>📝 Описание:</strong> ${p.description || 'Нет описания'}</p>
+                        <p><strong>✅ Решение:</strong> ${p.solution || 'Нет решения'}</p>
                         ${p.photo ? `
                         <div class="problem-photo" onclick="viewMedia('${p.photo}', 'image/jpeg')" style="cursor:pointer;">
-                            <img src="${p.photo}" alt="Фото проблемы" style="max-width:100%; max-height:200px; border-radius:5px;">
+                            <img src="${p.photo}" alt="Фото проблемы" style="max-width:100%; max-height:200px; border-radius:5px; border:2px solid #4a4a8a;">
                         </div>
                         ` : ''}
                         <p><small>👤 Добавил: ${p.author || 'Администратор'}</small></p>
@@ -693,6 +695,7 @@ async function loadProblems() {
     }
 }
 
+// Добавление проблемы (только для админов)
 window.addProblem = async function(event) {
     event.preventDefault();
     
@@ -701,7 +704,9 @@ window.addProblem = async function(event) {
         return;
     }
     
-    if (currentUser.role !== 'owner') {
+    // Проверка на админа
+    const admins = ['milfa', 'milk123', 'Xchik_'];
+    if (!admins.includes(currentUser.username)) {
         alert('❌ Только администратор может добавлять проблемы');
         return;
     }
@@ -736,9 +741,11 @@ window.addProblem = async function(event) {
         console.log('✅ Проблема сохранена:', data);
         alert('✅ Проблема добавлена' + (currentPhotoData ? ' с фото' : ''));
         
+        // Очищаем форму
         document.getElementById('problemForm').reset();
         removePhoto();
         
+        // Обновляем список для всех
         await loadProblems();
         
     } catch (e) {
