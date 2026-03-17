@@ -1,13 +1,44 @@
 // ==============================================
-// MOONGRIEF-FORUM - ПОЛНЫЙ ИСПРАВЛЕННЫЙ СКРИПТ
+// MOONGRIEF-FORUM - ПОЛНЫЙ СКРИПТ С ЗАЩИТОЙ
 // ==============================================
 
 console.log('🌙 MoonGrief-Forum загружается...');
 
+// ==============================================
+// ЗАЩИТА ОТ DDOS
+// ==============================================
+
+// Проверка на ботов
+if (navigator.webdriver || !navigator.language || navigator.languages.length === 0) {
+    window.location.href = 'about:blank';
+}
+
+const requestLimits = {};
+const loginAttempts = {};
+
+function checkRateLimit(userId, limit = 10, timeWindow = 60000) {
+    const now = Date.now();
+    if (!requestLimits[userId]) {
+        requestLimits[userId] = [];
+    }
+    
+    requestLimits[userId] = requestLimits[userId].filter(t => now - t < timeWindow);
+    
+    if (requestLimits[userId].length >= limit) {
+        return false;
+    }
+    
+    requestLimits[userId].push(now);
+    return true;
+}
+
+// ==============================================
+// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+// ==============================================
+
 let currentUser = null;
 let currentDevice = localStorage.getItem('mg_device') || null;
 let complaintFiles = [];
-let currentPhotoData = null;
 
 // ==============================================
 // ВЫБОР УСТРОЙСТВА
@@ -67,10 +98,6 @@ window.showSection = function(sectionId) {
         event.target.style.color = 'white';
     }
     
-    // Загружаем данные при переключении
-    if (sectionId === 'problems') {
-        loadProblems();
-    }
     if (sectionId === 'complaints' && currentUser) {
         loadPersonalComplaints();
     }
@@ -101,7 +128,7 @@ window.switchPlatform = function(platform) {
 };
 
 // ==============================================
-// АВТОРИЗАЦИЯ
+// АВТОРИЗАЦИЯ С ЗАЩИТОЙ
 // ==============================================
 
 window.login = async function() {
@@ -112,6 +139,24 @@ window.login = async function() {
         alert('Введите ник и пароль');
         return;
     }
+    
+    // Защита от брутфорса
+    const now = Date.now();
+    if (!loginAttempts[username]) {
+        loginAttempts[username] = { count: 0, lastAttempt: 0 };
+    }
+    
+    if (now - loginAttempts[username].lastAttempt > 300000) {
+        loginAttempts[username].count = 0;
+    }
+    
+    if (loginAttempts[username].count >= 5) {
+        alert('❌ Слишком много попыток. Подождите 5 минут.');
+        return;
+    }
+    
+    loginAttempts[username].count++;
+    loginAttempts[username].lastAttempt = now;
     
     try {
         const { data, error } = await window.mgSupabase
@@ -145,6 +190,9 @@ window.login = async function() {
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
             
+            // Сбрасываем счетчик при успешном входе
+            loginAttempts[username].count = 0;
+            
             loadPersonalComplaints();
             loadPersonalMedia();
             loadPersonalHelpers();
@@ -168,7 +216,6 @@ window.logout = function() {
     document.getElementById('complaintsList').innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои жалобы</div>';
     document.getElementById('mediaList').innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои анкеты</div>';
     document.getElementById('applicationsList').innerHTML = '<div class="empty-list">🌙 Войдите чтобы увидеть свои анкеты</div>';
-    document.getElementById('problemsList').innerHTML = '<div class="empty-list">📭 Список проблем пуст</div>';
 };
 
 // ==============================================
@@ -202,7 +249,7 @@ async function loadPersonalComplaints() {
         data.forEach(c => {
             const files = c.files || [];
             const filesHtml = files.length > 0 ? 
-                `<div class="complaint-files" style="display:flex; gap:5px; margin-top:5px;">
+                `<div style="display:flex; gap:5px; margin-top:5px;">
                     ${files.map((f, i) => `
                         <span onclick="viewMedia('${f.data}', '${f.type}')" style="cursor:pointer; background:#2a2a4a; padding:3px 8px; border-radius:5px;">
                             ${f.type.startsWith('video/') ? '▶️' : '📷'} Файл ${i+1}
@@ -327,7 +374,7 @@ async function loadPersonalHelpers() {
 }
 
 // ==============================================
-// ОТПРАВКА ЖАЛОБ С ФАЙЛАМИ
+// ОТПРАВКА ЖАЛОБ С ФАЙЛАМИ И ЗАЩИТОЙ
 // ==============================================
 
 window.handleComplaintFiles = function(event) {
@@ -385,10 +432,16 @@ window.removeComplaintFile = function(index) {
 };
 
 window.submitComplaint = async function(event) {
-    if (event) event.preventDefault();
+    event.preventDefault();
     
     if (!currentUser) {
         alert('Сначала войдите');
+        return;
+    }
+    
+    // Проверка лимита
+    if (!checkRateLimit(currentUser.username)) {
+        alert('❌ Слишком много запросов. Подождите минуту.');
         return;
     }
     
@@ -432,14 +485,19 @@ window.submitComplaint = async function(event) {
 };
 
 // ==============================================
-// ОТПРАВКА МЕДИА
+// ОТПРАВКА МЕДИА С ЗАЩИТОЙ
 // ==============================================
 
 window.submitTT = async function(event) {
-    if (event) event.preventDefault();
+    event.preventDefault();
     
     if (!currentUser) {
         alert('Сначала войдите');
+        return;
+    }
+    
+    if (!checkRateLimit(currentUser.username)) {
+        alert('❌ Слишком много запросов. Подождите минуту.');
         return;
     }
     
@@ -485,10 +543,15 @@ window.submitTT = async function(event) {
 };
 
 window.submitYT = async function(event) {
-    if (event) event.preventDefault();
+    event.preventDefault();
     
     if (!currentUser) {
         alert('Сначала войдите');
+        return;
+    }
+    
+    if (!checkRateLimit(currentUser.username)) {
+        alert('❌ Слишком много запросов. Подождите минуту.');
         return;
     }
     
@@ -534,14 +597,19 @@ window.submitYT = async function(event) {
 };
 
 // ==============================================
-// ОТПРАВКА ХЕЛПЕРОВ
+// ОТПРАВКА ХЕЛПЕРОВ С ЗАЩИТОЙ
 // ==============================================
 
 window.submitHelper = async function(event) {
-    if (event) event.preventDefault();
+    event.preventDefault();
     
     if (!currentUser) {
         alert('Сначала войдите');
+        return;
+    }
+    
+    if (!checkRateLimit(currentUser.username)) {
+        alert('❌ Слишком много запросов. Подождите минуту.');
         return;
     }
     
@@ -585,172 +653,6 @@ window.submitHelper = async function(event) {
     } catch (e) {
         console.error('Ошибка отправки:', e);
         alert('❌ Ошибка при отправке');
-    }
-};
-
-// ==============================================
-// ФУНКЦИИ ДЛЯ ФОТО В ПРОБЛЕМАХ
-// ==============================================
-
-window.handlePhotoSelect = function(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    if (file.size > 5 * 1024 * 1024) {
-        alert('❌ Файл слишком большой! Максимум 5MB');
-        return;
-    }
-    
-    if (!file.type.startsWith('image/')) {
-        alert('❌ Можно загружать только изображения');
-        return;
-    }
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        currentPhotoData = e.target.result;
-        
-        const preview = document.getElementById('photoPreview');
-        const previewImg = document.getElementById('previewImage');
-        const photoName = document.getElementById('photoName');
-        
-        if (preview && previewImg && photoName) {
-            previewImg.src = e.target.result;
-            preview.style.display = 'block';
-            photoName.textContent = file.name;
-        }
-    };
-    reader.readAsDataURL(file);
-};
-
-window.removePhoto = function() {
-    currentPhotoData = null;
-    const preview = document.getElementById('photoPreview');
-    const photoName = document.getElementById('photoName');
-    const photoInput = document.getElementById('problemPhoto');
-    
-    if (preview) preview.style.display = 'none';
-    if (photoName) photoName.textContent = '';
-    if (photoInput) photoInput.value = '';
-};
-
-// ==============================================
-// ПРОБЛЕМЫ (ВИДНЫ ВСЕМ - ИСПРАВЛЕНО)
-// ==============================================
-
-async function loadProblems() {
-    const list = document.getElementById('problemsList');
-    if (!list) return;
-    
-    try {
-        console.log('🔄 Загрузка проблем для всех пользователей...');
-        
-        // Просто загружаем все проблемы без фильтрации
-        const { data, error } = await window.mgSupabase
-            .from('problems')
-            .select('*')
-            .order('created_at', { ascending: false });
-        
-        if (error) {
-            console.error('Ошибка загрузки:', error);
-            list.innerHTML = '<div class="empty-list">❌ Ошибка загрузки проблем</div>';
-            return;
-        }
-        
-        // Проверяем есть ли данные
-        if (!data || data.length === 0) {
-            list.innerHTML = '<div class="empty-list">📭 Список проблем пуст</div>';
-            return;
-        }
-        
-        console.log(`✅ Загружено ${data.length} проблем`);
-        
-        let html = '';
-        data.forEach(p => {
-            html += `
-                <div class="problem-card">
-                    <div class="problem-header">
-                        <span class="problem-title">⚠️ ${p.title || 'Без названия'}</span>
-                        <span class="problem-date">${p.date || 'Дата неизвестна'}</span>
-                    </div>
-                    <div class="problem-body">
-                        <p><strong>📝 Описание:</strong> ${p.description || 'Нет описания'}</p>
-                        <p><strong>✅ Решение:</strong> ${p.solution || 'Нет решения'}</p>
-                        ${p.photo ? `
-                        <div class="problem-photo" onclick="viewMedia('${p.photo}', 'image/jpeg')" style="cursor:pointer;">
-                            <img src="${p.photo}" alt="Фото проблемы" style="max-width:100%; max-height:200px; border-radius:5px; border:2px solid #4a4a8a;">
-                        </div>
-                        ` : ''}
-                        <p><small>👤 Добавил: ${p.author || 'Администратор'}</small></p>
-                    </div>
-                </div>
-            `;
-        });
-        
-        list.innerHTML = html;
-        
-    } catch (e) {
-        console.error('Критическая ошибка:', e);
-        list.innerHTML = '<div class="empty-list">❌ Ошибка при загрузке</div>';
-    }
-}
-
-// Добавление проблемы (только для админов)
-window.addProblem = async function(event) {
-    event.preventDefault();
-    
-    if (!currentUser) {
-        alert('❌ Сначала войдите в аккаунт');
-        return;
-    }
-    
-    // Проверка на админа
-    const admins = ['milfa', 'milk123', 'Xchik_'];
-    if (!admins.includes(currentUser.username)) {
-        alert('❌ Только администратор может добавлять проблемы');
-        return;
-    }
-    
-    const title = document.getElementById('problemTitle')?.value;
-    const desc = document.getElementById('problemDesc')?.value;
-    const solution = document.getElementById('problemSolution')?.value;
-    
-    if (!title || !desc || !solution) {
-        alert('❌ Заполните все поля');
-        return;
-    }
-    
-    try {
-        console.log('💾 Сохраняем проблему...');
-        
-        const { data, error } = await window.mgSupabase
-            .from('problems')
-            .insert([{
-                title: title,
-                description: desc,
-                solution: solution,
-                photo: currentPhotoData,
-                author: currentUser.username,
-                date: new Date().toLocaleString(),
-                created_at: new Date().toISOString()
-            }])
-            .select();
-        
-        if (error) throw error;
-        
-        console.log('✅ Проблема сохранена:', data);
-        alert('✅ Проблема добавлена' + (currentPhotoData ? ' с фото' : ''));
-        
-        // Очищаем форму
-        document.getElementById('problemForm').reset();
-        removePhoto();
-        
-        // Обновляем список для всех
-        await loadProblems();
-        
-    } catch (e) {
-        console.error('❌ Ошибка сохранения:', e);
-        alert('❌ Ошибка: ' + e.message);
     }
 };
 
