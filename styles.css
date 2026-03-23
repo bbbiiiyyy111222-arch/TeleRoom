@@ -1165,4 +1165,29 @@ body {
 
 .files-preview {
     margin-top: 10px;
+
+   /* ==============================================
+   МОБИЛЬНАЯ ВЕРСИЯ
+   ============================================== */
+
+@media (max-width: 768px) {
+    .container { padding: 0 10px !important; }
+    .header-content { flex-direction: column !important; text-align: center !important; }
+    .logo h1 { font-size: 18px !important; }
+    .server-ip { flex-direction: column !important; }
+    .auth { width: 100% !important; }
+    .login-form { flex-direction: column !important; }
+    .auth-input { width: 100% !important; }
+    .btn-moon { width: 100% !important; justify-content: center !important; }
+    .nav .container { overflow-x: auto !important; flex-wrap: nowrap !important; }
+    .nav-btn { white-space: nowrap !important; font-size: 9px !important; padding: 6px 12px !important; }
+    .info-items { flex-direction: column !important; }
+    .info-item { width: 100% !important; }
+    .rules-scroll { max-height: 450px !important; }
+    .rule-item { flex-direction: column !important; gap: 3px !important; }
+    .mini-punish { margin-left: 0 !important; margin-top: 3px !important; display: inline-block !important; }
+    .form-row { flex-direction: column !important; }
+    .tabs { flex-direction: column !important; }
+    .device-switch-btn { font-size: 10px !important; padding: 8px 15px !important; }
+}
 }
