@@ -4,21 +4,24 @@ let currentUser = null;
 let currentDevice = localStorage.getItem('mg_device') || null;
 
 // ==============================================
-// ВЫБОР УСТРОЙСТВА
+// ВЫБОР УСТРОЙСТВА (РАБОТАЕТ НА ВСЕХ)
 // ==============================================
 
 window.selectDevice = function(device) {
     localStorage.setItem('mg_device', device);
     currentDevice = device;
+    
     document.getElementById('deviceChoice').style.display = 'none';
     document.getElementById('mainSite').style.display = 'block';
+    
     if (device === 'mobile') {
         document.body.classList.add('mobile-view');
         document.getElementById('deviceSwitch').style.display = 'block';
     } else {
         document.body.classList.remove('mobile-view');
-        document.getElementById('deviceSwitch').style.display = 'none';
+        document.getElementById('deviceSwitch').style.display = 'block';
     }
+    
     loadUserData();
 };
 
@@ -145,19 +148,7 @@ async function loadPersonalComplaints() {
         
         let html = '';
         data.forEach(c => {
-            html += `
-                <div class="complaint-card">
-                    <div class="complaint-header">
-                        <span class="complaint-title">${c.title || 'Жалоба'}</span>
-                        <span class="complaint-status status-new">${c.status || 'НОВАЯ'}</span>
-                    </div>
-                    <div class="complaint-body">
-                        <p><strong>Нарушитель:</strong> ${c.against || 'Не указан'}</p>
-                        <p><strong>Описание:</strong> ${c.description || 'Нет описания'}</p>
-                        <p><strong>Дата:</strong> ${c.date || new Date().toLocaleString()}</p>
-                    </div>
-                </div>
-            `;
+            html += `<div class="complaint-card"><div class="complaint-header"><span class="complaint-title">${c.title || 'Жалоба'}</span><span class="complaint-status status-new">${c.status || 'НОВАЯ'}</span></div><div class="complaint-body"><p><strong>Нарушитель:</strong> ${c.against || 'Не указан'}</p><p><strong>Описание:</strong> ${c.description || 'Нет описания'}</p><p><strong>Дата:</strong> ${c.date || new Date().toLocaleString()}</p></div></div>`;
         });
         list.innerHTML = html;
     } catch (e) {
@@ -188,19 +179,7 @@ async function loadPersonalMedia() {
         
         let html = '';
         data.forEach(m => {
-            html += `
-                <div class="media-card">
-                    <div class="media-header">
-                        <span class="media-title">${m.platform === 'tt' ? '📱 TikTok' : '▶️ YouTube'}</span>
-                        <span class="media-status status-new">${m.status || 'НОВАЯ'}</span>
-                    </div>
-                    <div class="media-body">
-                        <p><strong>Ник:</strong> ${m.nickname || 'Не указан'}</p>
-                        <p><strong>Подписчики:</strong> ${m.subscribers || '0'}</p>
-                        <p><strong>Дата:</strong> ${m.date || new Date().toLocaleString()}</p>
-                    </div>
-                </div>
-            `;
+            html += `<div class="media-card"><div class="media-header"><span class="media-title">${m.platform === 'tt' ? '📱 TikTok' : '▶️ YouTube'}</span><span class="media-status status-new">${m.status || 'НОВАЯ'}</span></div><div class="media-body"><p><strong>Ник:</strong> ${m.nickname || 'Не указан'}</p><p><strong>Подписчики:</strong> ${m.subscribers || '0'}</p><p><strong>Дата:</strong> ${m.date || new Date().toLocaleString()}</p></div></div>`;
         });
         list.innerHTML = html;
     } catch (e) {
@@ -231,18 +210,7 @@ async function loadPersonalHelpers() {
         
         let html = '';
         data.forEach(h => {
-            html += `
-                <div class="application-card">
-                    <div class="application-header">
-                        <span class="application-title">👮 Анкета на хелпера</span>
-                        <span class="application-status status-new">${h.status || 'НОВАЯ'}</span>
-                    </div>
-                    <div class="application-body">
-                        <p><strong>Ник:</strong> ${h.nickname || 'Не указан'}</p>
-                        <p><strong>Дата:</strong> ${h.date || new Date().toLocaleString()}</p>
-                    </div>
-                </div>
-            `;
+            html += `<div class="application-card"><div class="application-header"><span class="application-title">👮 Анкета на хелпера</span><span class="application-status status-new">${h.status || 'НОВАЯ'}</span></div><div class="application-body"><p><strong>Ник:</strong> ${h.nickname || 'Не указан'}</p><p><strong>Дата:</strong> ${h.date || new Date().toLocaleString()}</p></div></div>`;
         });
         list.innerHTML = html;
     } catch (e) {
@@ -256,76 +224,37 @@ async function loadPersonalHelpers() {
 
 window.submitComplaint = async function(event) {
     event.preventDefault();
-    if (!currentUser) {
-        alert('Сначала войдите');
-        return;
-    }
+    if (!currentUser) { alert('Сначала войдите'); return; }
     
     const title = document.getElementById('compTitle')?.value;
     const target = document.getElementById('compTarget')?.value;
     const desc = document.getElementById('compDesc')?.value;
-    
-    if (!title || !target || !desc) {
-        alert('Заполните все поля');
-        return;
-    }
+    if (!title || !target || !desc) { alert('Заполните все поля'); return; }
     
     try {
-        const { error } = await window.mgSupabase
-            .from('complaints')
-            .insert([{
-                author: currentUser.username,
-                title: title,
-                against: target,
-                description: desc,
-                status: 'НОВАЯ',
-                date: new Date().toLocaleString()
-            }]);
-        
+        const { error } = await window.mgSupabase.from('complaints').insert([{ author: currentUser.username, title: title, against: target, description: desc, status: 'НОВАЯ', date: new Date().toLocaleString() }]);
         if (error) throw error;
         alert('✅ Жалоба отправлена!');
         document.getElementById('compTitle').value = '';
         document.getElementById('compTarget').value = '';
         document.getElementById('compDesc').value = '';
         loadPersonalComplaints();
-    } catch (e) {
-        alert('❌ Ошибка при отправке');
-    }
+    } catch (e) { alert('❌ Ошибка при отправке'); }
 };
 
 window.submitTT = async function(event) {
     event.preventDefault();
-    if (!currentUser) {
-        alert('Сначала войдите');
-        return;
-    }
+    if (!currentUser) { alert('Сначала войдите'); return; }
     
     const age = document.getElementById('ttAge')?.value;
     const name = document.getElementById('ttName')?.value;
     const nick = document.getElementById('ttNick')?.value;
     const subs = document.getElementById('ttSubs')?.value;
     const link = document.getElementById('ttLink')?.value;
-    
-    if (!age || !name || !nick || !subs || !link) {
-        alert('Заполните все поля');
-        return;
-    }
+    if (!age || !name || !nick || !subs || !link) { alert('Заполните все поля'); return; }
     
     try {
-        const { error } = await window.mgSupabase
-            .from('media_applications')
-            .insert([{
-                user_name: currentUser.username,
-                platform: 'tt',
-                age: parseInt(age),
-                real_name: name,
-                nickname: nick,
-                subscribers: subs,
-                link: link,
-                status: 'НОВАЯ',
-                date: new Date().toLocaleString()
-            }]);
-        
+        const { error } = await window.mgSupabase.from('media_applications').insert([{ user_name: currentUser.username, platform: 'tt', age: parseInt(age), real_name: name, nickname: nick, subscribers: subs, link: link, status: 'НОВАЯ', date: new Date().toLocaleString() }]);
         if (error) throw error;
         alert('✅ Заявка на TikTok отправлена!');
         document.getElementById('ttAge').value = '';
@@ -334,44 +263,22 @@ window.submitTT = async function(event) {
         document.getElementById('ttSubs').value = '';
         document.getElementById('ttLink').value = '';
         loadPersonalMedia();
-    } catch (e) {
-        alert('❌ Ошибка при отправке');
-    }
+    } catch (e) { alert('❌ Ошибка при отправке'); }
 };
 
 window.submitYT = async function(event) {
     event.preventDefault();
-    if (!currentUser) {
-        alert('Сначала войдите');
-        return;
-    }
+    if (!currentUser) { alert('Сначала войдите'); return; }
     
     const age = document.getElementById('ytAge')?.value;
     const name = document.getElementById('ytName')?.value;
     const nick = document.getElementById('ytNick')?.value;
     const subs = document.getElementById('ytSubs')?.value;
     const link = document.getElementById('ytLink')?.value;
-    
-    if (!age || !name || !nick || !subs || !link) {
-        alert('Заполните все поля');
-        return;
-    }
+    if (!age || !name || !nick || !subs || !link) { alert('Заполните все поля'); return; }
     
     try {
-        const { error } = await window.mgSupabase
-            .from('media_applications')
-            .insert([{
-                user_name: currentUser.username,
-                platform: 'yt',
-                age: parseInt(age),
-                real_name: name,
-                nickname: nick,
-                subscribers: subs,
-                link: link,
-                status: 'НОВАЯ',
-                date: new Date().toLocaleString()
-            }]);
-        
+        const { error } = await window.mgSupabase.from('media_applications').insert([{ user_name: currentUser.username, platform: 'yt', age: parseInt(age), real_name: name, nickname: nick, subscribers: subs, link: link, status: 'НОВАЯ', date: new Date().toLocaleString() }]);
         if (error) throw error;
         alert('✅ Заявка на YouTube отправлена!');
         document.getElementById('ytAge').value = '';
@@ -380,17 +287,12 @@ window.submitYT = async function(event) {
         document.getElementById('ytSubs').value = '';
         document.getElementById('ytLink').value = '';
         loadPersonalMedia();
-    } catch (e) {
-        alert('❌ Ошибка при отправке');
-    }
+    } catch (e) { alert('❌ Ошибка при отправке'); }
 };
 
 window.submitHelper = async function(event) {
     event.preventDefault();
-    if (!currentUser) {
-        alert('Сначала войдите');
-        return;
-    }
+    if (!currentUser) { alert('Сначала войдите'); return; }
     
     const nick = document.getElementById('helpNick')?.value;
     const name = document.getElementById('helpName')?.value;
@@ -398,27 +300,10 @@ window.submitHelper = async function(event) {
     const tz = document.getElementById('helpTz')?.value;
     const exp = document.getElementById('helpExp')?.value;
     const why = document.getElementById('helpWhy')?.value;
-    
-    if (!nick || !name || !age || !tz || !exp || !why) {
-        alert('Заполните все поля');
-        return;
-    }
+    if (!nick || !name || !age || !tz || !exp || !why) { alert('Заполните все поля'); return; }
     
     try {
-        const { error } = await window.mgSupabase
-            .from('helper_applications')
-            .insert([{
-                user_name: currentUser.username,
-                nickname: nick,
-                real_name: name,
-                age: parseInt(age),
-                timezone: tz,
-                experience: exp,
-                motivation: why,
-                status: 'НОВАЯ',
-                date: new Date().toLocaleString()
-            }]);
-        
+        const { error } = await window.mgSupabase.from('helper_applications').insert([{ user_name: currentUser.username, nickname: nick, real_name: name, age: parseInt(age), timezone: tz, experience: exp, motivation: why, status: 'НОВАЯ', date: new Date().toLocaleString() }]);
         if (error) throw error;
         alert('✅ Анкета отправлена!');
         document.getElementById('helpNick').value = '';
@@ -428,9 +313,7 @@ window.submitHelper = async function(event) {
         document.getElementById('helpExp').value = '';
         document.getElementById('helpWhy').value = '';
         loadPersonalHelpers();
-    } catch (e) {
-        alert('❌ Ошибка при отправке');
-    }
+    } catch (e) { alert('❌ Ошибка при отправке'); }
 };
 
 // ==============================================
@@ -439,10 +322,7 @@ window.submitHelper = async function(event) {
 
 window.showRegister = function() { document.getElementById('registerModal').style.display = 'flex'; };
 window.closeModal = function() { document.getElementById('registerModal').style.display = 'none'; };
-window.showChangePassword = function() {
-    if (!currentUser) { alert('Сначала войдите'); return; }
-    document.getElementById('changePassModal').style.display = 'flex';
-};
+window.showChangePassword = function() { if (!currentUser) { alert('Сначала войдите'); return; } document.getElementById('changePassModal').style.display = 'flex'; };
 window.closeChangePass = function() { document.getElementById('changePassModal').style.display = 'none'; };
 window.register = function() { alert('Функция регистрации временно отключена'); closeModal(); };
 window.changePassword = function() { alert('Функция смены пароля временно отключена'); closeChangePass(); };
@@ -458,9 +338,7 @@ async function loadUserData() {
         document.getElementById('loginForm').style.display = 'none';
         document.getElementById('userInfo').style.display = 'flex';
         document.getElementById('currentUser').textContent = currentUser.username;
-        if (currentUser.role === 'owner') {
-            document.getElementById('adminLink').style.display = 'inline-block';
-        }
+        if (currentUser.role === 'owner') { document.getElementById('adminLink').style.display = 'inline-block'; }
         loadPersonalComplaints();
         loadPersonalMedia();
         loadPersonalHelpers();
@@ -473,10 +351,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (savedDevice) {
         document.getElementById('deviceChoice').style.display = 'none';
         document.getElementById('mainSite').style.display = 'block';
-        if (savedDevice === 'mobile') {
-            document.body.classList.add('mobile-view');
-            document.getElementById('deviceSwitch').style.display = 'block';
-        }
+        if (savedDevice === 'mobile') { document.body.classList.add('mobile-view'); }
+        document.getElementById('deviceSwitch').style.display = 'block';
         loadUserData();
     }
 });
