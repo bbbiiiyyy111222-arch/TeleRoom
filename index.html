@@ -251,7 +251,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="db.js"></script>
     <script src="script.js"></script>
-<!-- BLOCK BLAST - МАЛЕНЬКАЯ ВЕРСИЯ -->
+<!-- BLOCK BLAST - ДРАГ-ЭНД-ДРОП -->
 <div id="blockBlastGame" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 340px; max-width: 90%; background: #1e2a2f; border-radius: 25px; padding: 15px; z-index: 10000; box-shadow: 0 0 40px rgba(0,0,0,0.7); border: 2px solid #ffaa44;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
         <span style="color: #ffaa44; font-size: 14px;">🔷 BLOCK BLAST</span>
@@ -262,7 +262,7 @@
         <span style="color: #ffaa44; font-size: 24px; font-weight: bold;" id="blastScore">0</span>
     </div>
     
-    <!-- ПОЛЕ 6x6 (МАЛЕНЬКОЕ) -->
+    <!-- ПОЛЕ 6x6 -->
     <div id="blastGrid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; background: #0f1a1f; padding: 8px; border-radius: 12px; margin-bottom: 12px;"></div>
     
     <!-- БЛОКИ ДЛЯ ПЕРЕТАСКИВАНИЯ -->
@@ -276,14 +276,13 @@
 </div>
 
 <script>
-// BLOCK BLAST - МАЛЕНЬКАЯ ВЕРСИЯ 6x6
+// BLOCK BLAST - ПРОСТО ПЕРЕТАСКИВАНИЕ
 let grid = Array(6).fill().map(() => Array(6).fill(0));
 let score = 0;
 let blocks = [];
-let dragIndex = -1;
 let clickCount = 0;
 
-// Фигуры (маленькие)
+// Фигуры
 const shapes = [
     [[1,1],[1,1]],      // квадрат
     [[1,1,1]],          // палка 3
@@ -326,14 +325,33 @@ function drawGrid() {
             cell.style.cursor = 'pointer';
             cell.setAttribute('data-r', i);
             cell.setAttribute('data-c', j);
-            cell.ondrop = (e) => dropBlock(e, i, j);
+            
+            // ПРИНИМАЕМ ПЕРЕТАСКИВАНИЕ
+            cell.ondrop = (e) => {
+                e.preventDefault();
+                const blockData = e.dataTransfer.getData('text');
+                if(blockData) {
+                    const idx = parseInt(blockData);
+                    if(idx >= 0 && idx < blocks.length) {
+                        placeBlock(i, j, blocks[idx], idx);
+                    }
+                }
+            };
             cell.ondragover = (e) => e.preventDefault();
+            
+            // Подсветка при наведении
+            cell.onmouseenter = () => {
+                if(grid[i][j] === 0) cell.style.backgroundColor = '#3a6a6a';
+            };
+            cell.onmouseleave = () => {
+                if(grid[i][j] === 0) cell.style.backgroundColor = '#1e2f2f';
+            };
             cont.appendChild(cell);
         }
     }
 }
 
-// Рисуем блоки
+// Рисуем блоки (перетаскиваемые)
 function drawBlocks() {
     for(let i = 0; i < 3; i++) {
         const div = document.getElementById(`b${i+1}`);
@@ -359,22 +377,24 @@ function drawBlocks() {
                 } else {
                     cell.style.width = '28px';
                     cell.style.height = '28px';
-                    cell.style.backgroundColor = 'transparent';
+                    cell.backgroundColor = 'transparent';
                 }
                 div.appendChild(cell);
             }
         }
         
+        // НАСТРОЙКА ПЕРЕТАСКИВАНИЯ
         div.setAttribute('draggable', 'true');
-        div.ondragstart = (e) => dragStart(e, i);
-        div.ondragend = () => { dragIndex = -1; };
+        div.ondragstart = (e) => {
+            e.dataTransfer.setData('text', i);
+            e.dataTransfer.effectAllowed = 'copy';
+            div.style.opacity = '0.5';
+        };
+        div.ondragend = () => {
+            div.style.opacity = '1';
+        };
         div.style.cursor = 'grab';
     }
-}
-
-function dragStart(e, idx) {
-    dragIndex = idx;
-    e.dataTransfer.setData('text', idx);
 }
 
 // Можно ли поставить?
@@ -391,13 +411,10 @@ function canPlace(row, col, shape) {
 }
 
 // Поставить блок
-function dropBlock(e, row, col) {
-    e.preventDefault();
-    if(dragIndex < 0 || dragIndex >= blocks.length) return;
-    const block = blocks[dragIndex];
+function placeBlock(row, col, block, blockIndex) {
     if(!canPlace(row, col, block.shape)) return;
     
-    // Ставим
+    // Ставим блок
     for(let i = 0; i < block.shape.length; i++) {
         for(let j = 0; j < block.shape[i].length; j++) {
             if(block.shape[i][j]) {
@@ -406,24 +423,25 @@ function dropBlock(e, row, col) {
         }
     }
     
+    // Очки
     score += block.shape.flat().filter(x => x).length;
     document.getElementById('blastScore').innerText = score;
     
     // Удаляем блок
-    blocks.splice(dragIndex, 1);
+    blocks.splice(blockIndex, 1);
     
     // Проверяем линии
     checkLines();
     
-    // Добавляем новые
+    // Добавляем новые блоки
     if(blocks.length === 0) {
         blocks = getBlocks();
-        if(checkGameOver()) setTimeout(() => alert('Игра окончена! Счёт: ' + score), 50);
+        if(checkGameOver()) setTimeout(() => alert('💀 ИГРА ОКОНЧЕНА! Счёт: ' + score), 50);
     }
     
     drawGrid();
     drawBlocks();
-    if(checkGameOver()) setTimeout(() => alert('Игра окончена! Счёт: ' + score), 50);
+    if(checkGameOver()) setTimeout(() => alert('💀 ИГРА ОКОНЧЕНА! Счёт: ' + score), 50);
 }
 
 // Проверка линий
@@ -469,7 +487,6 @@ function resetBlastGame() {
     grid = Array(6).fill().map(() => Array(6).fill(0));
     score = 0;
     blocks = getBlocks();
-    dragIndex = -1;
     document.getElementById('blastScore').innerText = '0';
     drawGrid();
     drawBlocks();
