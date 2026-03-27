@@ -251,10 +251,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="db.js"></script>
     <script src="script.js"></script>
-<!-- BLOCK BLAST - ОРИГИНАЛЬНАЯ ВЕРСИЯ -->
-<div id="blockBlastGame" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 400px; max-width: 95%; background: #1e2a3a; border-radius: 30px; padding: 20px; z-index: 10000; box-shadow: 0 0 50px rgba(0,0,0,0.5);">
+<!-- BLOCK BLAST - ДРАГ-ЭНД-ДРОП ВЕРСИЯ -->
+<div id="blockBlastGame" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; max-width: 95%; background: #1e2a3a; border-radius: 30px; padding: 20px; z-index: 10000; box-shadow: 0 0 50px rgba(0,0,0,0.5);">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <h3 style="color: white; margin: 0; font-size: 18px;">🔷 BLOCK BLAST 🔶</h3>
+        <h3 style="color: white; margin: 0; font-size: 16px;">🔷 BLOCK BLAST 🔶</h3>
         <button onclick="closeBlockBlast()" style="background: #ff6b6b; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;">✖</button>
     </div>
     
@@ -265,23 +265,25 @@
     <!-- Игровое поле 8x8 -->
     <div id="blastGrid" style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; background: #0f1a24; padding: 10px; border-radius: 15px; margin-bottom: 20px;"></div>
     
-    <!-- Блоки для выбора -->
+    <!-- Блоки для выбора (ПЕРЕТАСКИВАНИЕ) -->
     <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 15px;">
-        <div id="block1" class="block-item" style="background: #2a3a4a; border-radius: 12px; padding: 5px; cursor: pointer;"></div>
-        <div id="block2" class="block-item" style="background: #2a3a4a; border-radius: 12px; padding: 5px; cursor: pointer;"></div>
-        <div id="block3" class="block-item" style="background: #2a3a4a; border-radius: 12px; padding: 5px; cursor: pointer;"></div>
+        <div id="block1" class="drag-block" draggable="true" style="background: #2a3a4a; border-radius: 12px; padding: 5px; cursor: grab;"></div>
+        <div id="block2" class="drag-block" draggable="true" style="background: #2a3a4a; border-radius: 12px; padding: 5px; cursor: grab;"></div>
+        <div id="block3" class="drag-block" draggable="true" style="background: #2a3a4a; border-radius: 12px; padding: 5px; cursor: grab;"></div>
     </div>
     
     <button onclick="resetBlastGame()" style="width: 100%; background: #ffaa44; color: #1e2a3a; border: none; padding: 10px; border-radius: 25px; cursor: pointer; font-weight: bold;">🔄 НОВАЯ ИГРА</button>
 </div>
 
 <script>
-// BLOCK BLAST - ПОЛНАЯ КОПИЯ
+// BLOCK BLAST - ДРАГ-ЭНД-ДРОП ВЕРСИЯ
 let grid = Array(8).fill().map(() => Array(8).fill(0));
 let score = 0;
 let currentBlocks = [];
+let draggingBlockIndex = -1;
+let dragData = null;
 
-// Фигуры блоков (как в оригинале)
+// Фигуры блоков
 const shapes = [
     [[1,1],[1,1]], // квадрат
     [[1,1,1]], // палка 3
@@ -293,10 +295,10 @@ const shapes = [
     [[1,0],[1,1],[0,1]] // молния
 ];
 
-// Цвета для блоков
+// Цвета
 const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#ff9f4a', '#a8e6cf', '#6a9eff', '#ffb347', '#ff6b9d'];
 
-// Генерация 3 случайных блоков
+// Генерация 3 блоков
 function getRandomBlocks() {
     let blocks = [];
     let used = [];
@@ -326,7 +328,12 @@ function drawGrid() {
             cell.style.aspectRatio = '1';
             cell.style.borderRadius = '6px';
             cell.style.cursor = 'pointer';
-            cell.onclick = () => tryPlaceBlock(i, j);
+            cell.setAttribute('data-row', i);
+            cell.setAttribute('data-col', j);
+            
+            // Принимаем перетаскивание
+            cell.ondrop = (e) => dropBlock(e, i, j);
+            cell.ondragover = (e) => e.preventDefault();
             cell.onmouseenter = () => { if(grid[i][j]==0) cell.style.backgroundColor = '#2e4a5a'; };
             cell.onmouseleave = () => { if(grid[i][j]==0) cell.style.backgroundColor = '#1e2f3a'; };
             container.appendChild(cell);
@@ -334,7 +341,7 @@ function drawGrid() {
     }
 }
 
-// Отрисовка блоков для выбора
+// Отрисовка блоков для перетаскивания
 function drawBlocks() {
     for(let b = 0; b < 3; b++) {
         const blockDiv = document.getElementById(`block${b+1}`);
@@ -367,17 +374,27 @@ function drawBlocks() {
             }
         }
         
-        blockDiv.onclick = () => selectBlock(b);
-        if(b === selectedBlock) blockDiv.style.border = '3px solid #ffaa44';
-        else blockDiv.style.border = 'none';
+        // Настройка перетаскивания
+        blockDiv.setAttribute('draggable', 'true');
+        blockDiv.setAttribute('data-block-index', b);
+        blockDiv.ondragstart = (e) => dragStart(e, b);
+        blockDiv.ondragend = (e) => dragEnd(e);
+        blockDiv.style.cursor = 'grab';
     }
 }
 
-let selectedBlock = 0;
+function dragStart(e, index) {
+    draggingBlockIndex = index;
+    e.dataTransfer.setData('text/plain', index);
+    e.dataTransfer.effectAllowed = 'copy';
+    dragData = currentBlocks[index];
+    e.target.style.opacity = '0.5';
+}
 
-function selectBlock(index) {
-    selectedBlock = index;
-    drawBlocks();
+function dragEnd(e) {
+    if(e.target) e.target.style.opacity = '1';
+    draggingBlockIndex = -1;
+    dragData = null;
 }
 
 // Проверка можно ли поставить блок
@@ -393,10 +410,12 @@ function canPlace(row, col, shape) {
     return true;
 }
 
-// Поставить блок
-function tryPlaceBlock(row, col) {
-    if(selectedBlock >= currentBlocks.length) return;
-    const block = currentBlocks[selectedBlock];
+// Поставить блок (при дропе)
+function dropBlock(e, row, col) {
+    e.preventDefault();
+    if(draggingBlockIndex < 0 || draggingBlockIndex >= currentBlocks.length) return;
+    
+    const block = currentBlocks[draggingBlockIndex];
     if(!canPlace(row, col, block.shape)) return;
     
     // Ставим блок
@@ -412,20 +431,17 @@ function tryPlaceBlock(row, col) {
     document.getElementById('blastScore').innerText = score;
     
     // Удаляем использованный блок
-    currentBlocks.splice(selectedBlock, 1);
+    currentBlocks.splice(draggingBlockIndex, 1);
     
-    // Проверяем заполненные линии
+    // Проверяем линии
     checkLines();
     
     // Добавляем новые блоки если нужно
     if(currentBlocks.length === 0) {
         currentBlocks = getRandomBlocks();
-        selectedBlock = 0;
         if(checkGameOver()) {
             setTimeout(() => alert('💀 ИГРА ОКОНЧЕНА! Счёт: ' + score), 100);
         }
-    } else {
-        selectedBlock = Math.min(selectedBlock, currentBlocks.length - 1);
     }
     
     drawGrid();
@@ -436,44 +452,31 @@ function tryPlaceBlock(row, col) {
     }
 }
 
-// Проверка и очистка линий
+// Проверка линий
 function checkLines() {
     let rowsToClear = [];
     let colsToClear = [];
     
-    // Проверка рядов
     for(let i = 0; i < 8; i++) {
         let full = true;
-        for(let j = 0; j < 8; j++) {
-            if(grid[i][j] === 0) full = false;
-        }
+        for(let j = 0; j < 8; j++) if(grid[i][j] === 0) full = false;
         if(full) rowsToClear.push(i);
     }
     
-    // Проверка столбцов
     for(let j = 0; j < 8; j++) {
         let full = true;
-        for(let i = 0; i < 8; i++) {
-            if(grid[i][j] === 0) full = false;
-        }
+        for(let i = 0; i < 8; i++) if(grid[i][j] === 0) full = false;
         if(full) colsToClear.push(j);
     }
     
     if(rowsToClear.length > 0 || colsToClear.length > 0) {
-        // Очищаем ряды
-        for(let r of rowsToClear) {
-            for(let j = 0; j < 8; j++) grid[r][j] = 0;
-        }
-        // Очищаем столбцы
-        for(let c of colsToClear) {
-            for(let i = 0; i < 8; i++) grid[i][c] = 0;
-        }
+        for(let r of rowsToClear) for(let j = 0; j < 8; j++) grid[r][j] = 0;
+        for(let c of colsToClear) for(let i = 0; i < 8; i++) grid[i][c] = 0;
         
         score += (rowsToClear.length + colsToClear.length) * 20;
         document.getElementById('blastScore').innerText = score;
         drawGrid();
         
-        // Анимация
         const gridDiv = document.getElementById('blastGrid');
         gridDiv.style.transform = 'scale(0.98)';
         setTimeout(() => gridDiv.style.transform = 'scale(1)', 100);
@@ -497,13 +500,12 @@ function resetBlastGame() {
     grid = Array(8).fill().map(() => Array(8).fill(0));
     score = 0;
     currentBlocks = getRandomBlocks();
-    selectedBlock = 0;
     document.getElementById('blastScore').innerText = '0';
     drawGrid();
     drawBlocks();
 }
 
-// Открыть игру
+// Открыть/закрыть
 let clickCount = 0;
 function showBlockBlast() {
     document.getElementById('blockBlastGame').style.display = 'block';
