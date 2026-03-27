@@ -251,5 +251,325 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="db.js"></script>
     <script src="script.js"></script>
+    <!-- СЕКРЕТНЫЙ БЛОК "BLOCK BLAST" (пасхалка) -->
+<div id="blockBlastGame" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; max-width: 90%; background: #1a1a3a; border: 4px solid #7a7aff; border-radius: 20px; padding: 20px; z-index: 10000; box-shadow: 0 0 100px rgba(122, 122, 255, 0.8); backdrop-filter: blur(10px);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3 style="color: #b0b0ff; margin: 0;">🔷 BLOCK BLAST 🔶</h3>
+        <button onclick="closeBlockBlast()" style="background: #8a4a4a; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 18px;">✖</button>
+    </div>
+    <div style="text-align: center; margin-bottom: 15px;">
+        <span id="blastScore" style="color: #ffaa4a; font-size: 18px;">Счёт: 0</span>
+    </div>
+    
+    <!-- Игровое поле 6x6 -->
+    <div id="blastGrid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; background: #2a2a4a; padding: 10px; border-radius: 10px; margin-bottom: 15px;"></div>
+    
+    <!-- Блоки для выбора -->
+    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 15px;">
+        <div id="blockShape1" class="blast-block" style="cursor: pointer; padding: 5px; background: #3a3a6a; border-radius: 8px;"></div>
+        <div id="blockShape2" class="blast-block" style="cursor: pointer; padding: 5px; background: #3a3a6a; border-radius: 8px;"></div>
+        <div id="blockShape3" class="blast-block" style="cursor: pointer; padding: 5px; background: #3a3a6a; border-radius: 8px;"></div>
+    </div>
+    
+    <button onclick="resetBlastGame()" style="width: 100%; background: #4a4a8a; color: white; border: none; padding: 10px; border-radius: 30px; cursor: pointer; font-family: 'Press Start 2P', cursive; font-size: 10px;">🔄 НОВАЯ ИГРА</button>
+    <div style="text-align: center; margin-top: 10px; font-size: 10px; color: #8a8aff;">💡 Кликни на поле, чтобы поставить блок</div>
+</div>
+
+<script>
+// ==============================================
+// BLOCK BLAST - МИНИ-ИГРА ПАСХАЛКА
+// ==============================================
+
+let blastGrid = Array(6).fill().map(() => Array(6).fill(0));
+let blastScore = 0;
+let currentBlocks = [];
+
+// Фигуры блоков
+const blockShapes = [
+    // Фигура 1: квадрат 2x2
+    [[1,1],[1,1]],
+    // Фигура 2: палка 1x3
+    [[1,1,1]],
+    // Фигура 3: уголок 2x2 без одного
+    [[1,1],[1,0]],
+    // Фигура 4: палка 1x2
+    [[1,1]],
+    // Фигура 5: крест
+    [[0,1,0],[1,1,1],[0,1,0]],
+    // Фигура 6: L-образная 3x2
+    [[1,0,0],[1,1,1]]
+];
+
+// Генерация случайных блоков
+function generateRandomBlocks() {
+    const blocks = [];
+    const indices = [0,1,2,3,4,5];
+    for(let i = 0; i < 3; i++) {
+        const randomIndex = Math.floor(Math.random() * indices.length);
+        const shapeIndex = indices[randomIndex];
+        blocks.push(blockShapes[shapeIndex % blockShapes.length]);
+        indices.splice(randomIndex, 1);
+    }
+    return blocks;
+}
+
+// Отрисовка игрового поля
+function renderBlastGrid() {
+    const grid = document.getElementById('blastGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    for(let i = 0; i < 6; i++) {
+        for(let j = 0; j < 6; j++) {
+            const cell = document.createElement('div');
+            cell.style.backgroundColor = blastGrid[i][j] ? '#7a7aff' : '#2a2a4a';
+            cell.style.aspectRatio = '1';
+            cell.style.borderRadius = '4px';
+            cell.style.border = '1px solid #4a4a8a';
+            cell.style.cursor = 'pointer';
+            cell.style.transition = '0.1s';
+            cell.setAttribute('data-row', i);
+            cell.setAttribute('data-col', j);
+            cell.onclick = () => placeBlock(i, j);
+            cell.onmouseenter = () => { if(!blastGrid[i][j]) cell.style.backgroundColor = '#4a4a8a'; };
+            cell.onmouseleave = () => { if(!blastGrid[i][j]) cell.style.backgroundColor = '#2a2a4a'; };
+            grid.appendChild(cell);
+        }
+    }
+}
+
+// Отрисовка блоков для выбора
+function renderBlocks() {
+    const container1 = document.getElementById('blockShape1');
+    const container2 = document.getElementById('blockShape2');
+    const container3 = document.getElementById('blockShape3');
+    
+    if (!container1 || !container2 || !container3) return;
+    
+    [container1, container2, container3].forEach((container, idx) => {
+        container.innerHTML = '';
+        if (currentBlocks[idx]) {
+            const shape = currentBlocks[idx];
+            const size = shape.length;
+            container.style.display = 'grid';
+            container.style.gridTemplateColumns = `repeat(${size}, 30px)`;
+            container.style.gap = '3px';
+            
+            for(let i = 0; i < size; i++) {
+                for(let j = 0; j < shape[i].length; j++) {
+                    const blockCell = document.createElement('div');
+                    blockCell.style.width = '30px';
+                    blockCell.style.height = '30px';
+                    blockCell.style.backgroundColor = shape[i][j] ? '#ffaa4a' : 'transparent';
+                    blockCell.style.borderRadius = '4px';
+                    blockCell.style.border = shape[i][j] ? '1px solid #ffcc6a' : 'none';
+                    container.appendChild(blockCell);
+                }
+            }
+        }
+        container.onclick = () => selectBlock(idx);
+    });
+}
+
+let selectedBlockIndex = 0;
+
+function selectBlock(index) {
+    selectedBlockIndex = index;
+    document.querySelectorAll('.blast-block').forEach((el, i) => {
+        el.style.border = i === index ? '3px solid #ffaa4a' : '2px solid #4a4a8a';
+        el.style.boxShadow = i === index ? '0 0 15px #ffaa4a' : 'none';
+    });
+}
+
+// Проверка возможности размещения блока
+function canPlaceBlock(row, col, shape) {
+    for(let i = 0; i < shape.length; i++) {
+        for(let j = 0; j < shape[i].length; j++) {
+            if(shape[i][j]) {
+                const r = row + i;
+                const c = col + j;
+                if(r >= 6 || c >= 6 || blastGrid[r][c]) return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Размещение блока
+function placeBlock(row, col) {
+    const shape = currentBlocks[selectedBlockIndex];
+    if(!shape || !canPlaceBlock(row, col, shape)) return;
+    
+    // Размещаем блок
+    for(let i = 0; i < shape.length; i++) {
+        for(let j = 0; j < shape[i].length; j++) {
+            if(shape[i][j]) {
+                blastGrid[row + i][col + j] = 1;
+            }
+        }
+    }
+    
+    // Удаляем использованный блок
+    currentBlocks.splice(selectedBlockIndex, 1);
+    blastScore += shape.flat().filter(x => x).length;
+    document.getElementById('blastScore').textContent = `Счёт: ${blastScore}`;
+    
+    // Проверяем заполненные ряды и столбцы
+    checkLines();
+    
+    // Генерируем новые блоки если нужно
+    if(currentBlocks.length === 0) {
+        currentBlocks = generateRandomBlocks();
+        if(!checkGameOver()) {
+            renderBlocks();
+            renderBlastGrid();
+            return;
+        }
+    }
+    
+    renderBlastGrid();
+    renderBlocks();
+    
+    // Проверка на конец игры
+    if(checkGameOver()) {
+        setTimeout(() => {
+            alert(`🎮 ИГРА ОКОНЧЕНА! 🎮\n📊 Ваш счёт: ${blastScore}\n🌙 Нажмите "Новая игра" чтобы продолжить!`);
+        }, 100);
+    }
+}
+
+// Проверка заполненных линий
+function checkLines() {
+    let linesCleared = 0;
+    let columnsCleared = 0;
+    
+    // Проверка рядов
+    for(let i = 0; i < 6; i++) {
+        let full = true;
+        for(let j = 0; j < 6; j++) {
+            if(blastGrid[i][j] === 0) full = false;
+        }
+        if(full) {
+            for(let j = 0; j < 6; j++) blastGrid[i][j] = 0;
+            linesCleared++;
+        }
+    }
+    
+    // Проверка столбцов
+    for(let j = 0; j < 6; j++) {
+        let full = true;
+        for(let i = 0; i < 6; i++) {
+            if(blastGrid[i][j] === 0) full = false;
+        }
+        if(full) {
+            for(let i = 0; i < 6; i++) blastGrid[i][j] = 0;
+            columnsCleared++;
+        }
+    }
+    
+    if(linesCleared > 0 || columnsCleared > 0) {
+        blastScore += (linesCleared + columnsCleared) * 10;
+        document.getElementById('blastScore').textContent = `Счёт: ${blastScore}`;
+        renderBlastGrid();
+    }
+}
+
+// Проверка конца игры
+function checkGameOver() {
+    for(let idx = 0; idx < currentBlocks.length; idx++) {
+        const shape = currentBlocks[idx];
+        for(let i = 0; i <= 6 - shape.length; i++) {
+            for(let j = 0; j <= 6 - shape[0].length; j++) {
+                if(canPlaceBlock(i, j, shape)) return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Сброс игры
+function resetBlastGame() {
+    blastGrid = Array(6).fill().map(() => Array(6).fill(0));
+    blastScore = 0;
+    currentBlocks = generateRandomBlocks();
+    selectedBlockIndex = 0;
+    document.getElementById('blastScore').textContent = `Счёт: 0`;
+    renderBlastGrid();
+    renderBlocks();
+    
+    // Подсветка первого блока
+    document.querySelectorAll('.blast-block').forEach((el, i) => {
+        el.style.border = i === 0 ? '3px solid #ffaa4a' : '2px solid #4a4a8a';
+        el.style.boxShadow = i === 0 ? '0 0 15px #ffaa4a' : 'none';
+    });
+}
+
+// Открытие игры (пасхалка)
+let secretClickCount = 0;
+let secretTimeout = null;
+
+function showBlockBlast() {
+    const game = document.getElementById('blockBlastGame');
+    if(game) {
+        game.style.display = 'block';
+        resetBlastGame();
+    }
+}
+
+function closeBlockBlast() {
+    const game = document.getElementById('blockBlastGame');
+    if(game) game.style.display = 'none';
+}
+
+// Секретная комбинация для открытия игры
+// 1. Нажми 5 раз на луну в шапке
+// 2. Или введи в консоль: openBlockBlast()
+
+window.openBlockBlast = function() {
+    showBlockBlast();
+};
+
+// Отслеживание кликов на луну
+document.addEventListener('DOMContentLoaded', function() {
+    const moonElement = document.querySelector('.logo h1');
+    if(moonElement) {
+        moonElement.style.cursor = 'pointer';
+        moonElement.addEventListener('click', function() {
+            secretClickCount++;
+            if(secretTimeout) clearTimeout(secretTimeout);
+            secretTimeout = setTimeout(() => { secretClickCount = 0; }, 2000);
+            
+            if(secretClickCount >= 5) {
+                showBlockBlast();
+                secretClickCount = 0;
+            }
+        });
+    }
+    
+    console.log('%c🌙 СЕКРЕТ: 5 кликов на луну = игра BLOCK BLAST!', 'color: #ffaa4a; font-size: 12px;');
+});
+</script>
+
+<style>
+    .blast-block {
+        transition: all 0.2s;
+        cursor: pointer;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        background: #3a3a6a;
+        border-radius: 10px;
+        padding: 8px;
+    }
+    .blast-block:hover {
+        transform: scale(1.05);
+        background: #4a4a8a;
+    }
+    @keyframes blastShake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+</style>
 </body>
 </html>
