@@ -251,6 +251,385 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="db.js"></script>
     <script src="script.js"></script>
+<!-- BLOCK BLAST - ПОЛНАЯ ВЕРСИЯ -->
+<div id="blockBlastGame" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 450px; max-width: 95%; background: #1a2a2f; border-radius: 35px; padding: 20px; z-index: 10000; box-shadow: 0 0 60px rgba(0,0,0,0.8); border: 2px solid #ffaa44;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 style="color: #ffaa44; margin: 0; font-size: 18px; text-shadow: 0 0 5px #ffaa44;">🔷 BLOCK BLAST! 🔶</h3>
+        <button onclick="closeBlockBlast()" style="background: #ff6b6b; color: white; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 18px;">✖</button>
+    </div>
+    
+    <div style="text-align: center; margin-bottom: 12px;">
+        <span style="color: #ffaa44; font-size: 32px; font-weight: bold;" id="blastScore">0</span>
+    </div>
+    
+    <!-- Игровое поле 8x8 -->
+    <div id="blastGrid" style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; background: #0f1a1f; padding: 12px; border-radius: 20px; margin-bottom: 20px;"></div>
+    
+    <!-- Блоки для перетаскивания -->
+    <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap;">
+        <div id="blastBlock1" class="blast-block-drag" draggable="true" style="background: #2a3a3f; border-radius: 15px; padding: 8px; cursor: grab;"></div>
+        <div id="blastBlock2" class="blast-block-drag" draggable="true" style="background: #2a3a3f; border-radius: 15px; padding: 8px; cursor: grab;"></div>
+        <div id="blastBlock3" class="blast-block-drag" draggable="true" style="background: #2a3a3f; border-radius: 15px; padding: 8px; cursor: grab;"></div>
+    </div>
+    
+    <button onclick="resetBlastGame()" style="width: 100%; background: linear-gradient(135deg, #ffaa44, #ff8844); color: #1a2a2f; border: none; padding: 12px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 14px;">🔄 НОВАЯ ИГРА</button>
+    <div style="text-align: center; margin-top: 10px; font-size: 10px; color: #88aabb;">✨ Перетащи блок мышкой на поле ✨</div>
+</div>
 
+<style>
+    .blast-block-drag {
+        transition: all 0.2s;
+    }
+    .blast-block-drag:active {
+        cursor: grabbing;
+        opacity: 0.7;
+    }
+    .blast-cell-highlight {
+        background-color: #3a6a7a !important;
+        box-shadow: 0 0 10px #ffaa44 !important;
+    }
+</style>
+
+<script>
+// ==============================================
+// BLOCK BLAST - ПОЛНАЯ ВЕРСИЯ (4 клика по луне)
+// ==============================================
+
+let blastGrid = Array(8).fill().map(() => Array(8).fill(0));
+let blastScore = 0;
+let blastBlocks = [];
+let draggingBlock = null;
+let dragBlockIndex = -1;
+let moonClickCount = 0;
+
+// Фигуры блоков (оригинальные)
+const blastShapes = [
+    { shape: [[1,1],[1,1]], name: "квадрат", color: 0 },
+    { shape: [[1,1,1]], name: "палка3", color: 1 },
+    { shape: [[1,1,1,1]], name: "палка4", color: 2 },
+    { shape: [[1,0,0],[1,1,1]], name: "L", color: 3 },
+    { shape: [[1,1,0],[0,1,1]], name: "Z", color: 4 },
+    { shape: [[0,1,1],[1,1,0]], name: "S", color: 5 },
+    { shape: [[1,1],[1,0]], name: "уголок", color: 6 },
+    { shape: [[1,0],[1,1],[0,1]], name: "молния", color: 7 }
+];
+
+// Цвета блоков
+const blastColors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#ff9f4a', '#a8e6cf', '#6a9eff', '#ffb347', '#ff6b9d'];
+
+// Генерация 3 случайных блоков
+function getRandomBlastBlocks() {
+    let blocks = [];
+    let used = [];
+    for(let i = 0; i < 3; i++) {
+        let idx;
+        do { idx = Math.floor(Math.random() * blastShapes.length); } 
+        while(used.includes(idx));
+        used.push(idx);
+        blocks.push({ 
+            shape: blastShapes[idx].shape, 
+            color: blastShapes[idx].color,
+            shapeData: blastShapes[idx]
+        });
+    }
+    return blocks;
+}
+
+// Отрисовка игрового поля
+function drawBlastGrid() {
+    const container = document.getElementById('blastGrid');
+    if(!container) return;
+    container.innerHTML = '';
+    
+    for(let i = 0; i < 8; i++) {
+        for(let j = 0; j < 8; j++) {
+            const cell = document.createElement('div');
+            if(blastGrid[i][j] > 0) {
+                cell.style.backgroundColor = blastColors[blastGrid[i][j]-1];
+                cell.style.boxShadow = 'inset 0 0 5px rgba(255,255,255,0.5), 0 0 3px rgba(0,0,0,0.3)';
+            } else {
+                cell.style.backgroundColor = '#1e2f2f';
+                cell.style.boxShadow = 'inset 0 0 3px rgba(0,0,0,0.3)';
+            }
+            cell.style.aspectRatio = '1';
+            cell.style.borderRadius = '8px';
+            cell.style.cursor = 'pointer';
+            cell.style.transition = 'all 0.1s';
+            cell.setAttribute('data-row', i);
+            cell.setAttribute('data-col', j);
+            
+            // Прием перетаскивания
+            cell.ondrop = (e) => dropBlastBlock(e, i, j);
+            cell.ondragover = (e) => e.preventDefault();
+            
+            // Подсветка при наведении
+            cell.onmouseenter = () => {
+                if(blastGrid[i][j] === 0 && dragBlockIndex !== -1) {
+                    const block = blastBlocks[dragBlockIndex];
+                    if(block && canPlaceBlast(i, j, block.shape)) {
+                        cell.style.backgroundColor = '#4a8a9a';
+                        cell.style.transform = 'scale(1.02)';
+                    } else if(blastGrid[i][j] === 0) {
+                        cell.style.backgroundColor = '#2e4a4a';
+                    }
+                } else if(blastGrid[i][j] === 0) {
+                    cell.style.backgroundColor = '#2e4a4a';
+                }
+            };
+            cell.onmouseleave = () => {
+                if(blastGrid[i][j] === 0) {
+                    cell.style.backgroundColor = '#1e2f2f';
+                    cell.style.transform = 'scale(1)';
+                }
+            };
+            container.appendChild(cell);
+        }
+    }
+}
+
+// Отрисовка блоков для перетаскивания
+function drawBlastBlocks() {
+    for(let b = 0; b < 3; b++) {
+        const blockDiv = document.getElementById(`blastBlock${b+1}`);
+        if(!blockDiv || b >= blastBlocks.length) continue;
+        
+        const block = blastBlocks[b];
+        const shape = block.shape;
+        const color = blastColors[block.color];
+        
+        blockDiv.innerHTML = '';
+        const cols = Math.max(...shape.map(row => row.length));
+        blockDiv.style.display = 'grid';
+        blockDiv.style.gridTemplateColumns = `repeat(${cols}, 42px)`;
+        blockDiv.style.gap = '4px';
+        blockDiv.style.padding = '10px';
+        blockDiv.style.justifyContent = 'center';
+        
+        for(let i = 0; i < shape.length; i++) {
+            for(let j = 0; j < cols; j++) {
+                const cell = document.createElement('div');
+                if(shape[i] && shape[i][j]) {
+                    cell.style.backgroundColor = color;
+                    cell.style.borderRadius = '8px';
+                    cell.style.width = '42px';
+                    cell.style.height = '42px';
+                    cell.style.boxShadow = 'inset 0 0 6px rgba(255,255,255,0.4)';
+                } else {
+                    cell.style.width = '42px';
+                    cell.style.height = '42px';
+                    cell.style.backgroundColor = 'transparent';
+                }
+                blockDiv.appendChild(cell);
+            }
+        }
+        
+        // Настройка перетаскивания
+        blockDiv.setAttribute('draggable', 'true');
+        blockDiv.setAttribute('data-blast-idx', b);
+        blockDiv.ondragstart = (e) => dragBlastStart(e, b);
+        blockDiv.ondragend = (e) => dragBlastEnd(e);
+        blockDiv.style.cursor = 'grab';
+    }
+}
+
+function dragBlastStart(e, index) {
+    if(index >= blastBlocks.length) return;
+    dragBlockIndex = index;
+    draggingBlock = blastBlocks[index];
+    e.dataTransfer.setData('text/plain', index);
+    e.dataTransfer.effectAllowed = 'copy';
+    e.target.style.opacity = '0.6';
+}
+
+function dragBlastEnd(e) {
+    if(e.target) e.target.style.opacity = '1';
+    dragBlockIndex = -1;
+    draggingBlock = null;
+}
+
+// Проверка возможности размещения
+function canPlaceBlast(row, col, shape) {
+    for(let i = 0; i < shape.length; i++) {
+        for(let j = 0; j < shape[i].length; j++) {
+            if(shape[i][j]) {
+                let r = row + i, c = col + j;
+                if(r >= 8 || c >= 8 || blastGrid[r][c] !== 0) return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Размещение блока
+function dropBlastBlock(e, row, col) {
+    e.preventDefault();
+    if(dragBlockIndex < 0 || dragBlockIndex >= blastBlocks.length) return;
+    
+    const block = blastBlocks[dragBlockIndex];
+    if(!canPlaceBlast(row, col, block.shape)) return;
+    
+    // Ставим блок
+    for(let i = 0; i < block.shape.length; i++) {
+        for(let j = 0; j < block.shape[i].length; j++) {
+            if(block.shape[i][j]) {
+                blastGrid[row + i][col + j] = block.color + 1;
+            }
+        }
+    }
+    
+    // Добавляем очки
+    const blockSize = block.shape.flat().filter(x => x).length;
+    blastScore += blockSize;
+    document.getElementById('blastScore').innerText = blastScore;
+    
+    // Удаляем использованный блок
+    blastBlocks.splice(dragBlockIndex, 1);
+    
+    // Проверяем линии
+    checkBlastLines();
+    
+    // Добавляем новые блоки если нужно
+    if(blastBlocks.length === 0) {
+        blastBlocks = getRandomBlastBlocks();
+        if(checkBlastGameOver()) {
+            setTimeout(() => alert('💀 ИГРА ОКОНЧЕНА! 💀\n📊 Счёт: ' + blastScore), 150);
+        }
+    }
+    
+    drawBlastGrid();
+    drawBlastBlocks();
+    
+    if(checkBlastGameOver()) {
+        setTimeout(() => alert('💀 ИГРА ОКОНЧЕНА! 💀\n📊 Счёт: ' + blastScore), 150);
+    }
+}
+
+// Проверка и очистка линий
+function checkBlastLines() {
+    let rowsToClear = [];
+    let colsToClear = [];
+    
+    // Ряды
+    for(let i = 0; i < 8; i++) {
+        let full = true;
+        for(let j = 0; j < 8; j++) {
+            if(blastGrid[i][j] === 0) full = false;
+        }
+        if(full) rowsToClear.push(i);
+    }
+    
+    // Столбцы
+    for(let j = 0; j < 8; j++) {
+        let full = true;
+        for(let i = 0; i < 8; i++) {
+            if(blastGrid[i][j] === 0) full = false;
+        }
+        if(full) colsToClear.push(j);
+    }
+    
+    if(rowsToClear.length > 0 || colsToClear.length > 0) {
+        // Очищаем
+        for(let r of rowsToClear) {
+            for(let j = 0; j < 8; j++) blastGrid[r][j] = 0;
+        }
+        for(let c of colsToClear) {
+            for(let i = 0; i < 8; i++) blastGrid[i][c] = 0;
+        }
+        
+        // Бонус за линии
+        const bonus = (rowsToClear.length + colsToClear.length) * 25;
+        blastScore += bonus;
+        document.getElementById('blastScore').innerText = blastScore;
+        drawBlastGrid();
+        
+        // Анимация
+        const gridDiv = document.getElementById('blastGrid');
+        if(gridDiv) {
+            gridDiv.style.transform = 'scale(0.97)';
+            setTimeout(() => { if(gridDiv) gridDiv.style.transform = 'scale(1)'; }, 120);
+        }
+    }
+}
+
+// Проверка конца игры
+function checkBlastGameOver() {
+    for(let b of blastBlocks) {
+        const shape = b.shape;
+        for(let i = 0; i <= 8 - shape.length; i++) {
+            for(let j = 0; j <= 8 - shape[0].length; j++) {
+                if(canPlaceBlast(i, j, shape)) return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Сброс игры
+function resetBlastGame() {
+    blastGrid = Array(8).fill().map(() => Array(8).fill(0));
+    blastScore = 0;
+    blastBlocks = getRandomBlastBlocks();
+    dragBlockIndex = -1;
+    draggingBlock = null;
+    document.getElementById('blastScore').innerText = '0';
+    drawBlastGrid();
+    drawBlastBlocks();
+}
+
+// Открыть игру
+function showBlastGame() {
+    const game = document.getElementById('blockBlastGame');
+    if(game) {
+        game.style.display = 'block';
+        resetBlastGame();
+    }
+}
+
+function closeBlockBlast() {
+    const game = document.getElementById('blockBlastGame');
+    if(game) game.style.display = 'none';
+    moonClickCount = 0;
+}
+
+// ==============================================
+// СЕКРЕТ: 4 КЛИКА ПО ЛУНЕ
+// ==============================================
+
+function initMoonSecret() {
+    const moonElement = document.querySelector('.logo h1');
+    if(moonElement) {
+        moonElement.style.cursor = 'pointer';
+        moonElement.onclick = function(e) {
+            e.stopPropagation();
+            moonClickCount++;
+            console.log(`🌙 Клик по луне! ${moonClickCount}/4`);
+            
+            // Эффект при клике
+            this.style.transform = 'scale(1.05)';
+            setTimeout(() => { if(this) this.style.transform = 'scale(1)'; }, 150);
+            
+            // Сброс через 2 секунды
+            setTimeout(() => { moonClickCount = 0; }, 2000);
+            
+            if(moonClickCount >= 4) {
+                showBlastGame();
+                moonClickCount = 0;
+                console.log('🎮 BLOCK BLAST АКТИВИРОВАН!');
+            }
+        };
+        console.log('🌙 Секрет активирован! 4 клика по луне = BLOCK BLAST');
+    } else {
+        setTimeout(initMoonSecret, 500);
+    }
+}
+
+// Запуск
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(initMoonSecret, 800);
+});
+
+// Открыть через консоль
+window.openBlockBlast = showBlastGame;
+</script>
 </body>
 </html>
