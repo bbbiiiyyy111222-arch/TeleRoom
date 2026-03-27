@@ -282,6 +282,7 @@ let score = 0;
 let currentBlocks = [];
 let draggingBlockIndex = -1;
 let dragData = null;
+let clickCount = 0;
 
 // Фигуры блоков
 const shapes = [
@@ -315,6 +316,7 @@ function getRandomBlocks() {
 // Отрисовка поля
 function drawGrid() {
     const container = document.getElementById('blastGrid');
+    if(!container) return;
     container.innerHTML = '';
     for(let i = 0; i < 8; i++) {
         for(let j = 0; j < 8; j++) {
@@ -331,7 +333,6 @@ function drawGrid() {
             cell.setAttribute('data-row', i);
             cell.setAttribute('data-col', j);
             
-            // Принимаем перетаскивание
             cell.ondrop = (e) => dropBlock(e, i, j);
             cell.ondragover = (e) => e.preventDefault();
             cell.onmouseenter = () => { if(grid[i][j]==0) cell.style.backgroundColor = '#2e4a5a'; };
@@ -374,7 +375,6 @@ function drawBlocks() {
             }
         }
         
-        // Настройка перетаскивания
         blockDiv.setAttribute('draggable', 'true');
         blockDiv.setAttribute('data-block-index', b);
         blockDiv.ondragstart = (e) => dragStart(e, b);
@@ -388,7 +388,7 @@ function dragStart(e, index) {
     e.dataTransfer.setData('text/plain', index);
     e.dataTransfer.effectAllowed = 'copy';
     dragData = currentBlocks[index];
-    e.target.style.opacity = '0.5';
+    if(e.target) e.target.style.opacity = '0.5';
 }
 
 function dragEnd(e) {
@@ -397,7 +397,6 @@ function dragEnd(e) {
     dragData = null;
 }
 
-// Проверка можно ли поставить блок
 function canPlace(row, col, shape) {
     for(let i = 0; i < shape.length; i++) {
         for(let j = 0; j < shape[i].length; j++) {
@@ -410,7 +409,6 @@ function canPlace(row, col, shape) {
     return true;
 }
 
-// Поставить блок (при дропе)
 function dropBlock(e, row, col) {
     e.preventDefault();
     if(draggingBlockIndex < 0 || draggingBlockIndex >= currentBlocks.length) return;
@@ -418,7 +416,6 @@ function dropBlock(e, row, col) {
     const block = currentBlocks[draggingBlockIndex];
     if(!canPlace(row, col, block.shape)) return;
     
-    // Ставим блок
     for(let i = 0; i < block.shape.length; i++) {
         for(let j = 0; j < block.shape[i].length; j++) {
             if(block.shape[i][j]) {
@@ -430,13 +427,10 @@ function dropBlock(e, row, col) {
     score += block.shape.flat().filter(x => x).length;
     document.getElementById('blastScore').innerText = score;
     
-    // Удаляем использованный блок
     currentBlocks.splice(draggingBlockIndex, 1);
     
-    // Проверяем линии
     checkLines();
     
-    // Добавляем новые блоки если нужно
     if(currentBlocks.length === 0) {
         currentBlocks = getRandomBlocks();
         if(checkGameOver()) {
@@ -452,7 +446,6 @@ function dropBlock(e, row, col) {
     }
 }
 
-// Проверка линий
 function checkLines() {
     let rowsToClear = [];
     let colsToClear = [];
@@ -478,12 +471,13 @@ function checkLines() {
         drawGrid();
         
         const gridDiv = document.getElementById('blastGrid');
-        gridDiv.style.transform = 'scale(0.98)';
-        setTimeout(() => gridDiv.style.transform = 'scale(1)', 100);
+        if(gridDiv) {
+            gridDiv.style.transform = 'scale(0.98)';
+            setTimeout(() => { if(gridDiv) gridDiv.style.transform = 'scale(1)'; }, 100);
+        }
     }
 }
 
-// Проверка конца игры
 function checkGameOver() {
     for(let b of currentBlocks) {
         for(let i = 0; i <= 8 - b.shape.length; i++) {
@@ -495,38 +489,55 @@ function checkGameOver() {
     return true;
 }
 
-// Сброс игры
 function resetBlastGame() {
     grid = Array(8).fill().map(() => Array(8).fill(0));
     score = 0;
     currentBlocks = getRandomBlocks();
-    document.getElementById('blastScore').innerText = '0';
+    const scoreEl = document.getElementById('blastScore');
+    if(scoreEl) scoreEl.innerText = '0';
     drawGrid();
     drawBlocks();
 }
 
-// Открыть/закрыть
-let clickCount = 0;
 function showBlockBlast() {
-    document.getElementById('blockBlastGame').style.display = 'block';
-    resetBlastGame();
-}
-function closeBlockBlast() {
-    document.getElementById('blockBlastGame').style.display = 'none';
+    const game = document.getElementById('blockBlastGame');
+    if(game) {
+        game.style.display = 'block';
+        resetBlastGame();
+    }
 }
 
-// Секрет: 5 кликов на луну
+function closeBlockBlast() {
+    const game = document.getElementById('blockBlastGame');
+    if(game) game.style.display = 'none';
+}
+
+// Секрет: 5 кликов на луну (исправлено)
 document.addEventListener('DOMContentLoaded', function() {
-    const moon = document.querySelector('.logo h1');
-    if(moon) {
-        moon.style.cursor = 'pointer';
-        moon.onclick = () => {
-            clickCount++;
-            setTimeout(() => clickCount = 0, 2000);
-            if(clickCount >= 5) { showBlockBlast(); clickCount = 0; }
-        };
-    }
+    setTimeout(() => {
+        const moonElement = document.querySelector('.logo h1');
+        if(moonElement) {
+            moonElement.style.cursor = 'pointer';
+            moonElement.onclick = function(e) {
+                e.stopPropagation();
+                clickCount++;
+                console.log('Клик по луне!', clickCount);
+                
+                setTimeout(() => { clickCount = 0; }, 2000);
+                
+                if(clickCount >= 5) {
+                    showBlockBlast();
+                    clickCount = 0;
+                }
+            };
+        } else {
+            console.log('Луна не найдена, ищем по классу .logo h1');
+        }
+    }, 1000);
 });
+
+// Также можно открыть через консоль
+window.openBlockBlast = showBlockBlast;
 </script>
 </body>
 </html>
