@@ -2,522 +2,365 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>MoonGrief-Forum 🌙 Minecraft сервер</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    
-    <script>
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('keydown', function(e) {
-            if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73) || (e.ctrlKey && e.keyCode == 85)) {
-                e.preventDefault();
-                return false;
-            }
-        });
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoonGrief-Forum 🌙 Технические работы</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: radial-gradient(circle at 30% 40%, #0a0a1a, #1a1a3a);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Анимированные звезды */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 10% 20%, white, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 30% 50%, white, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 50% 80%, white, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 70% 30%, white, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90% 60%, white, rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 20% 70%, #b0b0ff, rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 60% 15%, #b0b0ff, rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 85% 85%, #b0b0ff, rgba(0,0,0,0));
+            background-repeat: no-repeat;
+            background-size: 200px 200px;
+            animation: starsMove 20s linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes starsMove {
+            from { background-position: 0% 0%; }
+            to { background-position: 200% 200%; }
+        }
+
+        /* Луна */
+        .moon {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 80px;
+            filter: drop-shadow(0 0 20px #7a7aff);
+            animation: moonFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes moonFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+
+        /* Контейнер */
+        .container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 50px;
+            background: rgba(26, 26, 58, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 60px;
+            border: 3px solid #7a7aff;
+            box-shadow: 0 0 100px rgba(122, 122, 255, 0.5);
+            max-width: 600px;
+            width: 90%;
+            animation: containerGlow 3s infinite;
+        }
+
+        @keyframes containerGlow {
+            0%, 100% { box-shadow: 0 0 50px rgba(122, 122, 255, 0.4); border-color: #7a7aff; }
+            50% { box-shadow: 0 0 100px rgba(176, 176, 255, 0.8); border-color: #b0b0ff; }
+        }
+
+        /* Иконка шестеренки */
+        .gear-icon {
+            font-size: 80px;
+            display: inline-block;
+            animation: gearSpin 4s linear infinite;
+            filter: drop-shadow(0 0 20px #ffaa44);
+        }
+
+        @keyframes gearSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Заголовок */
+        h1 {
+            color: #ffaa44;
+            font-size: 28px;
+            margin: 20px 0;
+            text-shadow: 0 0 20px #ffaa44, 0 0 40px #ff8844;
+            letter-spacing: 2px;
+        }
+
+        /* Подзаголовок */
+        .subtitle {
+            color: #b0b0ff;
+            font-size: 12px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        /* Прогресс-бар */
+        .progress-bar {
+            width: 80%;
+            height: 20px;
+            background: #2a2a4a;
+            border-radius: 30px;
+            margin: 30px auto;
+            overflow: hidden;
+            border: 2px solid #4a4a8a;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #ffaa44, #ff6644, #ffaa44);
+            border-radius: 30px;
+            animation: progress 8s ease-in-out infinite;
+            box-shadow: 0 0 15px #ffaa44;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            20% { width: 15%; }
+            40% { width: 35%; }
+            60% { width: 55%; }
+            80% { width: 75%; }
+            100% { width: 0%; }
+        }
+
+        /* Текст статуса */
+        .status-text {
+            color: #c0c0ff;
+            font-size: 11px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #ffaa44;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        /* Кнопка обновления */
+        .refresh-btn {
+            background: linear-gradient(135deg, #4a4a8a, #6a6aaa);
+            border: 2px solid #b0b0ff;
+            color: white;
+            padding: 12px 30px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 0 20px rgba(122, 122, 255, 0.5);
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px #7a7aff;
+            background: linear-gradient(135deg, #5a5a9a, #7a7aff);
+        }
+
+        /* Список работ */
+        .work-list {
+            text-align: left;
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+        }
+
+        .work-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(122, 122, 255, 0.2);
+            color: #d0d0ff;
+            font-size: 10px;
+        }
+
+        .work-item:last-child {
+            border-bottom: none;
+        }
+
+        .work-check {
+            width: 20px;
+            height: 20px;
+            background: #4a4a8a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            animation: checkPulse 2s infinite;
+        }
+
+        @keyframes checkPulse {
+            0%, 100% { background: #4a4a8a; }
+            50% { background: #7a7aff; }
+        }
+
+        /* Таймер */
+        .timer {
+            font-size: 24px;
+            color: #ffaa44;
+            margin: 20px 0;
+            text-shadow: 0 0 10px #ffaa44;
+        }
+
+        /* Социальные ссылки */
+        .social-links {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .social-link {
+            color: #b0b0ff;
+            text-decoration: none;
+            font-size: 20px;
+            transition: all 0.3s;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #2a2a4a;
+            border-radius: 50%;
+            border: 2px solid #4a4a8a;
+        }
+
+        .social-link:hover {
+            transform: translateY(-5px);
+            border-color: #ffaa44;
+            color: #ffaa44;
+            box-shadow: 0 0 20px #ffaa44;
+        }
+    </style>
 </head>
 <body>
-    <!-- ЭКРАН ВЫБОРА УСТРОЙСТВА -->
-    <div id="deviceChoice" class="device-choice">
-        <div class="device-choice-content">
-            <h1 class="device-title">MOONGRIEF<br>FORUM</h1>
-            <p class="device-subtitle">ВЫБЕРИТЕ УСТРОЙСТВО</p>
-            <div class="device-buttons">
-                <button onclick="selectDevice('pc')" class="device-btn">
-                    <span class="device-icon">🖥️</span>
-                    <span class="device-name">ПК</span>
-                </button>
-                <button onclick="selectDevice('mobile')" class="device-btn">
-                    <span class="device-icon">📱</span>
-                    <span class="device-name">ТЕЛЕФОН</span>
-                </button>
+    <div class="moon">🌙</div>
+    
+    <div class="container">
+        <div class="gear-icon">⚙️</div>
+        
+        <h1>ТЕХНИЧЕСКИЕ РАБОТЫ</h1>
+        <div class="subtitle">САЙТ ВРЕМЕННО НЕДОСТУПЕН</div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        
+        <div class="status-text">
+            <span class="status-dot"></span>
+            <span>ИДУТ РАБОТЫ ПО УЛУЧШЕНИЮ СЕРВЕРА</span>
+            <span class="status-dot"></span>
+        </div>
+        
+        <div class="timer" id="timer">--:--:--</div>
+        
+        <div class="work-list">
+            <div class="work-item">
+                <div class="work-check">⚙️</div>
+                <span>Обновление серверного ПО</span>
+            </div>
+            <div class="work-item">
+                <div class="work-check">⚙️</div>
+                <span>Оптимизация базы данных</span>
+            </div>
+            <div class="work-item">
+                <div class="work-check">⚙️</div>
+                <span>Улучшение защиты от DDoS</span>
+            </div>
+            <div class="work-item">
+                <div class="work-check">⚙️</div>
+                <span>Добавление новых функций</span>
             </div>
         </div>
-    </div>
-
-    <!-- ОСНОВНОЙ САЙТ -->
-    <div id="mainSite" style="display: none;">
-        <!-- ШАПКА -->
-        <header class="header">
-            <div class="container">
-                <div class="header-content">
-                    <div class="logo">
-                        <h1>🌙 MOONGRIEF-FORUM</h1>
-                        <div class="server-ip">
-                            <span>Moongrief.aurorix.pro</span>
-                            <button onclick="copyIP()" class="copy-btn">📋 КОПИРОВАТЬ</button>
-                        </div>
-                    </div>
-                    
-                    <!-- АВТОРИЗАЦИЯ -->
-                    <div class="auth" id="auth">
-                        <div id="userInfo" style="display: none;">
-                            <span id="currentUser" class="user-name"></span>
-                            <button onclick="showChangePassword()" class="btn-moon">🔑 СМЕНИТЬ</button>
-                            <button onclick="logout()" class="btn-moon logout-btn">🚪 ВЫЙТИ</button>
-                        </div>
-                        <div id="loginForm" class="login-form">
-                            <input type="text" id="username" placeholder="НИК" class="auth-input">
-                            <input type="password" id="password" placeholder="ПАРОЛЬ" class="auth-input">
-                            <button onclick="login()" class="btn-moon">🔐 ВОЙТИ</button>
-                            <button onclick="showRegister()" class="btn-moon">📝 РЕГИСТРАЦИЯ</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- КНОПКА СМЕНЫ УСТРОЙСТВА (ВСЕГДА ВИДНА) -->
-        <div class="device-switch" id="deviceSwitch">
-            <button onclick="showDeviceChoice()" class="device-switch-btn">
-                <span>🖥️</span> СМЕНИТЬ УСТРОЙСТВО <span>📱</span>
-            </button>
+        
+        <div class="social-links">
+            <a href="https://t.me/milo4ika1" target="_blank" class="social-link" title="Telegram">📱</a>
+            <a href="#" class="social-link" title="Discord">💬</a>
+            <a href="#" class="social-link" title="VK">📘</a>
         </div>
-
-        <!-- НАВИГАЦИЯ -->
-        <nav class="nav">
-            <div class="container">
-                <button class="nav-btn active" onclick="showSection('rules')">📜 ПРАВИЛА</button>
-                <button class="nav-btn" onclick="showSection('complaints')">⚠️ ЖАЛОБЫ</button>
-                <button class="nav-btn" onclick="showSection('media')">📱 МЕДИА</button>
-                <button class="nav-btn" onclick="showSection('applications')">👮 ХЕЛПЕРЫ</button>
-                <a href="admin.html" id="adminLink" class="nav-btn" style="display: none;">⚡ АДМИН</a>
-            </div>
-        </nav>
-
-        <!-- ИНФОРМАЦИОННАЯ ПАНЕЛЬ -->
-        <div class="info-panel">
-            <div class="container">
-                <div class="info-items">
-                    <div class="info-item">
-                        <span class="info-icon">👑</span>
-                        <div class="info-text">
-                            <span class="info-label">НАШ КУРАТОР</span>
-                            <a href="https://t.me/milo4ika1" target="_blank" class="info-link">@milo4ika1</a>
-                            <span class="info-badge telegram">TELEGRAM</span>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-icon">⏳</span>
-                        <div class="info-text">
-                            <span class="info-label">СРОК РАССМОТРЕНИЯ</span>
-                            <span class="info-value">24 ЧАСА</span>
-                            <span class="info-badge">ЗАЯВКИ/ЖАЛОБЫ</span>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-icon">🐛</span>
-                        <div class="info-text">
-                            <span class="info-label">НАШЛИ БАГ?</span>
-                            <a href="https://t.me/milo4ika1" target="_blank" class="info-link">@milo4ika1</a>
-                            <span class="info-badge">НАПИШИТЕ СОЗДАТЕЛЮ ФОРУМА</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ОСНОВНОЙ КОНТЕНТ -->
-        <main class="main">
-            <div class="container">
-                <!-- ПРАВИЛА (все твои правила) -->
-                <div id="rules" class="section active">
-                    <h2 class="section-title">📜 ПРАВИЛА СЕРВЕРА MOONGRIEF</h2>
-                    <div class="rules-scroll">
-                        <div class="rule-block"><h3>⚔️ 1. ОБЩИЕ ПОЛОЖЕНИЯ</h3>
-                            <div class="rule-item"><span class="rule-num">1.1</span><p>Настоящие правила разработаны администратором сервера MoonGrief и действуют на всех существующих игровых режимах.</p></div>
-                            <div class="rule-item"><span class="rule-num">1.2</span><p>Официальные сервера: Moongrief.aurorix.pro. Регистрируясь, вы соглашаетесь с правилами.</p></div>
-                            <div class="rule-item"><span class="rule-num">1.3</span><p>Решения администрации окончательны.</p></div>
-                            <div class="rule-item"><span class="rule-num">1.4</span><p>Администрация не компенсирует потерю ресурсов от технических сбоев.</p></div>
-                            <div class="rule-item"><span class="rule-num">1.5</span><div class="rule-content"><p><strong>❌ ЗАПРЕЩЕНО:</strong></p><ul><li>Продажа/взлом аккаунтов</li><li>Распространение личных данных</li><li>Вред серверу</li></ul><p><span class="punish">⚡ НАКАЗАНИЕ: Бан по IP + Бан аккаунта</span></p></div></div>
-                            <div class="rule-item"><span class="rule-num">1.6</span><p>Уважение к администрации обязательно. <span class="mini-punish">БАН</span></p></div>
-                            <div class="rule-item"><span class="rule-num">1.7</span><p>Администрация может менять правила без уведомления.</p></div>
-                        </div>
-                        <div class="rule-block"><h3>⚔️ 2. АККАУНТ</h3>
-                            <div class="rule-item"><span class="rule-num">2.1</span><p>Никнейм должен соответствовать правилам.</p></div>
-                            <div class="rule-item"><span class="rule-num">2.1.1</span><p>Запрещены ники, похожие на администрацию. <span class="mini-punish">БАН</span></p></div>
-                            <div class="rule-item"><span class="rule-num">2.1.2</span><p>Запрещены оскорбительные ники. <span class="mini-punish">БАН</span></p></div>
-                            <div class="rule-item"><span class="rule-num">2.1.3</span><p>Запрещены ники с названиями читов. <span class="mini-punish">БАН</span></p></div>
-                            <div class="rule-item"><span class="rule-num">2.2</span><p>Сохраняйте чеки после покупки доната.</p></div>
-                        </div>
-                        <div class="rule-block"><h3>⚔️ 3. ДОНАТ</h3>
-                            <div class="rule-item"><span class="rule-num">3.1</span><p>Участие бесплатное.</p></div>
-                            <div class="rule-item"><span class="rule-num">3.2</span><p>Пожертвования добровольны.</p></div>
-                            <div class="rule-item"><span class="rule-num">3.3</span><p>При проблемах с платежом обращайтесь в поддержку.</p></div>
-                            <div class="rule-item"><span class="rule-num">3.4</span><p>Пожертвования не возвращаются.</p></div>
-                            <div class="rule-item"><span class="rule-num">3.5</span><p>Платные группы не дают право нарушать правила.</p></div>
-                        </div>
-                        <div class="rule-block"><h3>⚔️ 4. ЧАТ</h3>
-                            <div class="rule-item"><span class="rule-num">4.1</span><p>Флуд запрещен. <span class="mini-punish">МУТ 2Ч</span></p></div>
-                            <div class="rule-item"><span class="rule-num">4.2</span><p>Обход мута через /bc. <span class="mini-punish">БАН 1Д</span></p></div>
-                            <div class="rule-item"><span class="rule-num">4.3</span><p>CAPS (>50%). <span class="mini-punish">МУТ 2Ч</span></p></div>
-                            <div class="rule-item"><span class="rule-num">4.4</span><p>Оскорбления игроков. <span class="mini-punish">МУТ 2Ч</span></p></div>
-                            <div class="rule-item"><span class="rule-num">4.4.1</span><p>Оскорбления родителей. <span class="mini-punish">МУТ 6Ч</span></p></div>
-                            <div class="rule-item"><span class="rule-num">4.4.2</span><p>Упоминание родителей. <span class="mini-punish">МУТ 3Ч</span></p></div>
-                            <div class="rule-item"><span class="rule-num">4.5</span><p>Призыв к суициду. <span class="mini-punish">МУТ 1Д</span></p></div>
-                            <div class="rule-item"><span class="rule-num">4.6</span><p>Оскорбление проекта. <span class="mini-punish">МУТ 1Д</span></p></div>
-                            <div class="rule-item"><span class="rule-num">4.7</span><p>Попрошайничество у админов (искл: Xchik_, Milfochka_ezka). <span class="mini-punish">МУТ 2Ч</span></p></div>
-                            <div class="rule-item"><span class="rule-num">4.7.1</span><p>Попрошайничество у игроков. <span class="mini-punish">МУТ 1Ч</span></p></div>
-                            <div class="rule-item"><span class="rule-num">4.8</span><p>Дезинформация. <span class="mini-punish">МУТ 1Д</span></p></div>
-                            <div class="rule-item"><span class="rule-num">4.8.1</span><p>Выдача себя за администрацию. <span class="mini-punish">МУТ 1Ч</span></p></div>
-                            <div class="rule-item"><span class="rule-num">4.9</span><p>Упоминание сторонних проектов (искл: пт, бромик, пвп, сатурн). <span class="mini-punish">МУТ 2Ч</span></p></div>
-                            <div class="rule-item"><span class="rule-num">4.9.1</span><p>Реклама сторонних ресурсов. <span class="mini-punish">БАН 14Д</span></p></div>
-                        </div>
-                        <div class="rule-block"><h3>⚔️ 5. ЗАПРЕЩЕННЫЙ СОФТ</h3>
-                            <div class="rule-item"><span class="rule-num">5.2</span><p>Использование читов. <span class="mini-punish">БАН 50Д</span></p></div>
-                            <div class="rule-item"><span class="rule-num">5.2.1</span><p>Признание в читах при проверке. <span class="mini-punish">БАН 40Д</span></p></div>
-                            <div class="rule-item"><span class="rule-num">5.3</span><p>Игра с читерами. <span class="mini-punish">БАН 14Д</span></p></div>
-                        </div>
-                        <div class="rule-block"><h3>⚔️ 6. ИГРОВОЙ ПРОЦЕСС</h3>
-                            <div class="rule-item"><span class="rule-num">6.1</span><p>Лаг-машины. <span class="mini-punish">БАН 7Д</span></p></div>
-                            <div class="rule-item"><span class="rule-num">6.2</span><p>Варп до ловушки <10 блоков. <span class="mini-punish">БАН 1Д + СНОС</span></p></div>
-                            <div class="rule-item"><span class="rule-num">6.2.1</span><p>Закрытый варп без пространства 3x3. <span class="mini-punish">БАН 1Д + СНОС</span></p></div>
-                            <div class="rule-item"><span class="rule-num">6.3</span><p>Спам /spec. <span class="mini-punish">БАН 1Ч</span></p></div>
-                            <div class="rule-item"><span class="rule-num">6.4</span><p>Ложные жалобы. <span class="mini-punish">НАКАЗЫВАЕТСЯ</span></p></div>
-                            <div class="rule-item"><span class="rule-num">6.5</span><p>Ловушки без выхода. <span class="mini-punish">БАН 1Д + СНОС</span></p></div>
-                            <div class="rule-item"><span class="rule-num">6.6</span><p>Блокировка по IP не обжалуется. Связь: @waixzelz (TG)</p></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ЖАЛОБЫ -->
-                <div id="complaints" class="section">
-                    <h2 class="section-title">⚠️ ПОДАТЬ ЖАЛОБУ</h2>
-                    <div class="info-message"><span class="info-message-icon">⏳</span><div class="info-message-text"><strong>СРОК РАССМОТРЕНИЯ: 24 ЧАСА</strong><span>КУРАТОР: @milo4ika1</span></div></div>
-                    <div class="form-container"><h3 class="form-title">📝 НОВАЯ ЖАЛОБА</h3>
-                        <form id="complaintForm" onsubmit="submitComplaint(event)" class="form">
-                            <div class="form-group"><label>ЗАГОЛОВОК</label><input type="text" id="compTitle" placeholder="ВВЕДИТЕ ЗАГОЛОВОК" required class="form-input"></div>
-                            <div class="form-group"><label>НАРУШИТЕЛЬ</label><input type="text" id="compTarget" placeholder="НИК НАРУШИТЕЛЯ" required class="form-input"></div>
-                            <div class="form-group"><label>ОПИСАНИЕ</label><textarea id="compDesc" placeholder="ПОДРОБНО ОПИШИТЕ СИТУАЦИЮ" required class="form-textarea" rows="4"></textarea></div>
-                            <button type="submit" class="submit-btn"><span class="btn-icon">⚠️</span><span class="btn-text">ОТПРАВИТЬ ЖАЛОБУ</span></button>
-                        </form>
-                    </div>
-                    <div class="list-container"><h3 class="list-title">📋 МОИ ЖАЛОБЫ</h3><div id="complaintsList" class="items-list"></div></div>
-                </div>
-
-                <!-- МЕДИА -->
-                <div id="media" class="section">
-                    <h2 class="section-title">📱 АНКЕТА НА МЕДИЮ</h2>
-                    <div class="info-message"><span class="info-message-icon">⏳</span><div class="info-message-text"><strong>СРОК РАССМОТРЕНИЯ: 24 ЧАСА</strong><span>КУРАТОР: @milo4ika1</span></div></div>
-                    <div class="tabs"><button class="tab active" onclick="switchPlatform('tt')">📱 TIKTOK</button><button class="tab" onclick="switchPlatform('yt')">▶️ YOUTUBE</button></div>
-                    <div id="ttForm" class="form-container active"><h3 class="form-title">📱 TIKTOK</h3>
-                        <form onsubmit="submitTT(event)" class="form">
-                            <div class="form-group"><label>ВОЗРАСТ</label><input type="number" id="ttAge" placeholder="ВАШ ВОЗРАСТ" required class="form-input"></div>
-                            <div class="form-group"><label>ИМЯ</label><input type="text" id="ttName" placeholder="ВАШЕ ИМЯ" required class="form-input"></div>
-                            <div class="form-group"><label>ИГРОВОЙ НИК</label><input type="text" id="ttNick" placeholder="НИК В MINECRAFT" required class="form-input"></div>
-                            <div class="form-group"><label>ПОДПИСЧИКИ</label><input type="text" id="ttSubs" placeholder="КОЛИЧЕСТВО" required class="form-input"></div>
-                            <div class="form-group"><label>ССЫЛКА</label><input type="url" id="ttLink" placeholder="https://tiktok.com/..." required class="form-input"></div>
-                            <button type="submit" class="submit-btn"><span class="btn-icon">📱</span><span class="btn-text">ОТПРАВИТЬ</span></button>
-                        </form>
-                    </div>
-                    <div id="ytForm" class="form-container"><h3 class="form-title">▶️ YOUTUBE</h3>
-                        <form onsubmit="submitYT(event)" class="form">
-                            <div class="form-group"><label>ВОЗРАСТ</label><input type="number" id="ytAge" placeholder="ВАШ ВОЗРАСТ" required class="form-input"></div>
-                            <div class="form-group"><label>ИМЯ</label><input type="text" id="ytName" placeholder="ВАШЕ ИМЯ" required class="form-input"></div>
-                            <div class="form-group"><label>ИГРОВОЙ НИК</label><input type="text" id="ytNick" placeholder="НИК В MINECRAFT" required class="form-input"></div>
-                            <div class="form-group"><label>ПОДПИСЧИКИ</label><input type="text" id="ytSubs" placeholder="КОЛИЧЕСТВО" required class="form-input"></div>
-                            <div class="form-group"><label>ССЫЛКА</label><input type="url" id="ytLink" placeholder="https://youtube.com/..." required class="form-input"></div>
-                            <button type="submit" class="submit-btn"><span class="btn-icon">▶️</span><span class="btn-text">ОТПРАВИТЬ</span></button>
-                        </form>
-                    </div>
-                    <div class="list-container"><h3 class="list-title">📋 МОИ АНКЕТЫ</h3><div id="mediaList" class="items-list"></div></div>
-                </div>
-
-                <!-- ХЕЛПЕРЫ -->
-                <div id="applications" class="section">
-                    <h2 class="section-title">👮 АНКЕТА НА ХЕЛПЕРА</h2>
-                    <div class="info-message"><span class="info-message-icon">⏳</span><div class="info-message-text"><strong>СРОК РАССМОТРЕНИЯ: 24 ЧАСА</strong><span>КУРАТОР: @milo4ika1</span></div></div>
-                    <div class="form-container"><h3 class="form-title">👮 НОВАЯ АНКЕТА</h3>
-                        <form onsubmit="submitHelper(event)" class="form">
-                            <div class="form-group"><label>ИГРОВОЙ НИК</label><input type="text" id="helpNick" placeholder="НИК В MINECRAFT" required class="form-input"></div>
-                            <div class="form-group"><label>ИМЯ</label><input type="text" id="helpName" placeholder="ВАШЕ ИМЯ" required class="form-input"></div>
-                            <div class="form-row"><div class="form-group half"><label>ВОЗРАСТ</label><input type="number" id="helpAge" placeholder="ЛЕТ" required class="form-input"></div><div class="form-group half"><label>ЧАСОВОЙ ПОЯС</label><select id="helpTz" required class="form-select"><option value="">ВЫБЕРИТЕ</option><option value="UTC+2">UTC+2</option><option value="UTC+3">UTC+3 (МСК)</option></select></div></div>
-                            <div class="form-group"><label>ОПЫТ</label><textarea id="helpExp" placeholder="ВАШ ОПЫТ" required class="form-textarea" rows="2"></textarea></div>
-                            <div class="form-group"><label>МОТИВАЦИЯ</label><textarea id="helpWhy" placeholder="ПОЧЕМУ ХОТИТЕ СТАТЬ ХЕЛПЕРОМ?" required class="form-textarea" rows="3"></textarea></div>
-                            <button type="submit" class="submit-btn"><span class="btn-icon">👮</span><span class="btn-text">ОТПРАВИТЬ</span></button>
-                        </form>
-                    </div>
-                    <div class="list-container"><h3 class="list-title">📋 МОИ АНКЕТЫ</h3><div id="applicationsList" class="items-list"></div></div>
-                </div>
-            </div>
-        </main>
-
-        <!-- МОДАЛКИ -->
-        <div id="registerModal" class="modal"><div class="modal-content"><span class="close" onclick="closeModal()">✖</span><h2>📝 РЕГИСТРАЦИЯ</h2><input type="text" id="regUser" placeholder="НИК" class="form-input"><input type="password" id="regPass" placeholder="ПАРОЛЬ" class="form-input"><input type="password" id="regPass2" placeholder="ПОВТОРИТЕ" class="form-input"><button onclick="register()" class="submit-btn">📝 ЗАРЕГИСТРИРОВАТЬСЯ</button></div></div>
-        <div id="changePassModal" class="modal"><div class="modal-content"><span class="close" onclick="closeChangePass()">✖</span><h2>🔑 СМЕНА ПАРОЛЯ</h2><input type="password" id="oldPass" placeholder="СТАРЫЙ ПАРОЛЬ" class="form-input"><input type="password" id="newPass" placeholder="НОВЫЙ" class="form-input"><input type="password" id="newPass2" placeholder="ПОВТОРИТЕ" class="form-input"><button onclick="changePassword()" class="submit-btn">🔑 ИЗМЕНИТЬ</button></div></div>
+        
+        <button class="refresh-btn" onclick="checkSite()">
+            <span>🔄</span> ПРОВЕРИТЬ СТАТУС
+        </button>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="db.js"></script>
-    <script src="script.js"></script>
-<!-- BLOCK BLAST - ДРАГ-ЭНД-ДРОП -->
-<div id="blockBlastGame" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 340px; max-width: 90%; background: #1e2a2f; border-radius: 25px; padding: 15px; z-index: 10000; box-shadow: 0 0 40px rgba(0,0,0,0.7); border: 2px solid #ffaa44;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <span style="color: #ffaa44; font-size: 14px;">🔷 BLOCK BLAST</span>
-        <button onclick="closeBlockBlast()" style="background: #ff6b6b; color: white; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer;">✖</button>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 8px;">
-        <span style="color: #ffaa44; font-size: 24px; font-weight: bold;" id="blastScore">0</span>
-    </div>
-    
-    <!-- ПОЛЕ 6x6 -->
-    <div id="blastGrid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; background: #0f1a1f; padding: 8px; border-radius: 12px; margin-bottom: 12px;"></div>
-    
-    <!-- БЛОКИ ДЛЯ ПЕРЕТАСКИВАНИЯ -->
-    <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 12px;">
-        <div id="b1" class="drag-block" draggable="true" style="background: #2a3a3f; border-radius: 10px; padding: 5px;"></div>
-        <div id="b2" class="drag-block" draggable="true" style="background: #2a3a3f; border-radius: 10px; padding: 5px;"></div>
-        <div id="b3" class="drag-block" draggable="true" style="background: #2a3a3f; border-radius: 10px; padding: 5px;"></div>
-    </div>
-    
-    <button onclick="resetBlastGame()" style="width: 100%; background: #ffaa44; color: #1a2a2f; border: none; padding: 8px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 12px;">🔄 НОВАЯ ИГРА</button>
-</div>
-
-<script>
-// BLOCK BLAST - ПРОСТО ПЕРЕТАСКИВАНИЕ
-let grid = Array(6).fill().map(() => Array(6).fill(0));
-let score = 0;
-let blocks = [];
-let clickCount = 0;
-
-// Фигуры
-const shapes = [
-    [[1,1],[1,1]],      // квадрат
-    [[1,1,1]],          // палка 3
-    [[1,1]],            // палка 2
-    [[1,0],[1,1]],      // уголок
-    [[1,1,1,1]],        // палка 4
-    [[1,1,0],[0,1,1]]   // зигзаг
-];
-
-const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#ff9f4a', '#a8e6cf', '#6a9eff'];
-
-// Случайные блоки
-function getBlocks() {
-    let arr = [];
-    let used = [];
-    for(let i = 0; i < 3; i++) {
-        let idx;
-        do { idx = Math.floor(Math.random() * shapes.length); } while(used.includes(idx));
-        used.push(idx);
-        arr.push({ shape: shapes[idx], color: idx % colors.length });
-    }
-    return arr;
-}
-
-// Рисуем поле
-function drawGrid() {
-    const cont = document.getElementById('blastGrid');
-    if(!cont) return;
-    cont.innerHTML = '';
-    for(let i = 0; i < 6; i++) {
-        for(let j = 0; j < 6; j++) {
-            const cell = document.createElement('div');
-            if(grid[i][j] > 0) {
-                cell.style.backgroundColor = colors[grid[i][j]-1];
+    <script>
+        // Таймер обратного отсчета (примерное время до завершения)
+        let seconds = 3600; // 1 час
+        const timerElement = document.getElementById('timer');
+        
+        function updateTimer() {
+            if(seconds > 0) {
+                seconds--;
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                const secs = seconds % 60;
+                timerElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                setTimeout(updateTimer, 1000);
             } else {
-                cell.style.backgroundColor = '#1e2f2f';
-            }
-            cell.style.aspectRatio = '1';
-            cell.style.borderRadius = '5px';
-            cell.style.cursor = 'pointer';
-            cell.setAttribute('data-r', i);
-            cell.setAttribute('data-c', j);
-            
-            // ПРИНИМАЕМ ПЕРЕТАСКИВАНИЕ
-            cell.ondrop = (e) => {
-                e.preventDefault();
-                const blockData = e.dataTransfer.getData('text');
-                if(blockData) {
-                    const idx = parseInt(blockData);
-                    if(idx >= 0 && idx < blocks.length) {
-                        placeBlock(i, j, blocks[idx], idx);
-                    }
-                }
-            };
-            cell.ondragover = (e) => e.preventDefault();
-            
-            // Подсветка при наведении
-            cell.onmouseenter = () => {
-                if(grid[i][j] === 0) cell.style.backgroundColor = '#3a6a6a';
-            };
-            cell.onmouseleave = () => {
-                if(grid[i][j] === 0) cell.style.backgroundColor = '#1e2f2f';
-            };
-            cont.appendChild(cell);
-        }
-    }
-}
-
-// Рисуем блоки (перетаскиваемые)
-function drawBlocks() {
-    for(let i = 0; i < 3; i++) {
-        const div = document.getElementById(`b${i+1}`);
-        if(!div || i >= blocks.length) continue;
-        const b = blocks[i];
-        const sh = b.shape;
-        const rows = sh.length;
-        const cols = Math.max(...sh.map(r => r.length));
-        div.innerHTML = '';
-        div.style.display = 'grid';
-        div.style.gridTemplateColumns = `repeat(${cols}, 28px)`;
-        div.style.gap = '2px';
-        div.style.padding = '5px';
-        
-        for(let r = 0; r < rows; r++) {
-            for(let c = 0; c < cols; c++) {
-                const cell = document.createElement('div');
-                if(sh[r] && sh[r][c]) {
-                    cell.style.backgroundColor = colors[b.color];
-                    cell.style.borderRadius = '4px';
-                    cell.style.width = '28px';
-                    cell.style.height = '28px';
-                } else {
-                    cell.style.width = '28px';
-                    cell.style.height = '28px';
-                    cell.backgroundColor = 'transparent';
-                }
-                div.appendChild(cell);
+                timerElement.textContent = '00:00:00';
             }
         }
         
-        // НАСТРОЙКА ПЕРЕТАСКИВАНИЯ
-        div.setAttribute('draggable', 'true');
-        div.ondragstart = (e) => {
-            e.dataTransfer.setData('text', i);
-            e.dataTransfer.effectAllowed = 'copy';
-            div.style.opacity = '0.5';
-        };
-        div.ondragend = () => {
-            div.style.opacity = '1';
-        };
-        div.style.cursor = 'grab';
-    }
-}
-
-// Можно ли поставить?
-function canPlace(row, col, shape) {
-    for(let i = 0; i < shape.length; i++) {
-        for(let j = 0; j < shape[i].length; j++) {
-            if(shape[i][j]) {
-                let r = row + i, c = col + j;
-                if(r >= 6 || c >= 6 || grid[r][c] !== 0) return false;
-            }
+        updateTimer();
+        
+        // Проверка статуса
+        function checkSite() {
+            const btn = document.querySelector('.refresh-btn');
+            btn.textContent = '🔄 ПРОВЕРКА...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                const status = document.querySelector('.status-text');
+                const originalHtml = status.innerHTML;
+                status.innerHTML = '<span class="status-dot"></span><span>✅ РАБОТЫ ЗАВЕРШАЮТСЯ...</span><span class="status-dot"></span>';
+                
+                setTimeout(() => {
+                    status.innerHTML = originalHtml;
+                    btn.textContent = '🔄 ПРОВЕРИТЬ СТАТУС';
+                    btn.disabled = false;
+                }, 3000);
+            }, 1500);
         }
-    }
-    return true;
-}
-
-// Поставить блок
-function placeBlock(row, col, block, blockIndex) {
-    if(!canPlace(row, col, block.shape)) return;
-    
-    // Ставим блок
-    for(let i = 0; i < block.shape.length; i++) {
-        for(let j = 0; j < block.shape[i].length; j++) {
-            if(block.shape[i][j]) {
-                grid[row + i][col + j] = block.color + 1;
-            }
-        }
-    }
-    
-    // Очки
-    score += block.shape.flat().filter(x => x).length;
-    document.getElementById('blastScore').innerText = score;
-    
-    // Удаляем блок
-    blocks.splice(blockIndex, 1);
-    
-    // Проверяем линии
-    checkLines();
-    
-    // Добавляем новые блоки
-    if(blocks.length === 0) {
-        blocks = getBlocks();
-        if(checkGameOver()) setTimeout(() => alert('💀 ИГРА ОКОНЧЕНА! Счёт: ' + score), 50);
-    }
-    
-    drawGrid();
-    drawBlocks();
-    if(checkGameOver()) setTimeout(() => alert('💀 ИГРА ОКОНЧЕНА! Счёт: ' + score), 50);
-}
-
-// Проверка линий
-function checkLines() {
-    let rows = [];
-    let cols = [];
-    
-    for(let i = 0; i < 6; i++) {
-        let full = true;
-        for(let j = 0; j < 6; j++) if(grid[i][j] === 0) full = false;
-        if(full) rows.push(i);
-    }
-    
-    for(let j = 0; j < 6; j++) {
-        let full = true;
-        for(let i = 0; i < 6; i++) if(grid[i][j] === 0) full = false;
-        if(full) cols.push(j);
-    }
-    
-    if(rows.length > 0 || cols.length > 0) {
-        for(let r of rows) for(let j = 0; j < 6; j++) grid[r][j] = 0;
-        for(let c of cols) for(let i = 0; i < 6; i++) grid[i][c] = 0;
-        score += (rows.length + cols.length) * 15;
-        document.getElementById('blastScore').innerText = score;
-        drawGrid();
-    }
-}
-
-// Проверка конца игры
-function checkGameOver() {
-    for(let b of blocks) {
-        for(let i = 0; i <= 6 - b.shape.length; i++) {
-            for(let j = 0; j <= 6 - b.shape[0].length; j++) {
-                if(canPlace(i, j, b.shape)) return false;
-            }
-        }
-    }
-    return true;
-}
-
-// Сброс
-function resetBlastGame() {
-    grid = Array(6).fill().map(() => Array(6).fill(0));
-    score = 0;
-    blocks = getBlocks();
-    document.getElementById('blastScore').innerText = '0';
-    drawGrid();
-    drawBlocks();
-}
-
-// Открыть/закрыть
-function showBlast() {
-    const game = document.getElementById('blockBlastGame');
-    if(game) {
-        game.style.display = 'block';
-        resetBlastGame();
-    }
-}
-function closeBlockBlast() {
-    document.getElementById('blockBlastGame').style.display = 'none';
-}
-
-// 4 клика по луне
-document.addEventListener('DOMContentLoaded', function() {
-    const moon = document.querySelector('.logo h1');
-    if(moon) {
-        moon.style.cursor = 'pointer';
-        moon.onclick = () => {
-            clickCount++;
-            setTimeout(() => clickCount = 0, 1500);
-            if(clickCount >= 4) { showBlast(); clickCount = 0; }
-        };
-    }
-});
-
-window.openBlast = showBlast;
-</script>
+    </script>
 </body>
 </html>
