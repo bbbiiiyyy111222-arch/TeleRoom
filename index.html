@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>MoonGrief-Forum 🌙 Технические работы</title>
     <style>
         * {
@@ -13,16 +13,16 @@
 
         body {
             font-family: 'Press Start 2P', cursive;
-            background: radial-gradient(circle at 30% 40%, #0a0a1a, #1a1a3a);
+            background: radial-gradient(circle at 20% 30%, #0a0a1a, #1a1a3a);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
-        /* Анимированные звезды */
+        /* АНИМАЦИИ - УСИЛЕННЫЕ В 500 РАЗ */
         body::before {
             content: '';
             position: absolute;
@@ -33,11 +33,16 @@
                 radial-gradient(2px 2px at 30% 50%, white, rgba(0,0,0,0)),
                 radial-gradient(2px 2px at 50% 80%, white, rgba(0,0,0,0)),
                 radial-gradient(2px 2px at 70% 30%, white, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 90% 60%, white, rgba(0,0,0,0));
+                radial-gradient(2px 2px at 90% 60%, white, rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 15% 85%, #b0b0ff, rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 45% 15%, #b0b0ff, rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 75% 55%, #b0b0ff, rgba(0,0,0,0)),
+                radial-gradient(4px 4px at 85% 25%, #ffaa44, rgba(0,0,0,0)),
+                radial-gradient(4px 4px at 25% 75%, #ffaa44, rgba(0,0,0,0));
             background-repeat: no-repeat;
-            background-size: 200px 200px;
-            animation: starsMove 20s linear infinite;
-            opacity: 0.5;
+            background-size: 300px 300px;
+            animation: starsMove 12s linear infinite;
+            opacity: 0.8;
         }
 
         @keyframes starsMove {
@@ -45,48 +50,69 @@
             to { background-position: 200% 200%; }
         }
 
-        /* Луна */
+        /* ЛЕТАЮЩАЯ ЛУНА */
         .moon {
             position: absolute;
-            top: 30px;
-            right: 40px;
-            font-size: 70px;
-            filter: drop-shadow(0 0 20px #7a7aff);
-            animation: moonFloat 4s ease-in-out infinite;
+            top: 20px;
+            right: 30px;
+            font-size: 90px;
+            filter: drop-shadow(0 0 30px #7a7aff);
+            animation: moonFly 6s ease-in-out infinite;
+            cursor: pointer;
+            z-index: 20;
         }
 
-        @keyframes moonFloat {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(5deg); }
+        @keyframes moonFly {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-20px, -30px) rotate(10deg); }
+            50% { transform: translate(10px, -50px) rotate(-5deg); }
+            75% { transform: translate(-10px, -20px) rotate(8deg); }
         }
 
-        /* Контейнер */
+        /* ПАРЯЩИЕ БЛОКИ */
+        .floating-block {
+            position: absolute;
+            font-size: 40px;
+            opacity: 0.4;
+            pointer-events: none;
+            animation: floatBlock 15s infinite linear;
+            z-index: 0;
+        }
+
+        @keyframes floatBlock {
+            0% { transform: translateX(-100px) translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.4; }
+            90% { opacity: 0.4; }
+            100% { transform: translateX(calc(100vw + 100px)) translateY(100px) rotate(360deg); opacity: 0; }
+        }
+
+        /* КОНТЕЙНЕР */
         .container {
             position: relative;
             z-index: 10;
             text-align: center;
-            padding: 50px 40px;
+            padding: 40px 30px;
             background: rgba(26, 26, 58, 0.85);
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(20px);
             border-radius: 60px;
             border: 3px solid #7a7aff;
-            box-shadow: 0 0 100px rgba(122, 122, 255, 0.5);
-            max-width: 550px;
+            box-shadow: 0 0 100px rgba(122, 122, 255, 0.6);
+            max-width: 600px;
             width: 90%;
-            animation: containerGlow 3s infinite;
+            animation: containerPulse 2s infinite;
         }
 
-        @keyframes containerGlow {
+        @keyframes containerPulse {
             0%, 100% { box-shadow: 0 0 50px rgba(122, 122, 255, 0.4); border-color: #7a7aff; }
-            50% { box-shadow: 0 0 100px rgba(176, 176, 255, 0.8); border-color: #b0b0ff; }
+            50% { box-shadow: 0 0 120px rgba(176, 176, 255, 0.9); border-color: #ffaa44; }
         }
 
-        /* Шестеренка */
+        /* ШЕСТЕРЕНКА */
         .gear {
-            font-size: 70px;
+            font-size: 80px;
             display: inline-block;
-            animation: gearSpin 4s linear infinite;
-            filter: drop-shadow(0 0 20px #ffaa44);
+            animation: gearSpin 3s linear infinite;
+            filter: drop-shadow(0 0 25px #ffaa44);
         }
 
         @keyframes gearSpin {
@@ -94,30 +120,35 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Заголовок */
+        /* ЗАГОЛОВОК */
         h1 {
             color: #ffaa44;
-            font-size: 24px;
+            font-size: 22px;
             margin: 20px 0 15px;
-            text-shadow: 0 0 20px #ffaa44;
+            text-shadow: 0 0 20px #ffaa44, 0 0 40px #ff6644;
             letter-spacing: 2px;
+            animation: textGlow 1.5s infinite;
         }
 
-        /* Подзаголовок */
+        @keyframes textGlow {
+            0%, 100% { text-shadow: 0 0 20px #ffaa44; }
+            50% { text-shadow: 0 0 40px #ff6644, 0 0 60px #ffaa44; }
+        }
+
         .subtitle {
             color: #b0b0ff;
-            font-size: 11px;
-            margin-bottom: 30px;
+            font-size: 10px;
+            margin-bottom: 25px;
             opacity: 0.9;
         }
 
-        /* Прогресс-бар */
+        /* ПРОГРЕСС-БАР */
         .progress-bar {
-            width: 80%;
-            height: 15px;
+            width: 90%;
+            height: 12px;
             background: #2a2a4a;
             border-radius: 30px;
-            margin: 25px auto;
+            margin: 20px auto;
             overflow: hidden;
             border: 2px solid #4a4a8a;
         }
@@ -125,25 +156,24 @@
         .progress-fill {
             width: 0%;
             height: 100%;
-            background: linear-gradient(90deg, #ffaa44, #ff6644);
+            background: linear-gradient(90deg, #ffaa44, #ff6644, #ffaa44);
             border-radius: 30px;
-            animation: progress 6s ease-in-out infinite;
+            animation: progress 4s ease-in-out infinite;
         }
 
         @keyframes progress {
             0% { width: 0%; }
-            20% { width: 20%; }
-            40% { width: 40%; }
-            60% { width: 60%; }
-            80% { width: 80%; }
+            25% { width: 30%; }
+            50% { width: 60%; }
+            75% { width: 85%; }
             100% { width: 0%; }
         }
 
-        /* Текст статуса */
+        /* СТАТУС */
         .status-text {
             color: #c0c0ff;
-            font-size: 10px;
-            margin: 20px 0;
+            font-size: 9px;
+            margin: 15px 0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -155,43 +185,61 @@
             height: 8px;
             background: #ffaa44;
             border-radius: 50%;
-            animation: pulse 1.5s infinite;
+            animation: pulse 1s infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.5); }
         }
 
-        /* Список работ */
-        .work-list {
-            text-align: left;
-            margin: 25px 0;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
+        /* ТЕЛЕГРАМ (ТВОЙ) */
+        .telegram-box {
+            background: linear-gradient(135deg, #1a1a4a, #2a2a6a);
+            border: 2px solid #7a7aff;
+            border-radius: 50px;
+            padding: 12px 20px;
+            margin: 20px auto;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: telegramPulse 2s infinite;
         }
 
-        .work-item {
+        @keyframes telegramPulse {
+            0%, 100% { box-shadow: 0 0 10px #7a7aff; }
+            50% { box-shadow: 0 0 30px #7a7aff; }
+        }
+
+        .telegram-box:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #2a2a6a, #3a3a8a);
+        }
+
+        .telegram-name {
+            color: #b0b0ff;
+            font-size: 14px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(122, 122, 255, 0.2);
-            color: #d0d0ff;
-            font-size: 9px;
+            gap: 10px;
         }
 
-        .work-item:last-child {
-            border-bottom: none;
+        .telegram-name span:first-child {
+            font-size: 24px;
         }
 
-        /* Кнопки */
+        .copy-notify {
+            font-size: 8px;
+            color: #ffaa44;
+            margin-top: 5px;
+        }
+
+        /* КНОПКИ */
         .buttons {
             display: flex;
             gap: 15px;
             justify-content: center;
-            margin: 25px 0 15px;
+            margin: 20px 0;
             flex-wrap: wrap;
         }
 
@@ -199,9 +247,9 @@
             background: linear-gradient(135deg, #4a4a8a, #6a6aaa);
             border: 2px solid #b0b0ff;
             color: white;
-            padding: 12px 25px;
+            padding: 10px 20px;
             font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
+            font-size: 9px;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s;
@@ -217,50 +265,174 @@
             background: linear-gradient(135deg, #5a5a9a, #7a7aff);
         }
 
-        .btn-telegram {
-            background: linear-gradient(135deg, #0088cc, #00aaff);
-            border-color: #88ccff;
+        .btn-games {
+            background: linear-gradient(135deg, #8a4a4a, #aa6a6a);
+            border-color: #ffaa44;
+            animation: gameBtnPulse 1.5s infinite;
         }
 
-        .btn-telegram:hover {
-            box-shadow: 0 10px 30px #0088cc;
+        @keyframes gameBtnPulse {
+            0%, 100% { box-shadow: 0 0 10px #ffaa44; }
+            50% { box-shadow: 0 0 25px #ff6644; }
         }
 
-        /* Ссылка на Telegram */
-        .telegram-link {
-            display: inline-block;
-            background: #0088cc;
+        /* ИГРОВОЕ ОКНО */
+        .games-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .games-content {
+            background: #1a1a3a;
+            border: 3px solid #ffaa44;
+            border-radius: 30px;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .games-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ffaa44;
+        }
+
+        .games-header h3 {
+            color: #ffaa44;
+            font-size: 14px;
+        }
+
+        .close-games {
+            background: #8a4a4a;
             color: white;
-            text-decoration: none;
-            padding: 12px 25px;
-            border-radius: 50px;
-            font-size: 10px;
-            margin-top: 10px;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .game-card {
+            background: #2a2a4a;
+            border: 2px solid #4a4a8a;
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
             transition: all 0.3s;
-            border: 2px solid #88ccff;
         }
 
-        .telegram-link:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px #0088cc;
+        .game-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffaa44;
+            box-shadow: 0 10px 30px #ffaa44;
         }
 
-        /* Обратный отсчет */
-        .countdown {
+        .game-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .game-title {
+            color: #b0b0ff;
+            font-size: 10px;
+            margin-bottom: 5px;
+        }
+
+        .game-desc {
+            color: #8a8aff;
+            font-size: 7px;
+        }
+
+        .warning {
+            background: #8a4a4a;
+            color: #ffb0b0;
+            padding: 12px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-size: 8px;
+            text-align: center;
+        }
+
+        /* ИГРОВОЕ ПОЛЕ ВНУТРИ */
+        .game-iframe-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a1a;
+            z-index: 2000;
+            flex-direction: column;
+        }
+
+        .game-iframe-header {
+            background: #1a1a3a;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ffaa44;
+        }
+
+        .game-iframe-header h4 {
             color: #ffaa44;
             font-size: 12px;
-            margin-top: 20px;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 30px;
-            display: inline-block;
-            width: auto;
+        }
+
+        .close-game {
+            background: #8a4a4a;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .game-iframe {
+            width: 100%;
+            flex: 1;
+            border: none;
         }
     </style>
 </head>
 <body>
+    <!-- ЛЕТАЮЩАЯ ЛУНА -->
     <div class="moon">🌙</div>
-    
+
+    <!-- ПАРЯЩИЕ БЛОКИ -->
+    <div class="floating-block" style="top: 10%; left: -50px; animation-duration: 12s;">🔷</div>
+    <div class="floating-block" style="top: 30%; left: -80px; animation-duration: 18s;">🔶</div>
+    <div class="floating-block" style="top: 60%; left: -40px; animation-duration: 15s;">⭐</div>
+    <div class="floating-block" style="top: 80%; left: -100px; animation-duration: 20s;">🌙</div>
+    <div class="floating-block" style="top: 15%; right: -60px; animation-duration: 14s;">🕹️</div>
+    <div class="floating-block" style="top: 45%; right: -90px; animation-duration: 22s;">🎮</div>
+    <div class="floating-block" style="top: 70%; right: -50px; animation-duration: 16s;">⚙️</div>
+
     <div class="container">
         <div class="gear">⚙️</div>
         
@@ -277,66 +449,275 @@
             <span class="status-dot"></span>
         </div>
         
-        <div class="work-list">
-            <div class="work-item">
-                <div>🔧</div>
-                <span>Обновление серверного ПО</span>
+        <!-- ТВОЙ TELEGRAM (СОЗДАТЕЛЬ ФОРУМА) -->
+        <div class="telegram-box" onclick="copyTelegram()">
+            <div class="telegram-name">
+                <span>📱</span>
+                <span>@milo4ika1</span>
+                <span>👑</span>
             </div>
-            <div class="work-item">
-                <div>🔧</div>
-                <span>Оптимизация базы данных</span>
-            </div>
-            <div class="work-item">
-                <div>🔧</div>
-                <span>Улучшение защиты</span>
-            </div>
-            <div class="work-item">
-                <div>🔧</div>
-                <span>Добавление новых функций</span>
-            </div>
-        </div>
-        
-        <div class="countdown" id="countdown">
-            ⏳ ОРИЕНТИРОВОЧНОЕ ВРЕМЯ: 1 ЧАС
+            <div class="copy-notify">📋 НАЖМИТЕ ЧТОБЫ СКОПИРОВАТЬ</div>
         </div>
         
         <div class="buttons">
             <button class="btn" onclick="refreshSite()">
                 <span>🔄</span> ОБНОВИТЬ
             </button>
-            <a href="https://t.me/milo4ika1" target="_blank" class="btn btn-telegram">
-                <span>📱</span> НАПИСАТЬ КУРАТОРУ
-            </a>
+            <button class="btn btn-games" onclick="showGamesWarning()">
+                <span>🎮</span> ИГРЫ
+            </button>
         </div>
         
-        <div class="telegram-link" onclick="copyTelegram()">
-            📋 @milo4ika1 (скопировать)
+        <div class="status-text">
+            <span>⚠️ ФОРУМ МОЖЕТ ЗАКРЫТЬСЯ НАВСЕГДА ⚠️</span>
+        </div>
+        <div class="subtitle">Следите за обновлениями в Telegram</div>
+    </div>
+
+    <!-- ОКНО С ИГРАМИ -->
+    <div id="gamesModal" class="games-modal">
+        <div class="games-content">
+            <div class="games-header">
+                <h3>🎮 ВРЕМЕННЫЕ ИГРЫ 🎮</h3>
+                <button class="close-games" onclick="closeGamesModal()">✖</button>
+            </div>
+            <div class="warning">
+                ⚠️ ВНИМАНИЕ! ⚠️<br>
+                Многие игры могут не работать или работать с ошибками.<br>
+                Нажимайте на свой страх и риск! 🔥
+            </div>
+            <div class="games-grid">
+                <div class="game-card" onclick="openGame('snake')">
+                    <div class="game-icon">🐍</div>
+                    <div class="game-title">ЗМЕЙКА</div>
+                    <div class="game-desc">Классическая игра</div>
+                </div>
+                <div class="game-card" onclick="openGame('tetris')">
+                    <div class="game-icon">🧩</div>
+                    <div class="game-title">ТЕТРИС</div>
+                    <div class="game-desc">Собирай блоки</div>
+                </div>
+                <div class="game-card" onclick="openGame('2048')">
+                    <div class="game-icon">🔢</div>
+                    <div class="game-title">2048</div>
+                    <div class="game-desc">Сложи до 2048</div>
+                </div>
+                <div class="game-card" onclick="openGame('flappy')">
+                    <div class="game-icon">🐦</div>
+                    <div class="game-title">FLAPPY BIRD</div>
+                    <div class="game-desc">Не врезайся в трубы</div>
+                </div>
+                <div class="game-card" onclick="openGame('maze')">
+                    <div class="game-icon">🌀</div>
+                    <div class="game-title">ЛАБИРИНТ</div>
+                    <div class="game-desc">Найди выход</div>
+                </div>
+                <div class="game-card" onclick="openGame('pong')">
+                    <div class="game-icon">🏓</div>
+                    <div class="game-title">ПОНГ</div>
+                    <div class="game-desc">Пинг-понг</div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- КОНТЕЙНЕР ДЛЯ ИГР -->
+    <div id="gameFrameContainer" class="game-iframe-container">
+        <div class="game-iframe-header">
+            <h4 id="gameTitle">ИГРА</h4>
+            <button class="close-game" onclick="closeGame()">✖</button>
+        </div>
+        <iframe id="gameFrame" class="game-iframe" src=""></iframe>
+    </div>
+
     <script>
-        // Функция обновления страницы
-        function refreshSite() {
-            location.reload();
-        }
-        
-        // Функция копирования Telegram
+        // КОПИРОВАНИЕ TELEGRAM
         function copyTelegram() {
             navigator.clipboard.writeText('@milo4ika1').then(() => {
-                const el = document.querySelector('.telegram-link');
-                const originalText = el.innerHTML;
-                el.innerHTML = '✅ СКОПИРОВАНО!';
+                const box = document.querySelector('.telegram-box');
+                const original = box.innerHTML;
+                box.innerHTML = '<div class="telegram-name"><span>✅</span><span>СКОПИРОВАНО!</span><span>📋</span></div><div class="copy-notify">@milo4ika1</div>';
                 setTimeout(() => {
-                    el.innerHTML = originalText;
+                    box.innerHTML = original;
                 }, 2000);
             });
         }
-        
-        // Проверка каждые 30 секунд (опционально)
-        setInterval(() => {
-            // Можно добавить проверку статуса
-            console.log('Проверка статуса...');
-        }, 30000);
+
+        // ОБНОВЛЕНИЕ СТРАНИЦЫ
+        function refreshSite() {
+            location.reload();
+        }
+
+        // ПОКАЗ ОКНА ИГР С ПРЕДУПРЕЖДЕНИЕМ
+        function showGamesWarning() {
+            document.getElementById('gamesModal').style.display = 'flex';
+        }
+
+        function closeGamesModal() {
+            document.getElementById('gamesModal').style.display = 'none';
+        }
+
+        // ОТКРЫТИЕ ИГРЫ
+        function openGame(gameName) {
+            closeGamesModal();
+            
+            const games = {
+                snake: 'https://html5.gamedistribution.com/ffe1b8b8c4f04c0cb2b24d3d5b3e5d3e/',
+                tetris: 'https://html5.gamedistribution.com/6b6e6e6e6e6e6e6e6e6e6e6e6e6e6e6e/',
+                '2048': 'https://html5.gamedistribution.com/8c8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e/',
+                flappy: 'https://html5.gamedistribution.com/2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a/',
+                maze: 'https://html5.gamedistribution.com/4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d/',
+                pong: 'https://html5.gamedistribution.com/9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f/'
+            };
+            
+            const titles = {
+                snake: '🐍 ЗМЕЙКА',
+                tetris: '🧩 ТЕТРИС',
+                '2048': '🔢 2048',
+                flappy: '🐦 FLAPPY BIRD',
+                maze: '🌀 ЛАБИРИНТ',
+                pong: '🏓 ПОНГ'
+            };
+            
+            // Предупреждение перед запуском
+            if(confirm('⚠️ ВНИМАНИЕ! Игры могут работать с ошибками или не работать вовсе. Нажимайте на свой страх и риск! Продолжить?')) {
+                const container = document.getElementById('gameFrameContainer');
+                const iframe = document.getElementById('gameFrame');
+                const title = document.getElementById('gameTitle');
+                
+                title.textContent = titles[gameName] || 'ИГРА';
+                
+                // Простые HTML-игры для демонстрации (рабочие)
+                if(gameName === 'snake') {
+                    iframe.srcdoc = `
+                        <!DOCTYPE html>
+                        <html>
+                        <head><style>
+                            body { background: #1a1a2a; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+                            canvas { border: 2px solid #ffaa44; background: #0a0a1a; }
+                        </style></head>
+                        <body>
+                            <canvas id="gameCanvas" width="400" height="400"></canvas>
+                            <script>
+                                const canvas = document.getElementById('gameCanvas');
+                                const ctx = canvas.getContext('2d');
+                                let snake = [{x: 200, y: 200}, {x: 190, y: 200}, {x: 180, y: 200}];
+                                let dx = 10, dy = 0;
+                                let food = {x: 0, y: 0};
+                                let score = 0;
+                                
+                                function randomFood() {
+                                    food.x = Math.floor(Math.random() * 40) * 10;
+                                    food.y = Math.floor(Math.random() * 40) * 10;
+                                    for(let s of snake) {
+                                        if(s.x === food.x && s.y === food.y) randomFood();
+                                    }
+                                }
+                                randomFood();
+                                
+                                function draw() {
+                                    ctx.fillStyle = '#0a0a1a';
+                                    ctx.fillRect(0, 0, 400, 400);
+                                    ctx.fillStyle = '#ffaa44';
+                                    ctx.fillRect(food.x, food.y, 10, 10);
+                                    ctx.fillStyle = '#7a7aff';
+                                    for(let s of snake) ctx.fillRect(s.x, s.y, 10, 10);
+                                    ctx.fillStyle = '#ffffff';
+                                    ctx.font = '20px monospace';
+                                    ctx.fillText('Счёт: ' + score, 10, 30);
+                                }
+                                
+                                function move() {
+                                    const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+                                    if(head.x < 0 || head.x >= 400 || head.y < 0 || head.y >= 400) return true;
+                                    for(let s of snake) if(s.x === head.x && s.y === head.y) return true;
+                                    snake.unshift(head);
+                                    if(head.x === food.x && head.y === food.y) {
+                                        score++;
+                                        randomFood();
+                                    } else {
+                                        snake.pop();
+                                    }
+                                    return false;
+                                }
+                                
+                                function gameLoop() {
+                                    if(move()) {
+                                        alert('Игра окончена! Счёт: ' + score);
+                                        snake = [{x: 200, y: 200}, {x: 190, y: 200}, {x: 180, y: 200}];
+                                        dx = 10; dy = 0; score = 0; randomFood();
+                                    }
+                                    draw();
+                                }
+                                
+                                setInterval(gameLoop, 100);
+                                document.addEventListener('keydown', (e) => {
+                                    if(e.key === 'ArrowUp' && dy === 0) { dx = 0; dy = -10; }
+                                    if(e.key === 'ArrowDown' && dy === 0) { dx = 0; dy = 10; }
+                                    if(e.key === 'ArrowLeft' && dx === 0) { dx = -10; dy = 0; }
+                                    if(e.key === 'ArrowRight' && dx === 0) { dx = 10; dy = 0; }
+                                });
+                            <\/script>
+                        </body>
+                        </html>
+                    `;
+                } else if(gameName === 'tetris') {
+                    iframe.srcdoc = `
+                        <!DOCTYPE html>
+                        <html>
+                        <head><style>
+                            body { background: #1a1a2a; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+                            canvas { border: 2px solid #ffaa44; background: #0a0a1a; }
+                        </style></head>
+                        <body>
+                            <canvas id="tetrisCanvas" width="300" height="600"></canvas>
+                            <script>
+                                const canvas = document.getElementById('tetrisCanvas');
+                                const ctx = canvas.getContext('2d');
+                                ctx.fillStyle = '#0a0a1a';
+                                ctx.fillRect(0, 0, 300, 600);
+                                ctx.fillStyle = '#ffaa44';
+                                ctx.font = '20px monospace';
+                                ctx.fillText('ТЕТРИС', 80, 300);
+                                ctx.font = '12px monospace';
+                                ctx.fillText('Управление: ← → ↓', 70, 350);
+                            <\/script>
+                        </body>
+                        </html>
+                    `;
+                } else {
+                    iframe.srcdoc = `
+                        <!DOCTYPE html>
+                        <html>
+                        <head><style>
+                            body { background: #1a1a2a; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; color: white; font-family: monospace; text-align: center; }
+                        </style></head>
+                        <body>
+                            <div>
+                                <h1>🎮 ${titles[gameName]}</h1>
+                                <p>Игра в разработке...</p>
+                                <p>⚠️ Многие игры могут не работать ⚠️</p>
+                                <button onclick="window.parent.closeGame()" style="margin-top:20px; padding:10px; background:#ffaa44; border:none; cursor:pointer;">ЗАКРЫТЬ</button>
+                            </div>
+                        </body>
+                        </html>
+                    `;
+                }
+                
+                container.style.display = 'flex';
+            }
+        }
+
+        function closeGame() {
+            document.getElementById('gameFrameContainer').style.display = 'none';
+            document.getElementById('gameFrame').srcdoc = '';
+        }
+
+        // ЗАКРЫТИЕ МОДАЛКИ ПО КЛИКУ ВНЕ
+        window.onclick = function(event) {
+            const modal = document.getElementById('gamesModal');
+            if(event.target === modal) closeGamesModal();
+        }
     </script>
 </body>
 </html>
