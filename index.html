@@ -22,7 +22,6 @@
             overflow-x: hidden;
         }
 
-        /* Звёздный фон */
         body::before {
             content: '';
             position: absolute;
@@ -50,7 +49,6 @@
             to { background-position: 200% 200%; }
         }
 
-        /* Падающие звезды */
         .shooting-star {
             position: absolute;
             width: 2px;
@@ -62,17 +60,10 @@
         }
 
         @keyframes shoot {
-            0% {
-                transform: translateX(0) translateY(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateX(-300px) translateY(300px);
-                opacity: 0;
-            }
+            0% { transform: translateX(0) translateY(0); opacity: 1; }
+            100% { transform: translateX(-300px) translateY(300px); opacity: 0; }
         }
 
-        /* Летающая луна */
         .moon {
             position: absolute;
             top: 30px;
@@ -90,7 +81,6 @@
             75% { transform: translate(-5px, -15px) rotate(5deg); }
         }
 
-        /* Парящие блоки */
         .floating-block {
             position: absolute;
             font-size: 35px;
@@ -107,7 +97,6 @@
             100% { transform: translateX(calc(100vw + 100px)) translateY(80px) rotate(360deg); opacity: 0; }
         }
 
-        /* Контейнер */
         .container {
             position: relative;
             z-index: 10;
@@ -128,7 +117,6 @@
             50% { box-shadow: 0 0 100px rgba(176, 176, 255, 0.8); border-color: #ffaa44; }
         }
 
-        /* Иконка */
         .closed-icon {
             font-size: 80px;
             display: inline-block;
@@ -141,7 +129,6 @@
             50% { transform: scale(1.1); }
         }
 
-        /* Заголовок */
         h1 {
             color: #ffaa44;
             font-size: 28px;
@@ -156,7 +143,6 @@
             50% { text-shadow: 0 0 40px #ff6644, 0 0 60px #ffaa44; }
         }
 
-        /* Подзаголовок */
         .subtitle {
             color: #c0c0ff;
             font-size: 11px;
@@ -165,7 +151,6 @@
             line-height: 1.8;
         }
 
-        /* Разделитель */
         .divider {
             width: 80%;
             height: 2px;
@@ -173,7 +158,6 @@
             margin: 25px auto;
         }
 
-        /* Список воспоминаний */
         .memories {
             text-align: left;
             margin: 25px 0;
@@ -196,7 +180,6 @@
             border-bottom: none;
         }
 
-        /* Telegram блок */
         .telegram-box {
             background: linear-gradient(135deg, #1a1a4a, #2a2a6a);
             border: 2px solid #7a7aff;
@@ -237,7 +220,29 @@
             margin-top: 5px;
         }
 
-        /* Подвал */
+        .archive-btn {
+            background: linear-gradient(135deg, #4a4a8a, #6a6aaa);
+            border: 2px solid #b0b0ff;
+            color: white;
+            padding: 12px 25px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 9px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .archive-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px #7a7aff;
+            background: linear-gradient(135deg, #5a5a9a, #7a7aff);
+        }
+
         .footer {
             margin-top: 30px;
             color: #8a8aff;
@@ -264,17 +269,14 @@
     </style>
 </head>
 <body>
-    <!-- ЛЕТАЮЩАЯ ЛУНА -->
     <div class="moon">🌙</div>
 
-    <!-- ПАДАЮЩИЕ ЗВЕЗДЫ -->
     <div class="shooting-star" style="top: 10%; left: 80%; animation-delay: 0s;"></div>
     <div class="shooting-star" style="top: 30%; left: 70%; animation-delay: 2s;"></div>
     <div class="shooting-star" style="top: 50%; left: 85%; animation-delay: 4s;"></div>
     <div class="shooting-star" style="top: 70%; left: 60%; animation-delay: 1s;"></div>
     <div class="shooting-star" style="top: 20%; left: 90%; animation-delay: 3s;"></div>
 
-    <!-- ПАРЯЩИЕ БЛОКИ -->
     <div class="floating-block" style="top: 10%; left: -50px; animation-duration: 14s;">🔷</div>
     <div class="floating-block" style="top: 30%; left: -80px; animation-duration: 20s;">🔶</div>
     <div class="floating-block" style="top: 60%; left: -40px; animation-duration: 16s;">⭐</div>
@@ -302,7 +304,7 @@
             </div>
             <div class="memory-item">
                 <span>💖</span>
-                <span><strong style="color:#ffaa44">Milfa</strong> — я помню тебя! Ты всегда была с нами</span>
+                <span><strong style="color:#ffaa44">Milfa</strong> — я помню тебя! Ты всегда был с нами</span>
             </div>
             <div class="memory-item">
                 <span>⚡</span>
@@ -320,7 +322,6 @@
         
         <div class="divider"></div>
         
-        <!-- ТВОЙ TELEGRAM -->
         <div class="telegram-box" onclick="copyTelegram()">
             <div class="telegram-name">
                 <span>📱</span>
@@ -329,6 +330,10 @@
             </div>
             <div class="copy-notify">📋 НАЖМИТЕ ЧТОБЫ СКОПИРОВАТЬ</div>
         </div>
+        
+        <a href="archive.html" class="archive-btn">
+            <span>📚</span> АРХИВ ФОРУМА (ТОЛЬКО ПРОСМОТР)
+        </a>
         
         <div class="footer">
             <span class="heart">❤️</span> MoonGrief навсегда в наших сердцах <span class="heart">❤️</span><br>
@@ -341,7 +346,6 @@
     </div>
 
     <script>
-        // Копирование Telegram
         function copyTelegram() {
             navigator.clipboard.writeText('@milo4ika1').then(() => {
                 const box = document.querySelector('.telegram-box');
