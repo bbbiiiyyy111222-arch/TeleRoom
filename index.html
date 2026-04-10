@@ -118,7 +118,7 @@
             border-radius: 60px;
             border: 3px solid #7a7aff;
             box-shadow: 0 0 100px rgba(122, 122, 255, 0.5);
-            max-width: 600px;
+            max-width: 650px;
             width: 90%;
             animation: containerPulse 3s infinite;
         }
@@ -237,30 +237,6 @@
             margin-top: 5px;
         }
 
-        /* Кнопка архива */
-        .archive-btn {
-            background: linear-gradient(135deg, #4a4a8a, #6a6aaa);
-            border: 2px solid #b0b0ff;
-            color: white;
-            padding: 12px 25px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 9px;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 15px;
-        }
-
-        .archive-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px #7a7aff;
-            background: linear-gradient(135deg, #5a5a9a, #7a7aff);
-        }
-
         /* Подвал */
         .footer {
             margin-top: 30px;
@@ -278,6 +254,12 @@
         @keyframes heartBeat {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.2); }
+        }
+
+        .creator-name {
+            color: #ffaa44;
+            font-size: 10px;
+            margin-top: 15px;
         }
     </style>
 </head>
@@ -315,24 +297,24 @@
         
         <div class="memories">
             <div class="memory-item">
+                <span>👑</span>
+                <span>Создатель форума: <strong style="color:#ffaa44">milo4ika1</strong></span>
+            </div>
+            <div class="memory-item">
+                <span>💖</span>
+                <span><strong style="color:#ffaa44">Milfa</strong> — я помню тебя! Ты всегда была с нами</span>
+            </div>
+            <div class="memory-item">
+                <span>⚡</span>
+                <span><strong style="color:#ffaa44">Xchik_</strong> — как в первый раз показал нам этот форум</span>
+            </div>
+            <div class="memory-item">
+                <span>👥</span>
+                <span>Все наши админы: milfa, milk123, Xchik_</span>
+            </div>
+            <div class="memory-item">
                 <span>🌙</span>
-                <span>Мы были лучшим Minecraft-сообществом</span>
-            </div>
-            <div class="memory-item">
-                <span>⭐</span>
-                <span>Тысячи решённых жалоб и проблем</span>
-            </div>
-            <div class="memory-item">
-                <span>🎮</span>
-                <span>Сотни активных игроков каждый день</span>
-            </div>
-            <div class="memory-item">
-                <span>💬</span>
-                <span>Море общения и новых друзей</span>
-            </div>
-            <div class="memory-item">
-                <span>🏆</span>
-                <span>Лучшие хелперы и администраторы</span>
+                <span>MoonGrief навсегда в наших сердцах</span>
             </div>
         </div>
         
@@ -348,13 +330,13 @@
             <div class="copy-notify">📋 НАЖМИТЕ ЧТОБЫ СКОПИРОВАТЬ</div>
         </div>
         
-        <a href="archive.html" class="archive-btn">
-            <span>📚</span> ПОСМОТРЕТЬ АРХИВ ФОРУМА
-        </a>
-        
         <div class="footer">
             <span class="heart">❤️</span> MoonGrief навсегда в наших сердцах <span class="heart">❤️</span><br>
             <span style="font-size: 7px;">2023 - 2026</span>
+        </div>
+        
+        <div class="creator-name">
+            Создатель: @milo4ika1
         </div>
     </div>
 
